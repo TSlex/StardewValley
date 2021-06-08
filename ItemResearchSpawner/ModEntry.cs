@@ -33,7 +33,7 @@ namespace ItemResearchSpawner
 
         private IClickableMenu GetSpawnMenu()
         {
-            return new SpawnMenu();
+            return new SpawnMenu(Monitor);
         }
     }
 }
