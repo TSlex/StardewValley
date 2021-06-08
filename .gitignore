@@ -21,6 +21,9 @@ _ReSharper*/
 
 # Common IntelliJ Platform excludes
 
+**/.idea/**
+**/.idea
+
 # User specific
 **/.idea/**/workspace.xml
 **/.idea/**/tasks.xml
