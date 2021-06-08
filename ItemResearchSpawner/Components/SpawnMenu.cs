@@ -35,13 +35,15 @@ namespace ItemResearchSpawner.Components
         private ClickableComponent _searchBoxArea;
         private ClickableTextureComponent _searchIcon;
 
+        private readonly string[] _availableCategories;
+
         private string _searchText;
         private ItemQuality _quality;
         private ItemSortOption _sortBy;
 
         private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
-        public SpawnMenu(IContentHelper content, IMonitor monitor) : base(
+        public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IMonitor monitor) : base(
             inventory: new List<Item>(),
             reverseGrab: false,
             showReceivingMenu: true,
@@ -56,6 +58,7 @@ namespace ItemResearchSpawner.Components
         {
             _monitor = monitor;
             _baseDraw = RenderHelper.GetBaseDraw(this);
+            _availableCategories = GetDisplayCategories(spawnableItems).ToArray();
 
             _researchTexture = content.Load<Texture2D>("assets/search-button.png");
             _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
@@ -67,6 +70,30 @@ namespace ItemResearchSpawner.Components
             _sortBy = ItemSortOption.Category;
 
             InitializeComponents();
+        }
+
+        private IEnumerable<string> GetDisplayCategories(SpawnableItem[] items)
+        {
+            var categories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var item in items)
+            {
+                if (item.Category.ToLower().Equals("all") || item.Category.ToLower().Equals("misc"))
+                {
+                    continue;
+                }
+
+                categories.Add(item.Category);
+            }
+
+            yield return "all";
+
+            foreach (var category in categories.OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
+            {
+                yield return category;
+            }
+
+            yield return "misc";
         }
 
         private string GetSpaceIndent(SpriteFont font, int width)
@@ -148,8 +175,8 @@ namespace ItemResearchSpawner.Components
 
             _searchIcon = new ClickableTextureComponent(iconBounds, Game1.mouseCursors, iconRect, iconScale);
 
-            // _categoryDropdown = new Dropdown<string>(_sortButton.bounds.Right + 20, _sortButton.bounds.Y,
-            //     Game1.smallFont, categoryDropdown?.Selected ?? I18n.Filter_All(), this.categories, p => p);
+            _categoryDropdown = new Dropdown<string>(_sortButton.bounds.Right + 20, _sortButton.bounds.Y,
+                Game1.smallFont, _categoryDropdown?.Selected ?? "All", _availableCategories, p => p);
         }
 
         private int GetMaxSortLabelWidth(SpriteFont font)

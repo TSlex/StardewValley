@@ -1,0 +1,209 @@
+﻿[
+  {
+    "Label": "filter.equipment-tools",
+    "When": {
+      "ObjCategory": [
+        -19,
+        -21,
+        -22,
+        -99
+      ],
+      "ItemId": [
+        "Object:261",
+        "Object:297",
+        "Object:681",
+        "Object:688",
+        "Object:689",
+        "Object:690"
+      ]
+    },
+    "Except": {
+      "Class": [
+        "StardewValley.Tools.Slingshot"
+      ]
+    }
+  },
+  {
+    "Label": "filter.equipment-weapons",
+    "When": {
+      "ObjCategory": [
+        -98
+      ],
+      "Class": [
+        "StardewValley.Tools.Slingshot"
+      ],
+      "ItemId": [
+        "Object:286",
+        "Object:287",
+        "Object:288",
+        "Object:441"
+      ]
+    }
+  },
+  {
+    "Label": "filter.equipment-hats",
+    "When": {
+      "ObjCategory": [
+        -95
+      ]
+    }
+  },
+  {
+    "Label": "filter.equipment-clothes",
+    "When": {
+      "ObjCategory": [
+        -100
+      ]
+    }
+  },
+  {
+    "Label": "filter.equipment-boots",
+    "When": {
+      "ObjCategory": [
+        -97
+      ]
+    }
+  },
+  {
+    "Label": "filter.equipment-rings",
+    "When": {
+      "ObjCategory": [
+        -96
+      ]
+    }
+  },
+  {
+    "Label": "filter.farm-crops",
+    "When": {
+      "ObjCategory": [
+        -75,
+        -79,
+        -80,
+        -81
+      ],
+      "ItemId": [
+        "Object:417"
+      ]
+    }
+  },
+  {
+    "Label": "filter.farm-seeds",
+    "When": {
+      "ObjCategory": [
+        -74
+      ]
+    }
+  },
+  {
+    "Label": "filter.farm-animal-drops",
+    "When": {
+      "ObjCategory": [
+        -5,
+        -6,
+        -14,
+        -17,
+        -18,
+        -28
+      ],
+      "ItemId": [
+        "Object:413",
+        "Object:437",
+        "Object:439",
+        "Object:680"
+      ]
+    }
+  },
+  {
+    "Label": "filter.fish",
+    "When": {
+      "ObjCategory": [
+        -4,
+        -23
+      ],
+      "ObjType": [
+        "Fish"
+      ]
+    },
+    "Except": {
+      "ObjCategory": [
+        -20
+      ]
+    }
+  },
+  {
+    "Label": "filter.minerals-and-artifacts",
+    "When": {
+      "ObjCategory": [
+        -2,
+        -12
+      ],
+      "ObjType": [
+        "Arch"
+      ],
+      "ItemId": [
+        "Object:535",
+        "Object:536",
+        "Object:537",
+        "Object:749"
+      ]
+    }
+  },
+  {
+    "Label": "filter.crafting.resources",
+    "When": {
+      "ObjCategory": [
+        -15,
+        -16
+      ]
+    }
+  },
+  {
+    "Label": "filter.crafting.products",
+    "When": {
+      "ObjCategory": [
+        -8,
+        -9
+      ],
+      "ItemId": [
+        "Object:710",
+        "Object:463",
+        "Object:464"
+      ]
+    }
+  },
+  {
+    "Label": "filter.artisan-and-cooking",
+    "When": {
+      "ObjCategory": [
+        -7,
+        -25,
+        -26,
+        -27
+      ],
+      "ItemId": [
+        "Object:245",
+        "Object:246",
+        "Object:247",
+        "Object:403",
+        "Object:419",
+        "Object:423"
+      ]
+    }
+  },
+  {
+    "Label": "filter.decor.furniture",
+    "When": {
+      "Class": [
+        "StardewValley.Objects.Furniture"
+      ]
+    }
+  },
+  {
+    "Label": "filter.decor.other",
+    "When": {
+      "ObjCategory": [
+        -24
+      ]
+    }
+  }
+]
