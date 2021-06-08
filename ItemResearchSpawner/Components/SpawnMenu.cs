@@ -16,13 +16,14 @@ namespace ItemResearchSpawner.Components
     {
         private readonly IMonitor _monitor;
         private readonly Action<SpriteBatch> _baseDraw;
+        private readonly IContentHelper _content;
 
-        private readonly Texture2D _researchTexture;
+        // private readonly Texture2D _researchTexture;
         private readonly Texture2D _sortTexture;
         private readonly Texture2D _emptyQualityTexture;
 
-        private ClickableComponent _researchArea;
-        private ClickableTextureComponent _researchButton;
+        // private ClickableComponent _researchArea;
+        // private ClickableTextureComponent _researchButton;
         private ClickableComponent _qualityButton;
         private ClickableComponent _sortButton;
         private ClickableTextureComponent _sortIcon;
@@ -43,6 +44,12 @@ namespace ItemResearchSpawner.Components
 
         private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
+        private ItemResearchArea _researchArea;
+        private ItemQualitySelectorTab _qualitySelector;
+        private ItemSortTab _itemSortTab;
+        private ItemCategorySelectorTab _categorySelector;
+        private ItemSearchBarTab _searchBarTab;
+
         public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IMonitor monitor) : base(
             inventory: new List<Item>(),
             reverseGrab: false,
@@ -57,10 +64,11 @@ namespace ItemResearchSpawner.Components
         )
         {
             _monitor = monitor;
+            _content = content;
             _baseDraw = RenderHelper.GetBaseDraw(this);
             _availableCategories = GetDisplayCategories(spawnableItems).ToArray();
-
-            _researchTexture = content.Load<Texture2D>("assets/search-button.png");
+            
+            // _researchTexture = content.Load<Texture2D>("assets/search-button.png");
             _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
             _sortLabelIndent = GetSpaceIndent(Game1.smallFont, _sortTexture.Width) + " ";
             _emptyQualityTexture = content.Load<Texture2D>("assets/empty-quality-icon.png");
@@ -121,16 +129,18 @@ namespace ItemResearchSpawner.Components
 
             var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
 
-            _researchArea =
-                new ClickableComponent(
-                    new Rectangle(sideRightAnchor, sideTopAnchor, Game1.tileSize + 60, Game1.tileSize + 50), "");
+            _researchArea = new ItemResearchArea(_content, sideRightAnchor, sideTopAnchor);
 
-            _researchButton = new ClickableTextureComponent(
-                new Rectangle(
-                    (int) (sideRightAnchor + (_researchArea.bounds.Width + 32) / 2f - _researchTexture.Width / 2f),
-                    _researchArea.bounds.Height + 48 + sideTopAnchor, _researchTexture.Width,
-                    _researchTexture.Height), _researchTexture,
-                new Rectangle(0, 0, _researchTexture.Width, _researchTexture.Height), 1f);
+            // _researchArea =
+            //     new ClickableComponent(
+            //         new Rectangle(sideRightAnchor, sideTopAnchor, Game1.tileSize + 60, Game1.tileSize + 50), "");
+            //
+            // _researchButton = new ClickableTextureComponent(
+            //     new Rectangle(
+            //         (int) (sideRightAnchor + (_researchArea.bounds.Width + 32) / 2f - _researchTexture.Width / 2f),
+            //         _researchArea.bounds.Height + 48 + sideTopAnchor, _researchTexture.Width,
+            //         _researchTexture.Height), _researchTexture,
+            //     new Rectangle(0, 0, _researchTexture.Width, _researchTexture.Height), 1f);
 
             _qualityButton =
                 new ClickableComponent(
@@ -213,7 +223,10 @@ namespace ItemResearchSpawner.Components
         {
             _baseDraw(spriteBatch);
 
-            DrawResearchArea(spriteBatch);
+            // DrawResearchArea(spriteBatch);
+            
+            _researchArea.Draw(spriteBatch);
+            
             DrawQualityButton(spriteBatch);
 
             DrawSearchBox(spriteBatch);
@@ -225,25 +238,25 @@ namespace ItemResearchSpawner.Components
             drawMouse(spriteBatch);
         }
 
-        private void DrawResearchArea(SpriteBatch spriteBatch)
-        {
-            RenderHelper.DrawMenuBox(_researchArea.bounds.X, _researchArea.bounds.Y,
-                _researchArea.bounds.Width, _researchArea.bounds.Height, out var areaInnerAnchors);
-
-            var researchItemCellX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f - Game1.tileSize / 2f;
-            RenderHelper.DrawItemBox((int) researchItemCellX, (int) areaInnerAnchors.Y + 10, Game1.tileSize,
-                Game1.tileSize,
-                out _);
-
-            const string researchProgressString = "(0 / 20)";
-            var progressFont = Game1.dialogueFont;
-            var progressPositionX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f -
-                                    progressFont.MeasureString(researchProgressString).X / 2f;
-            spriteBatch.DrawString(progressFont, researchProgressString,
-                new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
-
-            spriteBatch.Draw(_researchButton.texture, _researchButton.bounds, _researchButton.sourceRect, Color.White);
-        }
+        // private void DrawResearchArea(SpriteBatch spriteBatch)
+        // {
+        //     RenderHelper.DrawMenuBox(_researchArea.bounds.X, _researchArea.bounds.Y,
+        //         _researchArea.bounds.Width, _researchArea.bounds.Height, out var areaInnerAnchors);
+        //
+        //     var researchItemCellX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f - Game1.tileSize / 2f;
+        //     RenderHelper.DrawItemBox((int) researchItemCellX, (int) areaInnerAnchors.Y + 10, Game1.tileSize,
+        //         Game1.tileSize,
+        //         out _);
+        //
+        //     const string researchProgressString = "(0 / 20)";
+        //     var progressFont = Game1.dialogueFont;
+        //     var progressPositionX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f -
+        //                             progressFont.MeasureString(researchProgressString).X / 2f;
+        //     spriteBatch.DrawString(progressFont, researchProgressString,
+        //         new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
+        //
+        //     spriteBatch.Draw(_researchButton.texture, _researchButton.bounds, _researchButton.sourceRect, Color.White);
+        // }
 
         private void DrawQualityButton(SpriteBatch spriteBatch)
         {

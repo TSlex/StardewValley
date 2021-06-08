@@ -59,6 +59,11 @@ namespace ItemResearchSpawner.Utils
             innerDrawPosition = new Vector2(x, y);
         }
 
+        public static int GetChildCenterPosition(int pos, int parentLenght, int childLenght)
+        {
+            return (int) (pos + parentLenght / 2f - childLenght / 2f);
+        }
+
         public static Action<SpriteBatch> GetBaseDraw(object instance)
         {
             var method =
