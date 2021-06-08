@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Reflection;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -10,13 +13,13 @@ namespace ItemResearchSpawner.Utils
         {
             var spriteBatch = Game1.spriteBatch;
 
-            var outerWidth = innerWidth + Constants.BorderWidth * 2;
-            var outerHeight = innerHeight + Constants.BorderWidth * 2;
+            var outerWidth = innerWidth + UIConstants.BorderWidth * 2;
+            var outerHeight = innerHeight + UIConstants.BorderWidth * 2;
 
             IClickableMenu.drawTextureBox(
                 spriteBatch,
-                Game1.menuTexture,
-                TextureRects.MenuSmallBorder,
+                MenuSprites.SpriteMap,
+                MenuSprites.MenuSmallBorder,
                 x,
                 y,
                 outerWidth,
@@ -25,7 +28,7 @@ namespace ItemResearchSpawner.Utils
                 1, 
                 false);
 
-            innerDrawPosition = new Vector2(x + Constants.BorderWidth, y + Constants.BorderWidth);
+            innerDrawPosition = new Vector2(x + UIConstants.BorderWidth, y + UIConstants.BorderWidth);
         }
         
         public static void DrawItemBox(int x, int y, int innerWidth, int innerHeight, out Vector2 innerDrawPosition)
@@ -34,8 +37,8 @@ namespace ItemResearchSpawner.Utils
             
             IClickableMenu.drawTextureBox(
                 spriteBatch,
-                Game1.menuTexture,
-                TextureRects.ItemCell,
+                MenuSprites.SpriteMap,
+                MenuSprites.ItemCell,
                 x,
                 y,
                 innerWidth,
@@ -45,6 +48,19 @@ namespace ItemResearchSpawner.Utils
                 false);
 
             innerDrawPosition = new Vector2(x, y);
+        }
+        
+        public static Action<SpriteBatch> GetBaseDraw(object instance)
+        {
+            var method =
+                typeof(ItemGrabMenu).GetMethod("draw", BindingFlags.Instance | BindingFlags.Public, null,
+                    new[] {typeof(SpriteBatch)}, null) ??
+                throw new InvalidOperationException(
+                    $"Can't find {nameof(ItemGrabMenu)}.{nameof(ItemGrabMenu.draw)} method.");
+
+            var pointer = method.MethodHandle.GetFunctionPointer();
+
+            return (Action<SpriteBatch>) Activator.CreateInstance(typeof(Action<SpriteBatch>), instance, pointer);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace ItemResearchSpawner.Utils
 {
-    public static class Constants
+    public static class UIConstants
     {
         public const int BorderWidth = 4 * Game1.pixelZoom;
     }

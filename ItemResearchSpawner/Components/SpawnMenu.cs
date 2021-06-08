@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,12 +16,29 @@ namespace ItemResearchSpawner.Components
         private readonly IMonitor _monitor;
         private readonly Action<SpriteBatch> _baseDraw;
 
+        private readonly Texture2D _researchTexture;
+        private readonly Texture2D _sortTexture;
+        private readonly Texture2D _emptyQualityTexture;
+
         private ClickableComponent _researchArea;
-        private ClickableComponent _researchButton;
+        private ClickableTextureComponent _researchButton;
+        private ClickableComponent _qualityButton;
+        private ClickableComponent _sortButton;
+        private ClickableTextureComponent _sortIcon;
+
+        private Dropdown<string> _categoryDropdown;
+
+        private TextBox _searchBox;
+        private Rectangle _searchBoxBounds;
+        private ClickableComponent _searchBoxArea;
+        private ClickableTextureComponent _searchIcon;
+
+        private string _searchText;
+        private ItemQuality _quality;
 
         private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
-        public SpawnMenu(IMonitor monitor) : base(
+        public SpawnMenu(IContentHelper content, IMonitor monitor) : base(
             inventory: new List<Item>(),
             reverseGrab: false,
             showReceivingMenu: true,
@@ -36,7 +53,14 @@ namespace ItemResearchSpawner.Components
         {
             _monitor = monitor;
 
-            _baseDraw = GetBaseDraw();
+            _baseDraw = RenderHelper.GetBaseDraw(this);
+
+            _researchTexture = content.Load<Texture2D>("assets/search-button.png");
+            _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
+            _emptyQualityTexture = content.Load<Texture2D>("assets/empty-quality-icon.png");
+
+            _quality = ItemQuality.Iridium;
+            _searchText = "Pumpkin";
 
             InitializeComponents();
         }
@@ -51,30 +75,66 @@ namespace ItemResearchSpawner.Components
             var sideTopAnchor = rootTopAnchor;
             var sideRightAnchor = rootRightAnchor;
 
+            var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
+
             _researchArea =
                 new ClickableComponent(
                     new Rectangle(sideRightAnchor, sideTopAnchor, Game1.tileSize + 60, Game1.tileSize + 50), "");
+
+            _researchButton = new ClickableTextureComponent(
+                new Rectangle(
+                    (int) (sideRightAnchor + (_researchArea.bounds.Width + 32) / 2f - _researchTexture.Width / 2f),
+                    _researchArea.bounds.Height + 48 + sideTopAnchor, _researchTexture.Width,
+                    _researchTexture.Height), _researchTexture,
+                new Rectangle(0, 0, _researchTexture.Width, _researchTexture.Height), 1f);
+
+            _qualityButton =
+                new ClickableComponent(
+                    new Rectangle(rootLeftAnchor - 8, barTopAnchor, 36 + UIConstants.BorderWidth,
+                        36 + UIConstants.BorderWidth - 2), "");
+
+            _sortButton =
+                new ClickableComponent(
+                    new Rectangle(_qualityButton.bounds.Right + 20, rootTopAnchor,
+                        50 + UIConstants.BorderWidth, Game1.tileSize), "");
+
+            _sortIcon = new ClickableTextureComponent(
+                new Rectangle(_sortButton.bounds.X + UIConstants.BorderWidth,
+                    rootTopAnchor + UIConstants.BorderWidth, _sortTexture.Width, Game1.tileSize), _sortTexture,
+                new Rectangle(0, 0, _sortTexture.Width, _sortTexture.Height), 1f);
+
+            _searchBox = new TextBox(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont,
+                Game1.textColor)
+            {
+                X = rootRightAnchor - 52,
+                Y = barTopAnchor,
+                Height = 0,
+                Width = 200,
+                Text = _searchText
+            };
+
+            _searchBoxBounds = new Rectangle(_searchBox.X, _searchBox.Y + 4, _searchBox.Width, 12 * Game1.pixelZoom);
+
+            _searchBoxArea =
+                new ClickableComponent(
+                    new Rectangle(_searchBoxBounds.X, _searchBoxBounds.Y, _searchBoxBounds.Width,
+                        _searchBoxBounds.Height), "");
+
+            var iconRect = new Rectangle(80, 0, 13, 13);
+            const float iconScale = 2.5f;
+
+            var iconBounds = new Rectangle((int) (_searchBoxBounds.Right - iconRect.Width * iconScale),
+                (int) (_searchBoxBounds.Center.Y - iconRect.Height / 2f * iconScale),
+                (int) (iconRect.Width * iconScale), (int) (iconRect.Height * iconScale)
+            );
+
+            _searchIcon = new ClickableTextureComponent(iconBounds, Game1.mouseCursors, iconRect, iconScale);
+
+            // _categoryDropdown = new Dropdown<string>(_sortButton.bounds.Right + 20, _sortButton.bounds.Y,
+            //     Game1.smallFont, categoryDropdown?.Selected ?? I18n.Filter_All(), this.categories, p => p);
         }
 
         #region InputHandlers
-
-        public override void receiveLeftClick(int x, int y, bool playSound = true)
-        {
-            if (trashCan.containsPoint(x, y) && heldItem != null)
-            {
-                Utility.trashItem(heldItem);
-                heldItem = null;
-            }
-            else
-            {
-                base.receiveLeftClick(x, y, playSound);
-            }
-        }
-
-        public override void receiveRightClick(int x, int y, bool playSound = true)
-        {
-            base.receiveRightClick(x, y, playSound);
-        }
 
         #endregion
 
@@ -83,38 +143,96 @@ namespace ItemResearchSpawner.Components
         public override void draw(SpriteBatch spriteBatch)
         {
             _baseDraw(spriteBatch);
-            
-            // draw research area
+
+            DrawResearchArea(spriteBatch);
+            DrawQualityButton(spriteBatch);
+
+            DrawSearchBox(spriteBatch);
+            DrawSortBox(spriteBatch);
+            DrawCategoryDropdown(spriteBatch);
+
+            //TODO: draw held item
+
+            drawMouse(spriteBatch);
+        }
+
+        private void DrawResearchArea(SpriteBatch spriteBatch)
+        {
             RenderHelper.DrawMenuBox(_researchArea.bounds.X, _researchArea.bounds.Y,
                 _researchArea.bounds.Width, _researchArea.bounds.Height, out var areaInnerAnchors);
 
             var researchItemCellX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f - Game1.tileSize / 2f;
-            RenderHelper.DrawItemBox((int) researchItemCellX, (int) areaInnerAnchors.Y + 10, Game1.tileSize, Game1.tileSize,
+            RenderHelper.DrawItemBox((int) researchItemCellX, (int) areaInnerAnchors.Y + 10, Game1.tileSize,
+                Game1.tileSize,
                 out _);
 
-            const string researchProgressString = "( 0 / 20 )";
+            const string researchProgressString = "(0 / 20)";
             var progressFont = Game1.dialogueFont;
-            var progressPositionX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f - progressFont.MeasureString(researchProgressString).X / 2f;
-            spriteBatch.DrawString(progressFont, researchProgressString, new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
-            
-            //TODO: draw held item
-            
-            drawMouse(spriteBatch);
+            var progressPositionX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f -
+                                    progressFont.MeasureString(researchProgressString).X / 2f;
+            spriteBatch.DrawString(progressFont, researchProgressString,
+                new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
+
+            spriteBatch.Draw(_researchButton.texture, _researchButton.bounds, _researchButton.sourceRect, Color.White);
+        }
+
+        private void DrawQualityButton(SpriteBatch spriteBatch)
+        {
+            GetCurrentQualityIcon(out var texture, out var sourceRect, out var color);
+
+            RenderHelper.DrawMenuBox(_qualityButton.bounds.X, _qualityButton.bounds.Y,
+                _qualityButton.bounds.Width - UIConstants.BorderWidth,
+                _qualityButton.bounds.Height - UIConstants.BorderWidth, out var qualityIconPos);
+
+            spriteBatch.Draw(texture, new Vector2(qualityIconPos.X, qualityIconPos.Y), sourceRect, color, 0,
+                Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f);
+        }
+
+        private void DrawSearchBox(SpriteBatch spriteBatch)
+        {
+            RenderHelper.DrawMenuBox(_searchBoxBounds.X, _searchBoxBounds.Y - UIConstants.BorderWidth / 2,
+                _searchBoxBounds.Width - UIConstants.BorderWidth * 3 / 2,
+                _searchBoxBounds.Height - UIConstants.BorderWidth, out _);
+
+            _searchBox.Draw(spriteBatch);
+            spriteBatch.Draw(_searchIcon.texture, _searchIcon.bounds, _searchIcon.sourceRect, Color.White);
+        }
+
+        private void GetCurrentQualityIcon(out Texture2D texture, out Rectangle sourceRect, out Color color)
+        {
+            texture = Game1.mouseCursors;
+            color = Color.White;
+
+            switch (_quality)
+            {
+                case ItemQuality.Normal:
+                    texture = _emptyQualityTexture;
+                    sourceRect = new Rectangle(0, 0, texture.Width, texture.Height);
+                    color *= 0.65f;
+                    break;
+
+                case ItemQuality.Silver:
+                    sourceRect = CursorSprites.SilverStarQuality;
+                    break;
+
+                case ItemQuality.Gold:
+                    sourceRect = CursorSprites.GoldStarQuality;
+                    break;
+
+                default:
+                    sourceRect = CursorSprites.IridiumStarQuality;
+                    break;
+            }
+        }
+
+        private void DrawSortBox(SpriteBatch spriteBatch)
+        {
+        }
+
+        private void DrawCategoryDropdown(SpriteBatch spriteBatch)
+        {
         }
 
         #endregion
-
-        private Action<SpriteBatch> GetBaseDraw()
-        {
-            var method =
-                typeof(ItemGrabMenu).GetMethod("draw", BindingFlags.Instance | BindingFlags.Public, null,
-                    new[] {typeof(SpriteBatch)}, null) ??
-                throw new InvalidOperationException(
-                    $"Can't find {nameof(ItemGrabMenu)}.{nameof(ItemGrabMenu.draw)} method.");
-
-            var pointer = method.MethodHandle.GetFunctionPointer();
-
-            return (Action<SpriteBatch>) Activator.CreateInstance(typeof(Action<SpriteBatch>), this, pointer);
-        }
     }
 }
