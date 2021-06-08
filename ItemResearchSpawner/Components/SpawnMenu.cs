@@ -177,6 +177,8 @@ namespace ItemResearchSpawner.Components
 
             _categoryDropdown = new Dropdown<string>(_sortButton.bounds.Right + 20, _sortButton.bounds.Y,
                 Game1.smallFont, _categoryDropdown?.Selected ?? "All", _availableCategories, p => p);
+
+            _categoryDropdown.IsExpanded = true;
         }
 
         private int GetMaxSortLabelWidth(SpriteFont font)
@@ -290,6 +292,25 @@ namespace ItemResearchSpawner.Components
 
         private void DrawCategoryDropdown(SpriteBatch spriteBatch)
         {
+            var position = new Vector2(
+                x: _categoryDropdown.bounds.X + _categoryDropdown.bounds.Width - 12,
+                y: _categoryDropdown.bounds.Y + 8
+            );
+
+            var sourceRect = CursorSprites.DropdownButton;
+            
+            spriteBatch.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
+                SpriteEffects.None, 1f);
+
+            if (_categoryDropdown.IsExpanded)
+            {
+                spriteBatch.Draw(Game1.mouseCursors,
+                    new Vector2(position.X + 2 * Game1.pixelZoom, position.Y + 3 * Game1.pixelZoom),
+                    new Rectangle(sourceRect.X + 2, sourceRect.Y + 3, 5, 6), Color.White, 0, Vector2.Zero,
+                    Game1.pixelZoom, SpriteEffects.FlipVertically, 1f);
+            }
+
+            _categoryDropdown.Draw(spriteBatch);
         }
 
         private void DrawSearchBox(SpriteBatch spriteBatch)

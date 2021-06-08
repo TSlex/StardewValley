@@ -15,8 +15,11 @@ namespace ItemResearchSpawner.Utils
         public static readonly Rectangle InactiveBackground = new Rectangle(269, 258, 4, 4);
         public static readonly Rectangle HoverBackground = new Rectangle(161, 340, 4, 4);
 
+        // stars
         public static readonly Rectangle SilverStarQuality = new Rectangle(338, 400, 8, 8);
         public static readonly Rectangle GoldStarQuality = new Rectangle(346, 400, 8, 8);
         public static readonly Rectangle IridiumStarQuality = new Rectangle(346, 392, 8, 8);
+        
+        public static readonly Rectangle DropdownButton = new Rectangle(437, 450, 10, 11);
     }
 }

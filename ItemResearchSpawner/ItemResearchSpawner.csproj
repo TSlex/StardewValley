@@ -44,13 +44,18 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Components\Dropdown.cs" />
-        <Compile Include="Components\DropdownList.cs" />
+        <Compile Include="Components\Helpers\Dropdown.cs" />
+        <Compile Include="Components\Helpers\DropdownList.cs" />
+        <Compile Include="Components\ItemCategorySelectorTab.cs" />
+        <Compile Include="Components\ItemQualitySelectorTab.cs" />
+        <Compile Include="Components\ItemResearchArea.cs" />
+        <Compile Include="Components\ItemSearchBarTab.cs" />
+        <Compile Include="Components\ItemSortTab.cs" />
         <Compile Include="Components\SpawnMenu.cs" />
-        <Compile Include="Models\ItemQuality.cs" />
+        <Compile Include="Models\Enums\ItemQuality.cs" />
+        <Compile Include="Models\Enums\ItemSortOption.cs" />
+        <Compile Include="Models\Enums\ItemType.cs" />
         <Compile Include="Models\ItemRepository.cs" />
-        <Compile Include="Models\ItemSortOption.cs" />
-        <Compile Include="Models\ItemType.cs" />
         <Compile Include="Models\ModConfig.cs" />
         <Compile Include="Models\ModDataCategory.cs" />
         <Compile Include="Models\ModDataCategoryRule.cs" />
