@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
@@ -25,6 +26,7 @@ namespace ItemResearchSpawner.Components
         private ClickableComponent _qualityButton;
         private ClickableComponent _sortButton;
         private ClickableTextureComponent _sortIcon;
+        private string _sortLabelIndent;
 
         private Dropdown<string> _categoryDropdown;
 
@@ -35,6 +37,7 @@ namespace ItemResearchSpawner.Components
 
         private string _searchText;
         private ItemQuality _quality;
+        private ItemSortOption _sortBy;
 
         private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
@@ -52,17 +55,31 @@ namespace ItemResearchSpawner.Components
         )
         {
             _monitor = monitor;
-
             _baseDraw = RenderHelper.GetBaseDraw(this);
 
             _researchTexture = content.Load<Texture2D>("assets/search-button.png");
             _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
+            _sortLabelIndent = GetSpaceIndent(Game1.smallFont, _sortTexture.Width) + " ";
             _emptyQualityTexture = content.Load<Texture2D>("assets/empty-quality-icon.png");
 
             _quality = ItemQuality.Iridium;
             _searchText = "Pumpkin";
+            _sortBy = ItemSortOption.Category;
 
             InitializeComponents();
+        }
+
+        private string GetSpaceIndent(SpriteFont font, int width)
+        {
+            if (width <= 0)
+                return "";
+
+            var indent = " ";
+
+            while (font.MeasureString(indent).X < width)
+                indent += " ";
+
+            return indent;
         }
 
         private void InitializeComponents()
@@ -95,12 +112,13 @@ namespace ItemResearchSpawner.Components
 
             _sortButton =
                 new ClickableComponent(
-                    new Rectangle(_qualityButton.bounds.Right + 20, rootTopAnchor,
-                        50 + UIConstants.BorderWidth, Game1.tileSize), "");
+                    new Rectangle(_qualityButton.bounds.Right + 20, barTopAnchor,
+                        GetMaxSortLabelWidth(Game1.smallFont) + UIConstants.BorderWidth, Game1.tileSize),
+                    GetSortLabel(_sortBy));
 
             _sortIcon = new ClickableTextureComponent(
                 new Rectangle(_sortButton.bounds.X + UIConstants.BorderWidth,
-                    rootTopAnchor + UIConstants.BorderWidth, _sortTexture.Width, Game1.tileSize), _sortTexture,
+                    barTopAnchor + UIConstants.BorderWidth, _sortTexture.Width, Game1.tileSize), _sortTexture,
                 new Rectangle(0, 0, _sortTexture.Width, _sortTexture.Height), 1f);
 
             _searchBox = new TextBox(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont,
@@ -132,6 +150,28 @@ namespace ItemResearchSpawner.Components
 
             // _categoryDropdown = new Dropdown<string>(_sortButton.bounds.Right + 20, _sortButton.bounds.Y,
             //     Game1.smallFont, categoryDropdown?.Selected ?? I18n.Filter_All(), this.categories, p => p);
+        }
+
+        private int GetMaxSortLabelWidth(SpriteFont font)
+        {
+            return
+                (
+                    from ItemSortOption key in Enum.GetValues(typeof(ItemSortOption))
+                    let text = GetSortLabel(key)
+                    select (int) font.MeasureString(text).X
+                )
+                .Max();
+        }
+
+        private string GetSortLabel(ItemSortOption sort)
+        {
+            return _sortLabelIndent + sort switch
+            {
+                ItemSortOption.Name => "Name",
+                ItemSortOption.Category => "Category",
+                ItemSortOption.ID => "ID",
+                _ => throw new NotSupportedException($"Invalid sort type {sort}.")
+            };
         }
 
         #region InputHandlers
@@ -188,16 +228,6 @@ namespace ItemResearchSpawner.Components
                 Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f);
         }
 
-        private void DrawSearchBox(SpriteBatch spriteBatch)
-        {
-            RenderHelper.DrawMenuBox(_searchBoxBounds.X, _searchBoxBounds.Y - UIConstants.BorderWidth / 2,
-                _searchBoxBounds.Width - UIConstants.BorderWidth * 3 / 2,
-                _searchBoxBounds.Height - UIConstants.BorderWidth, out _);
-
-            _searchBox.Draw(spriteBatch);
-            spriteBatch.Draw(_searchIcon.texture, _searchIcon.bounds, _searchIcon.sourceRect, Color.White);
-        }
-
         private void GetCurrentQualityIcon(out Texture2D texture, out Rectangle sourceRect, out Color color)
         {
             texture = Game1.mouseCursors;
@@ -227,10 +257,22 @@ namespace ItemResearchSpawner.Components
 
         private void DrawSortBox(SpriteBatch spriteBatch)
         {
+            RenderHelper.DrawTextMenuBox(_sortButton.bounds.X, _sortButton.bounds.Y, Game1.smallFont, _sortButton.name);
+            _sortIcon.draw(spriteBatch);
         }
 
         private void DrawCategoryDropdown(SpriteBatch spriteBatch)
         {
+        }
+
+        private void DrawSearchBox(SpriteBatch spriteBatch)
+        {
+            RenderHelper.DrawMenuBox(_searchBoxBounds.X, _searchBoxBounds.Y - UIConstants.BorderWidth / 2,
+                _searchBoxBounds.Width - UIConstants.BorderWidth * 3 / 2,
+                _searchBoxBounds.Height - UIConstants.BorderWidth, out _);
+
+            _searchBox.Draw(spriteBatch);
+            spriteBatch.Draw(_searchIcon.texture, _searchIcon.bounds, _searchIcon.sourceRect, Color.White);
         }
 
         #endregion

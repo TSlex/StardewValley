@@ -48,6 +48,7 @@
         <Compile Include="Components\DropdownList.cs" />
         <Compile Include="Components\SpawnMenu.cs" />
         <Compile Include="Models\ItemQuality.cs" />
+        <Compile Include="Models\ItemSortOption.cs" />
         <Compile Include="Models\ModConfig.cs" />
         <Compile Include="ModEntry.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

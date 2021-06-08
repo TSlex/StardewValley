@@ -30,7 +30,16 @@ namespace ItemResearchSpawner.Utils
 
             innerDrawPosition = new Vector2(x + UIConstants.BorderWidth, y + UIConstants.BorderWidth);
         }
-        
+
+        public static void DrawTextMenuBox(int x, int y, SpriteFont font, string text)
+        {
+            var spriteBatch = Game1.spriteBatch;
+            var bounds = font.MeasureString(text);
+            
+            DrawMenuBox(x, y, (int) bounds.X, (int) bounds.Y, out var textPosition);
+            Utility.drawTextWithShadow(spriteBatch, text, font, textPosition, Game1.textColor);
+        }
+
         public static void DrawItemBox(int x, int y, int innerWidth, int innerHeight, out Vector2 innerDrawPosition)
         {
             var spriteBatch = Game1.spriteBatch;
@@ -49,7 +58,7 @@ namespace ItemResearchSpawner.Utils
 
             innerDrawPosition = new Vector2(x, y);
         }
-        
+
         public static Action<SpriteBatch> GetBaseDraw(object instance)
         {
             var method =
