@@ -14,18 +14,19 @@ namespace ItemResearchSpawner.Components
 {
     internal class SpawnMenu : ItemGrabMenu
     {
+        private readonly SpawnableItem[] _spawnableItems;
         private readonly IMonitor _monitor;
         private readonly Action<SpriteBatch> _baseDraw;
         private readonly IContentHelper _content;
 
-        private Dropdown<string> _categoryDropdown;
+        // private Dropdown<string> _categoryDropdown;
 
         private TextBox _searchBox;
         private Rectangle _searchBoxBounds;
         private ClickableComponent _searchBoxArea;
         private ClickableTextureComponent _searchIcon;
 
-        private readonly string[] _availableCategories;
+        // private readonly string[] _availableCategories;
 
         private string _searchText;
 
@@ -50,40 +51,41 @@ namespace ItemResearchSpawner.Components
             source: IsAndroid ? source_chest : source_none
         )
         {
+            _spawnableItems = spawnableItems;
             _monitor = monitor;
             _content = content;
             _baseDraw = RenderHelper.GetBaseDraw(this);
-            _availableCategories = GetDisplayCategories(spawnableItems).ToArray();
+            // _availableCategories = GetDisplayCategories(spawnableItems).ToArray();
 
             _searchText = "Pumpkin";
 
             InitializeComponents();
         }
 
-        private IEnumerable<string> GetDisplayCategories(SpawnableItem[] items)
-        {
-            var categories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        // private IEnumerable<string> GetDisplayCategories(SpawnableItem[] items)
+        // {
+        //     var categories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        //
+        //     foreach (var item in items)
+        //     {
+        //         if (item.Category.ToLower().Equals("all") || item.Category.ToLower().Equals("misc"))
+        //         {
+        //             continue;
+        //         }
+        //
+        //         categories.Add(item.Category);
+        //     }
+        //
+        //     yield return "all";
+        //
+        //     foreach (var category in categories.OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
+        //     {
+        //         yield return category;
+        //     }
+        //
+        //     yield return "misc";
+        // }
 
-            foreach (var item in items)
-            {
-                if (item.Category.ToLower().Equals("all") || item.Category.ToLower().Equals("misc"))
-                {
-                    continue;
-                }
-
-                categories.Add(item.Category);
-            }
-
-            yield return "all";
-
-            foreach (var category in categories.OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
-            {
-                yield return category;
-            }
-
-            yield return "misc";
-        }
-        
 
         private void InitializeComponents()
         {
@@ -100,6 +102,8 @@ namespace ItemResearchSpawner.Components
             _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor);
             _qualitySelector = new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor);
             _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor);
+            _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
+                _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
 
             _searchBox = new TextBox(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont,
                 Game1.textColor)
@@ -128,10 +132,10 @@ namespace ItemResearchSpawner.Components
 
             _searchIcon = new ClickableTextureComponent(iconBounds, Game1.mouseCursors, iconRect, iconScale);
 
-            _categoryDropdown = new Dropdown<string>(_itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y,
-                Game1.smallFont, _categoryDropdown?.Selected ?? "All", _availableCategories, p => p);
-
-            _categoryDropdown.IsExpanded = true;
+            // _categoryDropdown = new Dropdown<string>(_itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y,
+            //     Game1.smallFont, _categoryDropdown?.Selected ?? "All", _availableCategories, p => p);
+            //
+            // _categoryDropdown.IsExpanded = true;
         }
 
         #region InputHandlers
@@ -147,37 +151,38 @@ namespace ItemResearchSpawner.Components
             _researchArea.Draw(spriteBatch);
             _qualitySelector.Draw(spriteBatch);
             _itemSortTab.Draw(spriteBatch);
+            _categorySelector.Draw(spriteBatch);
 
             DrawSearchBox(spriteBatch);
-            DrawCategoryDropdown(spriteBatch);
+            // DrawCategoryDropdown(spriteBatch);
 
             //TODO: draw held item
 
             drawMouse(spriteBatch);
         }
 
-        private void DrawCategoryDropdown(SpriteBatch spriteBatch)
-        {
-            var position = new Vector2(
-                x: _categoryDropdown.bounds.X + _categoryDropdown.bounds.Width - 12,
-                y: _categoryDropdown.bounds.Y + 8
-            );
-
-            var sourceRect = CursorSprites.DropdownButton;
-
-            spriteBatch.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
-                SpriteEffects.None, 1f);
-
-            if (_categoryDropdown.IsExpanded)
-            {
-                spriteBatch.Draw(Game1.mouseCursors,
-                    new Vector2(position.X + 2 * Game1.pixelZoom, position.Y + 3 * Game1.pixelZoom),
-                    new Rectangle(sourceRect.X + 2, sourceRect.Y + 3, 5, 6), Color.White, 0, Vector2.Zero,
-                    Game1.pixelZoom, SpriteEffects.FlipVertically, 1f);
-            }
-
-            _categoryDropdown.Draw(spriteBatch);
-        }
+        // private void DrawCategoryDropdown(SpriteBatch spriteBatch)
+        // {
+        //     var position = new Vector2(
+        //         x: _categoryDropdown.bounds.X + _categoryDropdown.bounds.Width - 12,
+        //         y: _categoryDropdown.bounds.Y + 8
+        //     );
+        //
+        //     var sourceRect = CursorSprites.DropdownButton;
+        //
+        //     spriteBatch.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
+        //         SpriteEffects.None, 1f);
+        //
+        //     if (_categoryDropdown.IsExpanded)
+        //     {
+        //         spriteBatch.Draw(Game1.mouseCursors,
+        //             new Vector2(position.X + 2 * Game1.pixelZoom, position.Y + 3 * Game1.pixelZoom),
+        //             new Rectangle(sourceRect.X + 2, sourceRect.Y + 3, 5, 6), Color.White, 0, Vector2.Zero,
+        //             Game1.pixelZoom, SpriteEffects.FlipVertically, 1f);
+        //     }
+        //
+        //     _categoryDropdown.Draw(spriteBatch);
+        // }
 
         private void DrawSearchBox(SpriteBatch spriteBatch)
         {
