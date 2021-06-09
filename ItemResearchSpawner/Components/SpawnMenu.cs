@@ -19,9 +19,9 @@ namespace ItemResearchSpawner.Components
         private readonly IContentHelper _content;
         
         private readonly Texture2D _sortTexture;
-        private readonly Texture2D _emptyQualityTexture;
+        // private readonly Texture2D _emptyQualityTexture;
 
-        private ClickableComponent _qualityButton;
+        // private ClickableComponent _qualityButton;
         private ClickableComponent _sortButton;
         private ClickableTextureComponent _sortIcon;
         private string _sortLabelIndent;
@@ -36,7 +36,7 @@ namespace ItemResearchSpawner.Components
         private readonly string[] _availableCategories;
 
         private string _searchText;
-        private ItemQuality _quality;
+        // private ItemQuality _quality;
         private ItemSortOption _sortBy;
 
         private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
@@ -67,9 +67,9 @@ namespace ItemResearchSpawner.Components
             
             _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
             _sortLabelIndent = GetSpaceIndent(Game1.smallFont, _sortTexture.Width) + " ";
-            _emptyQualityTexture = content.Load<Texture2D>("assets/empty-quality-icon.png");
+            // _emptyQualityTexture = content.Load<Texture2D>("assets/empty-quality-icon.png");
 
-            _quality = ItemQuality.Iridium;
+            // _quality = ItemQuality.Iridium;
             _searchText = "Pumpkin";
             _sortBy = ItemSortOption.Category;
 
@@ -125,16 +125,17 @@ namespace ItemResearchSpawner.Components
 
             var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
 
-            _researchArea = new ItemResearchArea(_content, sideRightAnchor, sideTopAnchor);
+            _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor);
+            _qualitySelector = new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor);
 
-            _qualityButton =
-                new ClickableComponent(
-                    new Rectangle(rootLeftAnchor - 8, barTopAnchor, 36 + UIConstants.BorderWidth,
-                        36 + UIConstants.BorderWidth - 2), "");
+            // _qualityButton =
+            //     new ClickableComponent(
+            //         new Rectangle(rootLeftAnchor - 8, barTopAnchor, 36 + UIConstants.BorderWidth,
+            //             36 + UIConstants.BorderWidth - 2), "");
 
             _sortButton =
                 new ClickableComponent(
-                    new Rectangle(_qualityButton.bounds.Right + 20, barTopAnchor,
+                    new Rectangle(_qualitySelector.Bounds.Right + 20, barTopAnchor,
                         GetMaxSortLabelWidth(Game1.smallFont) + UIConstants.BorderWidth, Game1.tileSize),
                     GetSortLabel(_sortBy));
 
@@ -209,8 +210,9 @@ namespace ItemResearchSpawner.Components
             _baseDraw(spriteBatch);
 
             _researchArea.Draw(spriteBatch);
+            _qualitySelector.Draw(spriteBatch);
             
-            DrawQualityButton(spriteBatch);
+            // DrawQualityButton(spriteBatch);
 
             DrawSearchBox(spriteBatch);
             DrawSortBox(spriteBatch);
@@ -221,44 +223,44 @@ namespace ItemResearchSpawner.Components
             drawMouse(spriteBatch);
         }
 
-        private void DrawQualityButton(SpriteBatch spriteBatch)
-        {
-            GetCurrentQualityIcon(out var texture, out var sourceRect, out var color);
+        // private void DrawQualityButton(SpriteBatch spriteBatch)
+        // {
+        //     GetCurrentQualityIcon(out var texture, out var sourceRect, out var color);
+        //
+        //     RenderHelper.DrawMenuBox(_qualityButton.bounds.X, _qualityButton.bounds.Y,
+        //         _qualityButton.bounds.Width - UIConstants.BorderWidth,
+        //         _qualityButton.bounds.Height - UIConstants.BorderWidth, out var qualityIconPos);
+        //
+        //     spriteBatch.Draw(texture, new Vector2(qualityIconPos.X, qualityIconPos.Y), sourceRect, color, 0,
+        //         Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f);
+        // }
 
-            RenderHelper.DrawMenuBox(_qualityButton.bounds.X, _qualityButton.bounds.Y,
-                _qualityButton.bounds.Width - UIConstants.BorderWidth,
-                _qualityButton.bounds.Height - UIConstants.BorderWidth, out var qualityIconPos);
-
-            spriteBatch.Draw(texture, new Vector2(qualityIconPos.X, qualityIconPos.Y), sourceRect, color, 0,
-                Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f);
-        }
-
-        private void GetCurrentQualityIcon(out Texture2D texture, out Rectangle sourceRect, out Color color)
-        {
-            texture = Game1.mouseCursors;
-            color = Color.White;
-
-            switch (_quality)
-            {
-                case ItemQuality.Normal:
-                    texture = _emptyQualityTexture;
-                    sourceRect = new Rectangle(0, 0, texture.Width, texture.Height);
-                    color *= 0.65f;
-                    break;
-
-                case ItemQuality.Silver:
-                    sourceRect = CursorSprites.SilverStarQuality;
-                    break;
-
-                case ItemQuality.Gold:
-                    sourceRect = CursorSprites.GoldStarQuality;
-                    break;
-
-                default:
-                    sourceRect = CursorSprites.IridiumStarQuality;
-                    break;
-            }
-        }
+        // private void GetCurrentQualityIcon(out Texture2D texture, out Rectangle sourceRect, out Color color)
+        // {
+        //     texture = Game1.mouseCursors;
+        //     color = Color.White;
+        //
+        //     switch (_quality)
+        //     {
+        //         case ItemQuality.Normal:
+        //             texture = _emptyQualityTexture;
+        //             sourceRect = new Rectangle(0, 0, texture.Width, texture.Height);
+        //             color *= 0.65f;
+        //             break;
+        //
+        //         case ItemQuality.Silver:
+        //             sourceRect = CursorSprites.SilverStarQuality;
+        //             break;
+        //
+        //         case ItemQuality.Gold:
+        //             sourceRect = CursorSprites.GoldStarQuality;
+        //             break;
+        //
+        //         default:
+        //             sourceRect = CursorSprites.IridiumStarQuality;
+        //             break;
+        //     }
+        // }
 
         private void DrawSortBox(SpriteBatch spriteBatch)
         {

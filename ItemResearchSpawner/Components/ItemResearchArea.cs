@@ -9,11 +9,11 @@ namespace ItemResearchSpawner.Components
 {
     public class ItemResearchArea
     {
-        private ClickableComponent _researchArea;
-        private ClickableTextureComponent _researchButton;
-        private Texture2D _researchTexture;
+        private readonly ClickableComponent _researchArea;
+        private readonly ClickableTextureComponent _researchButton;
+        private readonly Texture2D _researchTexture;
 
-        public ItemResearchArea(IContentHelper content, int x, int y)
+        public ItemResearchArea(IContentHelper content, IMonitor monitor, int x, int y)
         {
             _researchTexture = content.Load<Texture2D>("assets/search-button.png");
 
