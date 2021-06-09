@@ -12,9 +12,9 @@ namespace ItemResearchSpawner.Components
     {
         private readonly Texture2D _emptyQualityTexture;
 
-        private ClickableComponent _qualityButton;
+        private readonly ClickableComponent _qualityButton;
 
-        private ItemQuality _quality;
+        private readonly ItemQuality _quality;
 
         public ItemQualitySelectorTab(IContentHelper content, IMonitor monitor, int x, int y)
         {

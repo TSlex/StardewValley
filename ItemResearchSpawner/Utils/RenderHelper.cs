@@ -25,7 +25,7 @@ namespace ItemResearchSpawner.Utils
                 outerWidth,
                 outerHeight,
                 Color.White,
-                1, 
+                1,
                 false);
 
             innerDrawPosition = new Vector2(x + UIConstants.BorderWidth, y + UIConstants.BorderWidth);
@@ -35,7 +35,7 @@ namespace ItemResearchSpawner.Utils
         {
             var spriteBatch = Game1.spriteBatch;
             var bounds = font.MeasureString(text);
-            
+
             DrawMenuBox(x, y, (int) bounds.X, (int) bounds.Y, out var textPosition);
             Utility.drawTextWithShadow(spriteBatch, text, font, textPosition, Game1.textColor);
         }
@@ -43,7 +43,7 @@ namespace ItemResearchSpawner.Utils
         public static void DrawItemBox(int x, int y, int innerWidth, int innerHeight, out Vector2 innerDrawPosition)
         {
             var spriteBatch = Game1.spriteBatch;
-            
+
             IClickableMenu.drawTextureBox(
                 spriteBatch,
                 MenuSprites.SpriteMap,
@@ -53,7 +53,7 @@ namespace ItemResearchSpawner.Utils
                 innerWidth,
                 innerHeight,
                 Color.White,
-                1, 
+                1,
                 false);
 
             innerDrawPosition = new Vector2(x, y);
@@ -62,6 +62,19 @@ namespace ItemResearchSpawner.Utils
         public static int GetChildCenterPosition(int pos, int parentLenght, int childLenght)
         {
             return (int) (pos + parentLenght / 2f - childLenght / 2f);
+        }
+
+        public static string GetSpaceIndent(SpriteFont font, int width)
+        {
+            if (width <= 0)
+                return "";
+
+            var indent = " ";
+
+            while (font.MeasureString(indent).X < width)
+                indent += " ";
+
+            return indent;
         }
 
         public static Action<SpriteBatch> GetBaseDraw(object instance)

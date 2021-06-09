@@ -17,12 +17,12 @@ namespace ItemResearchSpawner.Components
         private readonly IMonitor _monitor;
         private readonly Action<SpriteBatch> _baseDraw;
         private readonly IContentHelper _content;
-        
-        private readonly Texture2D _sortTexture;
 
-        private ClickableComponent _sortButton;
-        private ClickableTextureComponent _sortIcon;
-        private string _sortLabelIndent;
+        // private readonly Texture2D _sortTexture;
+
+        // private ClickableComponent _sortButton;
+        // private ClickableTextureComponent _sortIcon;
+        // private string _sortLabelIndent;
 
         private Dropdown<string> _categoryDropdown;
 
@@ -34,7 +34,7 @@ namespace ItemResearchSpawner.Components
         private readonly string[] _availableCategories;
 
         private string _searchText;
-        private ItemSortOption _sortBy;
+        // private ItemSortOption _sortBy;
 
         private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
@@ -61,12 +61,12 @@ namespace ItemResearchSpawner.Components
             _content = content;
             _baseDraw = RenderHelper.GetBaseDraw(this);
             _availableCategories = GetDisplayCategories(spawnableItems).ToArray();
-            
-            _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
-            _sortLabelIndent = GetSpaceIndent(Game1.smallFont, _sortTexture.Width) + " ";
-            
+
+            // _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
+            // _sortLabelIndent = GetSpaceIndent(Game1.smallFont, _sortTexture.Width) + " ";
+
             _searchText = "Pumpkin";
-            _sortBy = ItemSortOption.Category;
+            // _sortBy = ItemSortOption.Category;
 
             InitializeComponents();
         }
@@ -95,18 +95,18 @@ namespace ItemResearchSpawner.Components
             yield return "misc";
         }
 
-        private string GetSpaceIndent(SpriteFont font, int width)
-        {
-            if (width <= 0)
-                return "";
-
-            var indent = " ";
-
-            while (font.MeasureString(indent).X < width)
-                indent += " ";
-
-            return indent;
-        }
+        // private string GetSpaceIndent(SpriteFont font, int width)
+        // {
+        //     if (width <= 0)
+        //         return "";
+        //
+        //     var indent = " ";
+        //
+        //     while (font.MeasureString(indent).X < width)
+        //         indent += " ";
+        //
+        //     return indent;
+        // }
 
         private void InitializeComponents()
         {
@@ -122,17 +122,18 @@ namespace ItemResearchSpawner.Components
 
             _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor);
             _qualitySelector = new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor);
+            _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor);
 
-            _sortButton =
-                new ClickableComponent(
-                    new Rectangle(_qualitySelector.Bounds.Right + 20, barTopAnchor,
-                        GetMaxSortLabelWidth(Game1.smallFont) + UIConstants.BorderWidth, Game1.tileSize),
-                    GetSortLabel(_sortBy));
+            // _sortButton =
+            //     new ClickableComponent(
+            //         new Rectangle(_qualitySelector.Bounds.Right + 20, barTopAnchor,
+            //             GetMaxSortLabelWidth(Game1.smallFont) + UIConstants.BorderWidth, Game1.tileSize),
+            //         GetSortLabel(_sortBy));
 
-            _sortIcon = new ClickableTextureComponent(
-                new Rectangle(_sortButton.bounds.X + UIConstants.BorderWidth,
-                    barTopAnchor + UIConstants.BorderWidth, _sortTexture.Width, Game1.tileSize), _sortTexture,
-                new Rectangle(0, 0, _sortTexture.Width, _sortTexture.Height), 1f);
+            // _sortIcon = new ClickableTextureComponent(
+            //     new Rectangle(_sortButton.bounds.X + UIConstants.BorderWidth,
+            //         barTopAnchor + UIConstants.BorderWidth, _sortTexture.Width, Game1.tileSize), _sortTexture,
+            //     new Rectangle(0, 0, _sortTexture.Width, _sortTexture.Height), 1f);
 
             _searchBox = new TextBox(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont,
                 Game1.textColor)
@@ -161,33 +162,33 @@ namespace ItemResearchSpawner.Components
 
             _searchIcon = new ClickableTextureComponent(iconBounds, Game1.mouseCursors, iconRect, iconScale);
 
-            _categoryDropdown = new Dropdown<string>(_sortButton.bounds.Right + 20, _sortButton.bounds.Y,
+            _categoryDropdown = new Dropdown<string>(_itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y,
                 Game1.smallFont, _categoryDropdown?.Selected ?? "All", _availableCategories, p => p);
 
             _categoryDropdown.IsExpanded = true;
         }
 
-        private int GetMaxSortLabelWidth(SpriteFont font)
-        {
-            return
-                (
-                    from ItemSortOption key in Enum.GetValues(typeof(ItemSortOption))
-                    let text = GetSortLabel(key)
-                    select (int) font.MeasureString(text).X
-                )
-                .Max();
-        }
+        // private int GetMaxSortLabelWidth(SpriteFont font)
+        // {
+        //     return
+        //         (
+        //             from ItemSortOption key in Enum.GetValues(typeof(ItemSortOption))
+        //             let text = GetSortLabel(key)
+        //             select (int) font.MeasureString(text).X
+        //         )
+        //         .Max();
+        // }
 
-        private string GetSortLabel(ItemSortOption sort)
-        {
-            return _sortLabelIndent + sort switch
-            {
-                ItemSortOption.Name => "Name",
-                ItemSortOption.Category => "Category",
-                ItemSortOption.ID => "ID",
-                _ => throw new NotSupportedException($"Invalid sort type {sort}.")
-            };
-        }
+        // private string GetSortLabel(ItemSortOption sort)
+        // {
+        //     return _sortLabelIndent + sort switch
+        //     {
+        //         ItemSortOption.Name => "Name",
+        //         ItemSortOption.Category => "Category",
+        //         ItemSortOption.ID => "ID",
+        //         _ => throw new NotSupportedException($"Invalid sort type {sort}.")
+        //     };
+        // }
 
         #region InputHandlers
 
@@ -201,9 +202,10 @@ namespace ItemResearchSpawner.Components
 
             _researchArea.Draw(spriteBatch);
             _qualitySelector.Draw(spriteBatch);
-            
+            _itemSortTab.Draw(spriteBatch);
+
             DrawSearchBox(spriteBatch);
-            DrawSortBox(spriteBatch);
+            // DrawSortBox(spriteBatch);
             DrawCategoryDropdown(spriteBatch);
 
             //TODO: draw held item
@@ -211,11 +213,11 @@ namespace ItemResearchSpawner.Components
             drawMouse(spriteBatch);
         }
 
-        private void DrawSortBox(SpriteBatch spriteBatch)
-        {
-            RenderHelper.DrawTextMenuBox(_sortButton.bounds.X, _sortButton.bounds.Y, Game1.smallFont, _sortButton.name);
-            _sortIcon.draw(spriteBatch);
-        }
+        // private void DrawSortBox(SpriteBatch spriteBatch)
+        // {
+        //     RenderHelper.DrawTextMenuBox(_sortButton.bounds.X, _sortButton.bounds.Y, Game1.smallFont, _sortButton.name);
+        //     _sortIcon.draw(spriteBatch);
+        // }
 
         private void DrawCategoryDropdown(SpriteBatch spriteBatch)
         {
@@ -225,7 +227,7 @@ namespace ItemResearchSpawner.Components
             );
 
             var sourceRect = CursorSprites.DropdownButton;
-            
+
             spriteBatch.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
                 SpriteEffects.None, 1f);
 
