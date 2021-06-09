@@ -31,13 +31,18 @@ namespace ItemResearchSpawner.Utils
             innerDrawPosition = new Vector2(x + UIConstants.BorderWidth, y + UIConstants.BorderWidth);
         }
 
-        public static void DrawTextMenuBox(int x, int y, SpriteFont font, string text)
+        public static void DrawTextMenuBox(int x, int y, SpriteFont font, string text, int offsetX = 0, int offsetY = 0)
         {
             var spriteBatch = Game1.spriteBatch;
             var bounds = font.MeasureString(text);
 
-            DrawMenuBox(x, y, (int) bounds.X, (int) bounds.Y, out var textPosition);
-            Utility.drawTextWithShadow(spriteBatch, text, font, textPosition, Game1.textColor);
+            var additionalBounds = new Vector2(offsetX > 0 ? offsetX : 0, offsetY > 0 ? offsetY : 0);
+
+            DrawMenuBox(x, y, (int) ((int) bounds.X + additionalBounds.X), (int) ((int) bounds.Y + additionalBounds.Y),
+                out var textPosition);
+            
+            Utility.drawTextWithShadow(spriteBatch, text, font,
+                new Vector2(textPosition.X + offsetX, textPosition.Y + offsetY), Game1.textColor);
         }
 
         public static void DrawItemBox(int x, int y, int innerWidth, int innerHeight, out Vector2 innerDrawPosition)

@@ -17,7 +17,7 @@ namespace ItemResearchSpawner.Components
         private readonly ClickableComponent _sortButton;
         private readonly ClickableTextureComponent _sortIcon;
 
-        private readonly string _sortLabelIndent;
+        // private readonly string _sortLabelIndent;
 
         private ItemSortOption _sortOption;
 
@@ -28,19 +28,20 @@ namespace ItemResearchSpawner.Components
         public ItemSortTab(IContentHelper content, IMonitor monitor, int x, int y, ItemSortOption initialSortOption)
         {
             _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
-            _sortLabelIndent = RenderHelpers.GetSpaceIndent(Game1.smallFont, _sortTexture.Width) + " ";
+            // _sortLabelIndent = RenderHelpers.GetSpaceIndent(Game1.smallFont, _sortTexture.Width) + " ";
 
             _sortOption = initialSortOption;
 
             _sortButton =
                 new ClickableComponent(
-                    new Rectangle(x, y, GetMaxSortLabelWidth(Game1.smallFont) + UIConstants.BorderWidth,
-                        Game1.tileSize), GetSortLabel(_sortOption));
+                    new Rectangle(x, y,
+                        GetMaxSortLabelWidth(Game1.smallFont) + _sortTexture.Width * Game1.pixelZoom +
+                        5 + UIConstants.BorderWidth, Game1.tileSize), GetSortLabel(_sortOption));
 
             _sortIcon = new ClickableTextureComponent(
                 new Rectangle(_sortButton.bounds.X + UIConstants.BorderWidth,
                     y + UIConstants.BorderWidth, _sortTexture.Width, Game1.tileSize), _sortTexture,
-                new Rectangle(0, 0, _sortTexture.Width, _sortTexture.Height), 1f);
+                new Rectangle(0, 0, _sortTexture.Width, _sortTexture.Height), Game1.pixelZoom);
         }
 
         public Rectangle Bounds => _sortButton.bounds;
@@ -62,7 +63,7 @@ namespace ItemResearchSpawner.Components
         public void Draw(SpriteBatch spriteBatch)
         {
             RenderHelpers.DrawTextMenuBox(_sortButton.bounds.X, _sortButton.bounds.Y, Game1.smallFont,
-                _sortButton.name);
+                _sortButton.name, _sortTexture.Width * Game1.pixelZoom + 5);
             _sortIcon.draw(spriteBatch);
         }
 
@@ -79,7 +80,7 @@ namespace ItemResearchSpawner.Components
 
         private string GetSortLabel(ItemSortOption sort)
         {
-            return _sortLabelIndent + sort switch
+            return /*_sortLabelIndent + */sort switch
             {
                 ItemSortOption.Name => "Name",
                 ItemSortOption.Category => "Category",
