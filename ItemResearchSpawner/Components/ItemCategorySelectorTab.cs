@@ -12,13 +12,23 @@ namespace ItemResearchSpawner.Components
 {
     public class ItemCategorySelectorTab
     {
+        private readonly IMonitor _monitor;
         private readonly Dropdown<string> _categoryDropdown;
 
         private readonly string[] _availableCategories;
 
+        public delegate void DropdownToggle(bool expanded);
+
+        public event DropdownToggle OnDropdownToggle;
+
+        public delegate void CategorySelected(string category);
+
+        public event CategorySelected OnCategorySelected;
+
         public ItemCategorySelectorTab(IContentHelper content, IMonitor monitor, SpawnableItem[] spawnableItems, int x,
             int y)
         {
+            _monitor = monitor;
             _availableCategories = GetDisplayCategories(spawnableItems).ToArray();
 
             _categoryDropdown = new Dropdown<string>(x, y, Game1.smallFont, _categoryDropdown?.Selected ?? "All",
@@ -28,6 +38,36 @@ namespace ItemResearchSpawner.Components
         }
 
         public Rectangle Bounds => _categoryDropdown.bounds;
+        public int MyID => _categoryDropdown.myID;
+        public string SelectedCategory => _categoryDropdown.Selected;
+        
+        public bool TryClick(int x, int y)
+        {
+            if (_categoryDropdown.TryClick(x, y, out var itemClicked, out var dropdownToggled))
+            {
+                if (dropdownToggled)
+                {
+                    _categoryDropdown.IsExpanded = !_categoryDropdown.IsExpanded;
+                    OnDropdownToggle?.Invoke(_categoryDropdown.IsExpanded);
+                }
+
+                if (itemClicked)
+                {
+                    var category = _categoryDropdown.Selected;
+                    
+                    if (!_categoryDropdown.TrySelect(category))
+                    {
+                        _monitor.Log($"Failed selecting category filter category '{category}'.", LogLevel.Warn);
+                    }
+
+                    OnCategorySelected?.Invoke(category);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
 
         public void Draw(SpriteBatch spriteBatch)
         {

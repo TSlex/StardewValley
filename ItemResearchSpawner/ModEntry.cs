@@ -59,7 +59,7 @@ namespace ItemResearchSpawner
             {
                 var category = _categories?.FirstOrDefault(rule => rule.IsMatch(entry));
 
-                yield return new SpawnableItem(entry, category?.Label ?? "???");
+                yield return new SpawnableItem(entry, category?.Label ?? "Misc");
             }
         }
     }

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
-using StardewValley;
 using StardewValley.Menus;
 
 namespace ItemResearchSpawner.Components
@@ -17,9 +15,7 @@ namespace ItemResearchSpawner.Components
     {
         private readonly SpriteFont _font;
 
-        private readonly DropdownList<TItem> List;
-
-        private bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
+        private readonly DropdownList<TItem> _list;
 
         private bool _isExpanded;
 
@@ -30,12 +26,12 @@ namespace ItemResearchSpawner.Components
             {
                 _isExpanded = value;
                 downNeighborID = value
-                    ? List.TopComponentId
+                    ? _list.TopComponentId
                     : DefaultDownNeighborId;
             }
         }
 
-        public TItem Selected => List.SelectedValue;
+        public TItem Selected => _list.SelectedValue;
 
         public int DefaultDownNeighborId { get; set; } = -99999;
 
@@ -44,33 +40,26 @@ namespace ItemResearchSpawner.Components
         {
             _font = font;
 
-            List = new DropdownList<TItem>(selectedItem, items, getLabel, x, y, font);
+            _list = new DropdownList<TItem>(selectedItem, items, getLabel, x, y, font);
 
             bounds.X = x;
             bounds.Y = y;
 
-            List.bounds.X = bounds.X;
-            List.bounds.Y = bounds.Bottom;
+            _list.bounds.X = bounds.X;
+            _list.bounds.Y = bounds.Bottom;
 
-            List.ReinitializeComponents();
-            
+            _list.ReinitializeComponents();
+
             bounds.Height = (int) _font.MeasureString("ABCDEFGHIJKLMNOPQRSTUVWXYZ").Y - 10 + UIConstants.BorderWidth;
-            bounds.Width = List.MaxLabelWidth + UIConstants.BorderWidth * 2;
+            bounds.Width = _list.MaxLabelWidth + UIConstants.BorderWidth * 2;
 
-            List.ReinitializeControllerFlow();
+            _list.ReinitializeControllerFlow();
             IsExpanded = IsExpanded;
         }
 
         public override bool containsPoint(int x, int y)
         {
-            return
-                base.containsPoint(x, y)
-                || (IsExpanded && List.containsPoint(x, y));
-        }
-
-        public bool TryClick(int x, int y)
-        {
-            return TryClick(x, y, out _, out _);
+            return base.containsPoint(x, y) || IsExpanded && _list.containsPoint(x, y);
         }
 
         public bool TryClick(int x, int y, out bool itemClicked, out bool dropdownToggled)
@@ -78,11 +67,10 @@ namespace ItemResearchSpawner.Components
             itemClicked = false;
             dropdownToggled = false;
 
-            if (IsExpanded && List.TryClick(x, y, out itemClicked))
+            if (IsExpanded && _list.TryClick(x, y, out itemClicked))
             {
                 if (itemClicked)
                 {
-                    IsExpanded = false;
                     dropdownToggled = true;
                 }
 
@@ -91,7 +79,6 @@ namespace ItemResearchSpawner.Components
 
             if (bounds.Contains(x, y) || IsExpanded)
             {
-                IsExpanded = !IsExpanded;
                 dropdownToggled = true;
 
                 return true;
@@ -100,16 +87,21 @@ namespace ItemResearchSpawner.Components
             return false;
         }
 
+        public bool TrySelect(TItem value)
+        {
+            return _list.TrySelect(value);
+        }
+
         public void Draw(SpriteBatch sprites, float opacity = 1)
         {
             RenderHelpers.DrawMenuBox(bounds.X, bounds.Y, bounds.Width - UIConstants.BorderWidth * 2,
-                List.MaxLabelHeight, out var textPos);
-            
-            sprites.DrawString(_font, List.SelectedLabel, textPos, Color.Black * opacity);
+                _list.MaxLabelHeight, out var textPos);
+
+            sprites.DrawString(_font, _list.SelectedLabel, textPos, Color.Black * opacity);
 
             if (IsExpanded)
             {
-                List.Draw(sprites, opacity);
+                _list.Draw(sprites, opacity);
             }
         }
     }
