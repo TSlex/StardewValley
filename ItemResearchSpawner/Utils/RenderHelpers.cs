@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -40,7 +41,7 @@ namespace ItemResearchSpawner.Utils
 
             DrawMenuBox(x, y, (int) ((int) bounds.X + additionalBounds.X), (int) ((int) bounds.Y + additionalBounds.Y),
                 out var textPosition);
-            
+
             Utility.drawTextWithShadow(spriteBatch, text, font,
                 new Vector2(textPosition.X + offsetX, textPosition.Y + offsetY), Game1.textColor);
         }
@@ -69,17 +70,37 @@ namespace ItemResearchSpawner.Utils
             return (int) (pos + parentLenght / 2f - childLenght / 2f);
         }
 
-        public static string GetSpaceIndent(SpriteFont font, int width)
+        public static string TruncateString(string value, SpriteFont font, int maxWidth)
         {
-            if (width <= 0)
-                return "";
+            // var smallSymWidth = font.MeasureString("a").X;
+            // var capSymWidth = font.MeasureString("A").X;
+            var overflowWidth = font.MeasureString("...").X;
 
-            var indent = " ";
+            var newString = new StringBuilder();
+            var width = 0f;
 
-            while (font.MeasureString(indent).X < width)
-                indent += " ";
+            foreach (var ch in value)
+            {
+                var charWidth = font.MeasureString(ch.ToString()).X;
 
-            return indent;
+                if (width + charWidth + overflowWidth > maxWidth)
+                {
+                    newString.Append("...");
+                    break;
+                }
+
+                newString.Append(ch);
+                width += charWidth;
+            }
+
+            // var lenght = (int) Math.Floor(maxWidth / symWidth);
+            //
+            // if (value.Length > lenght)
+            // {
+            //     return value.Substring(0, lenght - 3) + "...";
+            // }
+
+            return newString.ToString();
         }
 
         public static Action<SpriteBatch> GetBaseDraw(object instance)

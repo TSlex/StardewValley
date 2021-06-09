@@ -17,6 +17,8 @@ namespace ItemResearchSpawner.Components
 
         private readonly DropdownList<TItem> _list;
 
+        private readonly int _labelWidth;
+
         private bool _isExpanded;
 
         public bool IsExpanded
@@ -50,8 +52,10 @@ namespace ItemResearchSpawner.Components
 
             _list.ReinitializeComponents();
 
-            bounds.Height = (int) _font.MeasureString("ABCDEFGHIJKLMNOPQRSTUVWXYZ").Y + UIConstants.BorderWidth * 2;
-            bounds.Width = _list.MaxLabelWidth + UIConstants.BorderWidth * 2;
+            _labelWidth = (int) _font.MeasureString("THISISLABELWIDTHYEAH").X;
+
+            bounds.Height = (int) _font.MeasureString("ABOBA").Y + UIConstants.BorderWidth * 2;
+            bounds.Width = _labelWidth + UIConstants.BorderWidth * 2;
 
             _list.ReinitializeControllerFlow();
             IsExpanded = IsExpanded;
@@ -97,7 +101,8 @@ namespace ItemResearchSpawner.Components
             RenderHelpers.DrawMenuBox(bounds.X, bounds.Y, bounds.Width - UIConstants.BorderWidth * 2,
                 _list.MaxLabelHeight, out var textPos);
 
-            sprites.DrawString(_font, _list.SelectedLabel, textPos, Color.Black * opacity);
+            sprites.DrawString(_font, RenderHelpers.TruncateString(_list.SelectedLabel, _font, _labelWidth), textPos,
+                Color.Black * opacity);
 
             if (IsExpanded)
             {
