@@ -14,12 +14,16 @@ namespace ItemResearchSpawner.Components
 
         private readonly ClickableComponent _qualityButton;
 
-        private readonly ItemQuality _quality;
+        private ItemQuality _quality;
 
-        public ItemQualitySelectorTab(IContentHelper content, IMonitor monitor, int x, int y)
+        public delegate void QualityChange(ItemQuality newQuality);
+
+        public event QualityChange OnQualityChange;
+
+        public ItemQualitySelectorTab(IContentHelper content, IMonitor monitor, int x, int y, ItemQuality initQuality)
         {
             _emptyQualityTexture = content.Load<Texture2D>("assets/empty-quality-icon.png");
-            _quality = ItemQuality.Iridium;
+            _quality = initQuality;
 
             _qualityButton =
                 new ClickableComponent(
@@ -27,6 +31,18 @@ namespace ItemResearchSpawner.Components
         }
 
         public Rectangle Bounds => _qualityButton.bounds;
+
+        public void HandleLeftClick()
+        {
+            _quality = _quality.GetNext();
+            OnQualityChange?.Invoke(_quality);
+        }
+        
+        public void HandleRightClick()
+        {
+            _quality = _quality.GetPrevious();
+            OnQualityChange?.Invoke(_quality);
+        }
 
         public void Draw(SpriteBatch spriteBatch)
         {

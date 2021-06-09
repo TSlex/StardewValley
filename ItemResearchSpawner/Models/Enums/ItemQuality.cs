@@ -2,7 +2,7 @@
 
 namespace ItemResearchSpawner.Models
 {
-    internal enum ItemQuality
+    public enum ItemQuality
     {
         Normal = StardewValley.Object.lowQuality,
         Silver = StardewValley.Object.medQuality,
@@ -20,6 +20,18 @@ namespace ItemResearchSpawner.Models
                 ItemQuality.Silver => ItemQuality.Gold,
                 ItemQuality.Gold => ItemQuality.Iridium,
                 ItemQuality.Iridium => ItemQuality.Normal,
+                _ => throw new NotSupportedException($"Unknown quality '{current}'.")
+            };
+        }
+        
+        public static ItemQuality GetPrevious(this ItemQuality current)
+        {
+            return current switch
+            {
+                ItemQuality.Normal => ItemQuality.Iridium,
+                ItemQuality.Silver => ItemQuality.Normal,
+                ItemQuality.Gold => ItemQuality.Silver,
+                ItemQuality.Iridium => ItemQuality.Gold,
                 _ => throw new NotSupportedException($"Unknown quality '{current}'.")
             };
         }

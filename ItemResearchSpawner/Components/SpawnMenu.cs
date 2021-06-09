@@ -67,6 +67,44 @@ namespace ItemResearchSpawner.Components
 
             InitializeComponents();
             UpdateView(true);
+
+            _qualitySelector.OnQualityChange += OnQualityChange;
+        }
+
+        private void OnQualityChange(ItemQuality newQuality)
+        {
+            _quality = newQuality;
+            UpdateView();
+        }
+
+        public override void receiveLeftClick(int x, int y, bool playSound = true)
+        {
+            if (_qualitySelector.Bounds.Contains(x, y))
+            {
+                _qualitySelector.HandleLeftClick();
+            }
+            else
+            {
+                base.receiveLeftClick(x, y, playSound);
+            }
+        }
+        
+        public override void receiveRightClick(int x, int y, bool playSound = true)
+        {
+            if (_qualitySelector.Bounds.Contains(x, y))
+            {
+                _qualitySelector.HandleRightClick();
+            }
+            else
+            {
+                base.receiveRightClick(x, y, playSound);
+            }
+        }
+
+        public override void receiveScrollWheelAction(int direction)
+        {
+            base.receiveScrollWheelAction(direction);
+            ScrollView(-direction);
         }
 
         private void InitializeComponents()
@@ -82,7 +120,8 @@ namespace ItemResearchSpawner.Components
             var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
 
             _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor);
-            _qualitySelector = new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor);
+            _qualitySelector =
+                new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor, _quality);
             _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor);
             _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
                 _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
@@ -119,7 +158,7 @@ namespace ItemResearchSpawner.Components
             var totalRows = (int) Math.Ceiling(_filteredItems.Count / (ItemsPerRow * 1m));
 
             _maxTopRowIndex = Math.Max(0, totalRows - 3);
-            
+
             ScrollView(0, resetItemView: false);
 
             _itemsInView.Clear();
