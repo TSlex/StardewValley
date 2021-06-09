@@ -154,7 +154,7 @@ namespace ItemResearchSpawner.Components
             var rootRightAnchor = rootLeftAnchor + width;
             var rootBottomAnchor = rootTopAnchor + height;
 
-            var sideTopAnchor = rootTopAnchor;
+            var sideTopAnchor = rootTopAnchor - Game1.tileSize + UIConstants.BorderWidth - 2 * Game1.pixelZoom;
             var sideRightAnchor = rootRightAnchor;
 
             var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
