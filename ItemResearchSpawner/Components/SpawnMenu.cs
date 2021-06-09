@@ -42,6 +42,8 @@ namespace ItemResearchSpawner.Components
         private ItemSortOption _sortOption;
         private string _searchText;
 
+        private bool _overDropdown;
+
         public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IMonitor monitor) : base(
             inventory: new List<Item>(),
             reverseGrab: false,
@@ -67,6 +69,7 @@ namespace ItemResearchSpawner.Components
 
             _quality = ItemQuality.Normal;
             _sortOption = ItemSortOption.ID;
+            _searchText = "";
 
             InitializeComponents();
             UpdateView(true);
@@ -75,6 +78,7 @@ namespace ItemResearchSpawner.Components
             _itemSortTab.OnSortOptionChange += OnSortOptionChange;
             _categorySelector.OnDropdownToggle += OnDropdownToggle;
             _categorySelector.OnCategorySelected += OnCategorySelected;
+            _searchBarTab.OnSearchTextInput += OnSearchTextInput;
         }
 
         private void OnQualityChange(ItemQuality newQuality)
@@ -106,6 +110,13 @@ namespace ItemResearchSpawner.Components
             UpdateView(true);
         }
 
+        private void OnSearchTextInput(string key)
+        {
+            _searchText = key;
+            _topRowIndex = 0;
+            UpdateView(rebuild: true);
+        }
+
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             if (_qualitySelector.Bounds.Contains(x, y))
@@ -119,8 +130,18 @@ namespace ItemResearchSpawner.Components
             else if (_categorySelector.TryClick(x, y))
             {
             }
+            else if (_searchBarTab.Bounds.Contains(x, y))
+            {
+                if (!_searchBarTab.Selected || !_searchBarTab.PersistFocus)
+                    _searchBarTab.Focus(true);
+            }
             else
             {
+                if (_searchBarTab.Selected)
+                {
+                    _searchBarTab.Blur();
+                }
+
                 base.receiveLeftClick(x, y, playSound);
             }
         }
@@ -135,6 +156,14 @@ namespace ItemResearchSpawner.Components
             {
                 _itemSortTab.HandleRightClick();
             }
+            else if (_searchBarTab.Bounds.Contains(x, y))
+            {
+                _searchBarTab.Clear();
+            }
+            else if (_categorySelector.IsExpanded)
+            {
+                _categorySelector.Close();
+            }
             else
             {
                 base.receiveRightClick(x, y, playSound);
@@ -144,7 +173,64 @@ namespace ItemResearchSpawner.Components
         public override void receiveScrollWheelAction(int direction)
         {
             base.receiveScrollWheelAction(direction);
-            ScrollView(-direction);
+
+            if (_overDropdown)
+            {
+                _categorySelector.HandleScroll(direction);
+            }
+            else
+            {
+                ScrollView(-direction);
+            }
+        }
+
+        public override void performHoverAction(int x, int y)
+        {
+            _overDropdown = _categorySelector.Bounds.Contains(x, y);
+            
+            if (!_searchBarTab.PersistFocus)
+            {
+                var overSearchBox = _searchBarTab.Bounds.Contains(x, y);
+
+                if (_searchBarTab.Selected == overSearchBox) return;
+
+                if (overSearchBox)
+                {
+                    _searchBarTab.Focus(false);
+                }
+                else
+                {
+                    _searchBarTab.Blur();
+                }
+            }
+
+            base.performHoverAction(x, y);
+        }
+
+        public override void draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(Game1.fadeToBlackRect,
+                new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height), Color.Black * 0.5f);
+
+            _baseDraw(spriteBatch);
+
+            _researchArea.Draw(spriteBatch);
+            _qualitySelector.Draw(spriteBatch);
+            _itemSortTab.Draw(spriteBatch);
+            _categorySelector.Draw(spriteBatch);
+            _searchBarTab.Draw(spriteBatch);
+
+            //TODO: draw held item
+
+            // _baseDraw(spriteBatch);
+
+            drawMouse(spriteBatch);
+        }
+
+        public override void update(GameTime time)
+        {
+            _searchBarTab.Update(time);
+            base.update(time);
         }
 
         private void InitializeComponents()
@@ -169,26 +255,6 @@ namespace ItemResearchSpawner.Components
 
             _searchBarTab = new ItemSearchBarTab(_content, _monitor, _categorySelector.Right + 20, barTopAnchor,
                 _researchArea.Bounds.Right - _categorySelector.Right + 20 - 10 * Game1.pixelZoom);
-        }
-
-        public override void draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(Game1.fadeToBlackRect,
-                new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height), Color.Black * 0.5f);
-
-            _baseDraw(spriteBatch);
-
-            _researchArea.Draw(spriteBatch);
-            _qualitySelector.Draw(spriteBatch);
-            _itemSortTab.Draw(spriteBatch);
-            _categorySelector.Draw(spriteBatch);
-            _searchBarTab.Draw(spriteBatch);
-
-            //TODO: draw held item
-
-            // _baseDraw(spriteBatch);
-
-            drawMouse(spriteBatch);
         }
 
         private void UpdateView(bool rebuild = false)
@@ -259,15 +325,15 @@ namespace ItemResearchSpawner.Components
                     Helpers.EqualsCaseInsensitive(item.Category, _categorySelector.SelectedCategory));
             }
 
-            // string search = this.SearchBox.Text.Trim();
+            var search = _searchText.Trim();
 
-            // if (search != "")
-            // {
-            //     items = items.Where(item =>
-            //         item.Name.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0
-            //         || item.DisplayName.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0
-            //     );
-            // }
+            if (search != "")
+            {
+                items = items.Where(item =>
+                    item.Name.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0
+                    || item.DisplayName.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0
+                );
+            }
 
             return items;
         }

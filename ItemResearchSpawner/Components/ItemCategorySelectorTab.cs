@@ -42,6 +42,7 @@ namespace ItemResearchSpawner.Components
         public Rectangle Bounds => _categoryDropdown.bounds;
         public int MyID => _categoryDropdown.myID;
         public string SelectedCategory => _categoryDropdown.Selected;
+        public bool IsExpanded => _categoryDropdown.IsExpanded;
 
         public bool TryClick(int x, int y)
         {
@@ -71,6 +72,17 @@ namespace ItemResearchSpawner.Components
             return false;
         }
 
+        public void Close()
+        {
+            _categoryDropdown.IsExpanded = false;
+        }
+
+
+        public void HandleScroll(int direction)
+        {
+            NextCategory((int) MathHelper.Clamp(direction, -1, 1));
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             var sourceRect = CursorSprites.DropdownButton;
@@ -92,6 +104,28 @@ namespace ItemResearchSpawner.Components
             }
 
             _categoryDropdown.Draw(spriteBatch);
+        }
+
+        private void NextCategory(int direction)
+        {
+            direction = direction < 0 ? -1 : 1;
+
+            var last = _availableCategories.Length - 1;
+
+            var index = Array.IndexOf(_availableCategories, _categoryDropdown.Selected) + direction;
+
+            if (index < 0)
+            {
+                index = last;
+            }
+
+            if (index > last)
+            {
+                index = 0;
+            }
+
+            _categoryDropdown.TrySelect(_availableCategories[index]);
+            OnCategorySelected?.Invoke(_availableCategories[index]);
         }
 
         private IEnumerable<string> GetDisplayCategories(SpawnableItem[] items)

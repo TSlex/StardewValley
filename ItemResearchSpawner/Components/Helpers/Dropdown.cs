@@ -96,6 +96,14 @@ namespace ItemResearchSpawner.Components
             return _list.TrySelect(value);
         }
 
+        public void ReceiveScrollWheelAction(int direction)
+        {
+            if (IsExpanded)
+            {
+                _list.ReceiveScrollWheelAction(direction);
+            }
+        }
+
         public void Draw(SpriteBatch sprites, float opacity = 1)
         {
             RenderHelpers.DrawMenuBox(bounds.X, bounds.Y, bounds.Width - UIConstants.BorderWidth * 2,

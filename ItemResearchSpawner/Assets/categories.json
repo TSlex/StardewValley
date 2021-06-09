@@ -191,7 +191,7 @@
     }
   },
   {
-    "Label": "Furnitureaaaaaaaaaaaaaaaaa",
+    "Label": "Furniture",
     "When": {
       "Class": [
         "StardewValley.Objects.Furniture"
