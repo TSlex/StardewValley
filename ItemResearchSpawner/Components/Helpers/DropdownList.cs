@@ -18,10 +18,12 @@ namespace ItemResearchSpawner.Components
         private const int DropdownPadding = 5;
         private DropListOption _selectedOption;
         private readonly DropListOption[] _options;
+        
+        private readonly int _labelWidth;
 
         private int _firstVisibleIndex;
         private int _maxItems;
-
+        
         private int LastVisibleIndex => _firstVisibleIndex + _maxItems - 1;
         private int MaxFirstVisibleIndex => _options.Length - _maxItems;
         private bool CanScrollUp => _firstVisibleIndex > 0;
@@ -48,6 +50,8 @@ namespace ItemResearchSpawner.Components
                 .ToArray();
 
             _font = font;
+            _labelWidth = RenderHelpers.GetLabelWidth(_font);
+            
             MaxLabelHeight = _options.Max(p => p.LabelHeight);
 
             var selectedIndex = Array.IndexOf(items, selectedValue);
@@ -147,7 +151,8 @@ namespace ItemResearchSpawner.Components
                 var position =
                     new Vector2(option.bounds.X + DropdownPadding, option.bounds.Y + Game1.tileSize / 16);
 
-                sprites.DrawString(_font, option.label, position, Color.Black * opacity);
+                sprites.DrawString(_font, RenderHelpers.TruncateString(option.label, _font, _labelWidth), position,
+                    Color.Black * opacity);
             }
 
             if (CanScrollUp)
@@ -263,7 +268,7 @@ namespace ItemResearchSpawner.Components
 
                 var labelSize = font.MeasureString(label);
 
-                LabelWidth = (int) labelSize.X;
+                LabelWidth = RenderHelpers.GetLabelWidth(font) - 10;
                 LabelHeight = (int) labelSize.Y;
             }
         }

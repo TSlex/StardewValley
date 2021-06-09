@@ -52,7 +52,7 @@ namespace ItemResearchSpawner.Components
 
             _list.ReinitializeComponents();
 
-            _labelWidth = (int) _font.MeasureString("THISISLABELWIDTHYEAH").X;
+            _labelWidth = RenderHelpers.GetLabelWidth(_font);
 
             bounds.Height = (int) _font.MeasureString("ABOBA").Y + UIConstants.BorderWidth * 2;
             bounds.Width = _labelWidth + UIConstants.BorderWidth * 2;

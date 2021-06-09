@@ -70,6 +70,11 @@ namespace ItemResearchSpawner.Utils
             return (int) (pos + parentLenght / 2f - childLenght / 2f);
         }
 
+        public static int GetLabelWidth(SpriteFont font)
+        {
+            return (int) font.MeasureString("THISISLABELWIDTHYEAH").X;
+        }
+
         public static string TruncateString(string value, SpriteFont font, int maxWidth)
         {
             // var smallSymWidth = font.MeasureString("a").X;
@@ -83,7 +88,7 @@ namespace ItemResearchSpawner.Utils
             {
                 var charWidth = font.MeasureString(ch.ToString()).X;
 
-                if (width + charWidth + overflowWidth > maxWidth)
+                if (width + charWidth > maxWidth)
                 {
                     newString.Append("...");
                     break;
@@ -92,13 +97,6 @@ namespace ItemResearchSpawner.Utils
                 newString.Append(ch);
                 width += charWidth;
             }
-
-            // var lenght = (int) Math.Floor(maxWidth / symWidth);
-            //
-            // if (value.Length > lenght)
-            // {
-            //     return value.Substring(0, lenght - 3) + "...";
-            // }
 
             return newString.ToString();
         }
