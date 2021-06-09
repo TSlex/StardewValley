@@ -39,6 +39,8 @@ namespace ItemResearchSpawner.Components
         private int _maxTopRowIndex;
 
         private ItemQuality _quality;
+        private ItemSortOption _sortOption;
+        private string _searchText;
 
         public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IMonitor monitor) : base(
             inventory: new List<Item>(),
@@ -69,6 +71,7 @@ namespace ItemResearchSpawner.Components
             UpdateView(true);
 
             _qualitySelector.OnQualityChange += OnQualityChange;
+            _itemSortTab.OnSortOptionChange += OnSortOptionChange;
         }
 
         private void OnQualityChange(ItemQuality newQuality)
@@ -77,11 +80,21 @@ namespace ItemResearchSpawner.Components
             UpdateView();
         }
 
+        private void OnSortOptionChange(ItemSortOption newOption)
+        {
+            _sortOption = newOption;
+            UpdateView(true);
+        }
+
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             if (_qualitySelector.Bounds.Contains(x, y))
             {
                 _qualitySelector.HandleLeftClick();
+            }
+            else if (_itemSortTab.Bounds.Contains(x, y))
+            {
+                _itemSortTab.HandleLeftClick();
             }
             else
             {
@@ -94,6 +107,10 @@ namespace ItemResearchSpawner.Components
             if (_qualitySelector.Bounds.Contains(x, y))
             {
                 _qualitySelector.HandleRightClick();
+            }
+            else if (_itemSortTab.Bounds.Contains(x, y))
+            {
+                _itemSortTab.HandleRightClick();
             }
             else
             {
@@ -122,7 +139,7 @@ namespace ItemResearchSpawner.Components
             _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor);
             _qualitySelector =
                 new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor, _quality);
-            _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor);
+            _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor, _sortOption);
             _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
                 _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
             _searchBarTab = new ItemSearchBarTab(_content, _monitor, _categorySelector.Bounds.Right + 20, barTopAnchor);
@@ -151,7 +168,7 @@ namespace ItemResearchSpawner.Components
             if (rebuild)
             {
                 _filteredItems.Clear();
-                _filteredItems.AddRange(SearchItems());
+                _filteredItems.AddRange(GetFilteredItems());
                 _topRowIndex = 0;
             }
 
@@ -197,16 +214,16 @@ namespace ItemResearchSpawner.Components
             }
         }
 
-        private IEnumerable<SpawnableItem> SearchItems()
+        private IEnumerable<SpawnableItem> GetFilteredItems()
         {
             IEnumerable<SpawnableItem> items = _allItems;
 
-            // items = _sortBy switch
-            // {
-            //     ItemSortOption.Category => items.OrderBy(p => p.Item.Category),
-            //     ItemSortOption.ID => items.OrderBy(p => p.Item.ParentSheetIndex),
-            //     _ => items.OrderBy(p => p.Item.DisplayName)
-            // };
+            items = _sortOption switch
+            {
+                ItemSortOption.Category => items.OrderBy(p => p.Item.Category),
+                ItemSortOption.ID => items.OrderBy(p => p.Item.ParentSheetIndex),
+                _ => items.OrderBy(p => p.Item.DisplayName)
+            };
 
             // if (!Helpers.EqualsCaseInsensitive(this.CategoryDropdown.Selected, I18n.Filter_All()))
             //     items = items.Where(item => this.EqualsCaseInsensitive(item.Category, this.CategoryDropdown.Selected));
