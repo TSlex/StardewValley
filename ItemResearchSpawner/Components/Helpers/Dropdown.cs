@@ -43,11 +43,22 @@ namespace ItemResearchSpawner.Components
             : base(Rectangle.Empty, getLabel(selectedItem))
         {
             _font = font;
+
             List = new DropdownList<TItem>(selectedItem, items, getLabel, x, y, font);
+
             bounds.X = x;
             bounds.Y = y;
 
-            ReinitializeComponents();
+            List.bounds.X = bounds.X;
+            List.bounds.Y = bounds.Bottom;
+
+            List.ReinitializeComponents();
+            
+            bounds.Height = (int) _font.MeasureString("ABCDEFGHIJKLMNOPQRSTUVWXYZ").Y - 10 + UIConstants.BorderWidth;
+            bounds.Width = List.MaxLabelWidth + UIConstants.BorderWidth * 2;
+
+            List.ReinitializeControllerFlow();
+            IsExpanded = IsExpanded;
         }
 
         public override bool containsPoint(int x, int y)
@@ -89,55 +100,17 @@ namespace ItemResearchSpawner.Components
             return false;
         }
 
-
-        public bool TrySelect(TItem value)
-        {
-            return List.TrySelect(value);
-        }
-
-
-        public void ReceiveScrollWheelAction(int direction)
-        {
-            if (IsExpanded)
-            {
-                List.ReceiveScrollWheelAction(direction);
-            }
-        }
-
-
         public void Draw(SpriteBatch sprites, float opacity = 1)
         {
-            RenderHelpers.DrawMenuBox(bounds.X, bounds.Y, List.MaxLabelWidth, List.MaxLabelHeight, out var textPos);
+            RenderHelpers.DrawMenuBox(bounds.X, bounds.Y, bounds.Width - UIConstants.BorderWidth * 2,
+                List.MaxLabelHeight, out var textPos);
+            
             sprites.DrawString(_font, List.SelectedLabel, textPos, Color.Black * opacity);
 
             if (IsExpanded)
             {
                 List.Draw(sprites, opacity);
             }
-        }
-
-        public void ReinitializeComponents()
-        {
-            bounds.Height = (int) _font.MeasureString("ABCDEFGHIJKLMNOPQRSTUVWXYZ").Y - 10 + UIConstants.BorderWidth;
-            bounds.Width = List.MaxLabelWidth + UIConstants.BorderWidth;
-
-            List.bounds.X = bounds.X;
-            List.bounds.Y = bounds.Bottom;
-
-            List.ReinitializeComponents();
-
-            ReinitializeControllerFlow();
-        }
-
-        public void ReinitializeControllerFlow()
-        {
-            List.ReinitializeControllerFlow();
-            IsExpanded = IsExpanded;
-        }
-
-        public IEnumerable<ClickableComponent> GetChildComponents()
-        {
-            return List.GetChildComponents();
         }
     }
 }

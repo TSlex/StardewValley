@@ -150,17 +150,19 @@ namespace ItemResearchSpawner.Components
             spriteBatch.Draw(Game1.fadeToBlackRect,
                 new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height), Color.Black * 0.5f);
 
+            _baseDraw(spriteBatch);
+
             _researchArea.Draw(spriteBatch);
             _qualitySelector.Draw(spriteBatch);
             _itemSortTab.Draw(spriteBatch);
             _categorySelector.Draw(spriteBatch);
-            _searchBarTab.Draw(spriteBatch);
+            // _searchBarTab.Draw(spriteBatch);
 
             //TODO: draw held item
 
-            _baseDraw(spriteBatch);
+            // _baseDraw(spriteBatch);
 
-            // drawMouse(spriteBatch);
+            drawMouse(spriteBatch);
         }
 
         private void UpdateView(bool rebuild = false)

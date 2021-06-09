@@ -33,7 +33,7 @@ namespace ItemResearchSpawner.Components
                 Text = _searchText
             };
 
-            _searchBoxBounds = new Rectangle(_searchBox.X, _searchBox.Y + 4, _searchBox.Width, 12 * Game1.pixelZoom);
+            _searchBoxBounds = new Rectangle(_searchBox.X, _searchBox.Y + 4, _searchBox.Width, 36);
 
             _searchBoxArea =
                 new ClickableComponent(

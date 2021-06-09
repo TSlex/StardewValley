@@ -24,30 +24,30 @@ namespace ItemResearchSpawner.Components
             _categoryDropdown = new Dropdown<string>(x, y, Game1.smallFont, _categoryDropdown?.Selected ?? "All",
                 _availableCategories, p => p);
 
-            // _categoryDropdown.IsExpanded = false;
+            _categoryDropdown.IsExpanded = false;
         }
 
         public Rectangle Bounds => _categoryDropdown.bounds;
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            var position = new Vector2(
-                x: _categoryDropdown.bounds.X + _categoryDropdown.bounds.Width - 12,
-                y: _categoryDropdown.bounds.Y + 8
-            );
-
             var sourceRect = CursorSprites.DropdownButton;
+
+            var position = new Vector2(
+                x: _categoryDropdown.bounds.X + _categoryDropdown.bounds.Width - 5,
+                y: _categoryDropdown.bounds.Y + 10
+            );
 
             spriteBatch.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
                 SpriteEffects.None, 1f);
 
-            if (_categoryDropdown.IsExpanded)
-            {
-                spriteBatch.Draw(Game1.mouseCursors,
-                    new Vector2(position.X + 2 * Game1.pixelZoom, position.Y + 3 * Game1.pixelZoom),
-                    new Rectangle(sourceRect.X + 2, sourceRect.Y + 3, 5, 6), Color.White, 0, Vector2.Zero,
-                    Game1.pixelZoom, SpriteEffects.FlipVertically, 1f);
-            }
+            // if (_categoryDropdown.IsExpanded)
+            // {
+            //     spriteBatch.Draw(Game1.mouseCursors,
+            //         new Vector2(position.X + 2 * Game1.pixelZoom, position.Y + 3 * Game1.pixelZoom),
+            //         new Rectangle(sourceRect.X + 2, sourceRect.Y + 3, 5, 6), Color.White, 0, Vector2.Zero,
+            //         Game1.pixelZoom, SpriteEffects.FlipVertically, 1f);
+            // }
 
             _categoryDropdown.Draw(spriteBatch);
         }
@@ -66,14 +66,14 @@ namespace ItemResearchSpawner.Components
                 categories.Add(item.Category);
             }
 
-            yield return "all";
+            yield return "All";
 
             foreach (var category in categories.OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
             {
                 yield return category;
             }
 
-            yield return "misc";
+            yield return "Misc";
         }
     }
 }
