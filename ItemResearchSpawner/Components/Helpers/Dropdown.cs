@@ -107,7 +107,7 @@ namespace ItemResearchSpawner.Components
 
         public void Draw(SpriteBatch sprites, float opacity = 1)
         {
-            RenderHelper.DrawMenuBox(bounds.X, bounds.Y, List.MaxLabelWidth, List.MaxLabelHeight, out var textPos);
+            RenderHelpers.DrawMenuBox(bounds.X, bounds.Y, List.MaxLabelWidth, List.MaxLabelHeight, out var textPos);
             sprites.DrawString(_font, List.SelectedLabel, textPos, Color.Black * opacity);
 
             if (IsExpanded)

@@ -24,7 +24,7 @@ namespace ItemResearchSpawner.Components
         public ItemSortTab(IContentHelper content, IMonitor monitor, int x, int y)
         {
             _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
-            _sortLabelIndent = RenderHelper.GetSpaceIndent(Game1.smallFont, _sortTexture.Width) + " ";
+            _sortLabelIndent = RenderHelpers.GetSpaceIndent(Game1.smallFont, _sortTexture.Width) + " ";
             
             _sortBy = ItemSortOption.Category;
 
@@ -43,7 +43,7 @@ namespace ItemResearchSpawner.Components
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            RenderHelper.DrawTextMenuBox(_sortButton.bounds.X, _sortButton.bounds.Y, Game1.smallFont, _sortButton.name);
+            RenderHelpers.DrawTextMenuBox(_sortButton.bounds.X, _sortButton.bounds.Y, Game1.smallFont, _sortButton.name);
             _sortIcon.draw(spriteBatch);
         }
 

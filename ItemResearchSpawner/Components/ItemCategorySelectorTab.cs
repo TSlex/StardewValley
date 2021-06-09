@@ -24,9 +24,9 @@ namespace ItemResearchSpawner.Components
             _categoryDropdown = new Dropdown<string>(x, y, Game1.smallFont, _categoryDropdown?.Selected ?? "All",
                 _availableCategories, p => p);
 
-            _categoryDropdown.IsExpanded = true;
+            // _categoryDropdown.IsExpanded = false;
         }
-        
+
         public Rectangle Bounds => _categoryDropdown.bounds;
 
         public void Draw(SpriteBatch spriteBatch)

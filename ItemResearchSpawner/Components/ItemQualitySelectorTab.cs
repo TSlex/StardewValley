@@ -32,7 +32,7 @@ namespace ItemResearchSpawner.Components
         {
             GetCurrentQualityIcon(out var texture, out var sourceRect, out var color);
 
-            RenderHelper.DrawMenuBox(_qualityButton.bounds.X, _qualityButton.bounds.Y,
+            RenderHelpers.DrawMenuBox(_qualityButton.bounds.X, _qualityButton.bounds.Y,
                 _qualityButton.bounds.Width - UIConstants.BorderWidth,
                 _qualityButton.bounds.Height - UIConstants.BorderWidth, out var qualityIconPos);
 

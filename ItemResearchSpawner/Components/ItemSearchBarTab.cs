@@ -53,7 +53,7 @@ namespace ItemResearchSpawner.Components
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            RenderHelper.DrawMenuBox(_searchBoxBounds.X, _searchBoxBounds.Y - UIConstants.BorderWidth / 2,
+            RenderHelpers.DrawMenuBox(_searchBoxBounds.X, _searchBoxBounds.Y - UIConstants.BorderWidth / 2,
                 _searchBoxBounds.Width - UIConstants.BorderWidth * 3 / 2,
                 _searchBoxBounds.Height - UIConstants.BorderWidth, out _);
 

@@ -21,7 +21,7 @@ namespace ItemResearchSpawner.Components
 
             _researchButton = new ClickableTextureComponent(
                 new Rectangle(
-                    RenderHelper.GetChildCenterPosition(x, _researchArea.bounds.Width + 2 * UIConstants.BorderWidth,
+                    RenderHelpers.GetChildCenterPosition(x, _researchArea.bounds.Width + 2 * UIConstants.BorderWidth,
                         _researchTexture.Width),
                     _researchArea.bounds.Height + 48 + y, _researchTexture.Width,
                     _researchTexture.Height), _researchTexture,
@@ -30,11 +30,11 @@ namespace ItemResearchSpawner.Components
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            RenderHelper.DrawMenuBox(_researchArea.bounds.X, _researchArea.bounds.Y,
+            RenderHelpers.DrawMenuBox(_researchArea.bounds.X, _researchArea.bounds.Y,
                 _researchArea.bounds.Width, _researchArea.bounds.Height, out var areaInnerAnchors);
 
             var researchItemCellX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f - Game1.tileSize / 2f;
-            RenderHelper.DrawItemBox((int) researchItemCellX, (int) areaInnerAnchors.Y + 10, Game1.tileSize,
+            RenderHelpers.DrawItemBox((int) researchItemCellX, (int) areaInnerAnchors.Y + 10, Game1.tileSize,
                 Game1.tileSize,
                 out _);
 

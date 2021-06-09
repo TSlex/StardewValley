@@ -7,7 +7,7 @@ using StardewValley.Menus;
 
 namespace ItemResearchSpawner.Utils
 {
-    internal static class RenderHelper
+    internal static class RenderHelpers
     {
         public static void DrawMenuBox(int x, int y, int innerWidth, int innerHeight, out Vector2 innerDrawPosition)
         {
