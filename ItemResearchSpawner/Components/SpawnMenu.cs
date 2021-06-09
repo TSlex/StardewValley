@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
@@ -19,16 +17,12 @@ namespace ItemResearchSpawner.Components
         private readonly Action<SpriteBatch> _baseDraw;
         private readonly IContentHelper _content;
 
-        // private Dropdown<string> _categoryDropdown;
-
-        private TextBox _searchBox;
-        private Rectangle _searchBoxBounds;
-        private ClickableComponent _searchBoxArea;
-        private ClickableTextureComponent _searchIcon;
-
-        // private readonly string[] _availableCategories;
-
-        private string _searchText;
+        // private TextBox _searchBox;
+        // private Rectangle _searchBoxBounds;
+        // private ClickableComponent _searchBoxArea;
+        // private ClickableTextureComponent _searchIcon;
+        //
+        // private string _searchText;
 
         private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
@@ -55,37 +49,11 @@ namespace ItemResearchSpawner.Components
             _monitor = monitor;
             _content = content;
             _baseDraw = RenderHelper.GetBaseDraw(this);
-            // _availableCategories = GetDisplayCategories(spawnableItems).ToArray();
 
-            _searchText = "Pumpkin";
+            // _searchText = "Pumpkin";
 
             InitializeComponents();
         }
-
-        // private IEnumerable<string> GetDisplayCategories(SpawnableItem[] items)
-        // {
-        //     var categories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        //
-        //     foreach (var item in items)
-        //     {
-        //         if (item.Category.ToLower().Equals("all") || item.Category.ToLower().Equals("misc"))
-        //         {
-        //             continue;
-        //         }
-        //
-        //         categories.Add(item.Category);
-        //     }
-        //
-        //     yield return "all";
-        //
-        //     foreach (var category in categories.OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
-        //     {
-        //         yield return category;
-        //     }
-        //
-        //     yield return "misc";
-        // }
-
 
         private void InitializeComponents()
         {
@@ -104,38 +72,34 @@ namespace ItemResearchSpawner.Components
             _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor);
             _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
                 _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
+            _searchBarTab = new ItemSearchBarTab(_content, _monitor, _categorySelector.Bounds.Right + 20, barTopAnchor);
 
-            _searchBox = new TextBox(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont,
-                Game1.textColor)
-            {
-                X = rootRightAnchor - 52,
-                Y = barTopAnchor,
-                Height = 0,
-                Width = 200,
-                Text = _searchText
-            };
-
-            _searchBoxBounds = new Rectangle(_searchBox.X, _searchBox.Y + 4, _searchBox.Width, 12 * Game1.pixelZoom);
-
-            _searchBoxArea =
-                new ClickableComponent(
-                    new Rectangle(_searchBoxBounds.X, _searchBoxBounds.Y, _searchBoxBounds.Width,
-                        _searchBoxBounds.Height), "");
-
-            var iconRect = new Rectangle(80, 0, 13, 13);
-            const float iconScale = 2.5f;
-
-            var iconBounds = new Rectangle((int) (_searchBoxBounds.Right - iconRect.Width * iconScale),
-                (int) (_searchBoxBounds.Center.Y - iconRect.Height / 2f * iconScale),
-                (int) (iconRect.Width * iconScale), (int) (iconRect.Height * iconScale)
-            );
-
-            _searchIcon = new ClickableTextureComponent(iconBounds, Game1.mouseCursors, iconRect, iconScale);
-
-            // _categoryDropdown = new Dropdown<string>(_itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y,
-            //     Game1.smallFont, _categoryDropdown?.Selected ?? "All", _availableCategories, p => p);
+            // _searchBox = new TextBox(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont,
+            //     Game1.textColor)
+            // {
+            //     X = rootRightAnchor - 52,
+            //     Y = barTopAnchor,
+            //     Height = 0,
+            //     Width = 200,
+            //     Text = _searchText
+            // };
             //
-            // _categoryDropdown.IsExpanded = true;
+            // _searchBoxBounds = new Rectangle(_searchBox.X, _searchBox.Y + 4, _searchBox.Width, 12 * Game1.pixelZoom);
+            //
+            // _searchBoxArea =
+            //     new ClickableComponent(
+            //         new Rectangle(_searchBoxBounds.X, _searchBoxBounds.Y, _searchBoxBounds.Width,
+            //             _searchBoxBounds.Height), "");
+            //
+            // var iconRect = new Rectangle(80, 0, 13, 13);
+            // const float iconScale = 2.5f;
+            //
+            // var iconBounds = new Rectangle((int) (_searchBoxBounds.Right - iconRect.Width * iconScale),
+            //     (int) (_searchBoxBounds.Center.Y - iconRect.Height / 2f * iconScale),
+            //     (int) (iconRect.Width * iconScale), (int) (iconRect.Height * iconScale)
+            // );
+            //
+            // _searchIcon = new ClickableTextureComponent(iconBounds, Game1.mouseCursors, iconRect, iconScale);
         }
 
         #region InputHandlers
@@ -152,47 +116,22 @@ namespace ItemResearchSpawner.Components
             _qualitySelector.Draw(spriteBatch);
             _itemSortTab.Draw(spriteBatch);
             _categorySelector.Draw(spriteBatch);
-
-            DrawSearchBox(spriteBatch);
-            // DrawCategoryDropdown(spriteBatch);
-
+            _searchBarTab.Draw(spriteBatch);
+            
             //TODO: draw held item
 
             drawMouse(spriteBatch);
         }
 
-        // private void DrawCategoryDropdown(SpriteBatch spriteBatch)
+        // private void DrawSearchBox(SpriteBatch spriteBatch)
         // {
-        //     var position = new Vector2(
-        //         x: _categoryDropdown.bounds.X + _categoryDropdown.bounds.Width - 12,
-        //         y: _categoryDropdown.bounds.Y + 8
-        //     );
+        //     RenderHelper.DrawMenuBox(_searchBoxBounds.X, _searchBoxBounds.Y - UIConstants.BorderWidth / 2,
+        //         _searchBoxBounds.Width - UIConstants.BorderWidth * 3 / 2,
+        //         _searchBoxBounds.Height - UIConstants.BorderWidth, out _);
         //
-        //     var sourceRect = CursorSprites.DropdownButton;
-        //
-        //     spriteBatch.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
-        //         SpriteEffects.None, 1f);
-        //
-        //     if (_categoryDropdown.IsExpanded)
-        //     {
-        //         spriteBatch.Draw(Game1.mouseCursors,
-        //             new Vector2(position.X + 2 * Game1.pixelZoom, position.Y + 3 * Game1.pixelZoom),
-        //             new Rectangle(sourceRect.X + 2, sourceRect.Y + 3, 5, 6), Color.White, 0, Vector2.Zero,
-        //             Game1.pixelZoom, SpriteEffects.FlipVertically, 1f);
-        //     }
-        //
-        //     _categoryDropdown.Draw(spriteBatch);
+        //     _searchBox.Draw(spriteBatch);
+        //     spriteBatch.Draw(_searchIcon.texture, _searchIcon.bounds, _searchIcon.sourceRect, Color.White);
         // }
-
-        private void DrawSearchBox(SpriteBatch spriteBatch)
-        {
-            RenderHelper.DrawMenuBox(_searchBoxBounds.X, _searchBoxBounds.Y - UIConstants.BorderWidth / 2,
-                _searchBoxBounds.Width - UIConstants.BorderWidth * 3 / 2,
-                _searchBoxBounds.Height - UIConstants.BorderWidth, out _);
-
-            _searchBox.Draw(spriteBatch);
-            spriteBatch.Draw(_searchIcon.texture, _searchIcon.bounds, _searchIcon.sourceRect, Color.White);
-        }
 
         #endregion
     }
