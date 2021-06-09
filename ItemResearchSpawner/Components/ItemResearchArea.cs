@@ -28,6 +28,8 @@ namespace ItemResearchSpawner.Components
                 new Rectangle(0, 0, _researchTexture.Width, _researchTexture.Height), 1f);
         }
 
+        public Rectangle Bounds => _researchArea.bounds;
+
         public void Draw(SpriteBatch spriteBatch)
         {
             RenderHelpers.DrawMenuBox(_researchArea.bounds.X, _researchArea.bounds.Y,

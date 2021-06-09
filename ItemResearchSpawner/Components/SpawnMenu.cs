@@ -166,7 +166,9 @@ namespace ItemResearchSpawner.Components
                 _sortOption);
             _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
                 _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
-            _searchBarTab = new ItemSearchBarTab(_content, _monitor, _categorySelector.Bounds.Right + 20, barTopAnchor);
+
+            _searchBarTab = new ItemSearchBarTab(_content, _monitor, _categorySelector.Right + 20, barTopAnchor,
+                _researchArea.Bounds.Right - _categorySelector.Right + 20 - 10 * Game1.pixelZoom);
         }
 
         public override void draw(SpriteBatch spriteBatch)
@@ -180,7 +182,7 @@ namespace ItemResearchSpawner.Components
             _qualitySelector.Draw(spriteBatch);
             _itemSortTab.Draw(spriteBatch);
             _categorySelector.Draw(spriteBatch);
-            // _searchBarTab.Draw(spriteBatch);
+            _searchBarTab.Draw(spriteBatch);
 
             //TODO: draw held item
 
@@ -253,7 +255,8 @@ namespace ItemResearchSpawner.Components
 
             if (!Helpers.EqualsCaseInsensitive(_categorySelector.SelectedCategory, "All"))
             {
-                items = items.Where(item => Helpers.EqualsCaseInsensitive(item.Category, _categorySelector.SelectedCategory));
+                items = items.Where(item =>
+                    Helpers.EqualsCaseInsensitive(item.Category, _categorySelector.SelectedCategory));
             }
 
             // string search = this.SearchBox.Text.Trim();

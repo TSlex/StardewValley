@@ -37,10 +37,12 @@ namespace ItemResearchSpawner.Components
             _categoryDropdown.IsExpanded = false;
         }
 
+        public int Right => Bounds.Left + Bounds.Width - 5 + 4 * Game1.pixelZoom + CursorSprites.DropdownButton.Width;
+
         public Rectangle Bounds => _categoryDropdown.bounds;
         public int MyID => _categoryDropdown.myID;
         public string SelectedCategory => _categoryDropdown.Selected;
-        
+
         public bool TryClick(int x, int y)
         {
             if (_categoryDropdown.TryClick(x, y, out var itemClicked, out var dropdownToggled))
@@ -54,7 +56,7 @@ namespace ItemResearchSpawner.Components
                 if (itemClicked)
                 {
                     var category = _categoryDropdown.Selected;
-                    
+
                     if (!_categoryDropdown.TrySelect(category))
                     {
                         _monitor.Log($"Failed selecting category filter category '{category}'.", LogLevel.Warn);

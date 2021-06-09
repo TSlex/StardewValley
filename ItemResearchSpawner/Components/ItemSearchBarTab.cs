@@ -11,53 +11,48 @@ namespace ItemResearchSpawner.Components
     {
         private TextBox _searchBox;
 
-        private readonly Rectangle _searchBoxBounds;
+        // private readonly Rectangle _searchBoxBounds;
 
         private readonly ClickableComponent _searchBoxArea;
         private readonly ClickableTextureComponent _searchIcon;
 
         private string _searchText;
 
-
-        public ItemSearchBarTab(IContentHelper content, IMonitor monitor, int x, int y)
+        public ItemSearchBarTab(IContentHelper content, IMonitor monitor, int x, int y, int width)
         {
             _searchText = "Pumpkin";
+
+            _searchBoxArea =
+                new ClickableComponent(new Rectangle(x, y, width, 36 - 2), "");
 
             _searchBox = new TextBox(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont,
                 Game1.textColor)
             {
-                X = x,
-                Y = y,
+                X = _searchBoxArea.bounds.X,
+                Y = _searchBoxArea.bounds.Y + 5,
                 Height = 0,
-                Width = 200,
+                Width = _searchBoxArea.bounds.Width,
                 Text = _searchText
             };
 
-            _searchBoxBounds = new Rectangle(_searchBox.X, _searchBox.Y + 4, _searchBox.Width, 36);
-
-            _searchBoxArea =
-                new ClickableComponent(
-                    new Rectangle(_searchBoxBounds.X, _searchBoxBounds.Y, _searchBoxBounds.Width,
-                        _searchBoxBounds.Height), "");
-
             var iconRect = new Rectangle(80, 0, 13, 13);
             const float iconScale = 2.5f;
-
-            var iconBounds = new Rectangle((int) (_searchBoxBounds.Right - iconRect.Width * iconScale),
-                (int) (_searchBoxBounds.Center.Y - iconRect.Height / 2f * iconScale),
+            
+            var iconBounds = new Rectangle((int) (_searchBoxArea.bounds.Right - iconRect.Width * iconScale + 16),
+                (int) (_searchBoxArea.bounds.Center.Y + UIConstants.BorderWidth - iconRect.Height / 2f * iconScale + 2),
                 (int) (iconRect.Width * iconScale), (int) (iconRect.Height * iconScale)
             );
-
+            
             _searchIcon = new ClickableTextureComponent(iconBounds, Game1.mouseCursors, iconRect, iconScale);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            RenderHelpers.DrawMenuBox(_searchBoxBounds.X, _searchBoxBounds.Y - UIConstants.BorderWidth / 2,
-                _searchBoxBounds.Width - UIConstants.BorderWidth * 3 / 2,
-                _searchBoxBounds.Height - UIConstants.BorderWidth, out _);
-
+            RenderHelpers.DrawMenuBox(_searchBoxArea.bounds.X, _searchBoxArea.bounds.Y,
+                _searchBoxArea.bounds.Width, _searchBoxArea.bounds.Height, out _);
+            
             _searchBox.Draw(spriteBatch);
+            
             spriteBatch.Draw(_searchIcon.texture, _searchIcon.bounds, _searchIcon.sourceRect, Color.White);
         }
     }
