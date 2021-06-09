@@ -45,12 +45,12 @@ namespace ItemResearchSpawner.Components
             bounds.X = x;
             bounds.Y = y;
 
-            _list.bounds.X = bounds.X;
-            _list.bounds.Y = bounds.Bottom;
+            _list.bounds.X = bounds.X + UIConstants.BorderWidth;
+            _list.bounds.Y = bounds.Y + UIConstants.BorderWidth;
 
             _list.ReinitializeComponents();
 
-            bounds.Height = (int) _font.MeasureString("ABCDEFGHIJKLMNOPQRSTUVWXYZ").Y - 10 + UIConstants.BorderWidth;
+            bounds.Height = (int) _font.MeasureString("ABCDEFGHIJKLMNOPQRSTUVWXYZ").Y + UIConstants.BorderWidth * 2;
             bounds.Width = _list.MaxLabelWidth + UIConstants.BorderWidth * 2;
 
             _list.ReinitializeControllerFlow();

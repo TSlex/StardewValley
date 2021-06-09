@@ -81,13 +81,13 @@ namespace ItemResearchSpawner.Components
             spriteBatch.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
                 SpriteEffects.None, 1f);
 
-            // if (_categoryDropdown.IsExpanded)
-            // {
-            //     spriteBatch.Draw(Game1.mouseCursors,
-            //         new Vector2(position.X + 2 * Game1.pixelZoom, position.Y + 3 * Game1.pixelZoom),
-            //         new Rectangle(sourceRect.X + 2, sourceRect.Y + 3, 5, 6), Color.White, 0, Vector2.Zero,
-            //         Game1.pixelZoom, SpriteEffects.FlipVertically, 1f);
-            // }
+            if (_categoryDropdown.IsExpanded)
+            {
+                spriteBatch.Draw(Game1.mouseCursors,
+                    new Vector2(position.X + 2 * Game1.pixelZoom, position.Y + 3 * Game1.pixelZoom),
+                    new Rectangle(sourceRect.X + 2, sourceRect.Y + 3, 5, 6), Color.White, 0, Vector2.Zero,
+                    Game1.pixelZoom, SpriteEffects.FlipVertically, 1f);
+            }
 
             _categoryDropdown.Draw(spriteBatch);
         }
