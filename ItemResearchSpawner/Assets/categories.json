@@ -21,7 +21,8 @@
       "Class": [
         "StardewValley.Tools.Slingshot"
       ]
-    }
+    },
+    "ResearchCount": 1
   },
   {
     "Label": "Weapons",
@@ -38,7 +39,8 @@
         "Object:288",
         "Object:441"
       ]
-    }
+    },
+    "ResearchCount": 1
   },
   {
     "Label": "Hats",
@@ -46,7 +48,8 @@
       "ObjCategory": [
         -95
       ]
-    }
+    },
+    "ResearchCount": 1
   },
   {
     "Label": "Clothes",
@@ -54,7 +57,8 @@
       "ObjCategory": [
         -100
       ]
-    }
+    },
+    "ResearchCount": 1
   },
   {
     "Label": "Boots",
@@ -62,7 +66,8 @@
       "ObjCategory": [
         -97
       ]
-    }
+    },
+    "ResearchCount": 1
   },
   {
     "Label": "Rings",
@@ -70,7 +75,8 @@
       "ObjCategory": [
         -96
       ]
-    }
+    },
+    "ResearchCount": 1
   },
   {
     "Label": "Crops",
@@ -84,7 +90,8 @@
       "ItemId": [
         "Object:417"
       ]
-    }
+    },
+    "ResearchCount": 20
   },
   {
     "Label": "Seeds",
@@ -92,7 +99,8 @@
       "ObjCategory": [
         -74
       ]
-    }
+    },
+    "ResearchCount": 20
   },
   {
     "Label": "Animal products",
@@ -112,7 +120,8 @@
         "Object:680",
         "Object:857"
       ]
-    }
+    },
+    "ResearchCount": 25
   },
   {
     "Label": "Fish",
@@ -129,7 +138,8 @@
       "ObjCategory": [
         -20
       ]
-    }
+    },
+    "ResearchCount": 5
   },
   {
     "Label": "Minerals and artifacts",
@@ -147,7 +157,8 @@
         "Object:537",
         "Object:749"
       ]
-    }
+    },
+    "ResearchCount": 20
   },
   {
     "Label": "Resources",
@@ -156,7 +167,8 @@
         -15,
         -16
       ]
-    }
+    },
+    "ResearchCount": 50
   },
   {
     "Label": "Crafting products",
@@ -170,7 +182,8 @@
         "Object:463",
         "Object:464"
       ]
-    }
+    },
+    "ResearchCount": 20
   },
   {
     "Label": "Artisan and cooking",
@@ -189,7 +202,8 @@
         "Object:419",
         "Object:423"
       ]
-    }
+    },
+    "ResearchCount": 10
   },
   {
     "Label": "Furniture",
@@ -197,7 +211,8 @@
       "Class": [
         "StardewValley.Objects.Furniture"
       ]
-    }
+    },
+    "ResearchCount": 5
   },
   {
     "Label": "Decor",
@@ -205,6 +220,7 @@
       "ObjCategory": [
         -24
       ]
-    }
+    },
+    "ResearchCount": 1
   }
 ]

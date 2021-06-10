@@ -76,7 +76,6 @@
       <Content Include="Assets\categories.json" />
       <Content Include="Assets\empty-quality-icon.png" />
       <Content Include="Assets\item-data.json" />
-      <Content Include="Assets\progression_test.json" />
       <Content Include="Assets\search-button.png" />
       <Content Include="Assets\sort-icon.png" />
       <Content Include="manifest.json" />

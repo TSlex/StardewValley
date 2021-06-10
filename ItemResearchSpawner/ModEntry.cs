@@ -13,19 +13,28 @@ namespace ItemResearchSpawner
     internal class ModEntry : Mod
     {
         private ModConfig _config;
+        private IModHelper _helper;
         private ModItemData _itemData;
         private ModDataCategory[] _categories;
+        private SpawnableItem[] _items;
+
         private ProgressionManager _progressionManager;
 
         public override void Entry(IModHelper helper)
         {
+            _helper = helper;
             _config = helper.ReadConfig<ModConfig>();
             _itemData = helper.Data.ReadJsonFile<ModItemData>("assets/item-data.json");
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
 
-            _progressionManager = new ProgressionManager(Monitor, helper);
-
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+        }
+
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            _items = GetSpawnableItems().ToArray();
+            _progressionManager = new ProgressionManager(Monitor, _helper, _categories, _items);
         }
 
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
@@ -43,8 +52,7 @@ namespace ItemResearchSpawner
 
         private IClickableMenu GetSpawnMenu()
         {
-            var items = GetSpawnableItems().ToArray();
-            return new SpawnMenu(items, Helper.Content, Monitor);
+            return new SpawnMenu(_items, Helper.Content, Monitor);
         }
 
         private IEnumerable<SpawnableItem> GetSpawnableItems()

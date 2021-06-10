@@ -3,7 +3,7 @@ using StardewValley;
 
 namespace ItemResearchSpawner.Models
 {
-    public class SearchableItem
+    internal class SearchableItem
     {
         public ItemType Type { get; }
         public Item Item { get; }
@@ -26,16 +26,6 @@ namespace ItemResearchSpawner.Models
             ID = item.ID;
             CreateItem = item.CreateItem;
             Item = item.Item;
-        }
-
-        public bool NameContains(string substring)
-        {
-            return Name.ToLower().Contains(substring.ToLower()) || DisplayName.ToLower().Contains(substring.ToLower());
-        }
-
-        public bool NameEquivalentTo(string name)
-        {
-            return Name.ToLower().Equals(name.ToLower()) || DisplayName.ToLower().Equals(name.ToLower());
         }
     }
 }

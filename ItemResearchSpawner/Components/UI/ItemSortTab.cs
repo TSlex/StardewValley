@@ -10,7 +10,7 @@ using StardewValley.Menus;
 
 namespace ItemResearchSpawner.Components
 {
-    public class ItemSortTab
+    internal class ItemSortTab
     {
         private readonly Texture2D _sortTexture;
 

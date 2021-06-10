@@ -2,14 +2,17 @@
 
 namespace ItemResearchSpawner.Models
 {
-    public class ResearchProgression
+    internal class ResearchProgression
     {
-        public ICollection<ResearchItem> ResearchItems;
+        public ICollection<ResearchItem> ResearchItems { get; set; }
     }
 
-    public class ResearchItem
+    internal class ResearchItem
     {
-        public int ItemId;
-        public int ResearchCount;
+        public int ItemId { get; set; }
+        public int ResearchCount { get; set; }
+        public int ResearchCountGold { get; set; }
+        public int ResearchCountSilver { get; set; }
+        public int ResearchCountIridium { get; set; }
     }
 }

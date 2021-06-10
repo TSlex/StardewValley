@@ -8,7 +8,7 @@ using StardewValley.Menus;
 
 namespace ItemResearchSpawner.Components
 {
-    public class ItemSearchBarTab
+    internal class ItemSearchBarTab
     {
         private TextBox _searchBox;
 

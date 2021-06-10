@@ -8,7 +8,7 @@ using StardewValley.Menus;
 
 namespace ItemResearchSpawner.Components
 {
-    public class ItemQualitySelectorTab
+    internal class ItemQualitySelectorTab
     {
         private readonly Texture2D _emptyQualityTexture;
 

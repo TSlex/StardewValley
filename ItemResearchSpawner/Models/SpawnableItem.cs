@@ -1,6 +1,6 @@
 ﻿namespace ItemResearchSpawner.Models
 {
-    public class SpawnableItem : SearchableItem
+    internal class SpawnableItem : SearchableItem
     {
         public string Category { get; }
 

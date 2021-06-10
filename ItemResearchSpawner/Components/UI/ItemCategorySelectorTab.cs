@@ -10,7 +10,7 @@ using StardewValley;
 
 namespace ItemResearchSpawner.Components
 {
-    public class ItemCategorySelectorTab
+    internal class ItemCategorySelectorTab
     {
         private readonly IMonitor _monitor;
         private readonly Dropdown<string> _categoryDropdown;

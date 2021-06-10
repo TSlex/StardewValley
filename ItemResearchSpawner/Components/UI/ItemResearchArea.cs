@@ -7,7 +7,7 @@ using StardewValley.Menus;
 
 namespace ItemResearchSpawner.Components
 {
-    public class ItemResearchArea
+    internal class ItemResearchArea
     {
         private readonly ClickableComponent _researchArea;
         private readonly ClickableTextureComponent _researchButton;
@@ -69,7 +69,9 @@ namespace ItemResearchSpawner.Components
                 Game1.tileSize,
                 out _);
 
-            const string researchProgressString = "(0 / 20)";
+            var researchProgressString = _researchItem != null
+                ? ProgressionManager.Instance.GetItemProgression(_researchItem)
+                : "(0 / 0)";
 
             var progressFont = Game1.dialogueFont;
             var progressPositionX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f -
