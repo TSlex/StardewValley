@@ -237,7 +237,7 @@ namespace ItemResearchSpawner.Components
         public override void performHoverAction(int x, int y)
         {
             _overDropdown = _categorySelector.Bounds.Contains(x, y);
-            
+
             if (!_searchBarTab.PersistFocus)
             {
                 var overSearchBox = _searchBarTab.Bounds.Contains(x, y);
@@ -263,19 +263,45 @@ namespace ItemResearchSpawner.Components
             spriteBatch.Draw(Game1.fadeToBlackRect,
                 new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height), Color.Black * 0.5f);
 
+            _researchArea.Draw(spriteBatch);
+
             _baseDraw(spriteBatch);
 
-            _researchArea.Draw(spriteBatch);
             _qualitySelector.Draw(spriteBatch);
             _itemSortTab.Draw(spriteBatch);
             _categorySelector.Draw(spriteBatch);
             _searchBarTab.Draw(spriteBatch);
 
-            //TODO: draw held item
-
-            // _baseDraw(spriteBatch);
-
+            DrawHeldItem(spriteBatch);
             drawMouse(spriteBatch);
+        }
+
+        private void DrawHeldItem(SpriteBatch spriteBatch)
+        {
+            if (hoverText != null && (hoveredItem == null || ItemsToGrabMenu == null))
+            {
+                if (hoverAmount > 0)
+                {
+                    drawToolTip(spriteBatch, hoverText, "", null, true, moneyAmountToShowAtBottom: hoverAmount);
+                }
+                else
+                {
+                    drawHoverText(spriteBatch, hoverText, Game1.smallFont);
+                }
+            }
+
+            if (hoveredItem != null)
+            {
+                drawToolTip(spriteBatch, hoveredItem.getDescription(), hoveredItem.DisplayName, hoveredItem,
+                    heldItem != null);
+            }
+            else if (hoveredItem != null && ItemsToGrabMenu != null)
+            {
+                drawToolTip(spriteBatch, ItemsToGrabMenu.descriptionText, ItemsToGrabMenu.descriptionTitle, hoveredItem,
+                    heldItem != null);
+            }
+
+            heldItem?.drawInMenu(spriteBatch, new Vector2(Game1.getOldMouseX() + 8, Game1.getOldMouseY() + 8), 1f);
         }
 
         public override void update(GameTime time)
