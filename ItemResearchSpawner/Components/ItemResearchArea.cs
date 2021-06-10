@@ -13,6 +13,8 @@ namespace ItemResearchSpawner.Components
         private readonly ClickableTextureComponent _researchButton;
         private readonly Texture2D _researchTexture;
 
+        private Item _researchItem;
+
         public ItemResearchArea(IContentHelper content, IMonitor monitor, int x, int y)
         {
             _researchTexture = content.Load<Texture2D>("assets/search-button.png");
@@ -29,6 +31,25 @@ namespace ItemResearchSpawner.Components
         }
 
         public Rectangle Bounds => _researchArea.bounds;
+        public Rectangle ButtonBounds => _researchButton.bounds;
+        public Item ResearchItem => _researchItem;
+
+        public bool TrySetItem(Item item)
+        {
+            if (_researchItem != null) return false;
+
+            _researchItem = item;
+
+            return true;
+        }
+
+        public Item ReturnItem()
+        {
+            var item = _researchItem;
+            _researchItem = null;
+
+            return item;
+        }
 
         public void Draw(SpriteBatch spriteBatch)
         {
@@ -50,6 +71,8 @@ namespace ItemResearchSpawner.Components
                 new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
 
             spriteBatch.Draw(_researchButton.texture, _researchButton.bounds, _researchButton.sourceRect, Color.White);
+
+            _researchItem?.drawInMenu(spriteBatch, new Vector2(researchItemCellX, areaInnerAnchors.Y + 10), 1f);
         }
     }
 }

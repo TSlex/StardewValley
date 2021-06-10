@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Force.DeepCloner;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
@@ -131,6 +132,10 @@ namespace ItemResearchSpawner.Components
             else if (_categorySelector.TryClick(x, y))
             {
             }
+            else if (_researchArea.Bounds.Contains(x, y))
+            {
+                OnResearchAreaLeftClick();
+            }
             else if (_searchBarTab.Bounds.Contains(x, y))
             {
                 if (!_searchBarTab.Selected || !_searchBarTab.PersistFocus)
@@ -144,6 +149,58 @@ namespace ItemResearchSpawner.Components
                 }
 
                 base.receiveLeftClick(x, y, playSound);
+            }
+        }
+
+        private void OnResearchAreaLeftClick()
+        {
+            if (_researchArea.ResearchItem != null)
+            {
+                if (heldItem != null)
+                {
+                    var temp = _researchArea.ReturnItem();
+
+                    if (heldItem.Name.Equals(temp.Name, StringComparison.InvariantCultureIgnoreCase)
+                        && heldItem is Object heldObj && temp is Object resObj &&
+                        heldObj.quality.Equals(resObj.quality))
+                    {
+                        var rest = 0;
+
+                        if (temp.Stack + heldItem.Stack > temp.maximumStackSize())
+                        {
+                            rest = temp.Stack + heldItem.Stack - temp.maximumStackSize();
+                        }
+
+                        var quantityToTransfer = heldItem.Stack - rest;
+
+                        temp.Stack += quantityToTransfer;
+
+                        _researchArea.TrySetItem(temp);
+
+                        if (heldItem.Stack - quantityToTransfer <= 0)
+                        {
+                            heldItem = null;
+                        }
+                        else
+                        {
+                            heldItem.Stack -= quantityToTransfer;
+                        }
+                    }
+                    else
+                    {
+                        _researchArea.TrySetItem(heldItem);
+                        heldItem = temp;
+                    }
+                }
+                else
+                {
+                    heldItem = _researchArea.ReturnItem();
+                }
+            }
+            else
+            {
+                _researchArea.TrySetItem(heldItem);
+                heldItem = null;
             }
         }
 
@@ -169,9 +226,49 @@ namespace ItemResearchSpawner.Components
             {
                 _categorySelector.ResetCategory();
             }
+            else if (_researchArea.Bounds.Contains(x, y))
+            {
+                OnResearchAreaRightClick();
+            }
             else
             {
                 base.receiveRightClick(x, y, playSound);
+            }
+        }
+
+        private void OnResearchAreaRightClick()
+        {
+            if (_researchArea.ResearchItem != null)
+            {
+                var temp = _researchArea.ReturnItem();
+
+                if (heldItem == null)
+                {
+                    var newItem = temp.DeepClone();
+
+                    newItem.Stack = 1;
+                    temp.Stack--;
+
+                    heldItem = newItem;
+                    _researchArea.TrySetItem(temp);
+                }
+                else if (heldItem.Name.Equals(temp.Name, StringComparison.InvariantCultureIgnoreCase)
+                         && heldItem is Object heldObj && temp is Object resObj &&
+                         heldObj.quality.Equals(resObj.quality)
+                         && heldItem.Stack + 1 <= heldItem.maximumStackSize())
+                {
+                    heldItem.Stack++;
+
+                    if (temp.Stack - 1 > 0)
+                    {
+                        temp.Stack--;
+                        _researchArea.TrySetItem(temp);
+                    }
+                }
+                else
+                {
+                    _researchArea.TrySetItem(temp);
+                }
             }
         }
 
@@ -308,6 +405,17 @@ namespace ItemResearchSpawner.Components
         {
             _searchBarTab.Update(time);
             base.update(time);
+        }
+
+        protected override void cleanupBeforeExit()
+        {
+            if (_researchArea.ResearchItem != null)
+            {
+                Game1.createItemDebris(_researchArea.ReturnItem(), Game1.player.getStandingPosition(),
+                    Game1.player.FacingDirection);
+            }
+            
+            base.cleanupBeforeExit();
         }
 
         private void InitializeComponents()
