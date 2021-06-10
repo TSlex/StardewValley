@@ -145,6 +145,10 @@ namespace ItemResearchSpawner.Components
                 if (!_searchBarTab.Selected || !_searchBarTab.PersistFocus)
                     _searchBarTab.Focus(true);
             }
+            else if (trashCan.containsPoint(x, y) && heldItem != null)
+            {
+                TryTrashItem();
+            }
             else
             {
                 if (_searchBarTab.Selected)
@@ -311,6 +315,10 @@ namespace ItemResearchSpawner.Components
                     ScrollView(direction);
                 }
             }
+            else if (key == Keys.Delete && heldItem != null)
+            {
+                TryTrashItem();
+            }
             else
             {
                 var isIgnoredExitKey = _searchBarTab.Selected && isExitButton && !isEscape;
@@ -318,6 +326,15 @@ namespace ItemResearchSpawner.Components
                 {
                     base.receiveKeyPress(key);
                 }
+            }
+        }
+
+        private void TryTrashItem()
+        {
+            if (ProgressionManager.Instance.ItemResearched(heldItem))
+            {
+                Utility.trashItem(heldItem);
+                heldItem = null;
             }
         }
 
@@ -418,7 +435,7 @@ namespace ItemResearchSpawner.Components
                 Game1.createItemDebris(_researchArea.ReturnItem(), Game1.player.getStandingPosition(),
                     Game1.player.FacingDirection);
             }
-            
+
             base.cleanupBeforeExit();
         }
 

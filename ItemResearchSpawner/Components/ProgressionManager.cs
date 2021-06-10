@@ -21,6 +21,10 @@ namespace ItemResearchSpawner.Components
         private readonly SpawnableItem[] _items;
 
         private ResearchProgression _progression;
+        
+        public delegate void StackChanged(int newCount);
+
+        public static event StackChanged OnStackChanged;
 
         public ProgressionManager(IMonitor monitor, IModHelper helper,
             ModDataCategory[] categories, SpawnableItem[] items)
@@ -44,6 +48,17 @@ namespace ItemResearchSpawner.Components
 
         public void ResearchItem(Item item)
         {
+            var itemProgression = GetItemProgressionRaw(item);
+
+            if (itemProgression.max <= 0 || itemProgression.current >= itemProgression.max)
+            {
+                return;
+            }
+
+            var needCount = itemProgression.max - itemProgression.current;
+
+            var progressCount = item.Stack > needCount ? needCount : item.Stack;
+                
             var progressionItem = TryInitAndReturnProgressionItem(item);
 
             var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
@@ -51,49 +66,54 @@ namespace ItemResearchSpawner.Components
             switch (itemQuality)
             {
                 case ItemQuality.Silver:
-                    progressionItem.ResearchCountSilver += item.Stack;
+                    progressionItem.ResearchCountSilver += progressCount;
                     break;
                 case ItemQuality.Gold:
-                    progressionItem.ResearchCountGold += item.Stack;
+                    progressionItem.ResearchCountGold += progressCount;
                     break;
                 case ItemQuality.Iridium:
-                    progressionItem.ResearchCountIridium += item.Stack;
+                    progressionItem.ResearchCountIridium += progressCount;
                     break;
                 default:
-                    progressionItem.ResearchCount += item.Stack;
+                    progressionItem.ResearchCount += progressCount;
                     break;
             }
-
-            _monitor.Log($"Item: {item.DisplayName} was researched!", LogLevel.Info);
-            _monitor.Log(
-                $"Current progress: " +
-                $"Normal: {progressionItem.ResearchCount};" +
-                $"Silver: {progressionItem.ResearchCountSilver};" +
-                $"Gold: {progressionItem.ResearchCountGold};" +
-                $"Iridium: {progressionItem.ResearchCountIridium};",
-                LogLevel.Info);
+            
+            OnStackChanged?.Invoke(item.Stack - progressCount);
 
             SaveProgression();
         }
 
+        public bool ItemResearched(Item item)
+        {
+            var (itemProgression, maxProgression) = GetItemProgressionRaw(item);
+
+            return maxProgression > 0 && itemProgression >= maxProgression;
+        }
+
         public string GetItemProgression(Item item)
+        {
+            var (itemProgression, maxProgression) = GetItemProgressionRaw(item);
+
+            if (maxProgression <= 0)
+            {
+                return "???";
+            }
+
+            return $"({itemProgression} / {maxProgression})";
+        }
+
+        public (int current, int max) GetItemProgressionRaw(Item item)
         {
             var spawnableItem = GetSpawnableItem(item);
 
             if (spawnableItem == null)
             {
-                return "???";
+                return (0, 0);
             }
 
             var category = _categories.FirstOrDefault(c =>
                 Helpers.EqualsCaseInsensitive(spawnableItem.Category, c.Label));
-
-            // if (category == null)
-            // {
-            //     _monitor.LogOnce($"Item with ID: {item.parentSheetIndex} has no category!", LogLevel.Alert);
-            //
-            //     return "???";
-            // }
 
             var maxProgression = category?.ResearchCount ?? 1;
 
@@ -111,7 +131,7 @@ namespace ItemResearchSpawner.Components
 
             itemProgression = (int) MathHelper.Clamp(itemProgression, 0, maxProgression);
 
-            return $"({itemProgression} / {maxProgression})";
+            return (itemProgression, maxProgression);
         }
 
         private ResearchItem TryInitAndReturnProgressionItem(Item item)

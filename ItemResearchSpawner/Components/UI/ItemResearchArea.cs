@@ -28,10 +28,14 @@ namespace ItemResearchSpawner.Components
                     _researchArea.bounds.Height + 48 + y, _researchTexture.Width,
                     _researchTexture.Height), _researchTexture,
                 new Rectangle(0, 0, _researchTexture.Width, _researchTexture.Height), 1f);
+
+            ProgressionManager.OnStackChanged += OnStackChanged;
         }
 
         public Rectangle Bounds => _researchArea.bounds;
+
         public Rectangle ButtonBounds => _researchButton.bounds;
+
         public Item ResearchItem => _researchItem;
 
         public bool TrySetItem(Item item)
@@ -83,6 +87,18 @@ namespace ItemResearchSpawner.Components
             spriteBatch.Draw(_researchButton.texture, _researchButton.bounds, _researchButton.sourceRect, Color.White);
 
             _researchItem?.drawInMenu(spriteBatch, new Vector2(researchItemCellX, areaInnerAnchors.Y + 10), 1f);
+        }
+
+        private void OnStackChanged(int newCount)
+        {
+            if (newCount <= 0)
+            {
+                _researchItem = null;
+            }
+            else if (_researchItem != null)
+            {
+                _researchItem.Stack = newCount % _researchItem.maximumStackSize();
+            }
         }
     }
 }
