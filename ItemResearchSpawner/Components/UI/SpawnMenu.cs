@@ -33,7 +33,6 @@ namespace ItemResearchSpawner.Components
         private ItemCategorySelectorTab _categorySelector;
         private ItemSearchBarTab _searchBarTab;
 
-        private readonly SpawnableItem[] _allItems;
         private readonly List<SpawnableItem> _filteredItems = new List<SpawnableItem>();
         private readonly IList<Item> _itemsInView;
 
@@ -63,10 +62,10 @@ namespace ItemResearchSpawner.Components
             _content = content;
 
             _spawnableItems = spawnableItems;
-            _allItems = spawnableItems;
             _itemsInView = ItemsToGrabMenu.actualInventory;
 
             _baseDraw = RenderHelpers.GetBaseDraw(this);
+            
             drawBG = false; // disable to draw default ui over new menu
 
             _quality = ItemQuality.Normal;
@@ -516,7 +515,7 @@ namespace ItemResearchSpawner.Components
 
         private IEnumerable<SpawnableItem> GetFilteredItems()
         {
-            IEnumerable<SpawnableItem> items = _allItems;
+            IEnumerable<SpawnableItem> items = ProgressionManager.Instance.GetResearchedItems();
 
             items = _sortOption switch
             {

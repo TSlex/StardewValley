@@ -21,7 +21,7 @@ namespace ItemResearchSpawner.Components
         private readonly SpawnableItem[] _items;
 
         private ResearchProgression _progression;
-        
+
         public delegate void StackChanged(int newCount);
 
         public static event StackChanged OnStackChanged;
@@ -58,7 +58,7 @@ namespace ItemResearchSpawner.Components
             var needCount = itemProgression.max - itemProgression.current;
 
             var progressCount = item.Stack > needCount ? needCount : item.Stack;
-                
+
             var progressionItem = TryInitAndReturnProgressionItem(item);
 
             var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
@@ -78,7 +78,7 @@ namespace ItemResearchSpawner.Components
                     progressionItem.ResearchCount += progressCount;
                     break;
             }
-            
+
             OnStackChanged?.Invoke(item.Stack - progressCount);
 
             SaveProgression();
@@ -132,6 +132,39 @@ namespace ItemResearchSpawner.Components
             itemProgression = (int) MathHelper.Clamp(itemProgression, 0, maxProgression);
 
             return (itemProgression, maxProgression);
+        }
+
+        public (int current, int max) GetItemProgressionRaw(SpawnableItem item)
+        {
+            var category = _categories.FirstOrDefault(c =>
+                Helpers.EqualsCaseInsensitive(item.Category, c.Label));
+
+            var maxProgression = category?.ResearchCount ?? 1;
+
+            var progressionItem = TryInitAndReturnProgressionItem(item.Item);
+
+            var itemQuality = (ItemQuality) ((item.Item as Object)?.Quality ?? 0);
+
+            var itemProgression = itemQuality switch
+            {
+                ItemQuality.Silver => progressionItem.ResearchCountSilver,
+                ItemQuality.Gold => progressionItem.ResearchCountGold,
+                ItemQuality.Iridium => progressionItem.ResearchCountIridium,
+                _ => progressionItem.ResearchCount
+            };
+
+            itemProgression = (int) MathHelper.Clamp(itemProgression, 0, maxProgression);
+
+            return (itemProgression, maxProgression);
+        }
+
+        public IEnumerable<SpawnableItem> GetResearchedItems()
+        {
+            return _items.Where(item =>
+            {
+                var progression = GetItemProgressionRaw(item);
+                return progression.max > 0 && progression.current >= progression.max;
+            }).ToArray();
         }
 
         private ResearchItem TryInitAndReturnProgressionItem(Item item)
