@@ -67,6 +67,7 @@ namespace ItemResearchSpawner.Components
             _baseDraw = RenderHelpers.GetBaseDraw(this);
             
             drawBG = false; // disable to draw default ui over new menu
+            behaviorOnItemGrab = OnItemGrab;
 
             _quality = ItemQuality.Normal;
             _sortOption = ItemSortOption.Category;
@@ -373,6 +374,11 @@ namespace ItemResearchSpawner.Components
             }
 
             base.performHoverAction(x, y);
+        }
+        
+        private void OnItemGrab(Item item, Farmer player)
+        {
+            UpdateView();
         }
 
         public override void draw(SpriteBatch spriteBatch)
