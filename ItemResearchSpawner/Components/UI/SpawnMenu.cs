@@ -327,7 +327,7 @@ namespace ItemResearchSpawner.Components
 
             if (_overDropdown)
             {
-                _categorySelector.HandleScroll(direction);
+                _categorySelector.HandleScroll(-direction);
             }
             else
             {

@@ -4,8 +4,8 @@ namespace ItemResearchSpawner.Models
     {
         public string Label { get; set; }
 
-        internal ModDataCategoryRule When { get; set; }
-        internal ModDataCategoryRule Except { get; set; }
+        public ModDataCategoryRule When { get; set; }
+        public ModDataCategoryRule Except { get; set; }
 
         public int ResearchCount { get; set; }
 

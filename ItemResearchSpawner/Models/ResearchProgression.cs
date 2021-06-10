@@ -4,7 +4,7 @@ namespace ItemResearchSpawner.Models
 {
     internal class ResearchProgression
     {
-        public ICollection<ResearchItem> ResearchItems { get; set; }
+        public ICollection<ResearchItem> ResearchItems { get; set; } = new List<ResearchItem>();
     }
 
     internal class ResearchItem

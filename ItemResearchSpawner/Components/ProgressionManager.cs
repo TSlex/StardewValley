@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -43,11 +44,9 @@ namespace ItemResearchSpawner.Components
 
         public void ResearchItem(Item item)
         {
-            _progression.ResearchItems ??= new List<ResearchItem>();
-
             var progressionItem = TryInitAndReturnProgressionItem(item);
 
-            var itemQuality = (ItemQuality) (item as Object)!.Quality;
+            var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
 
             switch (itemQuality)
             {
@@ -79,28 +78,28 @@ namespace ItemResearchSpawner.Components
 
         public string GetItemProgression(Item item)
         {
-            var spawnableItem = _items.FirstOrDefault(si => si.ID.Equals(item.parentSheetIndex));
+            var spawnableItem = GetSpawnableItem(item);
 
             if (spawnableItem == null)
             {
-                _monitor.LogOnce($"Item with ID: {item.parentSheetIndex} is missing in register!", LogLevel.Alert);
-
                 return "???";
             }
 
-            var category = _categories.FirstOrDefault(c => c.IsMatch(spawnableItem));
+            var category = _categories.FirstOrDefault(c =>
+                Helpers.EqualsCaseInsensitive(spawnableItem.Category, c.Label));
 
-            if (category == null)
-            {
-                _monitor.LogOnce($"Item with ID: {item.parentSheetIndex} has no category!", LogLevel.Alert);
+            // if (category == null)
+            // {
+            //     _monitor.LogOnce($"Item with ID: {item.parentSheetIndex} has no category!", LogLevel.Alert);
+            //
+            //     return "???";
+            // }
 
-                return "???";
-            }
+            var maxProgression = category?.ResearchCount ?? 1;
 
-            var maxProgression = category.ResearchCount;
             var progressionItem = TryInitAndReturnProgressionItem(item);
 
-            var itemQuality = (ItemQuality) (item as Object)!.Quality;
+            var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
 
             var itemProgression = itemQuality switch
             {
@@ -117,20 +116,36 @@ namespace ItemResearchSpawner.Components
 
         private ResearchItem TryInitAndReturnProgressionItem(Item item)
         {
-            var progressionItem = (_progression.ResearchItems)
-                .FirstOrDefault(ri => ri.ItemId.Equals(item.parentSheetIndex));
+            var spawnableItem = GetSpawnableItem(item);
+
+            var progressionItem = spawnableItem != null
+                ? _progression.ResearchItems
+                    .FirstOrDefault(ri => ri.ItemId.Equals(spawnableItem.ID))
+                : null;
 
             if (progressionItem == null)
             {
                 progressionItem = new ResearchItem
                 {
-                    ItemId = item.parentSheetIndex
+                    ItemId = spawnableItem?.ID ?? -1
                 };
 
                 _progression.ResearchItems.Add(progressionItem);
             }
 
             return progressionItem;
+        }
+
+        private SpawnableItem GetSpawnableItem(Item item)
+        {
+            var spawnableItem = _items.FirstOrDefault(si => si.Name.Equals(item.Name));
+
+            if (spawnableItem == null)
+            {
+                _monitor.LogOnce($"Item with ID: {item.parentSheetIndex} is missing in register!", LogLevel.Alert);
+            }
+
+            return spawnableItem;
         }
 
         private static string DirectoryName => $"{Game1.player.Name}_{Game1.getFarm().NameOrUniqueName}";
