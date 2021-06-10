@@ -69,7 +69,7 @@ namespace ItemResearchSpawner.Components
             drawBG = false; // disable to draw default ui over new menu
 
             _quality = ItemQuality.Normal;
-            _sortOption = ItemSortOption.ID;
+            _sortOption = ItemSortOption.Category;
             _searchText = "";
 
             InitializeComponents();
