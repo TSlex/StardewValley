@@ -527,8 +527,8 @@ namespace ItemResearchSpawner.Components
 
         private IEnumerable<SpawnableItem> GetFilteredItems()
         {
-            // IEnumerable<SpawnableItem> items = ProgressionManager.Instance.GetResearchedItems();
-            IEnumerable<SpawnableItem> items = _spawnableItems;
+            IEnumerable<SpawnableItem> items = ProgressionManager.Instance.GetResearchedItems();
+            // IEnumerable<SpawnableItem> items = _spawnableItems;
 
             items = _sortOption switch
             {

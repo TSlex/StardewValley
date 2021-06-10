@@ -17,7 +17,7 @@ namespace ItemResearchSpawner.Components
 
         private readonly IMonitor _monitor;
         private readonly IModHelper _helper;
-        private readonly SpawnableItem[] _items;
+        private readonly Func<SpawnableItem[]> _items;
 
         private readonly CategoryProgress[] _categories;
 
@@ -31,7 +31,9 @@ namespace ItemResearchSpawner.Components
 
         public static event ResearchCompleted OnResearchCompleted;
 
-        public ProgressionManager(IMonitor monitor, IModHelper helper, SpawnableItem[] items)
+        private IEnumerable<SpawnableItem> Items => _items();
+
+        public ProgressionManager(IMonitor monitor, IModHelper helper, Func<SpawnableItem[]> items)
         {
             Instance ??= this;
 
@@ -45,8 +47,6 @@ namespace ItemResearchSpawner.Components
             _helper = helper;
             _items = items;
             
-            _helper.Data.WriteJsonFile($"test.json", _items.OrderBy(i => i.ID).Select(i => i.Name));
-
             _categories = helper.Data.ReadJsonFile<CategoryProgress[]>("assets/category-progress.json");
 
             _helper.Events.GameLoop.Saving += OnSaveProgression;
@@ -101,7 +101,7 @@ namespace ItemResearchSpawner.Components
                 OnResearchCompleted?.Invoke();
             }
 
-            SaveProgression();
+            // SaveProgression();
 
             // _monitor.Log(stopwatch.ElapsedMilliseconds.ToString(), LogLevel.Alert);
         }
@@ -157,7 +157,7 @@ namespace ItemResearchSpawner.Components
 
         public IEnumerable<SpawnableItem> GetResearchedItems()
         {
-            return _items.Where(item =>
+            return Items.Where(item =>
             {
                 var progression = GetItemProgressionRaw(item);
                 return progression.max > 0 && progression.current >= progression.max;
@@ -191,7 +191,7 @@ namespace ItemResearchSpawner.Components
 
         private SpawnableItem GetSpawnableItem(Item item)
         {
-            var spawnableItem = _items.FirstOrDefault(si => si.Item.Name.Equals(item.Name));
+            var spawnableItem = Items.FirstOrDefault(si => si.Item.Name.Equals(item.Name));
 
             if (spawnableItem == null)
             {
