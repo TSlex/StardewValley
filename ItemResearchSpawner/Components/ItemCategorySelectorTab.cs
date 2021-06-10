@@ -80,7 +80,42 @@ namespace ItemResearchSpawner.Components
 
         public void HandleScroll(int direction)
         {
-            NextCategory((int) MathHelper.Clamp(direction, -1, 1));
+            if (_categoryDropdown.IsExpanded)
+            {
+                _categoryDropdown.ReceiveScrollWheelAction(direction);
+            }
+            else
+            {
+                NextCategory((int) MathHelper.Clamp(direction, -1, 1));
+            }
+        }
+
+        public void NextCategory(int direction)
+        {
+            direction = direction < 0 ? -1 : 1;
+
+            var last = _availableCategories.Length - 1;
+
+            var index = Array.IndexOf(_availableCategories, _categoryDropdown.Selected) + direction;
+
+            if (index < 0)
+            {
+                index = last;
+            }
+
+            if (index > last)
+            {
+                index = 0;
+            }
+
+            _categoryDropdown.TrySelect(_availableCategories[index]);
+            OnCategorySelected?.Invoke(_availableCategories[index]);
+        }
+
+        public void ResetCategory()
+        {
+            _categoryDropdown.TrySelect("All");
+            OnCategorySelected?.Invoke("All");
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -104,28 +139,6 @@ namespace ItemResearchSpawner.Components
             }
 
             _categoryDropdown.Draw(spriteBatch);
-        }
-
-        private void NextCategory(int direction)
-        {
-            direction = direction < 0 ? -1 : 1;
-
-            var last = _availableCategories.Length - 1;
-
-            var index = Array.IndexOf(_availableCategories, _categoryDropdown.Selected) + direction;
-
-            if (index < 0)
-            {
-                index = last;
-            }
-
-            if (index > last)
-            {
-                index = 0;
-            }
-
-            _categoryDropdown.TrySelect(_availableCategories[index]);
-            OnCategorySelected?.Invoke(_availableCategories[index]);
         }
 
         private IEnumerable<string> GetDisplayCategories(SpawnableItem[] items)

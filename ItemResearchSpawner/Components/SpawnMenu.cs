@@ -5,6 +5,7 @@ using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
@@ -164,9 +165,58 @@ namespace ItemResearchSpawner.Components
             {
                 _categorySelector.Close();
             }
+            else if (_categorySelector.Bounds.Contains(x, y))
+            {
+                _categorySelector.ResetCategory();
+            }
             else
             {
                 base.receiveRightClick(x, y, playSound);
+            }
+        }
+
+        public override void receiveKeyPress(Keys key)
+        {
+            var inDropdown = _categorySelector.IsExpanded;
+            var isEscape = key == Keys.Escape;
+            var isExitButton = isEscape || Game1.options.doesInputListContain(Game1.options.menuButton, key) ||
+                               Game1.options.doesInputListContain(Game1.options.cancelButton, key);
+
+            if (isEscape && (_searchBarTab.PersistFocus ||
+                             _searchBarTab.Selected && !string.IsNullOrEmpty(_searchText)))
+            {
+                _searchBarTab.Clear();
+                _searchBarTab.Blur();
+            }
+            else if (inDropdown && isExitButton)
+            {
+                _categorySelector.Close();
+            }
+            else if (key == Keys.Left || key == Keys.Right)
+            {
+                var direction = key == Keys.Left ? -1 : 1;
+                _categorySelector.NextCategory(direction);
+            }
+            else if (key == Keys.Up || key == Keys.Down)
+            {
+                var direction = key == Keys.Up ? -1 : 1;
+
+                if (inDropdown)
+                {
+                    _categorySelector.HandleScroll(direction);
+                }
+                else
+                {
+                    ScrollView(direction);
+                }
+            }
+            else
+            {
+                var isIgnoredExitKey = _searchBarTab.Selected && isExitButton && !isEscape;
+                if (!isIgnoredExitKey && !_searchBarTab.IsSearchBoxSelectionChanging)
+                {
+                    base.receiveKeyPress(key);
+                }
             }
         }
 
@@ -192,15 +242,16 @@ namespace ItemResearchSpawner.Components
             {
                 var overSearchBox = _searchBarTab.Bounds.Contains(x, y);
 
-                if (_searchBarTab.Selected == overSearchBox) return;
-
-                if (overSearchBox)
+                if (_searchBarTab.Selected != overSearchBox)
                 {
-                    _searchBarTab.Focus(false);
-                }
-                else
-                {
-                    _searchBarTab.Blur();
+                    if (overSearchBox)
+                    {
+                        _searchBarTab.Focus(false);
+                    }
+                    else
+                    {
+                        _searchBarTab.Blur();
+                    }
                 }
             }
 

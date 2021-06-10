@@ -69,6 +69,7 @@ namespace ItemResearchSpawner.Components
 
         public bool Selected => _searchBox.Selected;
         public bool PersistFocus => _persistFocus;
+        public bool IsSearchBoxSelectionChanging => _iconOpacity > 0 && _iconOpacity < 1;
 
         public Rectangle Bounds => _searchBoxArea.bounds;
 
