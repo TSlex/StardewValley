@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using ItemResearchSpawner.Models;
-using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -44,6 +44,8 @@ namespace ItemResearchSpawner.Components
             _monitor = monitor;
             _helper = helper;
             _items = items;
+            
+            _helper.Data.WriteJsonFile($"test.json", _items.OrderBy(i => i.ID).Select(i => i.Name));
 
             _categories = helper.Data.ReadJsonFile<CategoryProgress[]>("assets/category-progress.json");
 
@@ -53,8 +55,12 @@ namespace ItemResearchSpawner.Components
 
         public void ResearchItem(Item item)
         {
+            // var stopwatch = new Stopwatch();
+            
+            // stopwatch.Start();
+            
             var itemProgression = GetItemProgressionRaw(item);
-
+            
             if (itemProgression.max <= 0 || itemProgression.current >= itemProgression.max)
             {
                 return;
@@ -63,8 +69,10 @@ namespace ItemResearchSpawner.Components
             var needCount = itemProgression.max - itemProgression.current;
 
             var progressCount = item.Stack > needCount ? needCount : item.Stack;
+            
 
             var progressionItem = TryInitAndReturnProgressionItem(item);
+            
 
             var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
 
@@ -83,6 +91,8 @@ namespace ItemResearchSpawner.Components
                     progressionItem.ResearchCount += progressCount;
                     break;
             }
+            
+            // stopwatch.Stop();
 
             OnStackChanged?.Invoke(item.Stack - progressCount);
 
@@ -92,6 +102,8 @@ namespace ItemResearchSpawner.Components
             }
 
             SaveProgression();
+
+            // _monitor.Log(stopwatch.ElapsedMilliseconds.ToString(), LogLevel.Alert);
         }
 
         public bool ItemResearched(Item item)
@@ -179,11 +191,11 @@ namespace ItemResearchSpawner.Components
 
         private SpawnableItem GetSpawnableItem(Item item)
         {
-            var spawnableItem = _items.FirstOrDefault(si => si.Name.Equals(item.Name));
+            var spawnableItem = _items.FirstOrDefault(si => si.Item.Name.Equals(item.Name));
 
             if (spawnableItem == null)
             {
-                _monitor.LogOnce($"Item with ID: {item.parentSheetIndex} is missing in register!", LogLevel.Alert);
+                _monitor.LogOnce($"Item with ID: {item.Name} is missing in register!", LogLevel.Alert);
             }
 
             return spawnableItem;
@@ -203,13 +215,13 @@ namespace ItemResearchSpawner.Components
 
         private void SaveProgression()
         {
-            _helper.Data.WriteJsonFile($"{DirectoryName}/progress.json", _progression);
+            _helper.Data.WriteJsonFile($"save/{DirectoryName}/progress.json", _progression);
             _monitor.Log("Progression saved! :)", LogLevel.Debug);
         }
 
         private void LoadProgression()
         {
-            _progression = _helper.Data.ReadJsonFile<ResearchProgression>($"{DirectoryName}/progress.json") ??
+            _progression = _helper.Data.ReadJsonFile<ResearchProgression>($"save/{DirectoryName}/progress.json") ??
                            new ResearchProgression();
             _monitor.Log("Progression loaded! :)", LogLevel.Debug);
         }

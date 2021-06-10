@@ -28,14 +28,14 @@ namespace ItemResearchSpawner
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
-            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            // helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
 
-        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
-        {
-            _items = GetSpawnableItems().ToArray();
-            _progressionManager = new ProgressionManager(Monitor, _helper, _items);
-        }
+        // private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        // {
+        //     _items = GetSpawnableItems().ToArray();
+        //     _progressionManager = new ProgressionManager(Monitor, _helper, _items);
+        // }
 
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
@@ -52,6 +52,8 @@ namespace ItemResearchSpawner
 
         private IClickableMenu GetSpawnMenu()
         {
+            _items = GetSpawnableItems().ToArray();
+            _progressionManager ??= new ProgressionManager(Monitor, _helper, _items);
             return new SpawnMenu(_items, Helper.Content, Monitor);
         }
 
@@ -59,13 +61,13 @@ namespace ItemResearchSpawner
         {
             var items = new ItemRepository().GetAll();
 
-            if (_itemData?.ProblematicItems?.Any() == true)
-            {
-                var problematicItems =
-                    new HashSet<string>(_itemData.ProblematicItems, StringComparer.OrdinalIgnoreCase);
-
-                items = items.Where(item => !problematicItems.Contains($"{item.Type}:{item.ID}"));
-            }
+            // if (_itemData?.ProblematicItems?.Any() == true)
+            // {
+            //     var problematicItems =
+            //         new HashSet<string>(_itemData.ProblematicItems, StringComparer.OrdinalIgnoreCase);
+            //
+            //     items = items.Where(item => !problematicItems.Contains($"{item.Type}:{item.ID}"));
+            // }
 
             foreach (var entry in items)
             {
