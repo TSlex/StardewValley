@@ -10,6 +10,7 @@ namespace ItemResearchSpawner.Models
     internal class ResearchItem
     {
         public int ItemId { get; set; }
+        public string ItemName { get; set; }
         public int ResearchCount { get; set; }
         public int ResearchCountGold { get; set; }
         public int ResearchCountSilver { get; set; }

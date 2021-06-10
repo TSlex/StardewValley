@@ -1,0 +1,177 @@
+﻿[
+  {
+    "Id": -100,
+    "Name": "category_clothing",
+    "ResearchCount": 1
+  },
+  {
+    "Id": -99,
+    "Name": "category_tool",
+    "ResearchCount": 1
+  },
+  {
+    "Id": -98,
+    "Name": "category_weapon",
+    "ResearchCount": 1
+  },
+  {
+    "Id": -97,
+    "Name": "category_boots",
+    "ResearchCount": 1
+  },
+  {
+    "Id": -96,
+    "Name": "category_ring",
+    "ResearchCount": 1
+  },
+  {
+    "Id": -95,
+    "Name": "category_hat",
+    "ResearchCount": 1
+  },
+  {
+    "Id": -81,
+    "Name": "category_greens",
+    "ResearchCount": 81
+  },
+  {
+    "Id": -80,
+    "Name": "category_flowers",
+    "ResearchCount": 80
+  },
+  {
+    "Id": -79,
+    "Name": "category_fruits",
+    "ResearchCount": 79
+  },
+  {
+    "Id": -75,
+    "Name": "category_vegetable",
+    "ResearchCount": 75
+  },
+  {
+    "Id": -74,
+    "Name": "category_seeds",
+    "ResearchCount": 74
+  },
+  {
+    "Id": -29,
+    "Name": "category_equipment",
+    "ResearchCount": 29
+  },
+  {
+    "Id": -28,
+    "Name": "category_monster_loot",
+    "ResearchCount": 28
+  },
+  {
+    "Id": -27,
+    "Name": "category_syrup",
+    "ResearchCount": 27
+  },
+  {
+    "Id": -26,
+    "Name": "category_artisan_goods",
+    "ResearchCount": 26
+  },
+  {
+    "Id": -25,
+    "Name": "category_ingredients",
+    "ResearchCount": 25
+  },
+  {
+    "Id": -24,
+    "Name": "category_furniture",
+    "ResearchCount": 24
+  },
+  {
+    "Id": -23,
+    "Name": "category_sell_at_fish_shop",
+    "ResearchCount": 23
+  },
+  {
+    "Id": -22,
+    "Name": "category_tackle",
+    "ResearchCount": 22
+  },
+  {
+    "Id": -21,
+    "Name": "category_bait",
+    "ResearchCount": 21
+  },
+  {
+    "Id": -20,
+    "Name": "category_junk",
+    "ResearchCount": 20
+  },
+  {
+    "Id": -19,
+    "Name": "category_fertilizer",
+    "ResearchCount": 19
+  },
+  {
+    "Id": -18,
+    "Name": "category_sell_at_pierres_and_marnies",
+    "ResearchCount": 18
+  },
+  {
+    "Id": -17,
+    "Name": "category_sell_at_pierres",
+    "ResearchCount": 17
+  },
+  {
+    "Id": -16,
+    "Name": "category_building_resources",
+    "ResearchCount": 16
+  },
+  {
+    "Id": -15,
+    "Name": "category_metal_resources",
+    "ResearchCount": 15
+  },
+  {
+    "Id": -14,
+    "Name": "category_meat",
+    "ResearchCount": 14
+  },
+  {
+    "Id": -12,
+    "Name": "category_minerals",
+    "ResearchCount": 12
+  },
+  {
+    "Id": -9,
+    "Name": "category_big_craftable",
+    "ResearchCount": 9
+  },
+  {
+    "Id": -8,
+    "Name": "category_crafting",
+    "ResearchCount": 8
+  },
+  {
+    "Id": -7,
+    "Name": "category_cooking",
+    "ResearchCount": 7
+  },
+  {
+    "Id": -6,
+    "Name": "category_milk",
+    "ResearchCount": 6
+  },
+  {
+    "Id": -5,
+    "Name": "category_egg",
+    "ResearchCount": 5
+  },
+  {
+    "Id": -4,
+    "Name": "category_fish",
+    "ResearchCount": 4
+  },
+  {
+    "Id": -2,
+    "Name": "category_gem",
+    "ResearchCount": 2
+  }
+]

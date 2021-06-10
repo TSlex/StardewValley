@@ -17,17 +17,21 @@ namespace ItemResearchSpawner.Components
 
         private readonly IMonitor _monitor;
         private readonly IModHelper _helper;
-        private readonly ModDataCategory[] _categories;
         private readonly SpawnableItem[] _items;
+
+        private readonly CategoryProgress[] _categories;
 
         private ResearchProgression _progression;
 
         public delegate void StackChanged(int newCount);
 
         public static event StackChanged OnStackChanged;
+        
+        public delegate void ResearchCompleted();
 
-        public ProgressionManager(IMonitor monitor, IModHelper helper,
-            ModDataCategory[] categories, SpawnableItem[] items)
+        public static event ResearchCompleted OnResearchCompleted;
+
+        public ProgressionManager(IMonitor monitor, IModHelper helper, SpawnableItem[] items)
         {
             Instance ??= this;
 
@@ -39,8 +43,9 @@ namespace ItemResearchSpawner.Components
 
             _monitor = monitor;
             _helper = helper;
-            _categories = categories;
             _items = items;
+
+            _categories = helper.Data.ReadJsonFile<CategoryProgress[]>("assets/category-progress.json");
 
             _helper.Events.GameLoop.Saving += OnSaveProgression;
             _helper.Events.GameLoop.DayStarted += OnLoadProgression;
@@ -81,6 +86,11 @@ namespace ItemResearchSpawner.Components
 
             OnStackChanged?.Invoke(item.Stack - progressCount);
 
+            if (item.Stack >= progressCount)
+            {
+                OnResearchCompleted?.Invoke();
+            }
+
             SaveProgression();
         }
 
@@ -103,41 +113,16 @@ namespace ItemResearchSpawner.Components
             return $"({itemProgression} / {maxProgression})";
         }
 
-        public (int current, int max) GetItemProgressionRaw(Item item)
+        private (int current, int max) GetItemProgressionRaw(Item item)
         {
             var spawnableItem = GetSpawnableItem(item);
 
-            if (spawnableItem == null)
-            {
-                return (0, 0);
-            }
-
-            var category = _categories.FirstOrDefault(c =>
-                Helpers.EqualsCaseInsensitive(spawnableItem.Category, c.Label));
-
-            var maxProgression = category?.ResearchCount ?? 1;
-
-            var progressionItem = TryInitAndReturnProgressionItem(item);
-
-            var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
-
-            var itemProgression = itemQuality switch
-            {
-                ItemQuality.Silver => progressionItem.ResearchCountSilver,
-                ItemQuality.Gold => progressionItem.ResearchCountGold,
-                ItemQuality.Iridium => progressionItem.ResearchCountIridium,
-                _ => progressionItem.ResearchCount
-            };
-
-            itemProgression = (int) MathHelper.Clamp(itemProgression, 0, maxProgression);
-
-            return (itemProgression, maxProgression);
+            return GetItemProgressionRaw(spawnableItem);
         }
 
-        public (int current, int max) GetItemProgressionRaw(SpawnableItem item)
+        private (int current, int max) GetItemProgressionRaw(SpawnableItem item)
         {
-            var category = _categories.FirstOrDefault(c =>
-                Helpers.EqualsCaseInsensitive(item.Category, c.Label));
+            var category = _categories.FirstOrDefault(c => item.Item.Category.Equals(c.Id));
 
             var maxProgression = category?.ResearchCount ?? 1;
 
@@ -173,14 +158,17 @@ namespace ItemResearchSpawner.Components
 
             var progressionItem = spawnableItem != null
                 ? _progression.ResearchItems
-                    .FirstOrDefault(ri => ri.ItemId.Equals(spawnableItem.ID))
+                    .FirstOrDefault(ri =>
+                        ri.ItemId.Equals(spawnableItem.ID) && ri.ItemName.Equals(spawnableItem.Name,
+                            StringComparison.InvariantCultureIgnoreCase))
                 : null;
 
             if (progressionItem == null)
             {
                 progressionItem = new ResearchItem
                 {
-                    ItemId = spawnableItem?.ID ?? -1
+                    ItemId = spawnableItem?.ID ?? -1,
+                    ItemName = spawnableItem?.Name ?? "???"
                 };
 
                 _progression.ResearchItems.Add(progressionItem);

@@ -81,6 +81,12 @@ namespace ItemResearchSpawner.Components
             _categorySelector.OnDropdownToggle += OnDropdownToggle;
             _categorySelector.OnCategorySelected += OnCategorySelected;
             _searchBarTab.OnSearchTextInput += OnSearchTextInput;
+            ProgressionManager.OnResearchCompleted += OnResearchCompleted;
+        }
+
+        private void OnResearchCompleted()
+        {
+            UpdateView(true);
         }
 
         private void OnQualityChange(ItemQuality newQuality)

@@ -57,6 +57,7 @@
         <Compile Include="Components\UI\ItemSearchBarTab.cs" />
         <Compile Include="Components\UI\ItemSortTab.cs" />
         <Compile Include="Components\UI\SpawnMenu.cs" />
+        <Compile Include="Models\Enums\CategoryProgress.cs" />
         <Compile Include="Models\Enums\ItemQuality.cs" />
         <Compile Include="Models\Enums\ItemSortOption.cs" />
         <Compile Include="Models\Enums\ItemType.cs" />
@@ -78,6 +79,7 @@
     </ItemGroup>
     <ItemGroup>
       <Content Include="Assets\categories.json" />
+      <Content Include="Assets\category-progress.json" />
       <Content Include="Assets\empty-quality-icon.png" />
       <Content Include="Assets\item-data.json" />
       <Content Include="Assets\search-button.png" />

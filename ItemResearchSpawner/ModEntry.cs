@@ -34,7 +34,7 @@ namespace ItemResearchSpawner
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
             _items = GetSpawnableItems().ToArray();
-            _progressionManager = new ProgressionManager(Monitor, _helper, _categories, _items);
+            _progressionManager = new ProgressionManager(Monitor, _helper, _items);
         }
 
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
