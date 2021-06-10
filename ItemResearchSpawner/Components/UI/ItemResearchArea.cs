@@ -51,6 +51,14 @@ namespace ItemResearchSpawner.Components
             return item;
         }
 
+        public void HandleResearch()
+        {
+            if (_researchItem != null)
+            {
+                ProgressionManager.Instance.ResearchItem(_researchItem);
+            }
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             RenderHelpers.DrawMenuBox(_researchArea.bounds.X, _researchArea.bounds.Y,

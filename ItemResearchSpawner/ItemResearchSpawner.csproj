@@ -44,14 +44,15 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Components\Helpers\Dropdown.cs" />
-        <Compile Include="Components\Helpers\DropdownList.cs" />
-        <Compile Include="Components\ItemCategorySelectorTab.cs" />
-        <Compile Include="Components\ItemQualitySelectorTab.cs" />
-        <Compile Include="Components\ItemResearchArea.cs" />
-        <Compile Include="Components\ItemSearchBarTab.cs" />
-        <Compile Include="Components\ItemSortTab.cs" />
-        <Compile Include="Components\SpawnMenu.cs" />
+        <Compile Include="Components\ProgressionManager.cs" />
+        <Compile Include="Components\UI\Helpers\Dropdown.cs" />
+        <Compile Include="Components\UI\Helpers\DropdownList.cs" />
+        <Compile Include="Components\UI\ItemCategorySelectorTab.cs" />
+        <Compile Include="Components\UI\ItemQualitySelectorTab.cs" />
+        <Compile Include="Components\UI\ItemResearchArea.cs" />
+        <Compile Include="Components\UI\ItemSearchBarTab.cs" />
+        <Compile Include="Components\UI\ItemSortTab.cs" />
+        <Compile Include="Components\UI\SpawnMenu.cs" />
         <Compile Include="Models\Enums\ItemQuality.cs" />
         <Compile Include="Models\Enums\ItemSortOption.cs" />
         <Compile Include="Models\Enums\ItemType.cs" />
@@ -60,6 +61,7 @@
         <Compile Include="Models\ModDataCategory.cs" />
         <Compile Include="Models\ModDataCategoryRule.cs" />
         <Compile Include="Models\ModItemData.cs" />
+        <Compile Include="Models\ResearchProgression.cs" />
         <Compile Include="Models\SearchableItem.cs" />
         <Compile Include="Models\SpawnableItem.cs" />
         <Compile Include="ModEntry.cs" />
@@ -74,6 +76,7 @@
       <Content Include="Assets\categories.json" />
       <Content Include="Assets\empty-quality-icon.png" />
       <Content Include="Assets\item-data.json" />
+      <Content Include="Assets\progression_test.json" />
       <Content Include="Assets\search-button.png" />
       <Content Include="Assets\sort-icon.png" />
       <Content Include="manifest.json" />

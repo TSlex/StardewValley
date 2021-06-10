@@ -136,6 +136,10 @@ namespace ItemResearchSpawner.Components
             {
                 OnResearchAreaLeftClick();
             }
+            else if (_researchArea.ButtonBounds.Contains(x, y))
+            {
+                _researchArea.HandleResearch();
+            }
             else if (_searchBarTab.Bounds.Contains(x, y))
             {
                 if (!_searchBarTab.Selected || !_searchBarTab.PersistFocus)
