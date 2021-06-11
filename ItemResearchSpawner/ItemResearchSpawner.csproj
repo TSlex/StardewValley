@@ -79,8 +79,8 @@
         <Compile Include="Utils\MenuSprites.cs" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="Assets\categories-progress.json" />
       <Content Include="Assets\categories.json" />
-      <Content Include="Assets\category-progress.json" />
       <Content Include="Assets\empty-quality-icon.png" />
       <Content Include="Assets\item-data.json" />
       <Content Include="Assets\search-button.png" />

@@ -37,6 +37,7 @@ namespace ItemResearchSpawner
         private void UnlockProgression(string command, string[] args)
         {
             _progressionManager.UnlockProgression();
+            Monitor.Log($"All researches were completed! :D", LogLevel.Info);
         }
 
 

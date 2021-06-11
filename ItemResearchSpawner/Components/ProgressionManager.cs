@@ -46,8 +46,7 @@ namespace ItemResearchSpawner.Components
             _monitor = monitor;
             _helper = helper;
 
-            // _categories = helper.Data.ReadJsonFile<CategoryProgress[]>("assets/category-progress.json");
-            _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
+            _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories-progress.json");
 
             _helper.Events.GameLoop.Saving += OnSaveProgression;
             _helper.Events.GameLoop.DayStarted += OnLoadProgression;
