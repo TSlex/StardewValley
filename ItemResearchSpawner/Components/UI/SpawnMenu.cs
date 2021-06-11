@@ -44,6 +44,7 @@ namespace ItemResearchSpawner.Components
         private string _searchText;
 
         private bool _overDropdown;
+        private bool _shiftPressed;
 
         public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IMonitor monitor) : base(
             inventory: new List<Item>(),
@@ -65,7 +66,7 @@ namespace ItemResearchSpawner.Components
             _itemsInView = ItemsToGrabMenu.actualInventory;
 
             _baseDraw = RenderHelpers.GetBaseDraw(this);
-            
+
             drawBG = false; // disable to draw default ui over new menu
             behaviorOnItemGrab = OnItemGrab;
 
@@ -92,7 +93,7 @@ namespace ItemResearchSpawner.Components
         private void OnQualityChange(ItemQuality newQuality)
         {
             _quality = newQuality;
-            UpdateView();
+            UpdateView(true);
         }
 
         private void OnSortOptionChange(ItemSortOption newOption)
@@ -138,11 +139,11 @@ namespace ItemResearchSpawner.Components
             else if (_categorySelector.TryClick(x, y))
             {
             }
-            else if (_researchArea.Bounds.Contains(x, y))
+            else if (_researchArea.Bounds.Contains(x, y) && !_shiftPressed)
             {
                 OnResearchAreaLeftClick();
             }
-            else if (_researchArea.ButtonBounds.Contains(x, y))
+            else if (_researchArea.ButtonBounds.Contains(x, y) && !_shiftPressed)
             {
                 _researchArea.HandleResearch();
             }
@@ -162,7 +163,14 @@ namespace ItemResearchSpawner.Components
                     _searchBarTab.Blur();
                 }
 
-                base.receiveLeftClick(x, y, playSound);
+                if (_shiftPressed)
+                {
+                    OnShiftLeftClickPressed(x, y);
+                }
+                else
+                {
+                    base.receiveLeftClick(x, y, playSound);
+                }
             }
         }
 
@@ -250,6 +258,25 @@ namespace ItemResearchSpawner.Components
             }
         }
 
+        private void TryReturnItemToInventory(Item item)
+        {
+            if (Game1.player.isInventoryFull())
+            {
+                if (heldItem != null)
+                {
+                    DropItem(item);
+                }
+                else
+                {
+                    heldItem = item;
+                }
+            }
+            else
+            {
+                Game1.player.addItemByMenuIfNecessary(item);
+            }
+        }
+
         private void OnResearchAreaRightClick()
         {
             if (_researchArea.ResearchItem != null)
@@ -327,12 +354,36 @@ namespace ItemResearchSpawner.Components
             }
             else
             {
+                _shiftPressed = key == Keys.LeftShift || key == Keys.RightShift;
                 var isIgnoredExitKey = _searchBarTab.Selected && isExitButton && !isEscape;
                 if (!isIgnoredExitKey && !_searchBarTab.IsSearchBoxSelectionChanging)
                 {
                     base.receiveKeyPress(key);
                 }
             }
+        }
+
+        private void OnShiftLeftClickPressed(int x, int y)
+        {
+            if (_researchArea.Bounds.Contains(x, y) || _researchArea.ButtonBounds.Contains(x, y))
+            {
+                if (_researchArea.ResearchItem != null)
+                {
+                    TryReturnItemToInventory(_researchArea.ReturnItem());
+                }
+            }
+            else if (hoveredItem != null && hoveredItem.HasBeenInInventory)
+            {
+                if (_researchArea.ResearchItem != null)
+                {
+                    TryReturnItemToInventory(_researchArea.ReturnItem());
+                }
+
+                _researchArea.TrySetItem(hoveredItem);
+                Game1.player.removeItemFromInventory(hoveredItem);
+            }
+
+            _shiftPressed = false;
         }
 
         private void TryTrashItem()
@@ -381,7 +432,7 @@ namespace ItemResearchSpawner.Components
 
             base.performHoverAction(x, y);
         }
-        
+
         private void OnItemGrab(Item item, Farmer player)
         {
             UpdateView();
@@ -443,11 +494,16 @@ namespace ItemResearchSpawner.Components
         {
             if (_researchArea.ResearchItem != null)
             {
-                Game1.createItemDebris(_researchArea.ReturnItem(), Game1.player.getStandingPosition(),
-                    Game1.player.FacingDirection);
+                DropItem(_researchArea.ReturnItem());
             }
 
             base.cleanupBeforeExit();
+        }
+
+        private static void DropItem(Item item)
+        {
+            Game1.createItemDebris(item, Game1.player.getStandingPosition(),
+                Game1.player.FacingDirection);
         }
 
         private void InitializeComponents()

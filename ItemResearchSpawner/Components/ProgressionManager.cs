@@ -71,29 +71,21 @@ namespace ItemResearchSpawner.Components
 
         private static string GetItemUniqueKey(Item item)
         {
-            // var quality = 0;
-            //
-            // if (item is Object sObject)
-            // {
-            //     quality = sObject.quality;
-            // }
-
-            return $"{item.category}:" + $"{item.Name}:" + $"{item.ParentSheetIndex}"; // category:name:id:quality
+            return $"{item.category}:" + $"{item.Name}:" + $"{item.ParentSheetIndex}";
         }
 
         public void ResearchItem(Item item)
         {
-            var itemProgression = GetItemProgressionRaw(item);
+            var (itemProgression, progressionMax) = GetItemProgressionRaw(item);
 
-            if (itemProgression.max <= 0 || itemProgression.current >= itemProgression.max)
+            if (progressionMax <= 0 || itemProgression >= progressionMax)
             {
                 return;
             }
 
-            var needCount = itemProgression.max - itemProgression.current;
+            var needCount = progressionMax - itemProgression;
 
             var progressCount = item.Stack > needCount ? needCount : item.Stack;
-
 
             var progressionItem = TryInitAndReturnProgressionItem(item);
 

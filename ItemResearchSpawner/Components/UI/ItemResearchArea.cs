@@ -54,6 +54,7 @@ namespace ItemResearchSpawner.Components
         {
             var item = _researchItem;
             _researchItem = null;
+            _lastItem = null;
 
             return item;
         }
