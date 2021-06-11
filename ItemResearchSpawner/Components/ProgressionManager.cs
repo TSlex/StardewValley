@@ -166,13 +166,13 @@ namespace ItemResearchSpawner.Components
 
             if (itemActive)
             {
-                // _monitor.Log($"Current item - name: {item.Name}, ID: {item.ID}, category: {item.Category}",
-                //     LogLevel.Alert);
-                // _monitor.Log($"Unique key: {Utils.Helpers.GetItemUniqueKey(item.Item)}",
-                //     LogLevel.Alert);
+                _monitor.Log($"Current item - name: {item.Name}, ID: {item.ID}, category: {item.Category}",
+                    LogLevel.Alert);
+                _monitor.Log($"Unique key: {Utils.Helpers.GetItemUniqueKey(item.Item)}",
+                    LogLevel.Alert);
                 
-                _monitor.Log($"\"{Utils.Helpers.GetItemUniqueKey(item.Item)}\",",
-                LogLevel.Alert);
+                // _monitor.Log($"\"{Utils.Helpers.GetItemUniqueKey(item.Item)}\",",
+                // LogLevel.Alert);
             }
 
             var maxProgression = category?.ResearchCount ?? 1;
