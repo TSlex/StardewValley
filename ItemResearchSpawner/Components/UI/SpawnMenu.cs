@@ -33,7 +33,7 @@ namespace ItemResearchSpawner.Components
         private ItemCategorySelectorTab _categorySelector;
         private ItemSearchBarTab _searchBarTab;
 
-        private readonly List<SpawnableItem> _filteredItems = new List<SpawnableItem>();
+        private readonly List<ResearchedItem> _filteredItems = new List<ResearchedItem>();
         private readonly IList<Item> _itemsInView;
 
         private int _topRowIndex;
@@ -549,13 +549,14 @@ namespace ItemResearchSpawner.Components
 
             foreach (var prefab in _filteredItems.Skip(_topRowIndex * ItemsPerRow).Take(ItemsPerView))
             {
-                var item = prefab.CreateItem();
+                var item = prefab.Item.CreateItem();
 
                 item.Stack = item.maximumStackSize();
 
                 if (item is Object obj)
                 {
-                    obj.Quality = (int) _quality;
+                    // obj.Quality = (int) _quality;
+                    obj.Quality = (int) prefab.GetAvailableQuality(_quality);
                 }
 
                 _itemsInView.Add(item);
@@ -581,22 +582,22 @@ namespace ItemResearchSpawner.Components
             }
         }
 
-        private IEnumerable<SpawnableItem> GetFilteredItems()
+        private IEnumerable<ResearchedItem> GetFilteredItems()
         {
-            IEnumerable<SpawnableItem> items = ProgressionManager.Instance.GetResearchedItems();
+            var items = ProgressionManager.Instance.GetResearchedItems();
             // IEnumerable<SpawnableItem> items = _spawnableItems;
 
             items = _sortOption switch
             {
-                ItemSortOption.Category => items.OrderBy(p => p.Item.Category),
-                ItemSortOption.ID => items.OrderBy(p => p.Item.ParentSheetIndex),
+                ItemSortOption.Category => items.OrderBy(p => p.Item.Item.Category),
+                ItemSortOption.ID => items.OrderBy(p => p.Item.Item.ParentSheetIndex),
                 _ => items.OrderBy(p => p.Item.DisplayName)
             };
 
             if (!Helpers.EqualsCaseInsensitive(_categorySelector.SelectedCategory, "All"))
             {
                 items = items.Where(item =>
-                    Helpers.EqualsCaseInsensitive(item.Category, _categorySelector.SelectedCategory));
+                    Helpers.EqualsCaseInsensitive(item.Item.Category, _categorySelector.SelectedCategory));
             }
 
             var search = _searchText.Trim();
@@ -604,8 +605,8 @@ namespace ItemResearchSpawner.Components
             if (search != "")
             {
                 items = items.Where(item =>
-                    item.Name.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0
-                    || item.DisplayName.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0
+                    item.Item.Name.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0
+                    || item.Item.DisplayName.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0
                 );
             }
 

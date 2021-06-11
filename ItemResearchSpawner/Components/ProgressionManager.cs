@@ -76,7 +76,7 @@ namespace ItemResearchSpawner.Components
 
         public void ResearchItem(Item item)
         {
-            var (itemProgression, progressionMax) = GetItemProgressionRaw(item);
+            var (itemProgression, progressionMax) = GetItemProgressionRaw(item, out var progressionItem);
 
             if (progressionMax <= 0 || itemProgression >= progressionMax)
             {
@@ -87,27 +87,27 @@ namespace ItemResearchSpawner.Components
 
             var progressCount = item.Stack > needCount ? needCount : item.Stack;
 
-            var progressionItem = TryInitAndReturnProgressionItem(item);
-
-
             var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
 
-            switch (itemQuality)
+            if (itemQuality >= ItemQuality.Normal)
             {
-                case ItemQuality.Silver:
-                    progressionItem.ResearchCountSilver += progressCount;
-                    break;
-                case ItemQuality.Gold:
-                    progressionItem.ResearchCountGold += progressCount;
-                    break;
-                case ItemQuality.Iridium:
-                    progressionItem.ResearchCountIridium += progressCount;
-                    break;
-                default:
-                    progressionItem.ResearchCount += progressCount;
-                    break;
+                progressionItem.ResearchCount += progressCount;
             }
 
+            if (itemQuality >= ItemQuality.Silver)
+            {
+                progressionItem.ResearchCountSilver += progressCount;
+            }
+
+            if (itemQuality >= ItemQuality.Gold)
+            {
+                progressionItem.ResearchCountGold += progressCount;
+            }
+
+            if (itemQuality >= ItemQuality.Iridium)
+            {
+                progressionItem.ResearchCountIridium += progressCount;
+            }
 
             OnStackChanged?.Invoke(item.Stack - progressCount);
 
@@ -119,14 +119,14 @@ namespace ItemResearchSpawner.Components
 
         public bool ItemResearched(Item item)
         {
-            var (itemProgression, maxProgression) = GetItemProgressionRaw(item);
+            var (itemProgression, maxProgression) = GetItemProgressionRaw(item, out _);
 
             return maxProgression > 0 && itemProgression >= maxProgression;
         }
 
         public string GetItemProgression(Item item, bool itemActive = false)
         {
-            var (itemProgression, maxProgression) = GetItemProgressionRaw(item, itemActive);
+            var (itemProgression, maxProgression) = GetItemProgressionRaw(item, out _, itemActive);
 
             if (maxProgression <= 0)
             {
@@ -136,14 +136,18 @@ namespace ItemResearchSpawner.Components
             return $"({itemProgression} / {maxProgression})";
         }
 
-        private (int current, int max) GetItemProgressionRaw(Item item, bool itemActive = false)
+        private (int current, int max) GetItemProgressionRaw(Item item, 
+            out ResearchProgression progressionItem, bool itemActive = false)
         {
             var spawnableItem = GetSpawnableItem(item);
 
-            return GetItemProgressionRaw(spawnableItem, itemActive);
+            var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
+            
+            return GetItemProgressionRaw(spawnableItem, out progressionItem, itemQuality, itemActive);
         }
 
-        private (int current, int max) GetItemProgressionRaw(SpawnableItem item, bool itemActive = false)
+        private (int current, int max) GetItemProgressionRaw(SpawnableItem item,
+            out ResearchProgression progressionItem, ItemQuality quality = ItemQuality.Normal, bool itemActive = false)
         {
             var category = _categories.FirstOrDefault(c => item.Category.Equals(c.Label));
 
@@ -155,11 +159,9 @@ namespace ItemResearchSpawner.Components
 
             var maxProgression = category?.ResearchCount ?? 1;
 
-            var progressionItem = TryInitAndReturnProgressionItem(item.Item);
+            progressionItem = TryInitAndReturnProgressionItem(item.Item);
 
-            var itemQuality = (ItemQuality) ((item.Item as Object)?.Quality ?? 0);
-
-            var itemProgression = itemQuality switch
+            var itemProgression = quality switch
             {
                 ItemQuality.Silver => progressionItem.ResearchCountSilver,
                 ItemQuality.Gold => progressionItem.ResearchCountGold,
@@ -172,14 +174,16 @@ namespace ItemResearchSpawner.Components
             return (itemProgression, maxProgression);
         }
 
-        public IEnumerable<SpawnableItem> GetResearchedItems()
+        public IEnumerable<ResearchedItem> GetResearchedItems()
         {
-            return _itemRegistry.Values.Where(item =>
-            {
-                var progression = GetItemProgressionRaw(item);
-
-                return progression.max > 0 && progression.current >= progression.max;
-            });
+            return _itemRegistry.Values
+                .Select(item => new ResearchedItem
+                {
+                    Item = item,
+                    NeededProgression = GetItemProgressionRaw(item, out var progression).max,
+                    Progression = progression
+                })
+                .Where(item => item.Progression.ResearchCount >= item.NeededProgression && item.NeededProgression > 0);
         }
 
         private ResearchProgression TryInitAndReturnProgressionItem(Item item)

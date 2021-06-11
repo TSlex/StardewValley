@@ -66,6 +66,7 @@
         <Compile Include="Models\ModDataCategory.cs" />
         <Compile Include="Models\ModDataCategoryRule.cs" />
         <Compile Include="Models\ModItemData.cs" />
+        <Compile Include="Models\ResearchedItem.cs" />
         <Compile Include="Models\ResearchProgression.cs" />
         <Compile Include="Models\SearchableItem.cs" />
         <Compile Include="Models\SpawnableItem.cs" />
