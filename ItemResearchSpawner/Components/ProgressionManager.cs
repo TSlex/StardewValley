@@ -71,15 +71,14 @@ namespace ItemResearchSpawner.Components
 
         private static string GetItemUniqueKey(Item item)
         {
-            var quality = 0;
+            // var quality = 0;
+            //
+            // if (item is Object sObject)
+            // {
+            //     quality = sObject.quality;
+            // }
 
-            if (item is Object sObject)
-            {
-                quality = sObject.quality;
-            }
-
-            return $"{item.category}:" + $"{item.Name}:" +
-                   $"{item.ParentSheetIndex}:" + $"{quality}"; // category:name:id:quality
+            return $"{item.category}:" + $"{item.Name}:" + $"{item.ParentSheetIndex}"; // category:name:id:quality
         }
 
         public void ResearchItem(Item item)
@@ -220,7 +219,7 @@ namespace ItemResearchSpawner.Components
 
             return spawnableItem;
         }
-        
+
         private SpawnableItem GetSpawnableItem(string key)
         {
             if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
