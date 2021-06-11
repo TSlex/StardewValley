@@ -108,6 +108,8 @@ namespace ItemResearchSpawner.Components
 
         private void OnStackChanged(int newCount)
         {
+            _lastItem = null; //update cached progression string
+                
             if (newCount <= 0)
             {
                 _researchItem = null;

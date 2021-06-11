@@ -17,11 +17,14 @@ namespace ItemResearchSpawner.Components
 
         private readonly IMonitor _monitor;
         private readonly IModHelper _helper;
-        private readonly Func<SpawnableItem[]> _items;
 
         private readonly ModDataCategory[] _categories;
 
-        private ResearchProgression _progression;
+        private readonly Dictionary<string, SpawnableItem> _itemRegistry =
+            new Dictionary<string, SpawnableItem>();
+
+        private Dictionary<string, ResearchProgression> _progression =
+            new Dictionary<string, ResearchProgression>();
 
         public delegate void StackChanged(int newCount);
 
@@ -31,12 +34,7 @@ namespace ItemResearchSpawner.Components
 
         public static event ResearchCompleted OnResearchCompleted;
 
-        // private IEnumerable<SpawnableItem> Items => _items();
-
-        private Dictionary<string, SpawnableItem> _itemRegistry = new Dictionary<string, SpawnableItem>();
-
         public ProgressionManager(IMonitor monitor, IModHelper helper)
-            // public ProgressionManager(IMonitor monitor, IModHelper helper, Func<SpawnableItem[]> items)
         {
             Instance ??= this;
 
@@ -48,7 +46,6 @@ namespace ItemResearchSpawner.Components
 
             _monitor = monitor;
             _helper = helper;
-            // _items = items;
 
             // _categories = helper.Data.ReadJsonFile<CategoryProgress[]>("assets/category-progress.json");
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
@@ -63,7 +60,7 @@ namespace ItemResearchSpawner.Components
             {
                 return;
             }
-            
+
             foreach (var spawnableItem in items)
             {
                 var key = GetItemUniqueKey(spawnableItem.Item);
@@ -87,10 +84,6 @@ namespace ItemResearchSpawner.Components
 
         public void ResearchItem(Item item)
         {
-            // var stopwatch = new Stopwatch();
-
-            // stopwatch.Start();
-
             var itemProgression = GetItemProgressionRaw(item);
 
             if (itemProgression.max <= 0 || itemProgression.current >= itemProgression.max)
@@ -124,7 +117,6 @@ namespace ItemResearchSpawner.Components
                     break;
             }
 
-            // stopwatch.Stop();
 
             OnStackChanged?.Invoke(item.Stack - progressCount);
 
@@ -132,10 +124,6 @@ namespace ItemResearchSpawner.Components
             {
                 OnResearchCompleted?.Invoke();
             }
-
-            // SaveProgression();
-
-            // _monitor.Log(stopwatch.ElapsedMilliseconds.ToString(), LogLevel.Alert);
         }
 
         public bool ItemResearched(Item item)
@@ -203,26 +191,20 @@ namespace ItemResearchSpawner.Components
             });
         }
 
-        private ResearchItem TryInitAndReturnProgressionItem(Item item)
+        private ResearchProgression TryInitAndReturnProgressionItem(Item item)
         {
-            var spawnableItem = GetSpawnableItem(item);
+            var key = GetItemUniqueKey(item);
 
-            var progressionItem = spawnableItem != null
-                ? _progression.ResearchItems
-                    .FirstOrDefault(ri =>
-                        ri.ItemId.Equals(spawnableItem.ID) && ri.ItemName.Equals(spawnableItem.Name,
-                            StringComparison.InvariantCultureIgnoreCase))
-                : null;
+            ResearchProgression progressionItem;
 
-            if (progressionItem == null)
+            if (_progression.ContainsKey(key))
             {
-                progressionItem = new ResearchItem
-                {
-                    ItemId = spawnableItem?.ID ?? -1,
-                    ItemName = spawnableItem?.Name ?? "???"
-                };
-
-                _progression.ResearchItems.Add(progressionItem);
+                progressionItem = _progression[key];
+            }
+            else
+            {
+                progressionItem = new ResearchProgression();
+                _progression[key] = new ResearchProgression();
             }
 
             return progressionItem;
@@ -230,8 +212,6 @@ namespace ItemResearchSpawner.Components
 
         private SpawnableItem GetSpawnableItem(Item item)
         {
-            // var spawnableItem = Items.FirstOrDefault(si => si.EqualsToSItem(item));
-
             if (!_itemRegistry.TryGetValue(GetItemUniqueKey(item), out var spawnableItem))
             {
                 _monitor.LogOnce($"Item with  - name: {item.Name}, ID: {item.parentSheetIndex} is missing in register!",
@@ -240,6 +220,19 @@ namespace ItemResearchSpawner.Components
 
             return spawnableItem;
         }
+        
+        private SpawnableItem GetSpawnableItem(string key)
+        {
+            if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
+            {
+                _monitor.LogOnce($"Key: {key} is missing in register!",
+                    LogLevel.Alert);
+            }
+
+            return spawnableItem;
+        }
+
+        #region SaveLoad
 
         private static string DirectoryName => $"{Game1.player.Name}_{Game1.getFarm().NameOrUniqueName}";
 
@@ -261,9 +254,13 @@ namespace ItemResearchSpawner.Components
 
         private void LoadProgression()
         {
-            _progression = _helper.Data.ReadJsonFile<ResearchProgression>($"save/{DirectoryName}/progress.json") ??
-                           new ResearchProgression();
+            _progression =
+                _helper.Data.ReadJsonFile<Dictionary<string, ResearchProgression>>(
+                    $"save/{DirectoryName}/progress.json") ?? new Dictionary<string, ResearchProgression>();
+
             _monitor.Log("Progression loaded! :)", LogLevel.Debug);
         }
+
+        #endregion
     }
 }

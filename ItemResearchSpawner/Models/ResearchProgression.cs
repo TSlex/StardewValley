@@ -1,16 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace ItemResearchSpawner.Models
+﻿namespace ItemResearchSpawner.Models
 {
     internal class ResearchProgression
     {
-        public ICollection<ResearchItem> ResearchItems { get; set; } = new List<ResearchItem>();
-    }
-
-    internal class ResearchItem
-    {
-        public int ItemId { get; set; }
-        public string ItemName { get; set; }
+        // public string UniqueKey { get; set; }
+        
         public int ResearchCount { get; set; }
         public int ResearchCountGold { get; set; }
         public int ResearchCountSilver { get; set; }
