@@ -1,5 +1,6 @@
 ﻿using System;
 using StardewValley;
+using Object = StardewValley.Object;
 
 namespace ItemResearchSpawner.Models
 {
@@ -26,6 +27,31 @@ namespace ItemResearchSpawner.Models
             ID = item.ID;
             CreateItem = item.CreateItem;
             Item = item.Item;
+        }
+
+        public bool EqualsToSItem(Item item)
+        {
+            if (!Item.Category.Equals(item.category))
+            {
+                return false;
+            }
+
+            if (!Item.Name.Equals(item.Name))
+            {
+                return false;
+            }
+
+            if (Item.ParentSheetIndex.Equals(item.ParentSheetIndex))
+            {
+                if (Item is Object item1 && Item is Object item2)
+                {
+                    return item1.quality.Equals(item2.quality);
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

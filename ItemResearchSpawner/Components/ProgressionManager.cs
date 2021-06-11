@@ -198,11 +198,12 @@ namespace ItemResearchSpawner.Components
 
         private SpawnableItem GetSpawnableItem(Item item)
         {
-            var spawnableItem = Items.FirstOrDefault(si => si.Item.Name.Equals(item.Name));
+            var spawnableItem = Items.FirstOrDefault(si => si.EqualsToSItem(item));
 
             if (spawnableItem == null)
             {
-                _monitor.LogOnce($"Item with ID: {item.Name} is missing in register!", LogLevel.Alert);
+                _monitor.LogOnce($"Item with  - name: {item.Name}, ID: {item.parentSheetIndex} is missing in register!",
+                    LogLevel.Alert);
             }
 
             return spawnableItem;
