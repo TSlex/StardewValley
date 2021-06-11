@@ -19,14 +19,14 @@ namespace ItemResearchSpawner.Components
         private readonly IModHelper _helper;
         private readonly Func<SpawnableItem[]> _items;
 
-        private readonly CategoryProgress[] _categories;
+        private readonly ModDataCategory[] _categories;
 
         private ResearchProgression _progression;
 
         public delegate void StackChanged(int newCount);
 
         public static event StackChanged OnStackChanged;
-        
+
         public delegate void ResearchCompleted();
 
         public static event ResearchCompleted OnResearchCompleted;
@@ -46,8 +46,9 @@ namespace ItemResearchSpawner.Components
             _monitor = monitor;
             _helper = helper;
             _items = items;
-            
-            _categories = helper.Data.ReadJsonFile<CategoryProgress[]>("assets/category-progress.json");
+
+            // _categories = helper.Data.ReadJsonFile<CategoryProgress[]>("assets/category-progress.json");
+            _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
 
             _helper.Events.GameLoop.Saving += OnSaveProgression;
             _helper.Events.GameLoop.DayStarted += OnLoadProgression;
@@ -56,11 +57,11 @@ namespace ItemResearchSpawner.Components
         public void ResearchItem(Item item)
         {
             // var stopwatch = new Stopwatch();
-            
+
             // stopwatch.Start();
-            
+
             var itemProgression = GetItemProgressionRaw(item);
-            
+
             if (itemProgression.max <= 0 || itemProgression.current >= itemProgression.max)
             {
                 return;
@@ -69,10 +70,10 @@ namespace ItemResearchSpawner.Components
             var needCount = itemProgression.max - itemProgression.current;
 
             var progressCount = item.Stack > needCount ? needCount : item.Stack;
-            
+
 
             var progressionItem = TryInitAndReturnProgressionItem(item);
-            
+
 
             var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
 
@@ -91,7 +92,7 @@ namespace ItemResearchSpawner.Components
                     progressionItem.ResearchCount += progressCount;
                     break;
             }
-            
+
             // stopwatch.Stop();
 
             OnStackChanged?.Invoke(item.Stack - progressCount);
@@ -113,9 +114,9 @@ namespace ItemResearchSpawner.Components
             return maxProgression > 0 && itemProgression >= maxProgression;
         }
 
-        public string GetItemProgression(Item item)
+        public string GetItemProgression(Item item, bool itemActive = false)
         {
-            var (itemProgression, maxProgression) = GetItemProgressionRaw(item);
+            var (itemProgression, maxProgression) = GetItemProgressionRaw(item, itemActive);
 
             if (maxProgression <= 0)
             {
@@ -125,16 +126,22 @@ namespace ItemResearchSpawner.Components
             return $"({itemProgression} / {maxProgression})";
         }
 
-        private (int current, int max) GetItemProgressionRaw(Item item)
+        private (int current, int max) GetItemProgressionRaw(Item item, bool itemActive = false)
         {
             var spawnableItem = GetSpawnableItem(item);
 
-            return GetItemProgressionRaw(spawnableItem);
+            return GetItemProgressionRaw(spawnableItem, itemActive);
         }
 
-        private (int current, int max) GetItemProgressionRaw(SpawnableItem item)
+        private (int current, int max) GetItemProgressionRaw(SpawnableItem item, bool itemActive = false)
         {
-            var category = _categories.FirstOrDefault(c => item.Item.Category.Equals(c.Id));
+            var category = _categories.FirstOrDefault(c => item.Category.Equals(c.Label));
+
+            if (itemActive)
+            {
+                _monitor.Log($"Current item - name: {item.Name}, ID: {item.ID}, category: {item.Category}",
+                    LogLevel.Alert);
+            }
 
             var maxProgression = category?.ResearchCount ?? 1;
 

@@ -14,7 +14,8 @@
         "Object:681",
         "Object:688",
         "Object:689",
-        "Object:690"
+        "Object:690",
+        "Object:886"
       ]
     },
     "Except": {
@@ -89,6 +90,11 @@
       ],
       "ItemId": [
         "Object:417"
+      ]
+    },
+    "Except": {
+      "ItemId": [
+        "Object:92"
       ]
     },
     "ResearchCount": 20
@@ -166,6 +172,9 @@
       "ObjCategory": [
         -15,
         -16
+      ],
+      "ItemId": [
+        "Object:92"
       ]
     },
     "ResearchCount": 50
@@ -183,14 +192,24 @@
         "Object:464"
       ]
     },
-    "ResearchCount": 20
+    "ResearchCount": 3
   },
   {
-    "Label": "Artisan and cooking",
+    "Label": "Artisan",
     "When": {
       "ObjCategory": [
-        -7,
-        -25,
+        -26,
+        -27
+      ],
+      "ItemId": [
+      ]
+    },
+    "ResearchCount": 10
+  },
+  {
+    "Label": "Сooking",
+    "When": {
+      "ObjCategory": [
         -26,
         -27
       ],
@@ -198,12 +217,14 @@
         "Object:245",
         "Object:246",
         "Object:247",
+        "Object:349",
+        "Object:395",
         "Object:403",
         "Object:419",
         "Object:423"
       ]
     },
-    "ResearchCount": 10
+    "ResearchCount": 5
   },
   {
     "Label": "Furniture",

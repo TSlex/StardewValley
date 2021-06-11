@@ -14,6 +14,9 @@ namespace ItemResearchSpawner.Components
         private readonly Texture2D _researchTexture;
 
         private Item _researchItem;
+        
+        private Item _lastItem;
+        private string _itemProgression;
 
         public ItemResearchArea(IContentHelper content, IMonitor monitor, int x, int y)
         {
@@ -73,9 +76,7 @@ namespace ItemResearchSpawner.Components
                 Game1.tileSize,
                 out _);
 
-            var researchProgressString = _researchItem != null
-                ? ProgressionManager.Instance.GetItemProgression(_researchItem)
-                : "(0 / 0)";
+            var researchProgressString = GetItemProgression();
 
             var progressFont = Game1.dialogueFont;
             var progressPositionX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f -
@@ -87,6 +88,22 @@ namespace ItemResearchSpawner.Components
             spriteBatch.Draw(_researchButton.texture, _researchButton.bounds, _researchButton.sourceRect, Color.White);
 
             _researchItem?.drawInMenu(spriteBatch, new Vector2(researchItemCellX, areaInnerAnchors.Y + 10), 1f);
+        }
+
+        private string GetItemProgression()
+        {
+            if (_researchItem == null)
+            {
+                return "(0 / 0)";
+            }
+            
+            if (_lastItem == null || !_lastItem.Equals(_researchItem))
+            {
+                _itemProgression = ProgressionManager.Instance.GetItemProgression(_researchItem, true);
+                _lastItem = _researchItem;
+            }
+
+            return _itemProgression;
         }
 
         private void OnStackChanged(int newCount)
