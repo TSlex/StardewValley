@@ -399,6 +399,10 @@ namespace ItemResearchSpawner.Components
         {
             base.receiveScrollWheelAction(direction);
 
+            if (_categorySelector.IsExpanded)
+            {
+                _categorySelector.ReceiveScrollWheelAction(direction);
+            }
             if (_overDropdown)
             {
                 _categorySelector.HandleScroll(-direction);

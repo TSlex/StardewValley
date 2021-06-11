@@ -118,6 +118,11 @@ namespace ItemResearchSpawner.Components
             OnCategorySelected?.Invoke("All");
         }
 
+        public void ReceiveScrollWheelAction(int direction)
+        {
+            _categoryDropdown.ReceiveScrollWheelAction(direction);
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             var sourceRect = CursorSprites.DropdownButton;
