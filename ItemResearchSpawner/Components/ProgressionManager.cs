@@ -225,9 +225,11 @@ namespace ItemResearchSpawner.Components
 
         private SpawnableItem GetSpawnableItem(Item item)
         {
-            if (!_itemRegistry.TryGetValue(Utils.Helpers.GetItemUniqueKey(item), out var spawnableItem))
+            var key = Utils.Helpers.GetItemUniqueKey(item);
+            
+            if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
             {
-                _monitor.LogOnce($"Item with  - name: {item.Name}, ID: {item.parentSheetIndex} is missing in register!",
+                _monitor.LogOnce($"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
                     LogLevel.Alert);
             }
 

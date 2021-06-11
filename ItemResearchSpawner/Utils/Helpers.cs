@@ -9,10 +9,26 @@ namespace ItemResearchSpawner.Utils
         {
             return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
         }
-        
+
         public static string GetItemUniqueKey(Item item)
         {
-            return $"{item.category}:" + $"{item.Name}:" + $"{item.ParentSheetIndex}";
+            var category = GetItemCategory(item);
+
+            return $"{category}:" + $"{item.Name}:" + $"{item.ParentSheetIndex}";
+        }
+
+        private static int GetItemCategory(Item item)
+        {
+            if (item.Name.Equals("Wallpaper", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return -24;
+            }
+            if (item.Name.Equals("Flooring", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return -24;
+            }
+
+            return item.category;
         }
     }
 }

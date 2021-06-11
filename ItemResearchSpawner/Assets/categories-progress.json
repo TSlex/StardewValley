@@ -1,10 +1,30 @@
 ﻿[
   {
-    "Label": "Tools",
+    "Label": "Usable",
     "When": {
       "ObjCategory": [
         -19,
-        -21,
+        -21
+      ]
+    },
+    "ResearchCount": 10
+  },
+  {
+    "Label": "Ammo",
+    "When": {
+      "ItemId": [
+        "Object:286",
+        "Object:287",
+        "Object:288",
+        "Object:441"
+      ]
+    },
+    "ResearchCount": 10
+  },
+  {
+    "Label": "Tools",
+    "When": {
+      "ObjCategory": [
         -22,
         -99
       ],
@@ -33,12 +53,6 @@
       ],
       "Class": [
         "StardewValley.Tools.Slingshot"
-      ],
-      "ItemId": [
-        "Object:286",
-        "Object:287",
-        "Object:288",
-        "Object:441"
       ]
     },
     "ResearchCount": 1
@@ -80,16 +94,50 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Crops",
+    "Label": "Unique crops",
     "When": {
-      "ObjCategory": [
-        -75,
-        -79,
-        -80,
-        -81
+      "UniqueKey": [
+        "-79:Qi Fruit:889",
+        "-79:Ancient Fruit:454"
       ],
       "ItemId": [
         "Object:417"
+      ]
+    },
+    "ResearchCount": 100
+  },
+  {
+    "Label": "Tree fruits",
+    "When": {
+      "UniqueKey": [
+        "-79:Apple:613",
+        "-79:Apricot:634",
+        "-79:Orange:635",
+        "-79:Peach:636",
+        "-79:Pomegranate:637",
+        "-79:Cherry:638",
+        "-79:Banana:91",
+        "-79:Mango:834"
+      ]
+    },
+    "ResearchCount": 1
+  },
+  {
+    "Label": "Forage plants",
+    "When": {
+      "ObjCategory": [
+        -81
+      ],
+      "UniqueKey": [
+        "-79:Coconut:88",
+        "-79:Cactus Fruit:90",
+        "-79:Salmonberry:296",
+        "-79:Blackberry:410",
+        "-79:Wild Plum:406",
+        "-79:Crystal Fruit:414",
+        "-75:Fiddlehead Fern:259",
+        "-79:Grape:398",
+        "-79:Spice Berry:396"
       ]
     },
     "Except": {
@@ -97,7 +145,45 @@
         "Object:92"
       ]
     },
-    "ResearchCount": 20
+    "ResearchCount": 5
+  },
+  {
+    "Label": "Flowers",
+    "When": {
+      "ObjCategory": [
+        -80
+      ],
+      "UniqueKey": [
+      ]
+    },
+    "ResearchCount": 5
+  },
+  {
+    "Label": "Crops",
+    "When": {
+      "ObjCategory": [
+        -75,
+        -79
+      ]
+    },
+    "ResearchCount": 30
+  },
+  {
+    "Label": "Saplings",
+    "When": {
+      "ItemId": [
+        "Object:69",
+        "Object:251",
+        "Object:628",
+        "Object:629",
+        "Object:630",
+        "Object:631",
+        "Object:632",
+        "Object:633",
+        "Object:835"
+      ]
+    },
+    "ResearchCount": 1
   },
   {
     "Label": "Seeds",
@@ -106,7 +192,7 @@
         -74
       ]
     },
-    "ResearchCount": 20
+    "ResearchCount": 10
   },
   {
     "Label": "Monster loot",
@@ -138,6 +224,24 @@
     "ResearchCount": 25
   },
   {
+    "Label": "Legendary fish",
+    "When": {
+      "UniqueKey": [
+        "-4:Glacierfish Jr.:902",
+        "-4:Radioactive Carp:901",
+        "-4:Legend II:900",
+        "-4:Ms. Angler:899",
+        "-4:Son of Crimsonfish:898",
+        "-4:Glacierfish:775",
+        "-4:Mutant Carp:682",
+        "-4:Angler:160",
+        "-4:Legend:163",
+        "-4:Crimsonfish:159"
+      ]
+    },
+    "ResearchCount": 1
+  },
+  {
     "Label": "Fish",
     "When": {
       "ObjCategory": [
@@ -156,23 +260,47 @@
     "ResearchCount": 5
   },
   {
-    "Label": "Minerals and artifacts",
+    "Label": "Geodes",
     "When": {
-      "ObjCategory": [
-        -2,
-        -12
-      ],
-      "ObjType": [
-        "Arch"
-      ],
       "ItemId": [
         "Object:535",
         "Object:536",
         "Object:537",
-        "Object:749"
+        "Object:749",
+        "Object:791"
+      ],
+      "UniqueKey": [
+        "0:Artifact Trove:275"
       ]
     },
-    "ResearchCount": 20
+    "ResearchCount": 5
+  },
+  {
+    "Label": "Rare minerals",
+    "When": {
+      "ObjCategory": [
+        -2
+      ]
+    },
+    "ResearchCount": 10
+  },
+  {
+    "Label": "Minerals",
+    "When": {
+      "ObjCategory": [
+        -12
+      ]
+    },
+    "ResearchCount": 1
+  },
+  {
+    "Label": "Artifacts",
+    "When": {
+      "ObjType": [
+        "Arch"
+      ]
+    },
+    "ResearchCount": 1
   },
   {
     "Label": "Resources",
@@ -183,9 +311,12 @@
       ],
       "ItemId": [
         "Object:92"
+      ],
+      "UniqueKey": [
+        "0:Dragon Tooth:852"
       ]
     },
-    "ResearchCount": 50
+    "ResearchCount": 45
   },
   {
     "Label": "Noncraftable",
@@ -321,7 +452,10 @@
         "Object:464"
       ],
       "UniqueKey": [
-        "-9:Staircase:71"
+        "-9:Staircase:71",
+        "0:Fairy Dust:872",
+        "0:Cookout Kit:926",
+        "0:Monster Musk:879"
       ]
     },
     "ResearchCount": 5
@@ -352,7 +486,8 @@
     "When": {
       "ObjCategory": [
         -26,
-        -27
+        -27,
+        -7
       ],
       "ItemId": [
         "Object:245",
@@ -363,6 +498,9 @@
         "Object:403",
         "Object:419",
         "Object:423"
+      ],
+      "UniqueKey": [
+        "0:Bug Steak:874"
       ]
     },
     "ResearchCount": 5
