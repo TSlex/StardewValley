@@ -27,12 +27,13 @@ namespace ItemResearchSpawner
             _itemData = helper.Data.ReadJsonFile<ModItemData>("assets/item-data.json");
             // _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories-progress.json");
-            
+
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
-            
-            helper.ConsoleCommands.Add("research_unlock_all", "unlock all items research progression", UnlockProgression);
+
+            helper.ConsoleCommands.Add("research_unlock_all", "unlock all items research progression",
+                UnlockProgression);
         }
 
         private void UnlockProgression(string command, string[] args)
@@ -57,21 +58,24 @@ namespace ItemResearchSpawner
 
         private IClickableMenu GetSpawnMenu()
         {
-            _items = GetSpawnableItems().ToArray(); // some items exists only after day started ;_;
-            _progressionManager.InitRegistry(_items);
-            
+            if (_items == null)
+            {
+                _items = GetSpawnableItems().ToArray(); // some items exists only after day started ;_;
+                _progressionManager.InitRegistry(_items);
+            }
+
             return new SpawnMenu(_items, Helper.Content, Monitor);
         }
 
         private IEnumerable<SpawnableItem> GetSpawnableItems()
         {
             var items = new ItemRepository().GetAll();
-            
+
             if (_itemData?.ProblematicItems?.Any() == true)
             {
                 var problematicItems =
                     new HashSet<string>(_itemData.ProblematicItems, StringComparer.OrdinalIgnoreCase);
-            
+
                 items = items.Where(item => !problematicItems.Contains($"{item.Type}:{item.ID}"));
             }
 
