@@ -19,6 +19,7 @@ namespace ItemResearchSpawner
         private SpawnableItem[] _items;
 
         private ProgressionManager _progressionManager;
+        private IClickableMenu _menu;
 
         public override void Entry(IModHelper helper)
         {
@@ -31,9 +32,16 @@ namespace ItemResearchSpawner
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
+            helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
 
             helper.ConsoleCommands.Add("research_unlock_all", "unlock all items research progression",
                 UnlockProgression);
+        }
+
+        private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
+        {
+            _menu = null;
+            _progressionManager = null;
         }
 
         private void UnlockProgression(string command, string[] args)
@@ -52,7 +60,8 @@ namespace ItemResearchSpawner
 
             if (_config.ShowMenuKey.JustPressed())
             {
-                Game1.activeClickableMenu = GetSpawnMenu();
+                _menu ??= GetSpawnMenu();
+                Game1.activeClickableMenu = _menu;
             }
         }
 
