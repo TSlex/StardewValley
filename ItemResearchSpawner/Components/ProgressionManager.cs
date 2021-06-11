@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Force.DeepCloner;
 using ItemResearchSpawner.Models;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -123,6 +124,26 @@ namespace ItemResearchSpawner.Components
 
             return maxProgression > 0 && itemProgression >= maxProgression;
         }
+        
+        public void UnlockProgression()
+        {
+            var progression = _progression.DeepClone();
+
+            foreach (var key in _progression.Keys)
+            {
+                var temp = progression[key];
+
+                temp.ResearchCount = 999;
+                temp.ResearchCountSilver = 999;
+                temp.ResearchCountGold = 999;
+                temp.ResearchCountIridium = 999;
+
+                progression[key] = temp;
+            }
+
+            _progression = progression;
+        }
+
 
         public string GetItemProgression(Item item, bool itemActive = false)
         {
@@ -252,10 +273,10 @@ namespace ItemResearchSpawner.Components
             _progression =
                 _helper.Data.ReadJsonFile<Dictionary<string, ResearchProgression>>(
                     $"save/{DirectoryName}/progress.json") ?? new Dictionary<string, ResearchProgression>();
-
+            
             _monitor.Log("Progression loaded! :)", LogLevel.Debug);
         }
-
+        
         #endregion
     }
 }
