@@ -93,7 +93,7 @@ namespace ItemResearchSpawner.Components
         private void OnQualityChange(ItemQuality newQuality)
         {
             _quality = newQuality;
-            UpdateView(true);
+            UpdateView();
         }
 
         private void OnSortOptionChange(ItemSortOption newOption)
@@ -555,7 +555,6 @@ namespace ItemResearchSpawner.Components
 
                 if (item is Object obj)
                 {
-                    // obj.Quality = (int) _quality;
                     obj.Quality = (int) prefab.GetAvailableQuality(_quality);
                 }
 
@@ -585,7 +584,6 @@ namespace ItemResearchSpawner.Components
         private IEnumerable<ResearchedItem> GetFilteredItems()
         {
             var items = ProgressionManager.Instance.GetResearchedItems();
-            // IEnumerable<SpawnableItem> items = _spawnableItems;
 
             items = _sortOption switch
             {

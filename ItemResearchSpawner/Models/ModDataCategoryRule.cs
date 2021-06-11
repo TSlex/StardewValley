@@ -13,12 +13,18 @@ namespace ItemResearchSpawner.Models
         public ISet<string> ObjType { get; set; }
         public ISet<int> ObjCategory { get; set; }
         public ISet<string> ItemId { get; set; }
-
+        public ISet<string> UniqueKey { get; set; }
 
         public bool IsMatch(SearchableItem entry)
         {
             var item = entry.Item;
             var obj = item as Object;
+            var key = Utils.Helpers.GetItemUniqueKey(item);
+
+            if (UniqueKey.Any() && UniqueKey.Contains(key))
+            {
+                return true;
+            }
 
             if (Class.Any() && GetClassFullNames(item).Any(className => Class.Contains(className)))
             {
@@ -51,6 +57,8 @@ namespace ItemResearchSpawner.Models
             ObjType = new HashSet<string>(ObjType ?? (IEnumerable<string>) new string[0],
                 StringComparer.OrdinalIgnoreCase);
             ItemId = new HashSet<string>(ItemId ?? (IEnumerable<string>) new string[0],
+                StringComparer.OrdinalIgnoreCase);
+            UniqueKey = new HashSet<string>(UniqueKey ?? (IEnumerable<string>) new string[0],
                 StringComparer.OrdinalIgnoreCase);
             ObjCategory ??= new HashSet<int>();
         }

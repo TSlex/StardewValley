@@ -61,15 +61,10 @@ namespace ItemResearchSpawner.Components
 
             foreach (var spawnableItem in items)
             {
-                var key = GetItemUniqueKey(spawnableItem.Item);
+                var key = Utils.Helpers.GetItemUniqueKey(spawnableItem.Item);
 
                 _itemRegistry[key] = spawnableItem;
             }
-        }
-
-        private static string GetItemUniqueKey(Item item)
-        {
-            return $"{item.category}:" + $"{item.Name}:" + $"{item.ParentSheetIndex}";
         }
 
         public void ResearchItem(Item item)
@@ -171,8 +166,13 @@ namespace ItemResearchSpawner.Components
 
             if (itemActive)
             {
-                _monitor.Log($"Current item - name: {item.Name}, ID: {item.ID}, category: {item.Category}",
-                    LogLevel.Alert);
+                // _monitor.Log($"Current item - name: {item.Name}, ID: {item.ID}, category: {item.Category}",
+                //     LogLevel.Alert);
+                // _monitor.Log($"Unique key: {Utils.Helpers.GetItemUniqueKey(item.Item)}",
+                //     LogLevel.Alert);
+                
+                _monitor.Log($"\"{Utils.Helpers.GetItemUniqueKey(item.Item)}\",",
+                LogLevel.Alert);
             }
 
             var maxProgression = category?.ResearchCount ?? 1;
@@ -206,7 +206,7 @@ namespace ItemResearchSpawner.Components
 
         private ResearchProgression TryInitAndReturnProgressionItem(Item item)
         {
-            var key = GetItemUniqueKey(item);
+            var key = Utils.Helpers.GetItemUniqueKey(item);
 
             ResearchProgression progressionItem;
 
@@ -225,7 +225,7 @@ namespace ItemResearchSpawner.Components
 
         private SpawnableItem GetSpawnableItem(Item item)
         {
-            if (!_itemRegistry.TryGetValue(GetItemUniqueKey(item), out var spawnableItem))
+            if (!_itemRegistry.TryGetValue(Utils.Helpers.GetItemUniqueKey(item), out var spawnableItem))
             {
                 _monitor.LogOnce($"Item with  - name: {item.Name}, ID: {item.parentSheetIndex} is missing in register!",
                     LogLevel.Alert);

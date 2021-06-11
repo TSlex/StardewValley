@@ -109,14 +109,9 @@
     "ResearchCount": 20
   },
   {
-    "Label": "Animal products",
+    "Label": "Monster loot",
     "When": {
       "ObjCategory": [
-        -5,
-        -6,
-        -14,
-        -17,
-        -18,
         -28
       ],
       "ItemId": [
@@ -125,6 +120,19 @@
         "Object:439",
         "Object:680",
         "Object:857"
+      ]
+    },
+    "ResearchCount": 25
+  },
+  {
+    "Label": "Animal products",
+    "When": {
+      "ObjCategory": [
+        -5,
+        -6,
+        -14,
+        -17,
+        -18
       ]
     },
     "ResearchCount": 25
@@ -180,16 +188,145 @@
     "ResearchCount": 50
   },
   {
-    "Label": "Crafting products",
+    "Label": "Craftable",
     "When": {
       "ObjCategory": [
-        -8,
-        -9
+        -8
       ],
       "ItemId": [
         "Object:710",
         "Object:463",
         "Object:464"
+      ]
+    },
+    "ResearchCount": 3
+  },
+  {
+    "Label": "Noncraftable",
+    "When": {
+      "UniqueKey": [
+        "-9:Statue Of True Perfection:280",
+        "-9:Campfire:278",
+        "-9:Auto-Petter:272",
+        "-9:Deconstructor:265",
+        "-9:Junimo Chest:256",
+        "-9:Sewing Machine:247",
+        "-9:Coffee Maker:246",
+        "-9:Mini-Shipping Bin:248",
+        "-9:Cursed P.K. Arcade System:219",
+        "-9:Mini-Fridge:216",
+        "-9:Telephone:214",
+        "-9:Workbench:208",
+        "-9:Seasonal Plant:204",
+        "-9:Seasonal Plant:200",
+        "-9:Seasonal Plant:196",
+        "-9:Seasonal Plant:192",
+        "-9:Seasonal Plant:188",
+        "-9:Seasonal Plant:184",
+        "-9:Crate:175",
+        "-9:Crate:174",
+        "-9:Auto-Grabber:165",
+        "-9:Solid Gold Lewis:164",
+        "-9:??Foroguemon??:162",
+        "-9:??Pinky Lemon??:161",
+        "-9:Statue Of Perfection:160",
+        "-9:Rarecrow:140",
+        "-9:Rarecrow:139",
+        "-9:Rarecrow:138",
+        "-9:Rarecrow:137",
+        "-9:Rarecrow:136",
+        "-9:Statue Of Endless Fortune:127",
+        "-9:Rarecrow:126",
+        "-9:Crate:125",
+        "-9:Barrel:124",
+        "-9:Crate:123",
+        "-9:Barrel:122",
+        "-9:Crate:121",
+        "-9:Barrel:120",
+        "-9:Crate:119",
+        "-9:Barrel:118",
+        "-9:Soda Machine:117",
+        "-9:Stardew Hero Trophy:116",
+        "-9:Rarecrow:113",
+        "-9:Dried Sunflowers:112",
+        "-9:Decorative Pitcher:111",
+        "-9:Rarecrow:110",
+        "-9:Tub o' Flowers:109",
+        "-9:Plush Bunny:107",
+        "-9:Camera:106",
+        "-9:Heater:104",
+        "-9:Feed Hopper:99",
+        "-9:Empty Capsule:98",
+        "-9:Strange Capsule:96",
+        "-9:Stone Owl:95",
+        "-9:Singing Stone:94",
+        "-9:Obsidian Vase:89",
+        "-9:Standing Geode:88",
+        "-9:Sloth Skeleton R:87",
+        "-9:Sloth Skeleton M:86",
+        "-9:Sloth Skeleton L:85",
+        "-9:Door:80",
+        "-9:Door:79",
+        "-9:Boulder:78",
+        "-9:Decorative Spears:76",
+        "-9:Bongo:75",
+        "-9:Bonfire:74",
+        "-9:Ritual Mask:73",
+        "-9:Tall Torch:72",
+        "-9:Dead Tree:70",
+        "-9:Teddy Timer:69",
+        "-9:Grandfather Clock:68",
+        "-9:Ancient Stool:67",
+        "-9:Ancient Table:66",
+        "-9:House Plant:0",
+        "-9:House Plant:1",
+        "-9:House Plant:2",
+        "-9:House Plant:3",
+        "-9:House Plant:4",
+        "-9:House Plant:5",
+        "-9:House Plant:6",
+        "-9:House Plant:7",
+        "-9:Table Piece L:22",
+        "-9:Table Piece R:23",
+        "-9:Wood Chair:26",
+        "-9:Wood Chair:27",
+        "-9:Skeleton Model:28",
+        "-9:Chicken Statue:31",
+        "-9:Stone Cairn:32",
+        "-9:Suit Of Armor:33",
+        "-9:Sign Of The Vessel:34",
+        "-9:Basic Log:35",
+        "-9:Lawn Flamingo:36",
+        "-9:Big Green Cane:40",
+        "-9:Green Canes:41",
+        "-9:Mixed Cane:42",
+        "-9:Red Canes:43",
+        "-9:Big Red Cane:44",
+        "-9:Ornamental Hay Bale:45",
+        "-9:Log Section:46",
+        "-9:Grave Stone:47",
+        "-9:Seasonal Decor:48",
+        "-9:Stone Frog:52",
+        "-9:Stone Parrot:53",
+        "-9:Stone Owl:54",
+        "-9:Stone Junimo:55",
+        "-9:Slime Ball:56",
+        "-9:Bookcase:64",
+        "-9:Fancy Table:65",
+        "-9:Chest:130",
+        "-9:Prairie King Arcade System:141",
+        "-9:??HMTGF??:155",
+        "-9:Junimo Kart Arcade System:159",
+        "-9:Barrel:174"
+      ]
+    },
+    "ResearchCount": 1
+  },
+  {
+    "Label": "Bigcraftable",
+    "When": {
+      "ObjCategory": [
+        -9
       ]
     },
     "ResearchCount": 3
