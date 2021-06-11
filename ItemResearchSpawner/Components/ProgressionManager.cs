@@ -31,9 +31,12 @@ namespace ItemResearchSpawner.Components
 
         public static event ResearchCompleted OnResearchCompleted;
 
-        private IEnumerable<SpawnableItem> Items => _items();
+        // private IEnumerable<SpawnableItem> Items => _items();
 
-        public ProgressionManager(IMonitor monitor, IModHelper helper, Func<SpawnableItem[]> items)
+        private Dictionary<string, SpawnableItem> _itemRegistry = new Dictionary<string, SpawnableItem>();
+
+        public ProgressionManager(IMonitor monitor, IModHelper helper)
+            // public ProgressionManager(IMonitor monitor, IModHelper helper, Func<SpawnableItem[]> items)
         {
             Instance ??= this;
 
@@ -45,13 +48,41 @@ namespace ItemResearchSpawner.Components
 
             _monitor = monitor;
             _helper = helper;
-            _items = items;
+            // _items = items;
 
             // _categories = helper.Data.ReadJsonFile<CategoryProgress[]>("assets/category-progress.json");
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
 
             _helper.Events.GameLoop.Saving += OnSaveProgression;
             _helper.Events.GameLoop.DayStarted += OnLoadProgression;
+        }
+
+        public void InitRegistry(SpawnableItem[] items)
+        {
+            if (_itemRegistry.Count > 0)
+            {
+                return;
+            }
+            
+            foreach (var spawnableItem in items)
+            {
+                var key = GetItemUniqueKey(spawnableItem.Item);
+
+                _itemRegistry[key] = spawnableItem;
+            }
+        }
+
+        private static string GetItemUniqueKey(Item item)
+        {
+            var quality = 0;
+
+            if (item is Object sObject)
+            {
+                quality = sObject.quality;
+            }
+
+            return $"{item.category}:" + $"{item.Name}:" +
+                   $"{item.ParentSheetIndex}:" + $"{quality}"; // category:name:id:quality
         }
 
         public void ResearchItem(Item item)
@@ -164,11 +195,12 @@ namespace ItemResearchSpawner.Components
 
         public IEnumerable<SpawnableItem> GetResearchedItems()
         {
-            return Items.Where(item =>
+            return _itemRegistry.Values.Where(item =>
             {
                 var progression = GetItemProgressionRaw(item);
+
                 return progression.max > 0 && progression.current >= progression.max;
-            }).ToArray();
+            });
         }
 
         private ResearchItem TryInitAndReturnProgressionItem(Item item)
@@ -198,9 +230,9 @@ namespace ItemResearchSpawner.Components
 
         private SpawnableItem GetSpawnableItem(Item item)
         {
-            var spawnableItem = Items.FirstOrDefault(si => si.EqualsToSItem(item));
+            // var spawnableItem = Items.FirstOrDefault(si => si.EqualsToSItem(item));
 
-            if (spawnableItem == null)
+            if (!_itemRegistry.TryGetValue(GetItemUniqueKey(item), out var spawnableItem))
             {
                 _monitor.LogOnce($"Item with  - name: {item.Name}, ID: {item.parentSheetIndex} is missing in register!",
                     LogLevel.Alert);

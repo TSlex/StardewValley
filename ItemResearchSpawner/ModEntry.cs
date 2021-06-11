@@ -27,7 +27,8 @@ namespace ItemResearchSpawner
             _itemData = helper.Data.ReadJsonFile<ModItemData>("assets/item-data.json");
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
             
-            _progressionManager ??= new ProgressionManager(Monitor, _helper, () => _items);
+            // _progressionManager ??= new ProgressionManager(Monitor, _helper, () => _items);
+            _progressionManager ??= new ProgressionManager(Monitor, _helper);
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
         }
@@ -48,7 +49,9 @@ namespace ItemResearchSpawner
 
         private IClickableMenu GetSpawnMenu()
         {
-            _items = GetSpawnableItems().ToArray();
+            _items = GetSpawnableItems().ToArray(); // some items exists only after day started ;_;
+            _progressionManager.InitRegistry(_items);
+            
             return new SpawnMenu(_items, Helper.Content, Monitor);
         }
 
