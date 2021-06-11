@@ -188,20 +188,6 @@
     "ResearchCount": 50
   },
   {
-    "Label": "Craftable",
-    "When": {
-      "ObjCategory": [
-        -8
-      ],
-      "ItemId": [
-        "Object:710",
-        "Object:463",
-        "Object:464"
-      ]
-    },
-    "ResearchCount": 3
-  },
-  {
     "Label": "Noncraftable",
     "When": {
       "UniqueKey": [
@@ -317,10 +303,28 @@
         "-9:Prairie King Arcade System:141",
         "-9:??HMTGF??:155",
         "-9:Junimo Kart Arcade System:159",
-        "-9:Barrel:174"
+        "-9:Barrel:174",
+        "-8:Hedge:929"
       ]
     },
     "ResearchCount": 1
+  },
+  {
+    "Label": "Craftable",
+    "When": {
+      "ObjCategory": [
+        -8
+      ],
+      "ItemId": [
+        "Object:710",
+        "Object:463",
+        "Object:464"
+      ],
+      "UniqueKey": [
+        "-9:Staircase:71"
+      ]
+    },
+    "ResearchCount": 5
   },
   {
     "Label": "Bigcraftable",
@@ -329,7 +333,7 @@
         -9
       ]
     },
-    "ResearchCount": 3
+    "ResearchCount": 2
   },
   {
     "Label": "Artisan",
