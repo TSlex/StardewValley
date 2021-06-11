@@ -27,12 +27,18 @@ namespace ItemResearchSpawner
             _itemData = helper.Data.ReadJsonFile<ModItemData>("assets/item-data.json");
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
             
-            // _progressionManager ??= new ProgressionManager(Monitor, _helper, () => _items);
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
+            
+            helper.ConsoleCommands.Add("research_unlock_all", "unlock all items research progression", UnlockProgression);
         }
-        
+
+        private void UnlockProgression(string command, string[] args)
+        {
+            _progressionManager.UnlockProgression();
+        }
+
 
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
