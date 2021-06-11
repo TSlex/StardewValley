@@ -136,7 +136,6 @@ namespace ItemResearchSpawner.Components
             _progression = progression;
         }
 
-
         public string GetItemProgression(Item item, bool itemActive = false)
         {
             var (itemProgression, maxProgression) = GetItemProgressionRaw(item, out _, itemActive);

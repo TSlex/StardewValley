@@ -403,6 +403,7 @@ namespace ItemResearchSpawner.Components
             {
                 _categorySelector.ReceiveScrollWheelAction(direction);
             }
+
             if (_overDropdown)
             {
                 _categorySelector.HandleScroll(-direction);
@@ -500,6 +501,15 @@ namespace ItemResearchSpawner.Components
             {
                 DropItem(_researchArea.ReturnItem());
             }
+            
+            _qualitySelector.OnQualityChange -= OnQualityChange;
+            _itemSortTab.OnSortOptionChange -= OnSortOptionChange;
+            _categorySelector.OnDropdownToggle -= OnDropdownToggle;
+            _categorySelector.OnCategorySelected -= OnCategorySelected;
+            _searchBarTab.OnSearchTextInput -= OnSearchTextInput;
+            ProgressionManager.OnResearchCompleted -= OnResearchCompleted;
+            
+            _researchArea.PrepareToBeKilled();
 
             base.cleanupBeforeExit();
         }
@@ -584,6 +594,23 @@ namespace ItemResearchSpawner.Components
                 UpdateView();
             }
         }
+
+        // public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
+        // {
+        //     var dHeight = newBounds.Height - oldBounds.Height;
+        //     var dWidth = newBounds.Width - oldBounds.Width;
+        //
+        //     movePosition(dWidth / 2, dHeight / 2);
+        //
+        //     if (_parentMenu != null)
+        //     {
+        //         _parentMenu.xPositionOnScreen = dWidth / 2;
+        //         _parentMenu.yPositionOnScreen = dHeight / 2;
+        //     }
+        //
+        //
+        //     // base.gameWindowSizeChanged(oldBounds, newBounds);
+        // }
 
         private IEnumerable<ResearchedItem> GetFilteredItems()
         {

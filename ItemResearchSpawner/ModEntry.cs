@@ -19,14 +19,12 @@ namespace ItemResearchSpawner
         private SpawnableItem[] _items;
 
         private ProgressionManager _progressionManager;
-        private IClickableMenu _menu;
 
         public override void Entry(IModHelper helper)
         {
             _helper = helper;
             _config = helper.ReadConfig<ModConfig>();
             _itemData = helper.Data.ReadJsonFile<ModItemData>("assets/item-data.json");
-            // _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories.json");
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories-progress.json");
 
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
@@ -40,7 +38,6 @@ namespace ItemResearchSpawner
 
         private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
         {
-            _menu = null;
             _progressionManager = null;
         }
 
@@ -60,8 +57,7 @@ namespace ItemResearchSpawner
 
             if (_config.ShowMenuKey.JustPressed())
             {
-                _menu ??= GetSpawnMenu();
-                Game1.activeClickableMenu = _menu;
+                Game1.activeClickableMenu = GetSpawnMenu();
             }
         }
 

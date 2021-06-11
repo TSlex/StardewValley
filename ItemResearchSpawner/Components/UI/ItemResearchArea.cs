@@ -14,7 +14,7 @@ namespace ItemResearchSpawner.Components
         private readonly Texture2D _researchTexture;
 
         private Item _researchItem;
-        
+
         private Item _lastItem;
         private string _itemProgression;
 
@@ -91,13 +91,18 @@ namespace ItemResearchSpawner.Components
             _researchItem?.drawInMenu(spriteBatch, new Vector2(researchItemCellX, areaInnerAnchors.Y + 10), 1f);
         }
 
+        public void PrepareToBeKilled()
+        {
+            ProgressionManager.OnStackChanged -= OnStackChanged;
+        }
+
         private string GetItemProgression()
         {
             if (_researchItem == null)
             {
                 return "(0 / 0)";
             }
-            
+
             if (_lastItem == null || !_lastItem.Equals(_researchItem))
             {
                 _itemProgression = ProgressionManager.Instance.GetItemProgression(_researchItem, true);
@@ -110,7 +115,7 @@ namespace ItemResearchSpawner.Components
         private void OnStackChanged(int newCount)
         {
             _lastItem = null; //update cached progression string
-                
+
             if (newCount <= 0)
             {
                 _researchItem = null;
