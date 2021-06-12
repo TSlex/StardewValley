@@ -118,6 +118,11 @@ namespace ItemResearchSpawner.Components
             OnCategorySelected?.Invoke("All");
         }
 
+        public void SelectCategory(string category)
+        {
+            _categoryDropdown.TrySelect(category);
+        }
+
         public void ReceiveScrollWheelAction(int direction)
         {
             _categoryDropdown.ReceiveScrollWheelAction(direction);

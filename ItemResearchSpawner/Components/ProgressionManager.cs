@@ -2,6 +2,7 @@
 using System.Linq;
 using Force.DeepCloner;
 using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -169,9 +170,6 @@ namespace ItemResearchSpawner.Components
                     LogLevel.Alert);
                 _monitor.Log($"Unique key: {Utils.Helpers.GetItemUniqueKey(item.Item)}",
                     LogLevel.Alert);
-                
-                // _monitor.Log($"\"{Utils.Helpers.GetItemUniqueKey(item.Item)}\",",
-                // LogLevel.Alert);
             }
 
             var maxProgression = category?.ResearchCount ?? 1;
@@ -248,8 +246,6 @@ namespace ItemResearchSpawner.Components
 
         #region SaveLoad
 
-        private static string DirectoryName => $"{Game1.player.Name}_{Game1.getFarm().NameOrUniqueName}";
-
         private void OnSaveProgression(object sender, SavingEventArgs e)
         {
             SaveProgression();
@@ -262,7 +258,7 @@ namespace ItemResearchSpawner.Components
 
         private void SaveProgression()
         {
-            _helper.Data.WriteJsonFile($"save/{DirectoryName}/progress.json", _progression);
+            _helper.Data.WriteJsonFile($"save/{SaveHelper.DirectoryName}/progress.json", _progression);
             _monitor.Log("Progression saved! :)", LogLevel.Debug);
         }
 
@@ -270,7 +266,7 @@ namespace ItemResearchSpawner.Components
         {
             _progression =
                 _helper.Data.ReadJsonFile<Dictionary<string, ResearchProgression>>(
-                    $"save/{DirectoryName}/progress.json") ?? new Dictionary<string, ResearchProgression>();
+                    $"save/{SaveHelper.DirectoryName}/progress.json") ?? new Dictionary<string, ResearchProgression>();
             
             _monitor.Log("Progression loaded! :)", LogLevel.Debug);
         }

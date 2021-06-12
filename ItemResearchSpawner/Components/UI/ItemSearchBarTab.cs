@@ -11,9 +11,7 @@ namespace ItemResearchSpawner.Components
     internal class ItemSearchBarTab
     {
         private TextBox _searchBox;
-
-        // private readonly Rectangle _searchBoxBounds;
-
+        
         private readonly ClickableComponent _searchBoxArea;
         private readonly ClickableTextureComponent _searchIcon;
 
@@ -114,6 +112,11 @@ namespace ItemResearchSpawner.Components
         public void Clear()
         {
             _searchBox.Text = "";
+        }
+
+        public void SetText(string text)
+        {
+            _searchBox.Text = text;
         }
     }
 }

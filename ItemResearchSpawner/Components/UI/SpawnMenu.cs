@@ -22,7 +22,7 @@ namespace ItemResearchSpawner.Components
         private readonly IMonitor _monitor;
         private readonly Action<SpriteBatch> _baseDraw;
         private readonly IContentHelper _content;
-        private readonly IModHelper _modHelper;
+        private readonly IModHelper _helper;
 
         private const int ItemsPerView = Chest.capacity;
         private const int ItemsPerRow = Chest.capacity / 3;
@@ -44,11 +44,13 @@ namespace ItemResearchSpawner.Components
         private ItemQuality _quality;
         private ItemSortOption _sortOption;
         private string _searchText;
+        private string _category;
 
         private bool _overDropdown;
         private bool _shiftPressed;
 
-        public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IModHelper modHelper, IMonitor monitor) : base(
+        public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IModHelper helper,
+            IMonitor monitor) : base(
             inventory: new List<Item>(),
             reverseGrab: false,
             showReceivingMenu: true,
@@ -63,7 +65,7 @@ namespace ItemResearchSpawner.Components
         {
             _monitor = monitor;
             _content = content;
-            _modHelper = modHelper;
+            _helper = helper;
 
             _spawnableItems = spawnableItems;
             _itemsInView = ItemsToGrabMenu.actualInventory;
@@ -73,10 +75,8 @@ namespace ItemResearchSpawner.Components
             drawBG = false; // disable to draw default ui over new menu
             behaviorOnItemGrab = OnItemGrab;
 
-            _quality = ItemQuality.Normal;
-            _sortOption = ItemSortOption.Category;
-            _searchText = "";
-
+            LoadSettings();
+            
             InitializeComponents();
             UpdateView(true);
 
@@ -86,25 +86,51 @@ namespace ItemResearchSpawner.Components
             _categorySelector.OnCategorySelected += OnCategorySelected;
             _searchBarTab.OnSearchTextInput += OnSearchTextInput;
             ProgressionManager.OnResearchCompleted += OnResearchCompleted;
-            _modHelper.Events.Input.ButtonsChanged += OnButtonChanged;
+            _helper.Events.Input.ButtonsChanged += OnButtonChanged;
         }
-        
+
+        private void LoadSettings()
+        {
+            var settings = _helper.Data.ReadJsonFile<MenuSettings>($"save/{SaveHelper.DirectoryName}/menu.json") ??
+                           new MenuSettings();
+
+            _quality = settings.Quality;
+            _sortOption = settings.SortOption;
+            _searchText = settings.SearchText;
+            _category = settings.Category;
+        }
+
+        private void SaveSettings()
+        {
+            var settings = new MenuSettings
+            {
+                Quality = _quality, 
+                SortOption = _sortOption, 
+                SearchText = _searchText,
+                Category = _category
+            };
+
+            _helper.Data.WriteJsonFile($"save/{SaveHelper.DirectoryName}/menu.json", settings);
+        }
+
         protected override void cleanupBeforeExit()
         {
             if (_researchArea.ResearchItem != null)
             {
                 DropItem(_researchArea.ReturnItem());
             }
-            
+
             _qualitySelector.OnQualityChange -= OnQualityChange;
             _itemSortTab.OnSortOptionChange -= OnSortOptionChange;
             _categorySelector.OnDropdownToggle -= OnDropdownToggle;
             _categorySelector.OnCategorySelected -= OnCategorySelected;
             _searchBarTab.OnSearchTextInput -= OnSearchTextInput;
             ProgressionManager.OnResearchCompleted -= OnResearchCompleted;
-            _modHelper.Events.Input.ButtonsChanged -= OnButtonChanged;
-            
+            _helper.Events.Input.ButtonsChanged -= OnButtonChanged;
+
             _researchArea.PrepareToBeKilled();
+
+            SaveSettings();
 
             base.cleanupBeforeExit();
         }
@@ -152,6 +178,7 @@ namespace ItemResearchSpawner.Components
 
         private void OnCategorySelected(string category)
         {
+            _category = category;
             UpdateView(true);
         }
 
@@ -405,7 +432,7 @@ namespace ItemResearchSpawner.Components
                 {
                     TryReturnItemToInventory(_researchArea.ReturnItem());
                 }
-                
+
                 return true;
             }
 
@@ -418,7 +445,7 @@ namespace ItemResearchSpawner.Components
 
                 _researchArea.TrySetItem(hoveredItem);
                 Game1.player.removeItemFromInventory(hoveredItem);
-                
+
                 return true;
             }
 
@@ -553,29 +580,38 @@ namespace ItemResearchSpawner.Components
             var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
 
             _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor);
+            
             _qualitySelector =
                 new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor, _quality);
+            
             _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor,
                 _sortOption);
+            
             _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
                 _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
+            _categorySelector?.SelectCategory(_category);
 
             _searchBarTab = new ItemSearchBarTab(_content, _monitor, _categorySelector.Right + 20, barTopAnchor,
                 _researchArea.Bounds.Right - _categorySelector.Right + 20 - 10 * Game1.pixelZoom);
+            _searchBarTab.SetText(_searchText);
         }
 
-        private void UpdateView(bool rebuild = false)
+        private void UpdateView(bool rebuild = false, bool resetScroll = true)
         {
             if (rebuild)
             {
                 _filteredItems.Clear();
                 _filteredItems.AddRange(GetFilteredItems());
-                _topRowIndex = 0;
             }
 
             var totalRows = (int) Math.Ceiling(_filteredItems.Count / (ItemsPerRow * 1m));
 
             _maxTopRowIndex = Math.Max(0, totalRows - 3);
+            
+            if (resetScroll && _topRowIndex > _maxTopRowIndex)
+            {
+                _topRowIndex = 0;
+            }
 
             ScrollView(0, resetItemView: false);
 
