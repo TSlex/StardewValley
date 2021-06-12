@@ -27,6 +27,10 @@ namespace ItemResearchSpawner.Utils
             {
                 return -24;
             }
+            if (item.Name.Equals("Wedding Ring", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return 0;
+            }
 
             return item.category;
         }
