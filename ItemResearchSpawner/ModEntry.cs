@@ -69,7 +69,7 @@ namespace ItemResearchSpawner
                 _progressionManager.InitRegistry(_items);
             }
 
-            return new SpawnMenu(_items, Helper.Content, Monitor);
+            return new SpawnMenu(_items, Helper.Content, _helper, Monitor);
         }
 
         private IEnumerable<SpawnableItem> GetSpawnableItems()

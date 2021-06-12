@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -21,6 +22,7 @@ namespace ItemResearchSpawner.Components
         private readonly IMonitor _monitor;
         private readonly Action<SpriteBatch> _baseDraw;
         private readonly IContentHelper _content;
+        private readonly IModHelper _modHelper;
 
         private const int ItemsPerView = Chest.capacity;
         private const int ItemsPerRow = Chest.capacity / 3;
@@ -46,7 +48,7 @@ namespace ItemResearchSpawner.Components
         private bool _overDropdown;
         private bool _shiftPressed;
 
-        public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IMonitor monitor) : base(
+        public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IModHelper modHelper, IMonitor monitor) : base(
             inventory: new List<Item>(),
             reverseGrab: false,
             showReceivingMenu: true,
@@ -61,6 +63,7 @@ namespace ItemResearchSpawner.Components
         {
             _monitor = monitor;
             _content = content;
+            _modHelper = modHelper;
 
             _spawnableItems = spawnableItems;
             _itemsInView = ItemsToGrabMenu.actualInventory;
@@ -83,6 +86,39 @@ namespace ItemResearchSpawner.Components
             _categorySelector.OnCategorySelected += OnCategorySelected;
             _searchBarTab.OnSearchTextInput += OnSearchTextInput;
             ProgressionManager.OnResearchCompleted += OnResearchCompleted;
+            _modHelper.Events.Input.ButtonsChanged += OnButtonChanged;
+        }
+        
+        protected override void cleanupBeforeExit()
+        {
+            if (_researchArea.ResearchItem != null)
+            {
+                DropItem(_researchArea.ReturnItem());
+            }
+            
+            _qualitySelector.OnQualityChange -= OnQualityChange;
+            _itemSortTab.OnSortOptionChange -= OnSortOptionChange;
+            _categorySelector.OnDropdownToggle -= OnDropdownToggle;
+            _categorySelector.OnCategorySelected -= OnCategorySelected;
+            _searchBarTab.OnSearchTextInput -= OnSearchTextInput;
+            ProgressionManager.OnResearchCompleted -= OnResearchCompleted;
+            _modHelper.Events.Input.ButtonsChanged -= OnButtonChanged;
+            
+            _researchArea.PrepareToBeKilled();
+
+            base.cleanupBeforeExit();
+        }
+
+        private void OnButtonChanged(object sender, ButtonsChangedEventArgs e)
+        {
+            if (e.Pressed.Contains(SButton.LeftShift) || e.Pressed.Contains(SButton.RightShift))
+            {
+                _shiftPressed = true;
+            }
+            else if (e.Released.Contains(SButton.LeftShift) || e.Released.Contains(SButton.RightShift))
+            {
+                _shiftPressed = false;
+            }
         }
 
         private void OnResearchCompleted()
@@ -143,7 +179,7 @@ namespace ItemResearchSpawner.Components
             {
                 OnResearchAreaLeftClick();
             }
-            else if (_researchArea.ButtonBounds.Contains(x, y) && !_shiftPressed)
+            else if (_researchArea.ButtonBounds.Contains(x, y))
             {
                 _researchArea.HandleResearch();
             }
@@ -163,9 +199,8 @@ namespace ItemResearchSpawner.Components
                     _searchBarTab.Blur();
                 }
 
-                if (_shiftPressed)
+                if (_shiftPressed && OnShiftLeftClickPressed(x, y))
                 {
-                    OnShiftLeftClickPressed(x, y);
                 }
                 else
                 {
@@ -354,7 +389,6 @@ namespace ItemResearchSpawner.Components
             }
             else
             {
-                _shiftPressed = key == Keys.LeftShift || key == Keys.RightShift;
                 var isIgnoredExitKey = _searchBarTab.Selected && isExitButton && !isEscape;
                 if (!isIgnoredExitKey && !_searchBarTab.IsSearchBoxSelectionChanging)
                 {
@@ -363,7 +397,7 @@ namespace ItemResearchSpawner.Components
             }
         }
 
-        private void OnShiftLeftClickPressed(int x, int y)
+        private bool OnShiftLeftClickPressed(int x, int y)
         {
             if (_researchArea.Bounds.Contains(x, y) || _researchArea.ButtonBounds.Contains(x, y))
             {
@@ -371,8 +405,11 @@ namespace ItemResearchSpawner.Components
                 {
                     TryReturnItemToInventory(_researchArea.ReturnItem());
                 }
+                
+                return true;
             }
-            else if (hoveredItem != null && hoveredItem.HasBeenInInventory)
+
+            if (hoveredItem != null && hoveredItem.HasBeenInInventory)
             {
                 if (_researchArea.ResearchItem != null)
                 {
@@ -381,9 +418,11 @@ namespace ItemResearchSpawner.Components
 
                 _researchArea.TrySetItem(hoveredItem);
                 Game1.player.removeItemFromInventory(hoveredItem);
+                
+                return true;
             }
 
-            _shiftPressed = false;
+            return false;
         }
 
         private void TryTrashItem()
@@ -493,25 +532,6 @@ namespace ItemResearchSpawner.Components
         {
             _searchBarTab.Update(time);
             base.update(time);
-        }
-
-        protected override void cleanupBeforeExit()
-        {
-            if (_researchArea.ResearchItem != null)
-            {
-                DropItem(_researchArea.ReturnItem());
-            }
-            
-            _qualitySelector.OnQualityChange -= OnQualityChange;
-            _itemSortTab.OnSortOptionChange -= OnSortOptionChange;
-            _categorySelector.OnDropdownToggle -= OnDropdownToggle;
-            _categorySelector.OnCategorySelected -= OnCategorySelected;
-            _searchBarTab.OnSearchTextInput -= OnSearchTextInput;
-            ProgressionManager.OnResearchCompleted -= OnResearchCompleted;
-            
-            _researchArea.PrepareToBeKilled();
-
-            base.cleanupBeforeExit();
         }
 
         private static void DropItem(Item item)
