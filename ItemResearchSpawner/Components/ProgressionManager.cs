@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using Object = StardewValley.Object;
 
 namespace ItemResearchSpawner.Components
 {
@@ -62,7 +61,7 @@ namespace ItemResearchSpawner.Components
 
             foreach (var spawnableItem in items)
             {
-                var key = Utils.Helpers.GetItemUniqueKey(spawnableItem.Item);
+                var key = Helpers.GetItemUniqueKey(spawnableItem.Item);
 
                 _itemRegistry[key] = spawnableItem;
             }
@@ -118,23 +117,43 @@ namespace ItemResearchSpawner.Components
             return maxProgression > 0 && itemProgression >= maxProgression;
         }
         
-        public void UnlockProgression()
+        public void UnlockAllProgression()
         {
             var progression = _progression.DeepClone();
 
             foreach (var key in _progression.Keys)
             {
                 var temp = progression[key];
-
+                
                 temp.ResearchCount = 999;
-                temp.ResearchCountSilver = 999;
-                temp.ResearchCountGold = 999;
-                temp.ResearchCountIridium = 999;
+                
+                if (GetSpawnableItem(key).Item is Object)
+                {
+                    temp.ResearchCountSilver = 999;
+                    temp.ResearchCountGold = 999;
+                    temp.ResearchCountIridium = 999;
+                }
 
                 progression[key] = temp;
             }
 
             _progression = progression;
+        }
+
+        public void UnlockProgression(Item activeItem)
+        {
+            var progression = TryInitAndReturnProgressionItem(activeItem);
+
+            progression.ResearchCount = 999;
+            
+            if (activeItem is Object)
+            {
+                progression.ResearchCountSilver = 999;
+                progression.ResearchCountGold = 999;
+                progression.ResearchCountIridium = 999;
+            }
+
+            OnResearchCompleted?.Invoke();
         }
 
         public string GetItemProgression(Item item, bool itemActive = false)
@@ -168,7 +187,7 @@ namespace ItemResearchSpawner.Components
             {
                 _monitor.Log($"Current item - name: {item.Name}, ID: {item.ID}, category: {item.Category}",
                     LogLevel.Alert);
-                _monitor.Log($"Unique key: {Utils.Helpers.GetItemUniqueKey(item.Item)}",
+                _monitor.Log($"Unique key: {Helpers.GetItemUniqueKey(item.Item)}",
                     LogLevel.Alert);
             }
 
@@ -203,7 +222,7 @@ namespace ItemResearchSpawner.Components
 
         private ResearchProgression TryInitAndReturnProgressionItem(Item item)
         {
-            var key = Utils.Helpers.GetItemUniqueKey(item);
+            var key = Helpers.GetItemUniqueKey(item);
 
             ResearchProgression progressionItem;
 
@@ -220,9 +239,9 @@ namespace ItemResearchSpawner.Components
             return progressionItem;
         }
 
-        private SpawnableItem GetSpawnableItem(Item item)
+        public SpawnableItem GetSpawnableItem(Item item)
         {
-            var key = Utils.Helpers.GetItemUniqueKey(item);
+            var key = Helpers.GetItemUniqueKey(item);
             
             if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
             {
@@ -233,7 +252,7 @@ namespace ItemResearchSpawner.Components
             return spawnableItem;
         }
 
-        private SpawnableItem GetSpawnableItem(string key)
+        public SpawnableItem GetSpawnableItem(string key)
         {
             if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
             {
@@ -270,7 +289,7 @@ namespace ItemResearchSpawner.Components
             
             _monitor.Log("Progression loaded! :)", LogLevel.Debug);
         }
-        
+
         #endregion
     }
 }
