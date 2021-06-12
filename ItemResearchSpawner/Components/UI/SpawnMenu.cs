@@ -76,7 +76,7 @@ namespace ItemResearchSpawner.Components
             behaviorOnItemGrab = OnItemGrab;
 
             LoadSettings();
-            
+
             InitializeComponents();
             UpdateView(true);
 
@@ -104,8 +104,8 @@ namespace ItemResearchSpawner.Components
         {
             var settings = new MenuSettings
             {
-                Quality = _quality, 
-                SortOption = _sortOption, 
+                Quality = _quality,
+                SortOption = _sortOption,
                 SearchText = _searchText,
                 Category = _category
             };
@@ -410,9 +410,19 @@ namespace ItemResearchSpawner.Components
                     ScrollView(direction);
                 }
             }
-            else if (key == Keys.Delete && heldItem != null)
+            else if (key == Keys.Delete)
             {
-                TryTrashItem();
+                if (heldItem != null)
+                {
+                    if (TryTrashItem(heldItem))
+                    {
+                        heldItem = null;
+                    }
+                }
+                else if (hoveredItem?.hasbeenInInventory && ProgressionManager.Instance.ItemResearched(hoveredItem))
+                {
+                    Game1.player.removeItemFromInventory(hoveredItem);
+                }
             }
             else
             {
@@ -436,6 +446,19 @@ namespace ItemResearchSpawner.Components
                 return true;
             }
 
+            if (trashCan.containsPoint(x, y))
+            {
+                foreach (var item in Game1.player.items.Where(item => item != null))
+                {
+                    if (ProgressionManager.Instance.ItemResearched(item))
+                    {
+                        Game1.player.removeItemFromInventory(item);
+                    }
+                }
+
+                return true;
+            }
+
             if (hoveredItem != null && hoveredItem.HasBeenInInventory)
             {
                 if (_researchArea.ResearchItem != null)
@@ -452,13 +475,28 @@ namespace ItemResearchSpawner.Components
             return false;
         }
 
-        private void TryTrashItem()
+        private bool TryTrashItem()
         {
-            if (ProgressionManager.Instance.ItemResearched(heldItem))
+            var result = TryTrashItem(heldItem);
+
+            if (result)
             {
-                Utility.trashItem(heldItem);
                 heldItem = null;
             }
+
+            return result;
+        }
+
+        private bool TryTrashItem(Item item)
+        {
+            if (ProgressionManager.Instance.ItemResearched(item))
+            {
+                Utility.trashItem(item);
+
+                return true;
+            }
+
+            return false;
         }
 
         public override void receiveScrollWheelAction(int direction)
@@ -563,8 +601,7 @@ namespace ItemResearchSpawner.Components
 
         private static void DropItem(Item item)
         {
-            Game1.createItemDebris(item, Game1.player.getStandingPosition(),
-                Game1.player.FacingDirection);
+            Game1.createItemDebris(item, Game1.player.getStandingPosition(), Game1.player.FacingDirection);
         }
 
         private void InitializeComponents()
@@ -580,13 +617,13 @@ namespace ItemResearchSpawner.Components
             var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
 
             _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor);
-            
+
             _qualitySelector =
                 new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor, _quality);
-            
+
             _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor,
                 _sortOption);
-            
+
             _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
                 _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
             _categorySelector?.SelectCategory(_category);
@@ -598,19 +635,19 @@ namespace ItemResearchSpawner.Components
 
         private void UpdateView(bool rebuild = false, bool resetScroll = true)
         {
+            var totalRows = (int) Math.Ceiling(_filteredItems.Count / (ItemsPerRow * 1m));
+
+            _maxTopRowIndex = Math.Max(0, totalRows - 3);
+
             if (rebuild)
             {
                 _filteredItems.Clear();
                 _filteredItems.AddRange(GetFilteredItems());
-            }
 
-            var totalRows = (int) Math.Ceiling(_filteredItems.Count / (ItemsPerRow * 1m));
-
-            _maxTopRowIndex = Math.Max(0, totalRows - 3);
-            
-            if (resetScroll && _topRowIndex > _maxTopRowIndex)
-            {
-                _topRowIndex = 0;
+                if (resetScroll || _topRowIndex > _maxTopRowIndex)
+                {
+                    _topRowIndex = 0;
+                }
             }
 
             ScrollView(0, resetItemView: false);
@@ -650,23 +687,6 @@ namespace ItemResearchSpawner.Components
                 UpdateView();
             }
         }
-
-        // public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
-        // {
-        //     var dHeight = newBounds.Height - oldBounds.Height;
-        //     var dWidth = newBounds.Width - oldBounds.Width;
-        //
-        //     movePosition(dWidth / 2, dHeight / 2);
-        //
-        //     if (_parentMenu != null)
-        //     {
-        //         _parentMenu.xPositionOnScreen = dWidth / 2;
-        //         _parentMenu.yPositionOnScreen = dHeight / 2;
-        //     }
-        //
-        //
-        //     // base.gameWindowSizeChanged(oldBounds, newBounds);
-        // }
 
         private IEnumerable<ResearchedItem> GetFilteredItems()
         {
