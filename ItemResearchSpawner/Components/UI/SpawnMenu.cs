@@ -436,7 +436,7 @@ namespace ItemResearchSpawner.Components
 
         private bool OnShiftLeftClickPressed(int x, int y)
         {
-            if (_researchArea.Bounds.Contains(x, y) || _researchArea.ButtonBounds.Contains(x, y))
+            if (_researchArea.Bounds.Contains(x, y))
             {
                 if (_researchArea.ResearchItem != null)
                 {
@@ -459,7 +459,7 @@ namespace ItemResearchSpawner.Components
                 return true;
             }
 
-            if (hoveredItem != null && hoveredItem.HasBeenInInventory)
+            if (hoveredItem != null && Game1.player.items.Contains(hoveredItem))
             {
                 if (_researchArea.ResearchItem != null)
                 {
