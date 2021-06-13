@@ -75,8 +75,9 @@ namespace ItemResearchSpawner.Components
         public void Close()
         {
             _categoryDropdown.IsExpanded = false;
+            OnDropdownToggle?.Invoke(_categoryDropdown.IsExpanded);
         }
-
+ 
 
         public void HandleScroll(int direction)
         {

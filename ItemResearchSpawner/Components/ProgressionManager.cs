@@ -120,25 +120,21 @@ namespace ItemResearchSpawner.Components
 
         public void UnlockAllProgression()
         {
-            var progression = _progression.DeepClone();
-
-            foreach (var key in _progression.Keys)
+            foreach (var item in _itemRegistry.Values)
             {
-                var temp = progression[key];
+                var progression = TryInitAndReturnProgressionItem(item.Item);
 
-                temp.ResearchCount = 999;
+                progression.ResearchCount = 999;
 
-                if (GetSpawnableItem(key).Item is Object)
+                if (item.Item is Object)
                 {
-                    temp.ResearchCountSilver = 999;
-                    temp.ResearchCountGold = 999;
-                    temp.ResearchCountIridium = 999;
+                    progression.ResearchCountSilver = 999;
+                    progression.ResearchCountGold = 999;
+                    progression.ResearchCountIridium = 999;
                 }
 
-                progression[key] = temp;
+                OnResearchCompleted?.Invoke();
             }
-
-            _progression = progression;
         }
 
         public void UnlockProgression(Item activeItem)

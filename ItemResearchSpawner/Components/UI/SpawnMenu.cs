@@ -507,8 +507,7 @@ namespace ItemResearchSpawner.Components
             {
                 _categorySelector.ReceiveScrollWheelAction(direction);
             }
-
-            if (_overDropdown)
+            else if (_overDropdown)
             {
                 _categorySelector.HandleScroll(-direction);
             }
