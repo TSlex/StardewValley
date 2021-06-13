@@ -12,9 +12,11 @@ namespace ItemResearchSpawner.Utils
 
         public static string GetItemUniqueKey(Item item)
         {
-            var category = GetItemCategory(item);
+            // var category = GetItemCategory(item);
 
-            return $"{category}:" + $"{item.Name}:" + $"{item.ParentSheetIndex}";
+            return $"{item.Name}:" + $"{item.ParentSheetIndex}";
+            
+            // return $"{category}:" + $"{item.Name}:" + $"{item.ParentSheetIndex}";
         }
 
         private static int GetItemCategory(Item item)

@@ -116,7 +116,7 @@ namespace ItemResearchSpawner.Components
 
             return maxProgression > 0 && itemProgression >= maxProgression;
         }
-        
+
         public void UnlockAllProgression()
         {
             var progression = _progression.DeepClone();
@@ -124,9 +124,9 @@ namespace ItemResearchSpawner.Components
             foreach (var key in _progression.Keys)
             {
                 var temp = progression[key];
-                
+
                 temp.ResearchCount = 999;
-                
+
                 if (GetSpawnableItem(key).Item is Object)
                 {
                     temp.ResearchCountSilver = 999;
@@ -145,7 +145,7 @@ namespace ItemResearchSpawner.Components
             var progression = TryInitAndReturnProgressionItem(activeItem);
 
             progression.ResearchCount = 999;
-            
+
             if (activeItem is Object)
             {
                 progression.ResearchCountSilver = 999;
@@ -168,13 +168,13 @@ namespace ItemResearchSpawner.Components
             return $"({itemProgression} / {maxProgression})";
         }
 
-        private (int current, int max) GetItemProgressionRaw(Item item, 
+        private (int current, int max) GetItemProgressionRaw(Item item,
             out ResearchProgression progressionItem, bool itemActive = false)
         {
             var spawnableItem = GetSpawnableItem(item);
 
             var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
-            
+
             return GetItemProgressionRaw(spawnableItem, out progressionItem, itemQuality, itemActive);
         }
 
@@ -242,10 +242,11 @@ namespace ItemResearchSpawner.Components
         public SpawnableItem GetSpawnableItem(Item item)
         {
             var key = Helpers.GetItemUniqueKey(item);
-            
+
             if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
             {
-                _monitor.LogOnce($"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
+                _monitor.LogOnce(
+                    $"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
                     LogLevel.Alert);
             }
 
@@ -283,9 +284,20 @@ namespace ItemResearchSpawner.Components
 
         private void LoadProgression()
         {
-            _progression =
+            var progressions =
                 _helper.Data.ReadJsonFile<Dictionary<string, ResearchProgression>>(
                     $"save/{SaveHelper.DirectoryName}/progress.json") ?? new Dictionary<string, ResearchProgression>();
+
+            //save backward compatibility
+            _progression = new Dictionary<string, ResearchProgression>();
+
+            foreach (var pair in progressions)
+            {
+                var keyParts = pair.Key.Split(':');
+                var key = keyParts.Length > 2 ? $"{keyParts[1]}:{keyParts[2]}" : pair.Key;
+
+                _progression[key] = pair.Value;
+            }
             
             _monitor.Log("Progression loaded! :)", LogLevel.Debug);
         }

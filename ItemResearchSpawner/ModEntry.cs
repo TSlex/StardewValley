@@ -7,6 +7,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using Object = StardewValley.Object;
 
 namespace ItemResearchSpawner
 {
@@ -91,20 +92,22 @@ namespace ItemResearchSpawner
         //     }
         //     else
         //     {
-        //         var temp = Game1.player.items[0];
+        //         // var temp = Game1.player.items[0];
         //         
         //         foreach (var spawnableItem in _items)
         //         {
-        //             var item = spawnableItem.CreateItem();
+        //             var item = new Object(spawnableItem.Item.parentSheetIndex, 1);
         //
-        //             Game1.player.addItemToInventory(item, 0);
+        //             // Game1.player.addItemToInventory(item, 0);
         //             
-        //             _progressionManager.GetSpawnableItem(Game1.player.items[0]);
+        //             _progressionManager.GetSpawnableItem(item);
+        //             
+        //             // _progressionManager.GetSpawnableItem(Game1.player.items[0]);
         //
-        //             if (item.Name.Contains("Wedding"))
-        //             {
-        //                 break;
-        //             }
+        //             // if (item.Name.Contains("Wedding"))
+        //             // {
+        //             //     break;
+        //             // }
         //         }
         //
         //         // Game1.player.items[0] = temp;
