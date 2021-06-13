@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Force.DeepCloner;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
@@ -290,11 +291,18 @@ namespace ItemResearchSpawner.Components
 
             //save backward compatibility
             _progression = new Dictionary<string, ResearchProgression>();
+            
+            var regex = new Regex(@"([\d+-]+):(.+):([\d+-]+)", RegexOptions.IgnoreCase);
 
             foreach (var pair in progressions)
             {
-                var keyParts = pair.Key.Split(':');
-                var key = keyParts.Length > 2 ? $"{keyParts[1]}:{keyParts[2]}" : pair.Key;
+                var key = pair.Key;
+                var match = regex.Match(key);
+
+                if (match.Success)
+                {
+                    key = $"{match.Groups[2]}:{match.Groups[3]}";
+                }
 
                 _progression[key] = pair.Value;
             }
