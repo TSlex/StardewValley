@@ -6,5 +6,5 @@
   "UniqueID": "TSlex.ItemResearchSpawner",
   "EntryDll": "ItemResearchSpawner.dll",
   "MinimumApiVersion": "3.9.5",
-  "UpdateKeys": []
+  "UpdateKeys": [ "Nexus:8933" ]
 }

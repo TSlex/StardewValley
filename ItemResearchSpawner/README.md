@@ -64,4 +64,4 @@ research_unlock_active //unlock hotbar active item (in-game only, menu must be o
 #### Сompatibility (at present):
 + Only windows supported (not tested on others)
 + Only keyboard + mouse (gamepad not tested)
-+ SMAPI 3.10.1 on later
++ **SMAPI 3.9.5** or later
