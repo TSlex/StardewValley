@@ -88,6 +88,7 @@
       <Content Include="Assets\item-data.json" />
       <Content Include="Assets\search-button.png" />
       <Content Include="Assets\sort-icon.png" />
+      <Content Include="LICENSE" />
       <Content Include="manifest.json" />
     </ItemGroup>
     <ItemGroup>
