@@ -89,7 +89,6 @@
     <Compile Include="Utils\CursorSprites.cs" />
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Utils\SaveHelper.cs" />
-    <Compile Include="Utils\TranslationHelper.cs" />
     <Compile Include="Utils\UIConstants.cs" />
     <Compile Include="Utils\RenderHelpers.cs" />
     <Compile Include="Utils\MenuSprites.cs" />

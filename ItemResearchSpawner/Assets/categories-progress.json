@@ -1,6 +1,6 @@
 ﻿[
   {
-    "Label": "Usable",
+    "Label": "category.usable",
     "When": {
       "ObjCategory": [
         -19,
@@ -10,7 +10,7 @@
     "ResearchCount": 10
   },
   {
-    "Label": "Ammo",
+    "Label": "category.ammo",
     "When": {
       "ItemId": [
         "Object:286",
@@ -22,7 +22,7 @@
     "ResearchCount": 10
   },
   {
-    "Label": "Tools",
+    "Label": "category.tools",
     "When": {
       "ObjCategory": [
         -22,
@@ -46,7 +46,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Weapons",
+    "Label": "category.weapons",
     "When": {
       "ObjCategory": [
         -98
@@ -58,7 +58,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Hats",
+    "Label": "category.hats",
     "When": {
       "ObjCategory": [
         -95
@@ -67,7 +67,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Clothes",
+    "Label": "category.clothes",
     "When": {
       "ObjCategory": [
         -100
@@ -76,7 +76,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Boots",
+    "Label": "category.boots",
     "When": {
       "ObjCategory": [
         -97
@@ -85,7 +85,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Rings",
+    "Label": "category.rings",
     "When": {
       "ObjCategory": [
         -96
@@ -94,7 +94,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Unique crops",
+    "Label": "category.unique-crops",
     "When": {
       "UniqueKey": [
         "Qi Fruit:889",
@@ -107,7 +107,7 @@
     "ResearchCount": 100
   },
   {
-    "Label": "Tree fruits",
+    "Label": "category.tree-fruits",
     "When": {
       "UniqueKey": [
         "Apple:613",
@@ -123,7 +123,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Forage plants",
+    "Label": "category.forage",
     "When": {
       "ObjCategory": [
         -81
@@ -148,7 +148,7 @@
     "ResearchCount": 5
   },
   {
-    "Label": "Flowers",
+    "Label": "category.flowers",
     "When": {
       "ObjCategory": [
         -80
@@ -159,7 +159,7 @@
     "ResearchCount": 5
   },
   {
-    "Label": "Crops",
+    "Label": "category.crops",
     "When": {
       "ObjCategory": [
         -75,
@@ -169,7 +169,7 @@
     "ResearchCount": 30
   },
   {
-    "Label": "Saplings",
+    "Label": "category.saplings",
     "When": {
       "ItemId": [
         "Object:69",
@@ -186,7 +186,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Seeds",
+    "Label": "category.seeds",
     "When": {
       "ObjCategory": [
         -74
@@ -195,7 +195,7 @@
     "ResearchCount": 10
   },
   {
-    "Label": "Monster loot",
+    "Label": "category.monster-loot",
     "When": {
       "ObjCategory": [
         -28
@@ -211,7 +211,7 @@
     "ResearchCount": 25
   },
   {
-    "Label": "Animal products",
+    "Label": "category.animal-products",
     "When": {
       "ObjCategory": [
         -5,
@@ -224,7 +224,7 @@
     "ResearchCount": 25
   },
   {
-    "Label": "Legendary fish",
+    "Label": "category.legendary-fish",
     "When": {
       "UniqueKey": [
         "Glacierfish Jr.:902",
@@ -242,7 +242,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Fish",
+    "Label": "category.fish",
     "When": {
       "ObjCategory": [
         -4,
@@ -260,7 +260,7 @@
     "ResearchCount": 5
   },
   {
-    "Label": "Geodes",
+    "Label": "category.geodes",
     "When": {
       "ItemId": [
         "Object:535",
@@ -276,7 +276,7 @@
     "ResearchCount": 5
   },
   {
-    "Label": "Rare minerals",
+    "Label": "category.rare-minerals",
     "When": {
       "ObjCategory": [
         -2
@@ -285,7 +285,7 @@
     "ResearchCount": 10
   },
   {
-    "Label": "Minerals",
+    "Label": "category.minerals",
     "When": {
       "ObjCategory": [
         -12
@@ -294,7 +294,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Artifacts",
+    "Label": "category.artifacts",
     "When": {
       "ObjType": [
         "Arch"
@@ -303,7 +303,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Resources",
+    "Label": "category.resources",
     "When": {
       "ObjCategory": [
         -15,
@@ -319,7 +319,7 @@
     "ResearchCount": 45
   },
   {
-    "Label": "Noncraftable",
+    "Label": "category.non-craftable",
     "When": {
       "UniqueKey": [
         "Statue Of True Perfection:280",
@@ -440,7 +440,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Craftable",
+    "Label": "category.craftable",
     "When": {
       "ObjCategory": [
         -8
@@ -460,7 +460,7 @@
     "ResearchCount": 5
   },
   {
-    "Label": "Bigcraftable",
+    "Label": "category.big-craftable",
     "When": {
       "ObjCategory": [
         -9
@@ -469,7 +469,7 @@
     "ResearchCount": 2
   },
   {
-    "Label": "Artisan",
+    "Label": "category.artisan",
     "When": {
       "ObjCategory": [
         -26,
@@ -481,7 +481,7 @@
     "ResearchCount": 10
   },
   {
-    "Label": "Сooking",
+    "Label": "category.cooking",
     "When": {
       "ObjCategory": [
         -26,
@@ -505,7 +505,7 @@
     "ResearchCount": 5
   },
   {
-    "Label": "Furniture",
+    "Label": "category.furniture",
     "When": {
       "Class": [
         "StardewValley.Objects.Furniture"
@@ -514,7 +514,7 @@
     "ResearchCount": 1
   },
   {
-    "Label": "Decor",
+    "Label": "category.decor",
     "When": {
       "ObjCategory": [
         -24

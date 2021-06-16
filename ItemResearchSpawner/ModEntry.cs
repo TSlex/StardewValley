@@ -7,7 +7,6 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
-using Object = StardewValley.Object;
 
 namespace ItemResearchSpawner
 {
@@ -158,8 +157,11 @@ namespace ItemResearchSpawner
             foreach (var entry in items)
             {
                 var category = _categories?.FirstOrDefault(rule => rule.IsMatch(entry));
+                var label = category != null
+                    ? I18n.GetByKey(category.Label).Default(category.Label)
+                    : I18n.Category_Misc();
 
-                yield return new SpawnableItem(entry, category?.Label ?? "Misc");
+                yield return new SpawnableItem(entry, label ?? I18n.Category_Misc());
             }
         }
     }

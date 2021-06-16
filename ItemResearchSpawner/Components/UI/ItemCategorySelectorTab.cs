@@ -54,7 +54,7 @@ namespace ItemResearchSpawner.Components
             _monitor = monitor;
             _availableCategories = GetDisplayCategories(spawnableItems).ToArray();
 
-            _categoryDropdown = new Dropdown<string>(x, y, Game1.smallFont, _categoryDropdown?.Selected ?? "All",
+            _categoryDropdown = new Dropdown<string>(x, y, Game1.smallFont, _categoryDropdown?.Selected ?? I18n.Category_All(),
                 _availableCategories, p => p);
 
             _categoryDropdown.IsExpanded = false;
@@ -138,13 +138,21 @@ namespace ItemResearchSpawner.Components
 
         public void ResetCategory()
         {
-            _categoryDropdown.TrySelect("All");
-            OnCategorySelected?.Invoke("All");
+            _categoryDropdown.TrySelect(I18n.Category_All());
+            OnCategorySelected?.Invoke(I18n.Category_All());
         }
 
         public void SelectCategory(string category)
         {
-            _categoryDropdown.TrySelect(category);
+            if (!_categoryDropdown.TrySelect(category))
+            {
+                _monitor.Log($"Failed selecting category '{category}'.", LogLevel.Warn);
+                
+                category = I18n.Category_All();
+                _categoryDropdown.TrySelect(category);
+            }
+            
+            OnCategorySelected?.Invoke(category);
         }
 
         public void ReceiveScrollWheelAction(int direction)
@@ -177,11 +185,14 @@ namespace ItemResearchSpawner.Components
 
         private IEnumerable<string> GetDisplayCategories(SpawnableItem[] items)
         {
+            var all = I18n.Category_All();
+            var misc = I18n.Category_Misc();
+            
             var categories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var item in items)
             {
-                if (item.Category.ToLower().Equals("all") || item.Category.ToLower().Equals("misc"))
+                if (item.Category.ToLower().Equals(all) || item.Category.ToLower().Equals(misc))
                 {
                     continue;
                 }
@@ -189,14 +200,14 @@ namespace ItemResearchSpawner.Components
                 categories.Add(item.Category);
             }
 
-            yield return "All";
+            yield return all;
 
             foreach (var category in categories.OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
             {
                 yield return category;
             }
 
-            yield return "Misc";
+            yield return misc;
         }
     }
 }

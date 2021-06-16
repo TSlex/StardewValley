@@ -721,7 +721,7 @@ namespace ItemResearchSpawner.Components
                 _ => items.OrderBy(p => p.Item.DisplayName)
             };
 
-            if (!Helpers.EqualsCaseInsensitive(_categorySelector.SelectedCategory, "All"))
+            if (!Helpers.EqualsCaseInsensitive(_categorySelector.SelectedCategory, I18n.Category_All()))
             {
                 items = items.Where(item =>
                     Helpers.EqualsCaseInsensitive(item.Item.Category, _categorySelector.SelectedCategory));
