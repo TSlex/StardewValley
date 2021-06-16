@@ -32,7 +32,6 @@ namespace ItemResearchSpawner
             I18n.Init(helper.Translation);
             
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
-            helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
 
             helper.ConsoleCommands.Add("research_unlock_all", "unlock all items research progression",
@@ -44,15 +43,8 @@ namespace ItemResearchSpawner
 
         private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
-            if (_items != null) return;
-            
             _items = GetSpawnableItems().ToArray(); // some items exists only after day started ;_;
             _progressionManager.InitRegistry(_items);
-        }
-
-        private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
-        {
-            _progressionManager = null;
         }
 
         private void UnlockAllProgression(string command, string[] args)
@@ -79,39 +71,6 @@ namespace ItemResearchSpawner
                 Monitor.Log($"Item - {activeItem.DisplayName}, was unlocked! ;)", LogLevel.Info);
             }
         }
-
-        // private void DebugCheckRegistry(string command, string[] args)
-        // {
-        //     if (!CheckCommandInGame()) return;
-        //
-        //     if (_items == null)
-        //     {
-        //         Monitor.Log($"Item registry is not initialized!", LogLevel.Warn);
-        //     }
-        //     else
-        //     {
-        //         // var temp = Game1.player.items[0];
-        //         
-        //         foreach (var spawnableItem in _items)
-        //         {
-        //             var item = new Object(spawnableItem.Item.parentSheetIndex, 1);
-        //
-        //             // Game1.player.addItemToInventory(item, 0);
-        //             
-        //             _progressionManager.GetSpawnableItem(item);
-        //             
-        //             // _progressionManager.GetSpawnableItem(Game1.player.items[0]);
-        //
-        //             // if (item.Name.Contains("Wedding"))
-        //             // {
-        //             //     break;
-        //             // }
-        //         }
-        //
-        //         // Game1.player.items[0] = temp;
-        //         Monitor.Log($"Registry check completed", LogLevel.Info);
-        //     }
-        // }
 
         private bool CheckCommandInGame()
         {

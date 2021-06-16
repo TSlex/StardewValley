@@ -79,7 +79,7 @@ namespace ItemResearchSpawner.Components
 
             var researchProgressString = GetItemProgression();
 
-            var progressFont = Game1.dialogueFont;
+            var progressFont = Game1.smallFont;
             var progressPositionX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f -
                                     progressFont.MeasureString(researchProgressString).X / 2f;
 

@@ -55,11 +55,6 @@ namespace ItemResearchSpawner.Components
 
         public void InitRegistry(SpawnableItem[] items)
         {
-            if (_itemRegistry.Count > 0)
-            {
-                return;
-            }
-
             foreach (var spawnableItem in items)
             {
                 var key = Helpers.GetItemUniqueKey(spawnableItem.Item);

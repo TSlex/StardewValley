@@ -243,11 +243,7 @@ namespace ItemResearchSpawner
         {
             return I18n.GetByKey("category.misc");
         }
-
-
-        /*********
-        ** Private methods
-        *********/
+        
         /// <summary>Get a translation by its key.</summary>
         /// <param name="key">The translation key.</param>
         /// <param name="tokens">An object containing token key/value pairs. This can be an anonymous object (like <c>new { value = 42, name = "Cranberries" }</c>), a dictionary, or a class instance.</param>
