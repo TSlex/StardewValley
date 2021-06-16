@@ -89,6 +89,7 @@
       <Content Include="LICENSE" />
       <Content Include="manifest.json" />
       <Content Include="README.md" />
+      <Content Include="release-notes.md" />
       <Content Include="screenshot.png" />
     </ItemGroup>
     <ItemGroup>
