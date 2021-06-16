@@ -1,8 +1,15 @@
 ## Item Research 'n' Spawn
 
-**Item Research 'n' Spawn** is a Stardew Valley mod that lets give any item you want if you've researched it!
+1. [Description](#description)
+2. [Usage](#usage)
+3. [Keys](#keys)
+4. [Commands](#commands)
+5. [Compatibility](#compatibility-\(at-present\))
+6. [Release notes](release-notes.md)
 
-#### Decription:
+### Description:
+
+**Item Research 'n' Spawn** is a Stardew Valley mod that lets give any item you want if you've researched it!
 
 Want many of **\<item you want here>**?    
 Collect some of them, put in research area, and click the button!    
@@ -10,7 +17,7 @@ Now you can have as much of **\<item you want here>** as you want :)
 
 ![](screenshot.png)
 
-#### Usage:
+### Usage:
 Press `R` on your keyboard (configurable) to open the menu.
 
 In the menu you can...
@@ -22,7 +29,7 @@ In the menu you can...
 
 Menu saves selected quality, category and search key
 
-#### Keys:
+### Keys:
 Quality button:   
 `LMB` - next higher quality   
 `RMB` - previous higher quality   
@@ -55,13 +62,13 @@ Other:
 `Delete` - delete an item (only if researched)   
 `Shift + LMB` - \*on trash can* delete all researched items
 
-#### Commands:
+### Commands:
 ```
 research_unlock_all //unlock all items (in-game only, menu must be opened at least once)   
 research_unlock_active //unlock hotbar active item (in-game only, menu must be opened at least once)  
 ```
 
-#### Сompatibility (at present):
+### Сompatibility (at present):
 + Only windows supported (not tested on others)
 + Only keyboard + mouse (gamepad not tested)
 + **SMAPI 3.9.5** or later
