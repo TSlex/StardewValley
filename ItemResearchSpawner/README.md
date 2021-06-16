@@ -4,7 +4,7 @@
 2. [Usage](#usage)
 3. [Keys](#keys)
 4. [Commands](#commands)
-5. [Сompatibility](#compatibility--at-present--)
+5. [Сompatibility](#сompatibility-at-present)
 6. [Release notes](release-notes.md)
 
 ### Description:
