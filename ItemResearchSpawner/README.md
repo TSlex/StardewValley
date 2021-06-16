@@ -4,7 +4,7 @@
 2. [Usage](#usage)
 3. [Keys](#keys)
 4. [Commands](#commands)
-5. [Сompatibility](#сompatibility-at-present)
+5. [Compatibility](#compatibility-at-present)
 6. [Release notes](release-notes.md)
 
 ### Description:
@@ -68,7 +68,7 @@ research_unlock_all //unlock all items (in-game only, menu must be opened at lea
 research_unlock_active //unlock hotbar active item (in-game only, menu must be opened at least once)  
 ```
 
-### Сompatibility (at present):
+### Compatibility (at present):
 + Only windows supported (not tested on others)
 + Only keyboard + mouse (gamepad not tested)
 + **SMAPI 3.9.5** or later
