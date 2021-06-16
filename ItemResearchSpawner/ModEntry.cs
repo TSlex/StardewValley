@@ -29,7 +29,9 @@ namespace ItemResearchSpawner
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories-progress.json");
 
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
-
+            
+            I18n.Init(helper.Translation);
+            
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
             helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
@@ -39,9 +41,6 @@ namespace ItemResearchSpawner
 
             helper.ConsoleCommands.Add("research_unlock_active", "unlock currently selected item",
                 UnlockActiveProgression);
-
-            // helper.ConsoleCommands.Add("research_check_registry", "check all items to match progression system",
-            //     DebugCheckRegistry);
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e)
