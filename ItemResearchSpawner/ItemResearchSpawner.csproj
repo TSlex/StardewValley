@@ -76,13 +76,13 @@
     <Compile Include="Models\Enums\ItemSortOption.cs" />
     <Compile Include="Models\Enums\ItemType.cs" />
     <Compile Include="Models\Enums\ModMode.cs" />
-    <Compile Include="Models\Enums\ModSave.cs" />
     <Compile Include="Models\ItemRepository.cs" />
     <Compile Include="Models\MenuSettings.cs" />
     <Compile Include="Models\ModConfig.cs" />
     <Compile Include="Models\ModDataCategory.cs" />
     <Compile Include="Models\ModDataCategoryRule.cs" />
     <Compile Include="Models\ModItemData.cs" />
+    <Compile Include="Models\ModState.cs" />
     <Compile Include="Models\ResearchedItem.cs" />
     <Compile Include="Models\ResearchProgression.cs" />
     <Compile Include="Models\SearchableItem.cs" />

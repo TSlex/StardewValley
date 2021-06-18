@@ -44,10 +44,6 @@ namespace ItemResearchSpawner.Components
 
         public event DropdownToggle OnDropdownToggle;
 
-        public delegate void CategorySelected(string category);
-
-        public event CategorySelected OnCategorySelected;
-
         public ItemCategorySelectorTab(IContentHelper content, IMonitor monitor, SpawnableItem[] spawnableItems, int x,
             int y)
         {
@@ -86,7 +82,7 @@ namespace ItemResearchSpawner.Components
                         _monitor.Log($"Failed selecting category filter category '{category}'.", LogLevel.Warn);
                     }
 
-                    OnCategorySelected?.Invoke(category);
+                    ModManager.Instance.Category = category;
                 }
 
                 return true;
@@ -133,13 +129,13 @@ namespace ItemResearchSpawner.Components
             }
 
             _categoryDropdown.TrySelect(_availableCategories[index]);
-            OnCategorySelected?.Invoke(_availableCategories[index]);
+            ModManager.Instance.Category = _availableCategories[index];
         }
 
         public void ResetCategory()
         {
             _categoryDropdown.TrySelect(I18n.Category_All());
-            OnCategorySelected?.Invoke(I18n.Category_All());
+            ModManager.Instance.Category = I18n.Category_All();
         }
 
         public void SelectCategory(string category)
@@ -151,8 +147,8 @@ namespace ItemResearchSpawner.Components
                 category = I18n.Category_All();
                 _categoryDropdown.TrySelect(category);
             }
-            
-            OnCategorySelected?.Invoke(category);
+
+            ModManager.Instance.Category = category;
         }
 
         public void ReceiveScrollWheelAction(int direction)

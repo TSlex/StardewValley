@@ -30,9 +30,9 @@ namespace ItemResearchSpawner
 
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
             _modManager ??= new ModManager(Monitor, _helper, _config);
-            
+
             I18n.Init(helper.Translation);
-            
+
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
 
@@ -41,7 +41,7 @@ namespace ItemResearchSpawner
 
             helper.ConsoleCommands.Add("research_unlock_active", "unlock currently selected item",
                 UnlockActiveProgression);
-            
+
             helper.ConsoleCommands.Add("research_set_mode", "change mode to \n 0 - Spawn Mode \n 1 - Buy/Sell Mode",
                 SetMode);
         }
@@ -80,11 +80,11 @@ namespace ItemResearchSpawner
         private void SetMode(string command, string[] args)
         {
             if (!CheckCommandInGame()) return;
-            
+
             try
             {
-                _modManager.SetMode((ModMode) int.Parse(args[0]));
-                Monitor.Log($"Mode was changed to: {_modManager.GetMode.GetString()}", LogLevel.Info);
+                _modManager.ModMode = (ModMode) int.Parse(args[0]);
+                Monitor.Log($"Mode was changed to: {_modManager.ModMode.GetString()}", LogLevel.Info);
             }
             catch (Exception e)
             {

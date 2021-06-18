@@ -38,17 +38,12 @@ namespace ItemResearchSpawner.Components
         private readonly ClickableComponent _searchBoxArea;
         private readonly ClickableTextureComponent _searchIcon;
 
-        private string _searchText;
         private float _iconOpacity;
         private bool _persistFocus;
 
-        public delegate void SearchTextInput(string key);
-
-        public event SearchTextInput OnSearchTextInput;
-
         public ItemSearchBarTab(IContentHelper content, IMonitor monitor, int x, int y, int width)
         {
-            _searchText = "";
+            ModManager.Instance.SearchText = "";
             _iconOpacity = 1f;
 
             _searchBoxArea =
@@ -62,7 +57,7 @@ namespace ItemResearchSpawner.Components
                 Y = _searchBoxArea.bounds.Y + 5,
                 Height = 0,
                 Width = _searchBoxArea.bounds.Width,
-                Text = _searchText
+                Text = ModManager.Instance.SearchText
             };
 
             var iconRect = new Rectangle(80, 0, 13, 13);
@@ -113,10 +108,9 @@ namespace ItemResearchSpawner.Components
                 Blur();
             }
 
-            if (_searchText != _searchBox.Text.Trim())
+            if (ModManager.Instance.SearchText != _searchBox.Text.Trim())
             {
-                _searchText = _searchBox.Text.Trim();
-                OnSearchTextInput?.Invoke(_searchText);
+                ModManager.Instance.SearchText = _searchBox.Text.Trim();
             }
 
 

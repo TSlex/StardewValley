@@ -32,10 +32,6 @@ namespace ItemResearchSpawner.Components
 
         public static event StackChanged OnStackChanged;
 
-        public delegate void ResearchCompleted();
-
-        public static event ResearchCompleted OnResearchCompleted;
-
         public ProgressionManager(IMonitor monitor, IModHelper helper)
         {
             Instance ??= this;
@@ -104,7 +100,7 @@ namespace ItemResearchSpawner.Components
 
             if (item.Stack >= progressCount)
             {
-                OnResearchCompleted?.Invoke();
+                OnResearchCompleted();
             }
         }
 
@@ -130,7 +126,7 @@ namespace ItemResearchSpawner.Components
                     progression.ResearchCountIridium = 999;
                 }
 
-                OnResearchCompleted?.Invoke();
+                OnResearchCompleted();
             }
         }
 
@@ -147,7 +143,12 @@ namespace ItemResearchSpawner.Components
                 progression.ResearchCountIridium = 999;
             }
 
-            OnResearchCompleted?.Invoke();
+            OnResearchCompleted();
+        }
+
+        private static void OnResearchCompleted()
+        {
+            ModManager.Instance.RequestMenuUpdate(true);
         }
 
         public string GetItemProgression(Item item, bool itemActive = false)
@@ -185,7 +186,7 @@ namespace ItemResearchSpawner.Components
                     LogLevel.Alert);
             }
 
-            var maxProgression = ModManager.Instance.GetMode switch
+            var maxProgression = ModManager.Instance.ModMode switch
             {
                 ModMode.Buy => 1,
                 _ => category?.ResearchCount ?? 1

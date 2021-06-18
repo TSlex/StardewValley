@@ -39,24 +39,16 @@ namespace ItemResearchSpawner.Components
 
         private readonly ClickableComponent _sortButton;
         private readonly ClickableTextureComponent _sortIcon;
-        
-        private ItemSortOption _sortOption;
 
-        public delegate void SortOptionChange(ItemSortOption newOption);
-
-        public event SortOptionChange OnSortOptionChange;
-
-        public ItemSortTab(IContentHelper content, IMonitor monitor, int x, int y, ItemSortOption initialSortOption)
+        public ItemSortTab(IContentHelper content, IMonitor monitor, int x, int y)
         {
             _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
-
-            _sortOption = initialSortOption;
-
+            
             _sortButton =
                 new ClickableComponent(
                     new Rectangle(x, y,
                         GetMaxSortLabelWidth(Game1.smallFont) + _sortTexture.Width * Game1.pixelZoom +
-                        5 + UIConstants.BorderWidth, Game1.tileSize), GetSortLabel(_sortOption));
+                        5 + UIConstants.BorderWidth, Game1.tileSize), GetSortLabel(ModManager.Instance.SortOption));
 
             _sortIcon = new ClickableTextureComponent(
                 new Rectangle(_sortButton.bounds.X + UIConstants.BorderWidth,
@@ -68,16 +60,14 @@ namespace ItemResearchSpawner.Components
 
         public void HandleLeftClick()
         {
-            _sortOption = _sortOption.GetNext();
-            _sortButton.label = _sortButton.name = GetSortLabel(_sortOption);
-            OnSortOptionChange?.Invoke(_sortOption);
+            ModManager.Instance.SortOption = ModManager.Instance.SortOption.GetNext();
+            _sortButton.label = _sortButton.name = GetSortLabel(ModManager.Instance.SortOption);
         }
 
         public void HandleRightClick()
         {
-            _sortOption = _sortOption.GetPrevious();
-            _sortButton.label = _sortButton.name = GetSortLabel(_sortOption);
-            OnSortOptionChange?.Invoke(_sortOption);
+            ModManager.Instance.SortOption = ModManager.Instance.SortOption.GetPrevious();
+            _sortButton.label = _sortButton.name = GetSortLabel(ModManager.Instance.SortOption);
         }
 
         public void Draw(SpriteBatch spriteBatch)

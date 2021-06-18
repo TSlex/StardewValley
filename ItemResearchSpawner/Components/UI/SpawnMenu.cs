@@ -65,11 +65,6 @@ namespace ItemResearchSpawner.Components
         private int _topRowIndex;
         private int _maxTopRowIndex;
 
-        private ItemQuality _quality;
-        private ItemSortOption _sortOption;
-        private string _searchText;
-        private string _category;
-
         private bool _overDropdown;
         private bool _shiftPressed;
 
@@ -98,43 +93,19 @@ namespace ItemResearchSpawner.Components
 
             drawBG = false; // disable to draw default ui over new menu
             behaviorOnItemGrab = OnItemGrab;
-
-            LoadSettings();
-
+            
             InitializeComponents();
             UpdateView(true);
+            
+            ModManager.Instance.OnUpdateMenuView += OnUpdateMenuView;
 
-            _qualitySelector.OnQualityChange += OnQualityChange;
-            _itemSortTab.OnSortOptionChange += OnSortOptionChange;
             _categorySelector.OnDropdownToggle += OnDropdownToggle;
-            _categorySelector.OnCategorySelected += OnCategorySelected;
-            _searchBarTab.OnSearchTextInput += OnSearchTextInput;
-            ProgressionManager.OnResearchCompleted += OnResearchCompleted;
             _helper.Events.Input.ButtonsChanged += OnButtonChanged;
         }
 
-        private void LoadSettings()
+        private void OnUpdateMenuView(bool rebuild)
         {
-            var settings = _helper.Data.ReadJsonFile<MenuSettings>($"save/{SaveHelper.DirectoryName}/menu.json") ??
-                           new MenuSettings();
-
-            _quality = settings.Quality;
-            _sortOption = settings.SortOption;
-            _searchText = settings.SearchText;
-            _category = settings.Category;
-        }
-
-        private void SaveSettings()
-        {
-            var settings = new MenuSettings
-            {
-                Quality = _quality,
-                SortOption = _sortOption,
-                SearchText = _searchText,
-                Category = _category
-            };
-
-            _helper.Data.WriteJsonFile($"save/{SaveHelper.DirectoryName}/menu.json", settings);
+            UpdateView(rebuild);
         }
 
         protected override void cleanupBeforeExit()
@@ -144,17 +115,12 @@ namespace ItemResearchSpawner.Components
                 DropItem(_researchArea.ReturnItem());
             }
 
-            _qualitySelector.OnQualityChange -= OnQualityChange;
-            _itemSortTab.OnSortOptionChange -= OnSortOptionChange;
+            ModManager.Instance.OnUpdateMenuView -= OnUpdateMenuView;
+
             _categorySelector.OnDropdownToggle -= OnDropdownToggle;
-            _categorySelector.OnCategorySelected -= OnCategorySelected;
-            _searchBarTab.OnSearchTextInput -= OnSearchTextInput;
-            ProgressionManager.OnResearchCompleted -= OnResearchCompleted;
             _helper.Events.Input.ButtonsChanged -= OnButtonChanged;
 
             _researchArea.PrepareToBeKilled();
-
-            SaveSettings();
 
             base.cleanupBeforeExit();
         }
@@ -171,23 +137,6 @@ namespace ItemResearchSpawner.Components
             }
         }
 
-        private void OnResearchCompleted()
-        {
-            UpdateView(true);
-        }
-
-        private void OnQualityChange(ItemQuality newQuality)
-        {
-            _quality = newQuality;
-            UpdateView();
-        }
-
-        private void OnSortOptionChange(ItemSortOption newOption)
-        {
-            _sortOption = newOption;
-            UpdateView(true);
-        }
-
         private void OnDropdownToggle(bool expanded)
         {
             inventory.highlightMethod = _ => !expanded;
@@ -198,19 +147,6 @@ namespace ItemResearchSpawner.Components
                 setCurrentlySnappedComponentTo(_categorySelector.MyID);
                 snapCursorToCurrentSnappedComponent();
             }
-        }
-
-        private void OnCategorySelected(string category)
-        {
-            _category = category;
-            UpdateView(true);
-        }
-
-        private void OnSearchTextInput(string key)
-        {
-            _searchText = key;
-            _topRowIndex = 0;
-            UpdateView(rebuild: true);
         }
 
         private void InitializeComponents()
@@ -231,18 +167,17 @@ namespace ItemResearchSpawner.Components
             _cashTab.SetBalance(Game1.player._money);
 
             _qualitySelector =
-                new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor, _quality);
+                new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor);
 
-            _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor,
-                _sortOption);
+            _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor);
 
             _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
                 _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
-            _categorySelector?.SelectCategory(_category);
+            _categorySelector?.SelectCategory(ModManager.Instance.Category);
 
             _searchBarTab = new ItemSearchBarTab(_content, _monitor, _categorySelector.Right + 20, barTopAnchor,
                 _researchArea.Bounds.Right - _categorySelector.Right + 20 - 10 * Game1.pixelZoom);
-            _searchBarTab.SetText(_searchText);
+            _searchBarTab.SetText(ModManager.Instance.SearchText);
         }
 
         public override void draw(SpriteBatch spriteBatch)
@@ -458,7 +393,7 @@ namespace ItemResearchSpawner.Components
                                Game1.options.doesInputListContain(Game1.options.cancelButton, key);
 
             if (isEscape && (_searchBarTab.PersistFocus ||
-                             _searchBarTab.Selected && !string.IsNullOrEmpty(_searchText)))
+                             _searchBarTab.Selected && !string.IsNullOrEmpty(ModManager.Instance.SearchText)))
             {
                 _searchBarTab.Clear();
                 _searchBarTab.Blur();
@@ -689,7 +624,7 @@ namespace ItemResearchSpawner.Components
 
                 if (item is Object obj)
                 {
-                    obj.Quality = (int) prefab.GetAvailableQuality(_quality);
+                    obj.Quality = (int) prefab.GetAvailableQuality(ModManager.Instance.Quality);
                 }
 
                 _itemsInView.Add(item);
@@ -719,7 +654,7 @@ namespace ItemResearchSpawner.Components
         {
             var items = ProgressionManager.Instance.GetResearchedItems();
 
-            items = _sortOption switch
+            items = ModManager.Instance.SortOption switch
             {
                 ItemSortOption.Category => items.OrderBy(p => p.Item.Item.Category),
                 ItemSortOption.ID => items.OrderBy(p => p.Item.Item.ParentSheetIndex),
@@ -732,7 +667,7 @@ namespace ItemResearchSpawner.Components
                     Helpers.EqualsCaseInsensitive(item.Item.Category, _categorySelector.SelectedCategory));
             }
 
-            var search = _searchText.Trim();
+            var search = ModManager.Instance.SearchText.Trim();
 
             if (search != "")
             {

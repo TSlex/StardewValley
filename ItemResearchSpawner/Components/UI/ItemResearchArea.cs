@@ -91,7 +91,7 @@ namespace ItemResearchSpawner.Components
             spriteBatch.DrawString(progressFont, researchProgressString,
                 new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
 
-            var buttonTexture = ModManager.Instance.GetMode switch
+            var buttonTexture = ModManager.Instance.ModMode switch
             {
                 ModMode.Buy => _sellTexture,
                 _ => _researchTexture
@@ -127,7 +127,7 @@ namespace ItemResearchSpawner.Components
         {
             _lastItem = null; //update cached progression string
 
-            if (ModManager.Instance.GetMode == ModMode.Buy && _researchItem != null)
+            if (ModManager.Instance.ModMode == ModMode.Buy && _researchItem != null)
             {
                 var amount = _researchItem.Stack - newCount;
             }
