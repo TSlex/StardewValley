@@ -98,9 +98,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\categories-progress.json" />
+    <Content Include="Assets\coin-icon.png" />
     <Content Include="Assets\empty-quality-icon.png" />
     <Content Include="Assets\item-data.json" />
     <Content Include="Assets\search-button.png" />
+    <Content Include="Assets\sell-button.png" />
     <Content Include="Assets\sort-icon.png" />
     <Content Include="I18n.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

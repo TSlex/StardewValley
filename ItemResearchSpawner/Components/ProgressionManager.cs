@@ -28,8 +28,6 @@ namespace ItemResearchSpawner.Components
         private Dictionary<string, ResearchProgression> _progression =
             new Dictionary<string, ResearchProgression>();
 
-        private ModMode CurrentMode => ModManager.Instance.GetMode;
-
         public delegate void StackChanged(int newCount);
 
         public static event StackChanged OnStackChanged;
@@ -177,7 +175,7 @@ namespace ItemResearchSpawner.Components
         private (int current, int max) GetItemProgressionRaw(SpawnableItem item,
             out ResearchProgression progressionItem, ItemQuality quality = ItemQuality.Normal, bool itemActive = false)
         {
-            var category = _categories.FirstOrDefault(c => item.Category.Equals(c.Label));
+            var category = _categories.FirstOrDefault(c => I18n.GetByKey(c.Label).ToString().Equals(item.Category));
 
             if (itemActive)
             {
@@ -187,12 +185,12 @@ namespace ItemResearchSpawner.Components
                     LogLevel.Alert);
             }
 
-            var maxProgression = CurrentMode switch
+            var maxProgression = ModManager.Instance.GetMode switch
             {
                 ModMode.Buy => 1,
                 _ => category?.ResearchCount ?? 1
             };
-            
+
             progressionItem = TryInitAndReturnProgressionItem(item.Item);
 
             var itemProgression = quality switch
@@ -279,7 +277,7 @@ namespace ItemResearchSpawner.Components
 
             //save backward compatibility
             _progression = new Dictionary<string, ResearchProgression>();
-            
+
             var regex = new Regex(@"([\d+-]+):(.+):([\d+-]+)", RegexOptions.IgnoreCase);
 
             foreach (var pair in progressions)
@@ -294,7 +292,7 @@ namespace ItemResearchSpawner.Components
 
                 _progression[key] = pair.Value;
             }
-            
+
             _monitor.Log("Progression loaded! :)", LogLevel.Debug);
         }
 

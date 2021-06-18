@@ -1,4 +1,6 @@
-﻿using ItemResearchSpawner.Utils;
+﻿using System;
+using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -11,7 +13,9 @@ namespace ItemResearchSpawner.Components
     {
         private readonly ClickableComponent _researchArea;
         private readonly ClickableTextureComponent _researchButton;
+        
         private readonly Texture2D _researchTexture;
+        private readonly Texture2D _sellTexture;
 
         private Item _researchItem;
 
@@ -21,6 +25,7 @@ namespace ItemResearchSpawner.Components
         public ItemResearchArea(IContentHelper content, IMonitor monitor, int x, int y)
         {
             _researchTexture = content.Load<Texture2D>("assets/search-button.png");
+            _sellTexture = content.Load<Texture2D>("assets/sell-button.png");
 
             _researchArea = new ClickableComponent(new Rectangle(x, y, Game1.tileSize + 60, Game1.tileSize + 50), "");
 
@@ -86,7 +91,13 @@ namespace ItemResearchSpawner.Components
             spriteBatch.DrawString(progressFont, researchProgressString,
                 new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
 
-            spriteBatch.Draw(_researchButton.texture, _researchButton.bounds, _researchButton.sourceRect, Color.White);
+            var buttonTexture = ModManager.Instance.GetMode switch
+            {
+                ModMode.Buy => _sellTexture,
+                _ => _researchTexture
+            };
+
+            spriteBatch.Draw(buttonTexture, _researchButton.bounds, _researchButton.sourceRect, Color.White);
 
             _researchItem?.drawInMenu(spriteBatch, new Vector2(researchItemCellX, areaInnerAnchors.Y + 10), 1f);
         }
