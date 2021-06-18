@@ -7,7 +7,8 @@
         -21
       ]
     },
-    "ResearchCount": 10
+    "ResearchCount": 10,
+    "BaseCost": 1000
   },
   {
     "Label": "category.ammo",
@@ -19,7 +20,8 @@
         "Object:441"
       ]
     },
-    "ResearchCount": 10
+    "ResearchCount": 10,
+    "BaseCost": 1000
   },
   {
     "Label": "category.tools",
@@ -43,7 +45,8 @@
         "StardewValley.Tools.Slingshot"
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.weapons",
@@ -55,7 +58,8 @@
         "StardewValley.Tools.Slingshot"
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.hats",
@@ -64,7 +68,8 @@
         -95
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.clothes",
@@ -73,7 +78,8 @@
         -100
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.boots",
@@ -82,7 +88,8 @@
         -97
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.rings",
@@ -91,7 +98,8 @@
         -96
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.unique-crops",
@@ -104,7 +112,8 @@
         "Object:417"
       ]
     },
-    "ResearchCount": 100
+    "ResearchCount": 100,
+    "BaseCost": 1000
   },
   {
     "Label": "category.tree-fruits",
@@ -120,7 +129,8 @@
         "Mango:834"
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.forage",
@@ -145,7 +155,8 @@
         "Object:92"
       ]
     },
-    "ResearchCount": 5
+    "ResearchCount": 5,
+    "BaseCost": 1000
   },
   {
     "Label": "category.flowers",
@@ -156,7 +167,8 @@
       "UniqueKey": [
       ]
     },
-    "ResearchCount": 5
+    "ResearchCount": 5,
+    "BaseCost": 1000
   },
   {
     "Label": "category.crops",
@@ -166,7 +178,8 @@
         -79
       ]
     },
-    "ResearchCount": 30
+    "ResearchCount": 30,
+    "BaseCost": 1000
   },
   {
     "Label": "category.saplings",
@@ -183,7 +196,8 @@
         "Object:835"
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.seeds",
@@ -192,7 +206,8 @@
         -74
       ]
     },
-    "ResearchCount": 10
+    "ResearchCount": 10,
+    "BaseCost": 1000
   },
   {
     "Label": "category.monster-loot",
@@ -208,7 +223,8 @@
         "Object:857"
       ]
     },
-    "ResearchCount": 25
+    "ResearchCount": 25,
+    "BaseCost": 1000
   },
   {
     "Label": "category.animal-products",
@@ -221,7 +237,8 @@
         -18
       ]
     },
-    "ResearchCount": 25
+    "ResearchCount": 25,
+    "BaseCost": 1000
   },
   {
     "Label": "category.legendary-fish",
@@ -239,7 +256,8 @@
         "Crimsonfish:159"
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.fish",
@@ -257,7 +275,8 @@
         -20
       ]
     },
-    "ResearchCount": 5
+    "ResearchCount": 5,
+    "BaseCost": 1000
   },
   {
     "Label": "category.geodes",
@@ -273,7 +292,8 @@
         "Artifact Trove:275"
       ]
     },
-    "ResearchCount": 5
+    "ResearchCount": 5,
+    "BaseCost": 1000
   },
   {
     "Label": "category.rare-minerals",
@@ -282,7 +302,8 @@
         -2
       ]
     },
-    "ResearchCount": 10
+    "ResearchCount": 10,
+    "BaseCost": 1000
   },
   {
     "Label": "category.minerals",
@@ -291,7 +312,8 @@
         -12
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.artifacts",
@@ -300,7 +322,8 @@
         "Arch"
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.resources",
@@ -316,7 +339,8 @@
         "Dragon Tooth:852"
       ]
     },
-    "ResearchCount": 45
+    "ResearchCount": 45,
+    "BaseCost": 1000
   },
   {
     "Label": "category.non-craftable",
@@ -437,7 +461,8 @@
         "Hedge:929"
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.craftable",
@@ -457,7 +482,8 @@
         "Monster Musk:879"
       ]
     },
-    "ResearchCount": 5
+    "ResearchCount": 5,
+    "BaseCost": 1000
   },
   {
     "Label": "category.big-craftable",
@@ -466,7 +492,8 @@
         -9
       ]
     },
-    "ResearchCount": 2
+    "ResearchCount": 2,
+    "BaseCost": 1000
   },
   {
     "Label": "category.artisan",
@@ -478,7 +505,8 @@
       "ItemId": [
       ]
     },
-    "ResearchCount": 10
+    "ResearchCount": 10,
+    "BaseCost": 1000
   },
   {
     "Label": "category.cooking",
@@ -502,7 +530,8 @@
         "Bug Steak:874"
       ]
     },
-    "ResearchCount": 5
+    "ResearchCount": 5,
+    "BaseCost": 1000
   },
   {
     "Label": "category.furniture",
@@ -511,7 +540,8 @@
         "StardewValley.Objects.Furniture"
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   },
   {
     "Label": "category.decor",
@@ -520,6 +550,7 @@
         -24
       ]
     },
-    "ResearchCount": 1
+    "ResearchCount": 1,
+    "BaseCost": 1000
   }
 ]

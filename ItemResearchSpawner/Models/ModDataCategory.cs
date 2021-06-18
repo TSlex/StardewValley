@@ -31,6 +31,7 @@ namespace ItemResearchSpawner.Models
         public ModDataCategoryRule Except { get; set; }
 
         public int ResearchCount { get; set; }
+        public int BaseCost { get; set; }
 
         public bool IsMatch(SearchableItem item)
         {

@@ -72,7 +72,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>I18n.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Enums\CategoryProgress.cs" />
     <Compile Include="Models\Enums\ItemQuality.cs" />
     <Compile Include="Models\Enums\ItemSortOption.cs" />
     <Compile Include="Models\Enums\ItemType.cs" />
