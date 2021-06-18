@@ -29,7 +29,7 @@ namespace ItemResearchSpawner
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories-progress.json");
 
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
-            _modManager ??= new ModManager(Monitor, _helper);
+            _modManager ??= new ModManager(Monitor, _helper, _config);
             
             I18n.Init(helper.Translation);
             

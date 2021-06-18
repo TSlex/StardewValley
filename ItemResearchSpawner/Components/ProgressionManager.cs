@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Force.DeepCloner;
@@ -8,6 +9,7 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using Object = StardewValley.Object;
 
 namespace ItemResearchSpawner.Components
 {
@@ -25,6 +27,8 @@ namespace ItemResearchSpawner.Components
 
         private Dictionary<string, ResearchProgression> _progression =
             new Dictionary<string, ResearchProgression>();
+
+        private ModMode CurrentMode => ModManager.Instance.GetMode;
 
         public delegate void StackChanged(int newCount);
 
@@ -183,8 +187,12 @@ namespace ItemResearchSpawner.Components
                     LogLevel.Alert);
             }
 
-            var maxProgression = category?.ResearchCount ?? 1;
-
+            var maxProgression = CurrentMode switch
+            {
+                ModMode.Buy => 1,
+                _ => category?.ResearchCount ?? 1
+            };
+            
             progressionItem = TryInitAndReturnProgressionItem(item.Item);
 
             var itemProgression = quality switch
@@ -239,17 +247,6 @@ namespace ItemResearchSpawner.Components
             {
                 _monitor.LogOnce(
                     $"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
-                    LogLevel.Alert);
-            }
-
-            return spawnableItem;
-        }
-
-        public SpawnableItem GetSpawnableItem(string key)
-        {
-            if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
-            {
-                _monitor.LogOnce($"Key: {key} is missing in register!",
                     LogLevel.Alert);
             }
 
