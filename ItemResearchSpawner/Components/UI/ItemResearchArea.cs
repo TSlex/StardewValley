@@ -28,7 +28,7 @@ namespace ItemResearchSpawner.Components
                 new Rectangle(
                     RenderHelpers.GetChildCenterPosition(x, _researchArea.bounds.Width + 2 * UIConstants.BorderWidth,
                         _researchTexture.Width),
-                    _researchArea.bounds.Height + 48 + y, _researchTexture.Width,
+                    _researchArea.bounds.Height + 38 + y, _researchTexture.Width,
                     _researchTexture.Height), _researchTexture,
                 new Rectangle(0, 0, _researchTexture.Width, _researchTexture.Height), 1f);
 
