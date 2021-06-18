@@ -127,6 +127,11 @@ namespace ItemResearchSpawner.Components
         {
             _lastItem = null; //update cached progression string
 
+            if (ModManager.Instance.GetMode == ModMode.Buy && _researchItem != null)
+            {
+                var amount = _researchItem.Stack - newCount;
+            }
+
             if (newCount <= 0)
             {
                 _researchItem = null;
