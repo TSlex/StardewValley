@@ -57,6 +57,7 @@ namespace ItemResearchSpawner.Components
         private ItemSortTab _itemSortTab;
         private ItemCategorySelectorTab _categorySelector;
         private ItemSearchBarTab _searchBarTab;
+        private CashTab _cashTab;
 
         private readonly List<ResearchedItem> _filteredItems = new List<ResearchedItem>();
         private readonly IList<Item> _itemsInView;
@@ -210,6 +211,56 @@ namespace ItemResearchSpawner.Components
             _searchText = key;
             _topRowIndex = 0;
             UpdateView(rebuild: true);
+        }
+
+        private void InitializeComponents()
+        {
+            var rootLeftAnchor = xPositionOnScreen;
+            var rootTopAnchor = yPositionOnScreen;
+            var rootRightAnchor = rootLeftAnchor + width;
+            var rootBottomAnchor = rootTopAnchor + height;
+
+            var sideTopAnchor = rootTopAnchor - Game1.tileSize + UIConstants.BorderWidth - 2 * Game1.pixelZoom;
+            var sideRightAnchor = rootRightAnchor;
+
+            var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
+
+            _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor + Game1.tileSize + 8);
+
+            _cashTab = new CashTab(_content, _monitor, sideRightAnchor - 34, sideTopAnchor, _researchArea.Bounds.Width + 34);
+
+            _qualitySelector =
+                new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor, _quality);
+
+            _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor,
+                _sortOption);
+
+            _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
+                _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
+            _categorySelector?.SelectCategory(_category);
+
+            _searchBarTab = new ItemSearchBarTab(_content, _monitor, _categorySelector.Right + 20, barTopAnchor,
+                _researchArea.Bounds.Right - _categorySelector.Right + 20 - 10 * Game1.pixelZoom);
+            _searchBarTab.SetText(_searchText);
+        }
+
+        public override void draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(Game1.fadeToBlackRect,
+                new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height), Color.Black * 0.5f);
+
+            _researchArea.Draw(spriteBatch);
+            _cashTab.Draw(spriteBatch);
+
+            _baseDraw(spriteBatch);
+
+            _qualitySelector.Draw(spriteBatch);
+            _itemSortTab.Draw(spriteBatch);
+            _categorySelector.Draw(spriteBatch);
+            _searchBarTab.Draw(spriteBatch);
+
+            DrawHeldItem(spriteBatch);
+            drawMouse(spriteBatch);
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -569,24 +620,6 @@ namespace ItemResearchSpawner.Components
             UpdateView();
         }
 
-        public override void draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(Game1.fadeToBlackRect,
-                new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height), Color.Black * 0.5f);
-
-            _researchArea.Draw(spriteBatch);
-
-            _baseDraw(spriteBatch);
-
-            _qualitySelector.Draw(spriteBatch);
-            _itemSortTab.Draw(spriteBatch);
-            _categorySelector.Draw(spriteBatch);
-            _searchBarTab.Draw(spriteBatch);
-
-            DrawHeldItem(spriteBatch);
-            drawMouse(spriteBatch);
-        }
-
         private void DrawHeldItem(SpriteBatch spriteBatch)
         {
             if (hoverText != null && (hoveredItem == null || ItemsToGrabMenu == null))
@@ -624,35 +657,6 @@ namespace ItemResearchSpawner.Components
         private static void DropItem(Item item)
         {
             Game1.createItemDebris(item, Game1.player.getStandingPosition(), Game1.player.FacingDirection);
-        }
-
-        private void InitializeComponents()
-        {
-            var rootLeftAnchor = xPositionOnScreen;
-            var rootTopAnchor = yPositionOnScreen;
-            var rootRightAnchor = rootLeftAnchor + width;
-            var rootBottomAnchor = rootTopAnchor + height;
-
-            var sideTopAnchor = rootTopAnchor - Game1.tileSize + UIConstants.BorderWidth - 2 * Game1.pixelZoom;
-            var sideRightAnchor = rootRightAnchor;
-
-            var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
-
-            _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor);
-
-            _qualitySelector =
-                new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor, _quality);
-
-            _itemSortTab = new ItemSortTab(_content, _monitor, _qualitySelector.Bounds.Right + 20, barTopAnchor,
-                _sortOption);
-
-            _categorySelector = new ItemCategorySelectorTab(_content, _monitor, _spawnableItems,
-                _itemSortTab.Bounds.Right + 20, _itemSortTab.Bounds.Y);
-            _categorySelector?.SelectCategory(_category);
-
-            _searchBarTab = new ItemSearchBarTab(_content, _monitor, _categorySelector.Right + 20, barTopAnchor,
-                _researchArea.Bounds.Right - _categorySelector.Right + 20 - 10 * Game1.pixelZoom);
-            _searchBarTab.SetText(_searchText);
         }
 
         private void UpdateView(bool rebuild = false, bool resetScroll = true)
