@@ -19,6 +19,7 @@ namespace ItemResearchSpawner
         private SpawnableItem[] _items;
 
         private ProgressionManager _progressionManager;
+        private ModManager _modManager;
 
         public override void Entry(IModHelper helper)
         {
@@ -28,6 +29,7 @@ namespace ItemResearchSpawner
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories-progress.json");
 
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
+            _modManager ??= new ModManager(Monitor, _helper);
             
             I18n.Init(helper.Translation);
             
@@ -39,6 +41,9 @@ namespace ItemResearchSpawner
 
             helper.ConsoleCommands.Add("research_unlock_active", "unlock currently selected item",
                 UnlockActiveProgression);
+            
+            helper.ConsoleCommands.Add("research_set_mode", "change mode to \n 0 - Spawn Mode \n 1 - Buy/Sell Mode",
+                SetMode);
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e)
@@ -69,6 +74,21 @@ namespace ItemResearchSpawner
             {
                 _progressionManager.UnlockProgression(activeItem);
                 Monitor.Log($"Item - {activeItem.DisplayName}, was unlocked! ;)", LogLevel.Info);
+            }
+        }
+
+        private void SetMode(string command, string[] args)
+        {
+            if (!CheckCommandInGame()) return;
+            
+            try
+            {
+                _modManager.SetMode((ModMode) int.Parse(args[0]));
+                Monitor.Log($"Mode was changed to: {_modManager.GetMode.GetString()}", LogLevel.Info);
+            }
+            catch (Exception e)
+            {
+                Monitor.Log($"Available modes: \n 0 - Spawn Mode \n 1 - Buy/Sell Mode", LogLevel.Info);
             }
         }
 
