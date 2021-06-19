@@ -28,10 +28,10 @@ namespace ItemResearchSpawner
             _itemData = helper.Data.ReadJsonFile<ModItemData>("assets/item-data.json");
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories-progress.json");
 
-            _progressionManager ??= new ProgressionManager(Monitor, _helper);
-            _modManager ??= new ModManager(Monitor, _helper, _config);
-
             I18n.Init(helper.Translation);
+            
+            _modManager ??= new ModManager(Monitor, _helper, _config);
+            _progressionManager ??= new ProgressionManager(Monitor, _helper);
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
             helper.Events.GameLoop.DayStarted += OnDayStarted;

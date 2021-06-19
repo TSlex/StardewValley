@@ -132,18 +132,5 @@ namespace ItemResearchSpawner.Utils
 
             return newString.ToString();
         }
-
-        public static Action<SpriteBatch> GetBaseDraw(object instance)
-        {
-            var method =
-                typeof(ItemGrabMenu).GetMethod("draw", BindingFlags.Instance | BindingFlags.Public, null,
-                    new[] {typeof(SpriteBatch)}, null) ??
-                throw new InvalidOperationException(
-                    $"Can't find {nameof(ItemGrabMenu)}.{nameof(ItemGrabMenu.draw)} method.");
-
-            var pointer = method.MethodHandle.GetFunctionPointer();
-
-            return (Action<SpriteBatch>) Activator.CreateInstance(typeof(Action<SpriteBatch>), instance, pointer);
-        }
     }
 }

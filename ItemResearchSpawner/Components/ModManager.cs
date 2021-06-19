@@ -13,7 +13,7 @@ namespace ItemResearchSpawner.Components
         private readonly IModHelper _helper;
         private readonly ModConfig _config;
 
-        #region proprerties
+        #region Proprerties
 
         private ItemQuality _quality;
         private ModMode _modMode;
@@ -100,6 +100,8 @@ namespace ItemResearchSpawner.Components
             OnUpdateMenuView?.Invoke(rebuild);
         }
 
+        #region Save/Load
+
         private void OnSave(object sender, SavingEventArgs e)
         {
             var state = new ModState
@@ -128,5 +130,7 @@ namespace ItemResearchSpawner.Components
             SearchText = state.SearchText;
             Category = state.Category;
         }
+
+        #endregion
     }
 }

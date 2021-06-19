@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Force.DeepCloner;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
@@ -39,11 +40,10 @@ namespace ItemResearchSpawner.Components
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
      **/
-    internal class SpawnMenu : ItemGrabMenu
+    internal class SpawnMenu : ItemGrabMenuWrapper
     {
         private readonly SpawnableItem[] _spawnableItems;
         private readonly IMonitor _monitor;
-        private readonly Action<SpriteBatch> _baseDraw;
         private readonly IContentHelper _content;
         private readonly IModHelper _helper;
 
@@ -59,7 +59,7 @@ namespace ItemResearchSpawner.Components
         private ItemSearchBarTab _searchBarTab;
         private CashTab _cashTab;
 
-        private readonly List<ResearchedItem> _filteredItems = new List<ResearchedItem>();
+        private readonly List<ResearchableItem> _filteredItems = new List<ResearchableItem>();
         private readonly IList<Item> _itemsInView;
 
         private int _topRowIndex;
@@ -89,14 +89,13 @@ namespace ItemResearchSpawner.Components
             _spawnableItems = spawnableItems;
             _itemsInView = ItemsToGrabMenu.actualInventory;
 
-            _baseDraw = RenderHelpers.GetBaseDraw(this);
 
             drawBG = false; // disable to draw default ui over new menu
             behaviorOnItemGrab = OnItemGrab;
-            
+
             InitializeComponents();
             UpdateView(true);
-            
+
             ModManager.Instance.OnUpdateMenuView += OnUpdateMenuView;
 
             _categorySelector.OnDropdownToggle += OnDropdownToggle;
@@ -161,9 +160,11 @@ namespace ItemResearchSpawner.Components
 
             var barTopAnchor = rootTopAnchor - Game1.tileSize * 2;
 
-            _researchArea = new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor + Game1.tileSize + 8);
+            _researchArea =
+                new ItemResearchArea(_content, _monitor, sideRightAnchor, sideTopAnchor + Game1.tileSize + 8);
 
-            _cashTab = new CashTab(_content, _monitor, sideRightAnchor - 34, sideTopAnchor, _researchArea.Bounds.Width + 34);
+            _cashTab = new CashTab(_content, _monitor, sideRightAnchor - 34, sideTopAnchor,
+                _researchArea.Bounds.Width + 34);
             _cashTab.SetBalance(Game1.player._money);
 
             _qualitySelector =
@@ -188,7 +189,7 @@ namespace ItemResearchSpawner.Components
             _researchArea.Draw(spriteBatch);
             _cashTab.Draw(spriteBatch);
 
-            _baseDraw(spriteBatch);
+            DrawMenu(spriteBatch);
 
             _qualitySelector.Draw(spriteBatch);
             _itemSortTab.Draw(spriteBatch);
@@ -196,7 +197,36 @@ namespace ItemResearchSpawner.Components
             _searchBarTab.Draw(spriteBatch);
 
             DrawHeldItem(spriteBatch);
+            // DrawNewTooltip(spriteBatch);
+
             drawMouse(spriteBatch);
+        }
+
+        private void DrawNewTooltip(SpriteBatch spriteBatch)
+        {
+            if (hoverText != null && (hoveredItem == null || ItemsToGrabMenu == null))
+            {
+                if (hoverAmount > 0)
+                {
+                    drawToolTip(spriteBatch, hoverText, "", null, true, moneyAmountToShowAtBottom: hoverAmount);
+                }
+                else
+                {
+                    drawHoverText(spriteBatch, hoverText, Game1.smallFont);
+                }
+            }
+
+            if (hoveredItem != null)
+            {
+                drawToolTip(spriteBatch, hoveredItem.getDescription(), hoveredItem.DisplayName, hoveredItem,
+                    heldItem != null,
+                    moneyAmountToShowAtBottom: 100);
+            }
+            else if (hoveredItem != null && ItemsToGrabMenu != null)
+            {
+                drawToolTip(spriteBatch, ItemsToGrabMenu.descriptionText, ItemsToGrabMenu.descriptionTitle, hoveredItem,
+                    heldItem != null, moneyAmountToShowAtBottom: 100);
+            }
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -650,7 +680,7 @@ namespace ItemResearchSpawner.Components
             }
         }
 
-        private IEnumerable<ResearchedItem> GetFilteredItems()
+        private IEnumerable<ResearchableItem> GetFilteredItems()
         {
             var items = ProgressionManager.Instance.GetResearchedItems();
 

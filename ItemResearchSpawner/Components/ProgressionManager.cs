@@ -146,9 +146,16 @@ namespace ItemResearchSpawner.Components
             OnResearchCompleted();
         }
 
-        private static void OnResearchCompleted()
+        public IEnumerable<ResearchableItem> GetResearchedItems()
         {
-            ModManager.Instance.RequestMenuUpdate(true);
+            return _itemRegistry.Values
+                .Select(item => new ResearchableItem
+                {
+                    Item = item,
+                    NeededProgression = GetItemProgressionRaw(item, out var progression).max,
+                    Progression = progression
+                })
+                .Where(item => item.Progression.ResearchCount >= item.NeededProgression && item.NeededProgression > 0);
         }
 
         public string GetItemProgression(Item item, bool itemActive = false)
@@ -161,6 +168,11 @@ namespace ItemResearchSpawner.Components
             }
 
             return $"({itemProgression} / {maxProgression})";
+        }
+
+        private static void OnResearchCompleted()
+        {
+            ModManager.Instance.RequestMenuUpdate(true);
         }
 
         private (int current, int max) GetItemProgressionRaw(Item item,
@@ -207,18 +219,6 @@ namespace ItemResearchSpawner.Components
             return (itemProgression, maxProgression);
         }
 
-        public IEnumerable<ResearchedItem> GetResearchedItems()
-        {
-            return _itemRegistry.Values
-                .Select(item => new ResearchedItem
-                {
-                    Item = item,
-                    NeededProgression = GetItemProgressionRaw(item, out var progression).max,
-                    Progression = progression
-                })
-                .Where(item => item.Progression.ResearchCount >= item.NeededProgression && item.NeededProgression > 0);
-        }
-
         private ResearchProgression TryInitAndReturnProgressionItem(Item item)
         {
             var key = Helpers.GetItemUniqueKey(item);
@@ -238,7 +238,7 @@ namespace ItemResearchSpawner.Components
             return progressionItem;
         }
 
-        public SpawnableItem GetSpawnableItem(Item item)
+        private SpawnableItem GetSpawnableItem(Item item)
         {
             var key = Helpers.GetItemUniqueKey(item);
 

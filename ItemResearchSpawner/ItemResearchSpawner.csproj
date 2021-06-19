@@ -61,6 +61,7 @@
     <Compile Include="Components\UI\CashTab.cs" />
     <Compile Include="Components\UI\Helpers\Dropdown.cs" />
     <Compile Include="Components\UI\Helpers\DropdownList.cs" />
+    <Compile Include="Components\UI\Helpers\ItemGrabMenuWrapper.cs" />
     <Compile Include="Components\UI\ItemCategorySelectorTab.cs" />
     <Compile Include="Components\UI\ItemQualitySelectorTab.cs" />
     <Compile Include="Components\UI\ItemResearchArea.cs" />
@@ -83,7 +84,7 @@
     <Compile Include="Models\ModDataCategoryRule.cs" />
     <Compile Include="Models\ModItemData.cs" />
     <Compile Include="Models\ModState.cs" />
-    <Compile Include="Models\ResearchedItem.cs" />
+    <Compile Include="Models\ResearchableItem.cs" />
     <Compile Include="Models\ResearchProgression.cs" />
     <Compile Include="Models\SearchableItem.cs" />
     <Compile Include="Models\SpawnableItem.cs" />
