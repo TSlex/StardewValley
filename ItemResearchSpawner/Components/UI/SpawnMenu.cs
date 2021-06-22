@@ -443,7 +443,7 @@ namespace ItemResearchSpawner.Components
                     ScrollView(direction);
                 }
             }
-            else if (key == Keys.Delete)
+            else if (key == Keys.Delete && ModManager.Instance.ModMode == ModMode.Spawn)
             {
                 if (heldItem != null)
                 {
@@ -503,12 +503,25 @@ namespace ItemResearchSpawner.Components
 
             if (hoveredItem != null && Game1.player.items.Contains(hoveredItem))
             {
-                if (_researchArea.ResearchItem != null)
+                if (ProgressionManager.Instance.ItemResearched(hoveredItem))
+                {
+                    if (ModManager.Instance.ModMode == ModMode.Buy)
+                    {
+                        ModManager.Instance.SellItem(hoveredItem);
+                        UpdateView();
+                    }
+                    
+                    // hereafter item will be deleted
+                }
+                else if (_researchArea.ResearchItem != null)
                 {
                     TryReturnItemToInventory(_researchArea.ReturnItem());
                 }
+                else
+                {
+                    _researchArea.TrySetItem(hoveredItem);
+                }
 
-                _researchArea.TrySetItem(hoveredItem);
                 Game1.player.removeItemFromInventory(hoveredItem);
 
                 return true;
