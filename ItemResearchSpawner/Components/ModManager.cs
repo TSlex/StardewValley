@@ -14,7 +14,7 @@ namespace ItemResearchSpawner.Components
         private readonly IMonitor _monitor;
         private readonly IModHelper _helper;
         private readonly ModConfig _config;
-        
+
         public readonly Dictionary<string, SpawnableItem> ItemRegistry =
             new Dictionary<string, SpawnableItem>();
 
@@ -99,7 +99,7 @@ namespace ItemResearchSpawner.Components
             _helper.Events.GameLoop.Saving += OnSave;
             _helper.Events.GameLoop.DayStarted += OnLoad;
         }
-        
+
         public void InitRegistry(SpawnableItem[] items)
         {
             foreach (var spawnableItem in items)
@@ -115,8 +115,29 @@ namespace ItemResearchSpawner.Components
             OnUpdateMenuView?.Invoke(rebuild);
         }
 
+        public void BuyItem(Item item)
+        {
+            var price = GetItemPrice(item, true);
+
+            if (price > Game1.player._money)
+            {
+                Game1.player._money = 0;
+            }
+            else
+            {
+                Game1.player._money -= price;
+            }
+        }
+
+        public void SellItem(Item item)
+        {
+            Game1.player._money += GetItemPrice(item, true);
+        }
+
         public int GetItemPrice(Item item, bool countStack = false)
         {
+            item.Stack = item.Stack > 0 ? item.Stack : 1;
+            
             var price = Utility.getSellToStorePriceOfItem(item, false);
 
             if (price <= 0)
@@ -131,7 +152,7 @@ namespace ItemResearchSpawner.Components
 
             return price;
         }
-        
+
         public SpawnableItem GetSpawnableItem(Item item)
         {
             var key = Helpers.GetItemUniqueKey(item);

@@ -67,6 +67,11 @@ namespace ItemResearchSpawner.Components
 
             if (progressionMax <= 0 || itemProgression >= progressionMax)
             {
+                if (ModManager.Instance.ModMode == ModMode.Buy)
+                {
+                    OnStackChanged?.Invoke(0);
+                }
+
                 return;
             }
 
@@ -96,7 +101,14 @@ namespace ItemResearchSpawner.Components
                 progressionItem.ResearchCountIridium += progressCount;
             }
 
-            OnStackChanged?.Invoke(item.Stack - progressCount);
+            if (ModManager.Instance.ModMode == ModMode.Buy)
+            {
+                OnStackChanged?.Invoke(0);
+            }
+            else
+            {
+                OnStackChanged?.Invoke(item.Stack - progressCount);
+            }
 
             if (item.Stack >= progressCount)
             {

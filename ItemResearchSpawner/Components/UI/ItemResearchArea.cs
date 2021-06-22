@@ -68,6 +68,11 @@ namespace ItemResearchSpawner.Components
         {
             if (_researchItem != null)
             {
+                if (ModManager.Instance.ModMode == ModMode.Buy)
+                {
+                    ModManager.Instance.SellItem(_researchItem); 
+                }
+                
                 ProgressionManager.Instance.ResearchItem(_researchItem);
             }
         }

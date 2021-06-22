@@ -70,6 +70,9 @@ namespace ItemResearchSpawner.Components
         private bool _shiftPressed;
         private bool _dropdownExpanded;
 
+        public Rectangle GrabMenuBounds => new Rectangle(ItemsToGrabMenu.xPositionOnScreen,
+            ItemsToGrabMenu.yPositionOnScreen, ItemsToGrabMenu.width, ItemsToGrabMenu.height);
+
         public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IModHelper helper,
             IMonitor monitor) : base(
             inventory: new List<Item>(),
@@ -92,7 +95,9 @@ namespace ItemResearchSpawner.Components
             _itemsInView = ItemsToGrabMenu.actualInventory;
 
             ItemsToGrabMenu.highlightMethod = item =>
-                !_dropdownExpanded && ModManager.Instance.GetItemPrice(item, true) <= Game1.player._money;
+                !_dropdownExpanded &&
+                (ModManager.Instance.ModMode == ModMode.Spawn ||
+                 ModManager.Instance.GetItemPrice(item, true) <= Game1.player._money);
 
             drawBG = false; // disable to draw default ui over new menu
             behaviorOnItemGrab = OnItemGrab;
@@ -143,7 +148,7 @@ namespace ItemResearchSpawner.Components
         private void OnDropdownToggle(bool expanded)
         {
             _dropdownExpanded = expanded;
-            ItemsToGrabMenu.highlightMethod = _ => !expanded;
+            inventory.highlightMethod = _ => !expanded;
 
             if (!expanded && !Game1.lastCursorMotionWasMouse)
             {
@@ -169,7 +174,6 @@ namespace ItemResearchSpawner.Components
 
             _cashTab = new CashTab(_content, _monitor, sideRightAnchor - 34, sideTopAnchor,
                 _researchArea.Bounds.Width + 34);
-            _cashTab.SetBalance(Game1.player._money);
 
             _moneyTooltip = new ItemMoneyTooltip(_content, _monitor);
 
@@ -240,6 +244,11 @@ namespace ItemResearchSpawner.Components
             else if (trashCan.containsPoint(x, y) && heldItem != null)
             {
                 TryTrashItem();
+            }
+            else if (ModManager.Instance.ModMode == ModMode.Buy && GrabMenuBounds.Contains(x, y) && heldItem != null)
+            {
+                ModManager.Instance.SellItem(heldItem);
+                heldItem = null;
             }
             else
             {
@@ -474,7 +483,16 @@ namespace ItemResearchSpawner.Components
                 {
                     if (ProgressionManager.Instance.ItemResearched(item))
                     {
-                        Game1.player.removeItemFromInventory(item);
+                        switch (ModManager.Instance.ModMode)
+                        {
+                            case ModMode.Buy:
+                                ModManager.Instance.SellItem(item);
+                                Game1.player.removeItemFromInventory(item);
+                                break;
+                            default:
+                                Game1.player.removeItemFromInventory(item);
+                                break;
+                        }
                     }
                 }
 
@@ -565,6 +583,12 @@ namespace ItemResearchSpawner.Components
 
         private void OnItemGrab(Item item, Farmer player)
         {
+            if (ModManager.Instance.ModMode == ModMode.Buy &&
+                ModManager.Instance.GetItemPrice(item, true) <= Game1.player._money)
+            {
+                ModManager.Instance.BuyItem(item);
+            }
+
             UpdateView();
         }
 

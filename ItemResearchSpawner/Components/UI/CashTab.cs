@@ -16,7 +16,7 @@ namespace ItemResearchSpawner.Components
         private readonly ClickableComponent _balanceArea;
         private readonly ClickableTextureComponent _coin;
 
-        private int _balance;
+        // private int _balance;
 
         public CashTab(IContentHelper content, IMonitor monitor, int x, int y, int width)
         {
@@ -32,26 +32,26 @@ namespace ItemResearchSpawner.Components
                 new Rectangle(0, 0, _coinTexture.Width, _coinTexture.Height), Game1.pixelZoom);
         }
 
-        public int Balance => _balance;
-
-        public void SetBalance(int cash, bool append = false)
-        {
-            if (append)
-            {
-                _balance += cash;
-                _balance = (int) MathHelper.Clamp(_balance, 0, int.MaxValue);
-            }
-            else
-            {
-                _balance = (int) MathHelper.Clamp(cash, 0, int.MaxValue);
-            }
-        }
+        // public int Balance => _balance;
+        //
+        // public void SetBalance(int cash, bool append = false)
+        // {
+        //     if (append)
+        //     {
+        //         _balance += cash;
+        //         _balance = (int) MathHelper.Clamp(_balance, 0, int.MaxValue);
+        //     }
+        //     else
+        //     {
+        //         _balance = (int) MathHelper.Clamp(cash, 0, int.MaxValue);
+        //     }
+        // }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             var textOffsetX = _coinTexture.Width * Game1.pixelZoom + 5;
             RenderHelpers.DrawTextMenuBox(_balanceArea.bounds.X, _balanceArea.bounds.Y, _width, Game1.smallFont,
-                RenderHelpers.FillString(_balance.ToString(), "0", Game1.smallFont, _width - textOffsetX - 5, "+"),
+                RenderHelpers.FillString(Game1.player._money.ToString(), "0", Game1.smallFont, _width - textOffsetX - 5, "+"),
                 textOffsetX);
 
             _coin.draw(spriteBatch);
