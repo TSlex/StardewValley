@@ -17,20 +17,27 @@ namespace ItemResearchSpawner.Components
 
         public void Draw(SpriteBatch spriteBatch, Item hoveredItem)
         {
-            var cost = ModManager.Instance.GetItemBuyPrice(hoveredItem);
+            var cost = ModManager.Instance.GetItemPrice(hoveredItem);
 
             if (cost <= 0)
             {
                 return;
             }
-            
+
+            var costText = hoveredItem.Stack > 1 ? $"{cost * hoveredItem.Stack}({cost})" : $"{cost}";
+
             var mousePos = Game1.getMousePosition();
-            var mousePosVector = new Vector2(mousePos.X, mousePos.Y);
+            var basePosition = new Vector2(mousePos.X, mousePos.Y) + new Vector2(-38, 0);
 
             var textOffsetX = _coinTexture.Width * Game1.pixelZoom + 5;
+            var textWidth = Game1.smallFont.MeasureString(costText).X;
 
-            RenderHelpers.DrawTextMenuBox(mousePos.X + 32, mousePos.Y - 40, Game1.smallFont, cost.ToString(), textOffsetX);
-            Utility.drawWithShadow(spriteBatch, _coinTexture, mousePosVector + new Vector2(48, -24),
+            var boxWidth = textWidth + UIConstants.BorderWidth * 2 + _coinTexture.Width;
+
+            RenderHelpers.DrawTextMenuBox((int) (basePosition.X - boxWidth), (int) (basePosition.Y - 40),
+                Game1.smallFont, costText, textOffsetX);
+
+            Utility.drawWithShadow(spriteBatch, _coinTexture, basePosition + new Vector2(-boxWidth + 16, -24),
                 _coinTexture.Bounds, Color.White, 0f, Vector2.Zero, shadowIntensity: 0f);
         }
     }

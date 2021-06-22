@@ -115,13 +115,18 @@ namespace ItemResearchSpawner.Components
             OnUpdateMenuView?.Invoke(rebuild);
         }
 
-        public int GetItemBuyPrice(Item hoveredItem)
+        public int GetItemPrice(Item hoveredItem, bool countStack = false)
         {
-            var price = hoveredItem.salePrice();
+            var price = Utility.getSellToStorePriceOfItem(hoveredItem, false);
 
             if (price <= 0)
             {
                 price = GetSpawnableItem(hoveredItem).CategoryPrice;
+            }
+
+            if (countStack)
+            {
+                price *= hoveredItem.Stack;
             }
 
             return price;
