@@ -8,7 +8,7 @@
       ]
     },
     "ResearchCount": 10,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.ammo",
@@ -21,7 +21,7 @@
       ]
     },
     "ResearchCount": 10,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.tools",
@@ -69,7 +69,7 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.clothes",
@@ -79,7 +79,7 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.boots",
@@ -89,7 +89,7 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 500
   },
   {
     "Label": "category.rings",
@@ -99,7 +99,7 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 500
   },
   {
     "Label": "category.unique-crops",
@@ -130,7 +130,7 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.forage",
@@ -147,7 +147,8 @@
         "Crystal Fruit:414",
         "Fiddlehead Fern:259",
         "Grape:398",
-        "Spice Berry:396"
+        "Spice Berry:396",
+        "Hay:178"
       ]
     },
     "Except": {
@@ -156,7 +157,7 @@
       ]
     },
     "ResearchCount": 5,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.flowers",
@@ -168,7 +169,7 @@
       ]
     },
     "ResearchCount": 5,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.crops",
@@ -179,7 +180,7 @@
       ]
     },
     "ResearchCount": 30,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.saplings",
@@ -197,7 +198,7 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.seeds",
@@ -207,7 +208,7 @@
       ]
     },
     "ResearchCount": 10,
-    "BaseCost": 1000
+    "BaseCost": 50
   },
   {
     "Label": "category.monster-loot",
@@ -224,7 +225,7 @@
       ]
     },
     "ResearchCount": 25,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.animal-products",
@@ -238,7 +239,7 @@
       ]
     },
     "ResearchCount": 25,
-    "BaseCost": 1000
+    "BaseCost": 150
   },
   {
     "Label": "category.legendary-fish",
@@ -276,7 +277,7 @@
       ]
     },
     "ResearchCount": 5,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.geodes",
@@ -293,7 +294,7 @@
       ]
     },
     "ResearchCount": 5,
-    "BaseCost": 1000
+    "BaseCost": 50
   },
   {
     "Label": "category.rare-minerals",
@@ -303,7 +304,7 @@
       ]
     },
     "ResearchCount": 10,
-    "BaseCost": 1000
+    "BaseCost": 500
   },
   {
     "Label": "category.minerals",
@@ -313,7 +314,7 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 50
   },
   {
     "Label": "category.artifacts",
@@ -323,7 +324,7 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 50
   },
   {
     "Label": "category.resources",
@@ -340,7 +341,7 @@
       ]
     },
     "ResearchCount": 45,
-    "BaseCost": 1000
+    "BaseCost": 50
   },
   {
     "Label": "category.non-craftable",
@@ -483,7 +484,7 @@
       ]
     },
     "ResearchCount": 5,
-    "BaseCost": 1000
+    "BaseCost": 500
   },
   {
     "Label": "category.big-craftable",
@@ -493,7 +494,7 @@
       ]
     },
     "ResearchCount": 2,
-    "BaseCost": 1000
+    "BaseCost": 500
   },
   {
     "Label": "category.artisan",
@@ -506,7 +507,7 @@
       ]
     },
     "ResearchCount": 10,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.cooking",
@@ -531,7 +532,7 @@
       ]
     },
     "ResearchCount": 5,
-    "BaseCost": 1000
+    "BaseCost": 100
   },
   {
     "Label": "category.furniture",
@@ -541,7 +542,7 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 50
   },
   {
     "Label": "category.decor",
@@ -551,6 +552,6 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 1000
+    "BaseCost": 10
   }
 ]

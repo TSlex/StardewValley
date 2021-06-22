@@ -250,6 +250,7 @@ namespace ItemResearchSpawner.Components
             {
                 ModManager.Instance.SellItem(heldItem);
                 heldItem = null;
+                UpdateView();
             }
             else
             {
