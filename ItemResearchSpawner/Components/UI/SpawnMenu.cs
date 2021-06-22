@@ -245,7 +245,8 @@ namespace ItemResearchSpawner.Components
             {
                 TryTrashItem();
             }
-            else if (ModManager.Instance.ModMode == ModMode.Buy && GrabMenuBounds.Contains(x, y) && heldItem != null)
+            else if (ModManager.Instance.ModMode == ModMode.Buy && GrabMenuBounds.Contains(x, y) && heldItem != null &&
+                     ProgressionManager.Instance.ItemResearched(heldItem))
             {
                 ModManager.Instance.SellItem(heldItem);
                 heldItem = null;

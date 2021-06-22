@@ -1,5 +1,6 @@
-﻿using ItemResearchSpawner.Components;
-using StardewValley;
+﻿using System;
+using ItemResearchSpawner.Components;
+using Object = StardewValley.Object;
 
 namespace ItemResearchSpawner.Models
 {
@@ -80,7 +81,15 @@ namespace ItemResearchSpawner.Models
                 obj.Quality = (int) requestedQuality;
             }
 
-            return money / ModManager.Instance.GetItemPrice(item);
+            try
+            {
+                return money / ModManager.Instance.GetItemPrice(item);
+            }
+            
+            catch (Exception e)
+            {
+                return item.maximumStackSize();
+            }
         }
 
         public ItemQuality GetAvailableQuality(ItemQuality requestedQuality)

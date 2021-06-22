@@ -1,4 +1,6 @@
-﻿namespace ItemResearchSpawner.Models
+﻿using ItemResearchSpawner.Components;
+
+namespace ItemResearchSpawner.Models
 {
     /**
         MIT License
@@ -25,16 +27,19 @@
      **/
     internal class SpawnableItem : SearchableItem
     {
+        private readonly int _progressionLimit;
+        
         public string Category { get; }
         
         public int CategoryPrice { get; }
-        public int ProgressionLimit { get; }
+
+        public int ProgressionLimit => ModManager.Instance.ModMode == ModMode.Buy ? 1 : _progressionLimit;
 
         public SpawnableItem(SearchableItem item, string category, int categoryPrice, int progressionLimit) : base(item)
         {
             Category = category;
             CategoryPrice = categoryPrice;
-            ProgressionLimit = progressionLimit;
+            _progressionLimit = progressionLimit;
         }
     }
 }

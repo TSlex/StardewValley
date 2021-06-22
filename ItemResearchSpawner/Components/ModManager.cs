@@ -142,7 +142,7 @@ namespace ItemResearchSpawner.Components
             item.Stack = item.Stack > 0 ? item.Stack : 1;
 
             var spawnableItem = GetSpawnableItem(item, out var key);
-            var price = 0;
+            var price = -1;
 
             if (CustomItemPriceList.ContainsKey(key))
             {
@@ -152,7 +152,7 @@ namespace ItemResearchSpawner.Components
             {
                 price = Utility.getSellToStorePriceOfItem(item, false);
             }
-            if (price < 0)
+            if (price <= 0 && !CustomItemPriceList.ContainsKey(key))
             {
                 price = spawnableItem.CategoryPrice;
             }
