@@ -68,6 +68,7 @@ namespace ItemResearchSpawner.Components
 
         private bool _overDropdown;
         private bool _shiftPressed;
+        private bool _dropdownExpanded;
 
         public SpawnMenu(SpawnableItem[] spawnableItems, IContentHelper content, IModHelper helper,
             IMonitor monitor) : base(
@@ -89,7 +90,10 @@ namespace ItemResearchSpawner.Components
 
             _spawnableItems = spawnableItems;
             _itemsInView = ItemsToGrabMenu.actualInventory;
-            
+
+            ItemsToGrabMenu.highlightMethod = item =>
+                !_dropdownExpanded && ModManager.Instance.GetItemPrice(item, true) <= Game1.player._money;
+
             drawBG = false; // disable to draw default ui over new menu
             behaviorOnItemGrab = OnItemGrab;
 
@@ -138,7 +142,7 @@ namespace ItemResearchSpawner.Components
 
         private void OnDropdownToggle(bool expanded)
         {
-            inventory.highlightMethod = _ => !expanded;
+            _dropdownExpanded = expanded;
             ItemsToGrabMenu.highlightMethod = _ => !expanded;
 
             if (!expanded && !Game1.lastCursorMotionWasMouse)
@@ -628,11 +632,31 @@ namespace ItemResearchSpawner.Components
             {
                 var item = prefab.Item.CreateItem();
 
-                item.Stack = item.maximumStackSize();
+                var quality = ItemQuality.Normal;
+
+                switch (ModManager.Instance.ModMode)
+                {
+                    case ModMode.Buy:
+                        item.Stack = prefab.GetAvailableQuantity(Game1.player._money, ModManager.Instance.Quality,
+                            out var availableQuality);
+
+                        quality = availableQuality;
+                        break;
+                    default:
+                        item.Stack = item.maximumStackSize();
+                        break;
+                }
+
+                if (ModManager.Instance.ModMode != ModMode.Buy)
+                {
+                    quality = item is Object
+                        ? prefab.GetAvailableQuality(ModManager.Instance.Quality)
+                        : ItemQuality.Normal;
+                }
 
                 if (item is Object obj)
                 {
-                    obj.Quality = (int) prefab.GetAvailableQuality(ModManager.Instance.Quality);
+                    obj.Quality = (int) quality;
                 }
 
                 _itemsInView.Add(item);
