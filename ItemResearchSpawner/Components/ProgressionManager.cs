@@ -22,8 +22,8 @@ namespace ItemResearchSpawner.Components
 
         private readonly ModDataCategory[] _categories;
 
-        private readonly Dictionary<string, SpawnableItem> _itemRegistry =
-            new Dictionary<string, SpawnableItem>();
+        // private readonly Dictionary<string, SpawnableItem> _itemRegistry =
+        //     new Dictionary<string, SpawnableItem>();
 
         private Dictionary<string, ResearchProgression> _progression =
             new Dictionary<string, ResearchProgression>();
@@ -51,15 +51,15 @@ namespace ItemResearchSpawner.Components
             _helper.Events.GameLoop.DayStarted += OnLoadProgression;
         }
 
-        public void InitRegistry(SpawnableItem[] items)
-        {
-            foreach (var spawnableItem in items)
-            {
-                var key = Helpers.GetItemUniqueKey(spawnableItem.Item);
-
-                _itemRegistry[key] = spawnableItem;
-            }
-        }
+        // public void InitRegistry(SpawnableItem[] items)
+        // {
+        //     foreach (var spawnableItem in items)
+        //     {
+        //         var key = Helpers.GetItemUniqueKey(spawnableItem.Item);
+        //
+        //         _itemRegistry[key] = spawnableItem;
+        //     }
+        // }
 
         public void ResearchItem(Item item)
         {
@@ -113,7 +113,7 @@ namespace ItemResearchSpawner.Components
 
         public void UnlockAllProgression()
         {
-            foreach (var item in _itemRegistry.Values)
+            foreach (var item in ModManager.Instance.ItemRegistry.Values)
             {
                 var progression = TryInitAndReturnProgressionItem(item.Item);
 
@@ -148,7 +148,7 @@ namespace ItemResearchSpawner.Components
 
         public IEnumerable<ResearchableItem> GetResearchedItems()
         {
-            return _itemRegistry.Values
+            return ModManager.Instance.ItemRegistry.Values
                 .Select(item => new ResearchableItem
                 {
                     Item = item,
@@ -178,7 +178,7 @@ namespace ItemResearchSpawner.Components
         private (int current, int max) GetItemProgressionRaw(Item item,
             out ResearchProgression progressionItem, bool itemActive = false)
         {
-            var spawnableItem = GetSpawnableItem(item);
+            var spawnableItem = ModManager.Instance.GetSpawnableItem(item);
 
             var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
 
@@ -238,19 +238,19 @@ namespace ItemResearchSpawner.Components
             return progressionItem;
         }
 
-        private SpawnableItem GetSpawnableItem(Item item)
-        {
-            var key = Helpers.GetItemUniqueKey(item);
-
-            if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
-            {
-                _monitor.LogOnce(
-                    $"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
-                    LogLevel.Alert);
-            }
-
-            return spawnableItem;
-        }
+        // private SpawnableItem GetSpawnableItem(Item item)
+        // {
+        //     var key = Helpers.GetItemUniqueKey(item);
+        //
+        //     if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
+        //     {
+        //         _monitor.LogOnce(
+        //             $"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
+        //             LogLevel.Alert);
+        //     }
+        //
+        //     return spawnableItem;
+        // }
 
         #region SaveLoad
 

@@ -58,6 +58,7 @@ namespace ItemResearchSpawner.Components
         private ItemCategorySelectorTab _categorySelector;
         private ItemSearchBarTab _searchBarTab;
         private CashTab _cashTab;
+        private ItemMoneyTooltip _moneyTooltip;
 
         private readonly List<ResearchableItem> _filteredItems = new List<ResearchableItem>();
         private readonly IList<Item> _itemsInView;
@@ -88,8 +89,7 @@ namespace ItemResearchSpawner.Components
 
             _spawnableItems = spawnableItems;
             _itemsInView = ItemsToGrabMenu.actualInventory;
-
-
+            
             drawBG = false; // disable to draw default ui over new menu
             behaviorOnItemGrab = OnItemGrab;
 
@@ -167,6 +167,8 @@ namespace ItemResearchSpawner.Components
                 _researchArea.Bounds.Width + 34);
             _cashTab.SetBalance(Game1.player._money);
 
+            _moneyTooltip = new ItemMoneyTooltip(_content, _monitor);
+
             _qualitySelector =
                 new ItemQualitySelectorTab(_content, _monitor, rootLeftAnchor - 8, barTopAnchor);
 
@@ -196,37 +198,13 @@ namespace ItemResearchSpawner.Components
             _categorySelector.Draw(spriteBatch);
             _searchBarTab.Draw(spriteBatch);
 
+            if (ModManager.Instance.ModMode == ModMode.Buy && hoveredItem != null)
+            {
+                _moneyTooltip.Draw(spriteBatch, hoveredItem);
+            }
+
             DrawHeldItem(spriteBatch);
-            // DrawNewTooltip(spriteBatch);
-
             drawMouse(spriteBatch);
-        }
-
-        private void DrawNewTooltip(SpriteBatch spriteBatch)
-        {
-            if (hoverText != null && (hoveredItem == null || ItemsToGrabMenu == null))
-            {
-                if (hoverAmount > 0)
-                {
-                    drawToolTip(spriteBatch, hoverText, "", null, true, moneyAmountToShowAtBottom: hoverAmount);
-                }
-                else
-                {
-                    drawHoverText(spriteBatch, hoverText, Game1.smallFont);
-                }
-            }
-
-            if (hoveredItem != null)
-            {
-                drawToolTip(spriteBatch, hoveredItem.getDescription(), hoveredItem.DisplayName, hoveredItem,
-                    heldItem != null,
-                    moneyAmountToShowAtBottom: 100);
-            }
-            else if (hoveredItem != null && ItemsToGrabMenu != null)
-            {
-                drawToolTip(spriteBatch, ItemsToGrabMenu.descriptionText, ItemsToGrabMenu.descriptionTitle, hoveredItem,
-                    heldItem != null, moneyAmountToShowAtBottom: 100);
-            }
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)

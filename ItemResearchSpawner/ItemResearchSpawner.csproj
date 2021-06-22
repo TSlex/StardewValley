@@ -63,6 +63,7 @@
     <Compile Include="Components\UI\Helpers\DropdownList.cs" />
     <Compile Include="Components\UI\Helpers\ItemGrabMenuWrapper.cs" />
     <Compile Include="Components\UI\ItemCategorySelectorTab.cs" />
+    <Compile Include="Components\UI\ItemMoneyTooltip.cs" />
     <Compile Include="Components\UI\ItemQualitySelectorTab.cs" />
     <Compile Include="Components\UI\ItemResearchArea.cs" />
     <Compile Include="Components\UI\ItemSearchBarTab.cs" />

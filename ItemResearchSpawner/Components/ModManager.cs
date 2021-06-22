@@ -1,7 +1,9 @@
-﻿using ItemResearchSpawner.Models;
+﻿using System.Collections.Generic;
+using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley;
 
 namespace ItemResearchSpawner.Components
 {
@@ -12,6 +14,9 @@ namespace ItemResearchSpawner.Components
         private readonly IMonitor _monitor;
         private readonly IModHelper _helper;
         private readonly ModConfig _config;
+        
+        public readonly Dictionary<string, SpawnableItem> ItemRegistry =
+            new Dictionary<string, SpawnableItem>();
 
         #region Proprerties
 
@@ -94,10 +99,39 @@ namespace ItemResearchSpawner.Components
             _helper.Events.GameLoop.Saving += OnSave;
             _helper.Events.GameLoop.DayStarted += OnLoad;
         }
+        
+        public void InitRegistry(SpawnableItem[] items)
+        {
+            foreach (var spawnableItem in items)
+            {
+                var key = Helpers.GetItemUniqueKey(spawnableItem.Item);
+
+                ItemRegistry[key] = spawnableItem;
+            }
+        }
 
         public void RequestMenuUpdate(bool rebuild)
         {
             OnUpdateMenuView?.Invoke(rebuild);
+        }
+
+        public int GetItemBuyPrice(Item hoveredItem)
+        {
+            throw new System.NotImplementedException();
+        }
+        
+        public SpawnableItem GetSpawnableItem(Item item)
+        {
+            var key = Helpers.GetItemUniqueKey(item);
+
+            if (!ItemRegistry.TryGetValue(key, out var spawnableItem))
+            {
+                _monitor.LogOnce(
+                    $"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
+                    LogLevel.Alert);
+            }
+
+            return spawnableItem;
         }
 
         #region Save/Load

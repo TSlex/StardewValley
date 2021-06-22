@@ -49,7 +49,7 @@ namespace ItemResearchSpawner
         private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             _items = GetSpawnableItems().ToArray(); // some items exists only after day started ;_;
-            _progressionManager.InitRegistry(_items);
+            _modManager.InitRegistry(_items);
         }
 
         private void UnlockAllProgression(string command, string[] args)
