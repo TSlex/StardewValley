@@ -16,8 +16,6 @@ namespace ItemResearchSpawner.Components
         private readonly ClickableComponent _balanceArea;
         private readonly ClickableTextureComponent _coin;
 
-        // private int _balance;
-
         public CashTab(IContentHelper content, IMonitor monitor, int x, int y, int width)
         {
             _width = width;
@@ -31,21 +29,6 @@ namespace ItemResearchSpawner.Components
                     y + UIConstants.BorderWidth, _coinTexture.Width, Game1.tileSize), _coinTexture,
                 new Rectangle(0, 0, _coinTexture.Width, _coinTexture.Height), Game1.pixelZoom);
         }
-
-        // public int Balance => _balance;
-        //
-        // public void SetBalance(int cash, bool append = false)
-        // {
-        //     if (append)
-        //     {
-        //         _balance += cash;
-        //         _balance = (int) MathHelper.Clamp(_balance, 0, int.MaxValue);
-        //     }
-        //     else
-        //     {
-        //         _balance = (int) MathHelper.Clamp(cash, 0, int.MaxValue);
-        //     }
-        // }
 
         public void Draw(SpriteBatch spriteBatch)
         {

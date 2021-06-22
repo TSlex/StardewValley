@@ -22,9 +22,6 @@ namespace ItemResearchSpawner.Components
 
         private readonly ModDataCategory[] _categories;
 
-        // private readonly Dictionary<string, SpawnableItem> _itemRegistry =
-        //     new Dictionary<string, SpawnableItem>();
-
         private Dictionary<string, ResearchProgression> _progression =
             new Dictionary<string, ResearchProgression>();
 
@@ -50,16 +47,6 @@ namespace ItemResearchSpawner.Components
             _helper.Events.GameLoop.Saving += OnSaveProgression;
             _helper.Events.GameLoop.DayStarted += OnLoadProgression;
         }
-
-        // public void InitRegistry(SpawnableItem[] items)
-        // {
-        //     foreach (var spawnableItem in items)
-        //     {
-        //         var key = Helpers.GetItemUniqueKey(spawnableItem.Item);
-        //
-        //         _itemRegistry[key] = spawnableItem;
-        //     }
-        // }
 
         public void ResearchItem(Item item)
         {
@@ -249,20 +236,6 @@ namespace ItemResearchSpawner.Components
 
             return progressionItem;
         }
-
-        // private SpawnableItem GetSpawnableItem(Item item)
-        // {
-        //     var key = Helpers.GetItemUniqueKey(item);
-        //
-        //     if (!_itemRegistry.TryGetValue(key, out var spawnableItem))
-        //     {
-        //         _monitor.LogOnce(
-        //             $"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
-        //             LogLevel.Alert);
-        //     }
-        //
-        //     return spawnableItem;
-        // }
 
         #region SaveLoad
 
