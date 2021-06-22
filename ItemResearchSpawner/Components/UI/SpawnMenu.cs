@@ -516,6 +516,8 @@ namespace ItemResearchSpawner.Components
                 else if (_researchArea.ResearchItem != null)
                 {
                     TryReturnItemToInventory(_researchArea.ReturnItem());
+                    
+                    _researchArea.TrySetItem(hoveredItem);
                 }
                 else
                 {
