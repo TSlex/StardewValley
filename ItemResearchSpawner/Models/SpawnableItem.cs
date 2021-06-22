@@ -26,10 +26,15 @@
     internal class SpawnableItem : SearchableItem
     {
         public string Category { get; }
+        
+        public int CategoryPrice { get; }
+        public int ProgressionLimit { get; }
 
-        public SpawnableItem(SearchableItem item, string category) : base(item)
+        public SpawnableItem(SearchableItem item, string category, int categoryPrice, int progressionLimit) : base(item)
         {
             Category = category;
+            CategoryPrice = categoryPrice;
+            ProgressionLimit = progressionLimit;
         }
     }
 }

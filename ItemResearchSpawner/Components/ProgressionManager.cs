@@ -152,10 +152,10 @@ namespace ItemResearchSpawner.Components
                 .Select(item => new ResearchableItem
                 {
                     Item = item,
-                    NeededProgression = GetItemProgressionRaw(item, out var progression).max,
-                    Progression = progression
+                    Progression = TryInitAndReturnProgressionItem(item.Item)
                 })
-                .Where(item => item.Progression.ResearchCount >= item.NeededProgression && item.NeededProgression > 0);
+                .Where(item =>
+                    item.Progression.ResearchCount >= item.Item.ProgressionLimit && item.Item.ProgressionLimit > 0);
         }
 
         public string GetItemProgression(Item item, bool itemActive = false)

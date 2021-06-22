@@ -29,7 +29,7 @@ namespace ItemResearchSpawner
             _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories-progress.json");
 
             I18n.Init(helper.Translation);
-            
+
             _modManager ??= new ModManager(Monitor, _helper, _config);
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
 
@@ -140,7 +140,8 @@ namespace ItemResearchSpawner
                     ? I18n.GetByKey(category.Label).Default(category.Label)
                     : I18n.Category_Misc();
 
-                yield return new SpawnableItem(entry, label ?? I18n.Category_Misc());
+                yield return new SpawnableItem(entry, label ?? I18n.Category_Misc(), category?.BaseCost ?? 100,
+                    category?.ResearchCount ?? 1);
             }
         }
     }

@@ -117,7 +117,14 @@ namespace ItemResearchSpawner.Components
 
         public int GetItemBuyPrice(Item hoveredItem)
         {
-            throw new System.NotImplementedException();
+            var price = hoveredItem.salePrice();
+
+            if (price <= 0)
+            {
+                price = GetSpawnableItem(hoveredItem).CategoryPrice;
+            }
+
+            return price;
         }
         
         public SpawnableItem GetSpawnableItem(Item item)
