@@ -50,6 +50,16 @@ namespace ItemResearchSpawner
             
             helper.ConsoleCommands.Add("research_reset_price", "reset hotbar active item price (globally, for mod menu only)",
                 ResetPrice);
+            
+            helper.ConsoleCommands.Add("research_reload_prices", "reload pricelist file",
+                ReloadPriceList);
+        }
+
+        private void ReloadPriceList(string command, string[] args)
+        {
+            if (!CheckCommandInGame()) return;
+            
+            ModManager.Instance.ReloadPriceList();
         }
 
         private void ResetPrice(string command, string[] args)

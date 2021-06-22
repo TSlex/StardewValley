@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
 using StardewModdingAPI;
@@ -17,7 +18,7 @@ namespace ItemResearchSpawner.Components
 
         public readonly Dictionary<string, SpawnableItem> ItemRegistry =
             new Dictionary<string, SpawnableItem>();
-        
+
         public Dictionary<string, int> CustomItemPriceList =
             new Dictionary<string, int>();
 
@@ -148,14 +149,17 @@ namespace ItemResearchSpawner.Components
             {
                 price = CustomItemPriceList[key];
             }
+
             if (price < 0)
             {
                 price = Utility.getSellToStorePriceOfItem(item, false);
             }
+
             if (price <= 0 && !CustomItemPriceList.ContainsKey(key))
             {
                 price = spawnableItem.CategoryPrice;
             }
+
             if (countStack)
             {
                 price *= item.Stack;
@@ -167,7 +171,7 @@ namespace ItemResearchSpawner.Components
         public void SetItemPrice(Item activeItem, int price)
         {
             var key = Helpers.GetItemUniqueKey(activeItem);
-            
+
             if (price < 0 && CustomItemPriceList.ContainsKey(key))
             {
                 CustomItemPriceList.Remove(key);
@@ -176,7 +180,7 @@ namespace ItemResearchSpawner.Components
             {
                 CustomItemPriceList[key] = price;
             }
-            
+
             _helper.Data.WriteJsonFile($"price-config.json", CustomItemPriceList);
         }
 
@@ -230,5 +234,11 @@ namespace ItemResearchSpawner.Components
         }
 
         #endregion
+
+        public void ReloadPriceList()
+        {
+            CustomItemPriceList = _helper.Data.ReadJsonFile<Dictionary<string, int>>(
+                $"price-config.json") ?? new Dictionary<string, int>();
+        }
     }
 }

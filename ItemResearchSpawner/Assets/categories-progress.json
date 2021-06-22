@@ -553,5 +553,20 @@
     },
     "ResearchCount": 1,
     "BaseCost": 10
+  },
+  {
+    "Label": "category.junk",
+    "When": {
+      "UniqueKey": [
+        "Joja Cola:167",
+        "Trash:168",
+        "Driftwood:169",
+        "Broken Glasses:170",
+        "Broken CD:171",
+        "Soggy Newspaper:172"
+      ]
+    },
+    "ResearchCount": 1,
+    "BaseCost": 10
   }
 ]
