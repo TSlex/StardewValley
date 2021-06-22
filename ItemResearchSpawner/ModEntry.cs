@@ -39,11 +39,65 @@ namespace ItemResearchSpawner
             helper.ConsoleCommands.Add("research_unlock_all", "unlock all items research progression",
                 UnlockAllProgression);
 
-            helper.ConsoleCommands.Add("research_unlock_active", "unlock currently selected item",
+            helper.ConsoleCommands.Add("research_unlock_active", "unlock hotbar active item",
                 UnlockActiveProgression);
 
             helper.ConsoleCommands.Add("research_set_mode", "change mode to \n 0 - Spawn Mode \n 1 - Buy/Sell Mode",
                 SetMode);
+            
+            helper.ConsoleCommands.Add("research_set_price", "set hotbar active item price (globally, for mod menu only) \n 0+ values only",
+                SetPrice);
+            
+            helper.ConsoleCommands.Add("research_reset_price", "reset hotbar active item price (globally, for mod menu only)",
+                ResetPrice);
+        }
+
+        private void ResetPrice(string command, string[] args)
+        {
+            if (!CheckCommandInGame()) return;
+
+            var activeItem = Game1.player.CurrentItem;
+
+            if (activeItem == null)
+            {
+                Monitor.Log($"Select an item first", LogLevel.Info);
+            }
+            else
+            {
+                _modManager.SetItemPrice(activeItem, -1);
+                Monitor.Log($"Price for {activeItem.DisplayName}, was resetted! ;)", LogLevel.Info);
+            }
+        }
+
+        private void SetPrice(string command, string[] args)
+        {
+            if (!CheckCommandInGame()) return;
+
+            var activeItem = Game1.player.CurrentItem;
+            
+            if (activeItem == null)
+            {
+                Monitor.Log($"Select an item first", LogLevel.Info);
+            }
+            else
+            {
+                try
+                {
+                    var price = int.Parse(args[0]);
+
+                    if (price < 0)
+                    {
+                        Monitor.Log($"Price must be a non-negative number", LogLevel.Info);
+                    }
+                    
+                    _modManager.SetItemPrice(activeItem, price);
+                    Monitor.Log($"Price for {activeItem.DisplayName}, was changed to: {price}! ;)", LogLevel.Info);
+                }
+                catch (Exception e)
+                {
+                    Monitor.Log($"Price must be a correct non-negative number", LogLevel.Info);
+                }
+            }
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e)
@@ -68,7 +122,7 @@ namespace ItemResearchSpawner
 
             if (activeItem == null)
             {
-                Monitor.Log($"Select an item to be unlocked", LogLevel.Info);
+                Monitor.Log($"Select an item first", LogLevel.Info);
             }
             else
             {

@@ -17,6 +17,9 @@ namespace ItemResearchSpawner.Components
 
         public readonly Dictionary<string, SpawnableItem> ItemRegistry =
             new Dictionary<string, SpawnableItem>();
+        
+        public Dictionary<string, int> CustomItemPriceList =
+            new Dictionary<string, int>();
 
         #region Proprerties
 
@@ -137,14 +140,22 @@ namespace ItemResearchSpawner.Components
         public int GetItemPrice(Item item, bool countStack = false)
         {
             item.Stack = item.Stack > 0 ? item.Stack : 1;
-            
-            var price = Utility.getSellToStorePriceOfItem(item, false);
 
-            if (price <= 0)
+            var spawnableItem = GetSpawnableItem(item, out var key);
+            var price = 0;
+
+            if (CustomItemPriceList.ContainsKey(key))
             {
-                price = GetSpawnableItem(item).CategoryPrice;
+                price = CustomItemPriceList[key];
             }
-
+            if (price < 0)
+            {
+                price = Utility.getSellToStorePriceOfItem(item, false);
+            }
+            if (price < 0)
+            {
+                price = spawnableItem.CategoryPrice;
+            }
             if (countStack)
             {
                 price *= item.Stack;
@@ -153,9 +164,25 @@ namespace ItemResearchSpawner.Components
             return price;
         }
 
-        public SpawnableItem GetSpawnableItem(Item item)
+        public void SetItemPrice(Item activeItem, int price)
         {
-            var key = Helpers.GetItemUniqueKey(item);
+            var key = Helpers.GetItemUniqueKey(activeItem);
+            
+            if (price < 0 && CustomItemPriceList.ContainsKey(key))
+            {
+                CustomItemPriceList.Remove(key);
+            }
+            else
+            {
+                CustomItemPriceList[key] = price;
+            }
+            
+            _helper.Data.WriteJsonFile($"price-config.json", CustomItemPriceList);
+        }
+
+        public SpawnableItem GetSpawnableItem(Item item, out string key)
+        {
+            key = Helpers.GetItemUniqueKey(item);
 
             if (!ItemRegistry.TryGetValue(key, out var spawnableItem))
             {
@@ -181,6 +208,7 @@ namespace ItemResearchSpawner.Components
             };
 
             _helper.Data.WriteJsonFile($"save/{SaveHelper.DirectoryName}/progress.json", state);
+            _helper.Data.WriteJsonFile($"price-config.json", CustomItemPriceList);
         }
 
         private void OnLoad(object sender, DayStartedEventArgs e)
@@ -196,6 +224,9 @@ namespace ItemResearchSpawner.Components
             SortOption = state.SortOption;
             SearchText = state.SearchText;
             Category = state.Category;
+
+            CustomItemPriceList = _helper.Data.ReadJsonFile<Dictionary<string, int>>(
+                $"price-config.json") ?? new Dictionary<string, int>();
         }
 
         #endregion

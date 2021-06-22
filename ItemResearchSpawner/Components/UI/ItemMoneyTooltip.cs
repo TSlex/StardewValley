@@ -19,11 +19,6 @@ namespace ItemResearchSpawner.Components
         {
             var cost = ModManager.Instance.GetItemPrice(hoveredItem);
 
-            if (cost <= 0)
-            {
-                return;
-            }
-
             var costText = hoveredItem.Stack > 1 ? $"{cost * hoveredItem.Stack}({cost})" : $"{cost}";
 
             var mousePos = Game1.getMousePosition();

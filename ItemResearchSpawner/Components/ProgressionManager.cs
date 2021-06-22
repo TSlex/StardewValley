@@ -177,7 +177,7 @@ namespace ItemResearchSpawner.Components
         private (int current, int max) GetItemProgressionRaw(Item item,
             out ResearchProgression progressionItem, bool itemActive = false)
         {
-            var spawnableItem = ModManager.Instance.GetSpawnableItem(item);
+            var spawnableItem = ModManager.Instance.GetSpawnableItem(item, out _);
 
             var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
 
