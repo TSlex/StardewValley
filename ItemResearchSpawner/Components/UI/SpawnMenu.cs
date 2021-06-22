@@ -445,7 +445,7 @@ namespace ItemResearchSpawner.Components
             }
             else if (key == Keys.Delete && ModManager.Instance.ModMode == ModMode.Spawn)
             {
-                if (heldItem != null)
+                if (heldItem != null && ModManager.Instance.ModMode == ModMode.Spawn)
                 {
                     if (TryTrashItem(heldItem))
                     {
