@@ -103,7 +103,7 @@ namespace ItemResearchSpawner
                     _modManager.SetItemPrice(activeItem, price);
                     Monitor.Log($"Price for {activeItem.DisplayName}, was changed to: {price}! ;)", LogLevel.Info);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Monitor.Log($"Price must be a correct non-negative number", LogLevel.Info);
                 }
@@ -150,7 +150,7 @@ namespace ItemResearchSpawner
                 _modManager.ModMode = (ModMode) int.Parse(args[0]);
                 Monitor.Log($"Mode was changed to: {_modManager.ModMode.GetString()}", LogLevel.Info);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Monitor.Log($"Available modes: \n 0 - Spawn Mode \n 1 - Buy/Sell Mode", LogLevel.Info);
             }
