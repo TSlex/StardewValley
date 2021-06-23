@@ -73,7 +73,7 @@ namespace ItemResearchSpawner
 
             var availableModes = new List<string>(){"Spawn mode", "Buy/Sell mode"};
             
-            api.RegisterChoiceOption(ModManifest, "Default mode", "Default mod menu mode", 
+            api.RegisterChoiceOption(ModManifest, "Default mode", "Mod menu mode for the new games", 
                 () => availableModes[(int)_config.DefaultMode], val => _config.DefaultMode = (ModMode) availableModes.IndexOf(val), availableModes.ToArray());
         }
 

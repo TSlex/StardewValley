@@ -7,6 +7,7 @@
 1. [Commands](#commands)
 1. [Compatibility](#compatibility-at-present)
 1. [Release notes](release-notes.md)
+1. [How to support](supporting.md)
 
 ### Description:
 
@@ -82,8 +83,9 @@ Other:
 `Shift + LMB` - \*on trash can* delete all researched items
 
 ### Commands:
-
+__In-game only, menu must be opened at least once!__
 ```
+
 research_unlock_all //unlock all items (in-game only, menu must be opened at least once)   
 
 research_unlock_active //unlock hotbar active item (in-game only, menu must be opened at least once)  
@@ -102,3 +104,5 @@ research_reload_prices //load prices from price-config.json file
 + All platforms supported, but only working with __windows is guaranteed__
 + Only keyboard + mouse (gamepad not tested)
 + **SMAPI 3.9.5** or later
+
+[(Top)](#item-research-n-spawn)

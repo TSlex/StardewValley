@@ -1,10 +1,10 @@
-﻿[← Back to readme](README.md)
+﻿[(← Back to readme)](README.md)
 
 ## 1.0.0-alpha-r2
 Released 24 June 2021 for SMAPI 3.9.5 or later.
 
-* Added support for translation
-* Added russian translation
+* Added support for translation (menu only)
+* Added russian translation (menu only)
 * Added new tab to show player balance  
 * Added ProjectE like mode (research costs 1, sell and buy any items)
 * Added "Junk" category
