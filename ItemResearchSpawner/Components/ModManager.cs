@@ -211,7 +211,7 @@ namespace ItemResearchSpawner.Components
                 Category = Category
             };
 
-            _helper.Data.WriteJsonFile($"save/{SaveHelper.DirectoryName}/progress.json", state);
+            _helper.Data.WriteJsonFile($"save/{SaveHelper.DirectoryName}/state.json", state);
             _helper.Data.WriteJsonFile($"price-config.json", CustomItemPriceList);
         }
 
