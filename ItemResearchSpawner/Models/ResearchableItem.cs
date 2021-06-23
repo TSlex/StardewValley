@@ -86,7 +86,7 @@ namespace ItemResearchSpawner.Models
                 return money / ModManager.Instance.GetItemPrice(item);
             }
             
-            catch (Exception e)
+            catch (Exception)
             {
                 return item.maximumStackSize();
             }

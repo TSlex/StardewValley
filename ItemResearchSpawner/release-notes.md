@@ -1,5 +1,17 @@
 ﻿[← Back to readme](README.md)
 
+## 1.0.0-alpha-r2
+Released 24 June 2021 for SMAPI 3.9.5 or later.
+
+* Added support for translation
+* Added russian translation
+* Added new tab to show player balance  
+* Added ProjectE like mode (research costs 1, sell and buy any items)
+* Added "Junk" category
+* Moved hay to "Forage" category instead of "Misc"
+* Added commands for ProjectE like mode
+* Shift click insta deletes (or sells) items if they are researched
+
 ## 1.0.0-alpha
 Released 15 June 2021 for SMAPI 3.9.5 or later.
 

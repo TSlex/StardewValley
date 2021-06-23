@@ -1,15 +1,16 @@
 ## Item Research 'n' Spawn
 
 1. [Description](#description)
-2. [Usage](#usage)
-3. [Keys](#keys)
-4. [Commands](#commands)
-5. [Compatibility](#compatibility-at-present)
-6. [Release notes](release-notes.md)
+1. [Modes](#modes)
+1. [Usage](#usage)
+1. [Keys](#keys)
+1. [Commands](#commands)
+1. [Compatibility](#compatibility-at-present)
+1. [Release notes](release-notes.md)
 
 ### Description:
 
-**Item Research 'n' Spawn** is a Stardew Valley mod that lets give any item you want if you've researched it!
+**Item Research 'n' Spawn** is a mod for Stardew Valley that lets give any item you want if you've researched it!
 
 Want many of **\<item you want here>**?    
 Collect some of them, put in research area, and click the button!    
@@ -17,10 +18,26 @@ Now you can have as much of **\<item you want here>** as you want :)
 
 ![](screenshot.png)
 
+### Modes:
+
+This mod has two modes:
+
+* __"Spawn" mode__ - [Terraria Journey mode](https://terraria.fandom.com/wiki/Journey_Mode#Duplication) like mode.
+  Research the items and afterward give as much as you want. Different items have different amount of quantity needed
+  for research completion, depends on item category.
+
+* __"Buy" mode__ - [Minecraft ProjectE mod](https://ftb.fandom.com/wiki/ProjectE) like mode. 
+  Works almost like "Spawn" mode, but here you need to spend money to get the item. Returning the item (selling)
+  will increase your balance. In this mode all researches required only one item.
+  
+See [commands](#commands) to know how to change mode and prices for "Buy" mode
+
 ### Usage:
+
 Press `R` on your keyboard (configurable) to open the menu.
 
 In the menu you can...
+
 + Change item quality by clicking the quality button.
 + Change category filters by clicking the dropdown.
 + Scroll items with your mouse scroll wheel.
@@ -30,9 +47,10 @@ In the menu you can...
 Menu saves selected quality, category and search key
 
 ### Keys:
+
 Quality button:   
 `LMB` - next higher quality   
-`RMB` - previous higher quality   
+`RMB` - previous higher quality
 
 Sort option button:   
 `LMB` - next option   
@@ -48,12 +66,12 @@ Searchbar:
 `LMB` - focus / blur    
 `Hover` - focus / blur    
 `RMB` - clear searchbar   
-`ESC` - clear searchbar   
+`ESC` - clear searchbar
 
 Research area:   
 `LMB` - standard actions, like in chest / research    
 `RMB` - standard actions, like in chest     
-`Shift + LMB` - fast move an item to research area and back  
+`Shift + LMB` - fast move an item to research area and back
 
 Other:   
 `Scroll` - scroll cheat inventory   
@@ -63,12 +81,23 @@ Other:
 `Shift + LMB` - \*on trash can* delete all researched items
 
 ### Commands:
+
 ```
 research_unlock_all //unlock all items (in-game only, menu must be opened at least once)   
+
 research_unlock_active //unlock hotbar active item (in-game only, menu must be opened at least once)  
+
+research_set_mode [0/1] //change mod mode to Spawn (0) or Buy (1)
+
+research_set_price [0+] //change price for hotbar active item for "Buy" mode. Price must be non-negative!
+
+research_reset_price //reset price for hotbar active item for "Buy" mode to initial values
+
+research_reload_prices //load prices from price-config.json file
 ```
 
 ### Compatibility (at present):
-+ Only windows supported (not tested on others)
+
++ All platforms supported, but only working with __windows is guaranteed__
 + Only keyboard + mouse (gamepad not tested)
 + **SMAPI 3.9.5** or later
