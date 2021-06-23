@@ -30,11 +30,12 @@ namespace ItemResearchSpawner
 
             I18n.Init(helper.Translation);
 
-            _modManager ??= new ModManager(Monitor, _helper, _config);
+            _modManager ??= new ModManager(Monitor, _helper);
             _progressionManager ??= new ProgressionManager(Monitor, _helper);
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
+            helper.Events.GameLoop.GameLaunched += OnLaunched;
 
             helper.ConsoleCommands.Add("research_unlock_all", "unlock all items research progression",
                 UnlockAllProgression);
@@ -44,21 +45,86 @@ namespace ItemResearchSpawner
 
             helper.ConsoleCommands.Add("research_set_mode", "change mode to \n 0 - Spawn Mode \n 1 - Buy/Sell Mode",
                 SetMode);
-            
-            helper.ConsoleCommands.Add("research_set_price", "set hotbar active item price (globally, for mod menu only) \n 0+ values only",
+
+            helper.ConsoleCommands.Add("research_set_price",
+                "set hotbar active item price (globally, for mod menu only) \n 0+ values only",
                 SetPrice);
-            
-            helper.ConsoleCommands.Add("research_reset_price", "reset hotbar active item price (globally, for mod menu only)",
+
+            helper.ConsoleCommands.Add("research_reset_price",
+                "reset hotbar active item price (globally, for mod menu only)",
                 ResetPrice);
-            
+
             helper.ConsoleCommands.Add("research_reload_prices", "reload pricelist file",
                 ReloadPriceList);
         }
 
+        private void OnLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            var api = Helper.ModRegistry.GetApi<GenericModConfigMenuAPI>("spacechase0.GenericModConfigMenu");
+
+            if (api == null) return;
+
+            api.RegisterModConfig(ModManifest, () => _config = new ModConfig(), () => Helper.WriteConfig(_config));
+            api.RegisterLabel(ModManifest, "Description", "ModManifest.Description");
+            api.RegisterParagraph(ModManifest, ModManifest.Description.ToString());
+            api.RegisterLabel(ModManifest, "Mod config", ":)");
+            api.RegisterSimpleOption(ModManifest, "Menu open key", "Key to open mod menu",
+                () => _config.ShowMenuKey, val => _config.ShowMenuKey = val);
+
+            var availableModes = new List<string>(){"Spawn mode", "Buy/Sell mode"};
+            
+            api.RegisterChoiceOption(ModManifest, "Default mode", "Default mod menu mode", 
+                () => availableModes[(int)_config.DefaultMode], val => _config.DefaultMode = (ModMode) availableModes.IndexOf(val), availableModes.ToArray());
+        }
+
+        private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
+        {
+            if (!Context.IsPlayerFree)
+            {
+                return;
+            }
+
+            if (_config.ShowMenuKey.JustPressed())
+            {
+                Game1.activeClickableMenu = GetSpawnMenu();
+            }
+        }
+
+        private IClickableMenu GetSpawnMenu()
+        {
+            return new SpawnMenu(_items, Helper.Content, _helper, Monitor);
+        }
+
+        private IEnumerable<SpawnableItem> GetSpawnableItems()
+        {
+            var items = new ItemRepository().GetAll();
+
+            if (_itemData?.ProblematicItems?.Any() == true)
+            {
+                var problematicItems =
+                    new HashSet<string>(_itemData.ProblematicItems, StringComparer.OrdinalIgnoreCase);
+
+                items = items.Where(item => !problematicItems.Contains($"{item.Type}:{item.ID}"));
+            }
+
+            foreach (var entry in items)
+            {
+                var category = _categories?.FirstOrDefault(rule => rule.IsMatch(entry));
+                var label = category != null
+                    ? I18n.GetByKey(category.Label).Default(category.Label)
+                    : I18n.Category_Misc();
+
+                yield return new SpawnableItem(entry, label ?? I18n.Category_Misc(), category?.BaseCost ?? 100,
+                    category?.ResearchCount ?? 1);
+            }
+        }
+
+        #region Commands
+
         private void ReloadPriceList(string command, string[] args)
         {
             if (!CheckCommandInGame()) return;
-            
+
             ModManager.Instance.ReloadPriceList();
         }
 
@@ -84,7 +150,7 @@ namespace ItemResearchSpawner
             if (!CheckCommandInGame()) return;
 
             var activeItem = Game1.player.CurrentItem;
-            
+
             if (activeItem == null)
             {
                 Monitor.Log($"Select an item first", LogLevel.Info);
@@ -99,7 +165,7 @@ namespace ItemResearchSpawner
                     {
                         Monitor.Log($"Price must be a non-negative number", LogLevel.Info);
                     }
-                    
+
                     _modManager.SetItemPrice(activeItem, price);
                     Monitor.Log($"Price for {activeItem.DisplayName}, was changed to: {price}! ;)", LogLevel.Info);
                 }
@@ -167,46 +233,6 @@ namespace ItemResearchSpawner
             return true;
         }
 
-        private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
-        {
-            if (!Context.IsPlayerFree)
-            {
-                return;
-            }
-
-            if (_config.ShowMenuKey.JustPressed())
-            {
-                Game1.activeClickableMenu = GetSpawnMenu();
-            }
-        }
-
-        private IClickableMenu GetSpawnMenu()
-        {
-            return new SpawnMenu(_items, Helper.Content, _helper, Monitor);
-        }
-
-        private IEnumerable<SpawnableItem> GetSpawnableItems()
-        {
-            var items = new ItemRepository().GetAll();
-
-            if (_itemData?.ProblematicItems?.Any() == true)
-            {
-                var problematicItems =
-                    new HashSet<string>(_itemData.ProblematicItems, StringComparer.OrdinalIgnoreCase);
-
-                items = items.Where(item => !problematicItems.Contains($"{item.Type}:{item.ID}"));
-            }
-
-            foreach (var entry in items)
-            {
-                var category = _categories?.FirstOrDefault(rule => rule.IsMatch(entry));
-                var label = category != null
-                    ? I18n.GetByKey(category.Label).Default(category.Label)
-                    : I18n.Category_Misc();
-
-                yield return new SpawnableItem(entry, label ?? I18n.Category_Misc(), category?.BaseCost ?? 100,
-                    category?.ResearchCount ?? 1);
-            }
-        }
+        #endregion
     }
 }

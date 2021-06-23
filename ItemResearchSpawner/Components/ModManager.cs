@@ -14,7 +14,6 @@ namespace ItemResearchSpawner.Components
 
         private readonly IMonitor _monitor;
         private readonly IModHelper _helper;
-        private readonly ModConfig _config;
 
         public readonly Dictionary<string, SpawnableItem> ItemRegistry =
             new Dictionary<string, SpawnableItem>();
@@ -86,7 +85,7 @@ namespace ItemResearchSpawner.Components
 
         public event UpdateMenuView OnUpdateMenuView;
 
-        public ModManager(IMonitor monitor, IModHelper helper, ModConfig config)
+        public ModManager(IMonitor monitor, IModHelper helper)
         {
             Instance ??= this;
 
@@ -98,7 +97,6 @@ namespace ItemResearchSpawner.Components
 
             _monitor = monitor;
             _helper = helper;
-            _config = config;
 
             _helper.Events.GameLoop.Saving += OnSave;
             _helper.Events.GameLoop.DayStarted += OnLoad;
@@ -220,7 +218,7 @@ namespace ItemResearchSpawner.Components
             var state = _helper.Data.ReadJsonFile<ModState>(
                 $"save/{SaveHelper.DirectoryName}/state.json") ?? new ModState
             {
-                ActiveMode = _config.DefaultMode
+                ActiveMode = _helper.ReadConfig<ModConfig>().DefaultMode
             };
 
             ModMode = state.ActiveMode;

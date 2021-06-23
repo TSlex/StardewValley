@@ -74,13 +74,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>I18n.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModConfig.cs" />
     <Compile Include="Models\Enums\ItemQuality.cs" />
     <Compile Include="Models\Enums\ItemSortOption.cs" />
     <Compile Include="Models\Enums\ItemType.cs" />
     <Compile Include="Models\Enums\ModMode.cs" />
+    <Compile Include="Models\GenericModConfigMenuAPI.cs" />
     <Compile Include="Models\ItemRepository.cs" />
     <Compile Include="Models\MenuSettings.cs" />
-    <Compile Include="Models\ModConfig.cs" />
     <Compile Include="Models\ModDataCategory.cs" />
     <Compile Include="Models\ModDataCategoryRule.cs" />
     <Compile Include="Models\ModItemData.cs" />

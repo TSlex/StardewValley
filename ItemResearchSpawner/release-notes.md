@@ -11,6 +11,7 @@ Released 24 June 2021 for SMAPI 3.9.5 or later.
 * Moved hay to "Forage" category instead of "Misc"
 * Added commands for ProjectE like mode
 * Shift click insta deletes (or sells) items if they are researched
+* Added support for [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 
 ## 1.0.0-alpha
 Released 15 June 2021 for SMAPI 3.9.5 or later.

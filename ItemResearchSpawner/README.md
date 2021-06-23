@@ -30,7 +30,8 @@ This mod has two modes:
   Works almost like "Spawn" mode, but here you need to spend money to get the item. Returning the item (selling)
   will increase your balance. In this mode all researches required only one item.
   
-See [commands](#commands) to know how to change mode and prices for "Buy" mode
+See [commands](#commands) to know how to change mode and prices for "Buy" mode   
+In mod config, you can specify default mode!
 
 ### Usage:
 
