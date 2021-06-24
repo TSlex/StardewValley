@@ -38,7 +38,7 @@ Open mod categories file located in .../Stardew Valley/Mods/ItemResearchSpawner/
 
 File has the following syntax:
 
-```json
+```json5
 [
   {
     "Label": "category i18n name (do not change this)",
