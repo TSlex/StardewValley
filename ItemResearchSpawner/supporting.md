@@ -26,7 +26,7 @@ Where "_Deluxe Speed-Gro:466_" is unique key (case sensitive)
 
 ---
 Open you mod save file located in    
-.../Stardew Valley/Mods/ItemResearchSpawner/save/<farmer>_<farm>/progress.json
+.../Stardew Valley/Mods/ItemResearchSpawner/save/\<farmer\>_\<farm\>/progress.json
 
 Find your item key by searching it (Ctrl+F in most editors)
 
