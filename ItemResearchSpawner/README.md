@@ -73,14 +73,15 @@ Searchbar:
 Research area:   
 `LMB` - standard actions, like in chest / research    
 `RMB` - standard actions, like in chest     
-`Shift + LMB` - fast move an item to research area and back
+`Shift + LMB` - fast move an item to research area and back (if item not researched)
 
 Other:   
 `Scroll` - scroll cheat inventory   
 `Up/Down arrows` - scroll cheat inventory   
 `LMB` - move item to trash (only if researched) / drop items   
-`Delete` - delete an item (only if researched)   
-`Shift + LMB` - \*on trash can* delete all researched items
+`Delete` - delete an item (only if researched and only in "Spawn" mode)   
+`Shift + LMB (over trashcan)` - delete all researched items (or sells them in "Buy" mode)
+`Shift + LMB` - delete an item or sell it
 
 ### Commands:
 __In-game only, menu must be opened at least once!__
