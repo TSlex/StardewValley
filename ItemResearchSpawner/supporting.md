@@ -3,9 +3,9 @@
 If you want to support this mod development, you can:
 
 * [Help balancing categories](#balance-categories)
-* [Help balancing individual item prices for the "Buy" mode]()
-* [Suggest improvement on the forum]()
-* [Endorse this mod and tell somebody about it :)]()
+* [Help balancing individual item prices for the "Buy" mode](#balance-individual-item-prices)
+* [Suggest improvement on the forum](#suggest-improvement)
+* [Endorse this mod and tell somebody about it :)](#endorse-this-mod-and-tell-somebody-about-it)
 
 ### [Tip] How to get an item "Unique Key"
 
@@ -84,7 +84,45 @@ the first category that privatise the item, will have it. If you want to add ite
 
 ### Balance individual item prices
 
+You can change items prices (for menu only) by commands and file price-config.json
+
+```
+research_set_price [0+] //change price for hotbar active item for "Buy" mode. Price must be non-negative!
+
+research_reset_price //reset price for hotbar active item for "Buy" mode to initial values
+```
+
+This commands will change the item price globally for all farms   
+__Please open menu at least once and execute commands in game only!__
+
+In addition, you can change the config file located in
+.../Stardew Valley/Mods/ItemResearchSpawner/price-config.json
+
+File has the following syntax:
+
+```json5
+{
+  "Solar Essence:768": 99999, //"Unique Key": price (must be non-negative, can be 0)
+  ...
+}
+```
+
+Please pay attention to commas (or validate via any json validator online)
+
+You can add, modify and remove the items from this file. After saving the file execute the following command to 
+apply changes in game. Note the game auto-saves and loads the content of the file, so please execute command before continuing the game
+
+```
+research_reload_prices //load prices from price-config.json file
+```
+
 ### Suggest improvement
+
+You can suggest improvement on [forum](https://www.nexusmods.com/stardewvalley/mods/8933?tab=forum). But please consider the following
+* I might have no time or mood for your big plans, so please be patient, polite and understanding
+* I might not answer right away, but i will try to do this asap
+* I might not accept suggestion, if it changes a lot of functionality
+* Froggie memes will make me feel so much better :)
 
 ### Endorse this mod and tell somebody about it
 
