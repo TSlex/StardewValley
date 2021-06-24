@@ -77,7 +77,7 @@ Please pay attention to commas (or validate via any json validator online)
 To change research count, edit __\"ResearchCount\": \<number here\>__   
 To change base price, edit __\"BaseCost\": \<number here\>__ (number must be non-negative)
 
-To change which item belong to category please consider using [Unique Keys](#[Tip]-How-to-get-an-item-"Unique Key").
+To change which item belong to category please consider using [Unique Keys](#tip-how-to-get-an-item-unique-key).
 If you experienced enough you can use ObjCategory, ItemId, Class as well. However here is some note: this file is read top-down, so
 the first category that privatise the item, will have it. If you want to add item to category below, you __should add it to 
 "When" of new category and to "Except" in old category__.
