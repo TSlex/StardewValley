@@ -82,6 +82,8 @@ If you experienced enough you can use ObjCategory, ItemId, Class as well. Howeve
 the first category that privatise the item, will have it. If you want to add item to category below, you __should add it to 
 "When" of new category and to "Except" in old category__.
 
+You can upload you file or its content to ["Categories balancing" forum topic](https://www.nexusmods.com/stardewvalley/mods/8933/?tab=forum&topic_id=10179748)
+
 ### Balance individual item prices
 
 You can change items prices (for menu only) by commands and file price-config.json
@@ -116,6 +118,8 @@ apply changes in game. Note the game auto-saves and loads the content of the fil
 research_reload_prices //load prices from price-config.json file
 ```
 
+You can upload you file or its content to ["Individual item prices balancing" forum topic](https://www.nexusmods.com/stardewvalley/mods/8933/?tab=forum&topic_id=10179773)
+
 ### Suggest improvement
 
 You can suggest improvement on [forum](https://www.nexusmods.com/stardewvalley/mods/8933?tab=forum). But please consider the following
@@ -125,5 +129,4 @@ You can suggest improvement on [forum](https://www.nexusmods.com/stardewvalley/m
 * Froggie memes will make me feel so much better :)
 
 ### Endorse this mod and tell somebody about it
-
 :)
