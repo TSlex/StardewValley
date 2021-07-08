@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\CommandManager.cs" />
     <Compile Include="Components\ModManager.cs" />
     <Compile Include="Components\ProgressionManager.cs" />
     <Compile Include="Components\UI\CashTab.cs" />
