@@ -109,6 +109,12 @@ namespace ItemResearchSpawner.Components
             {
                 var key = Helpers.GetItemUniqueKey(spawnableItem.Item);
 
+                // fix copper pan
+                if (key.Equals("Copper Pan:-1") && spawnableItem.Type == ItemType.Hat)
+                {
+                    continue;
+                }
+
                 ItemRegistry[key] = spawnableItem;
             }
         }
