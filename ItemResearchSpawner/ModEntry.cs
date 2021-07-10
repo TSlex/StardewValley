@@ -63,7 +63,7 @@ namespace ItemResearchSpawner
 
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
-            if (!Context.IsPlayerFree)
+            if (!Context.IsPlayerFree || !Context.CanPlayerMove)
             {
                 return;
             }
