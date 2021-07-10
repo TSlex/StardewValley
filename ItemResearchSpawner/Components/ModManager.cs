@@ -215,18 +215,30 @@ namespace ItemResearchSpawner.Components
                 SearchText = SearchText,
                 Category = Category
             };
+            
+            _helper.Data.WriteSaveData(SaveHelper.ModStateKey, state);
 
-            _helper.Data.WriteJsonFile($"save/{SaveHelper.DirectoryName}/state.json", state);
             _helper.Data.WriteJsonFile($"price-config.json", CustomItemPriceList);
         }
 
         private void OnLoad(object sender, DayStartedEventArgs e)
         {
-            var state = _helper.Data.ReadJsonFile<ModState>(
-                $"save/{SaveHelper.DirectoryName}/state.json") ?? new ModState
+            ModState state;
+
+            try
             {
-                ActiveMode = _helper.ReadConfig<ModConfig>().DefaultMode
-            };
+                state = _helper.Data.ReadSaveData<ModState>(SaveHelper.ModStateKey) ?? new ModState
+                {
+                    ActiveMode = _helper.ReadConfig<ModConfig>().DefaultMode
+                };
+            }
+            catch (Exception _)
+            {
+                state = new ModState
+                {
+                    ActiveMode = _helper.ReadConfig<ModConfig>().DefaultMode
+                };
+            }
 
             ModMode = state.ActiveMode;
             Quality = state.Quality;

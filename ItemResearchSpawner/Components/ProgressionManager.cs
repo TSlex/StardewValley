@@ -252,15 +252,23 @@ namespace ItemResearchSpawner.Components
 
         private void SaveProgression()
         {
-            _helper.Data.WriteJsonFile($"save/{SaveHelper.DirectoryName}/progress.json", _progression);
-            _monitor.Log("Progression saved! :)", LogLevel.Debug);
+            _helper.Data.WriteSaveData(SaveHelper.ProgressionKey, _progression);
         }
 
         private void LoadProgression()
         {
-            var progressions =
-                _helper.Data.ReadJsonFile<Dictionary<string, ResearchProgression>>(
-                    $"save/{SaveHelper.DirectoryName}/progress.json") ?? new Dictionary<string, ResearchProgression>();
+            Dictionary<string, ResearchProgression> progressions;
+
+            try
+            {
+                progressions =
+                    _helper.Data.ReadSaveData<Dictionary<string, ResearchProgression>>(SaveHelper.ProgressionKey)
+                    ?? new Dictionary<string, ResearchProgression>();
+            }
+            catch (Exception _)
+            {
+                progressions = new Dictionary<string, ResearchProgression>();
+            }
 
             //save backward compatibility
             _progression = new Dictionary<string, ResearchProgression>();
@@ -279,8 +287,6 @@ namespace ItemResearchSpawner.Components
 
                 _progression[key] = pair.Value;
             }
-
-            _monitor.Log("Progression loaded! :)", LogLevel.Debug);
         }
 
         #endregion
