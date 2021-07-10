@@ -42,7 +42,7 @@ namespace ItemResearchSpawner.Components
 
         public ItemSortTab(IContentHelper content, IMonitor monitor, int x, int y)
         {
-            _sortTexture = content.Load<Texture2D>("assets/sort-icon.png");
+            _sortTexture = content.Load<Texture2D>("assets/images/sort-icon.png");
             
             _sortButton =
                 new ClickableComponent(

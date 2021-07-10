@@ -25,8 +25,8 @@ namespace ItemResearchSpawner
         {
             _helper = helper;
             _config = helper.ReadConfig<ModConfig>();
-            _itemData = helper.Data.ReadJsonFile<ModItemData>("assets/item-data.json");
-            _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/categories-progress.json");
+            _itemData = helper.Data.ReadJsonFile<ModItemData>("assets/config/item-data.json");
+            _categories = helper.Data.ReadJsonFile<ModDataCategory[]>("assets/config/categories-progress.json");
 
             I18n.Init(helper.Translation);
 

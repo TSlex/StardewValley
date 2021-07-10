@@ -1,5 +1,6 @@
 ﻿using System;
 using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Utils;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -39,6 +40,9 @@ namespace ItemResearchSpawner.Components
 
             helper.ConsoleCommands.Add("research_reload_prices", "reload pricelist file",
                 ReloadPriceList);
+            
+            helper.ConsoleCommands.Add("research_get_key", "get hotbar active item unique key",
+                GetUniqueKey);
         }
 
         private void UnlockAllProgression(string command, string[] args)
@@ -135,6 +139,22 @@ namespace ItemResearchSpawner.Components
             if (!CheckCommandInGame()) return;
 
             ModManager.Instance.ReloadPriceList();
+        }
+        
+        private void GetUniqueKey(string command, string[] args)
+        {
+            if (!CheckCommandInGame()) return;
+
+            var activeItem = Game1.player.CurrentItem;
+
+            if (activeItem == null)
+            {
+                _monitor.Log($"Select an item first", LogLevel.Info);
+            }
+            else
+            {
+                _monitor.Log($"{Helpers.GetItemUniqueKey(activeItem)}", LogLevel.Info);
+            }
         }
 
         private bool CheckCommandInGame()

@@ -16,7 +16,7 @@ namespace ItemResearchSpawner.Components
         
         public ItemQualitySelectorTab(IContentHelper content, IMonitor monitor, int x, int y)
         {
-            _emptyQualityTexture = content.Load<Texture2D>("assets/empty-quality-icon.png");
+            _emptyQualityTexture = content.Load<Texture2D>("assets/images/empty-quality-icon.png");
 
             _qualityButton =
                 new ClickableComponent(

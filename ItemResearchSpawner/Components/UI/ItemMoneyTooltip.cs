@@ -12,7 +12,7 @@ namespace ItemResearchSpawner.Components
 
         public ItemMoneyTooltip(IContentHelper content, IMonitor monitor)
         {
-            _coinTexture = content.Load<Texture2D>("assets/coin-icon.png");
+            _coinTexture = content.Load<Texture2D>("assets/images/coin-icon.png");
         }
 
         public void Draw(SpriteBatch spriteBatch, Item hoveredItem)

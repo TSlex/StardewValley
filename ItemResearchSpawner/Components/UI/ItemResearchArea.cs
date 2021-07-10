@@ -24,8 +24,8 @@ namespace ItemResearchSpawner.Components
 
         public ItemResearchArea(IContentHelper content, IMonitor monitor, int x, int y)
         {
-            _researchTexture = content.Load<Texture2D>("assets/search-button.png");
-            _sellTexture = content.Load<Texture2D>("assets/sell-button.png");
+            _researchTexture = content.Load<Texture2D>("assets/images/search-button.png");
+            _sellTexture = content.Load<Texture2D>("assets/images/sell-button.png");
 
             _researchArea = new ClickableComponent(new Rectangle(x, y, Game1.tileSize + 60, Game1.tileSize + 50), "");
 
