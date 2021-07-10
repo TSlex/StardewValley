@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\CommandManager.cs" />
+    <Compile Include="Components\ItemRepository.cs" />
     <Compile Include="Components\ModManager.cs" />
     <Compile Include="Components\ProgressionManager.cs" />
     <Compile Include="Components\UI\CashTab.cs" />
@@ -81,7 +82,6 @@
     <Compile Include="Models\Enums\ItemType.cs" />
     <Compile Include="Models\Enums\ModMode.cs" />
     <Compile Include="Models\GenericModConfigMenuAPI.cs" />
-    <Compile Include="Models\ItemRepository.cs" />
     <Compile Include="Models\MenuSettings.cs" />
     <Compile Include="Models\ModDataCategory.cs" />
     <Compile Include="Models\ModDataCategoryRule.cs" />

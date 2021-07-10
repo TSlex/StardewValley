@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Models.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using StardewValley;
@@ -10,7 +12,7 @@ using StardewValley.Objects;
 using StardewValley.Tools;
 using SObject = StardewValley.Object;
 
-namespace ItemResearchSpawner.Models
+namespace ItemResearchSpawner.Components
 {
     /**
         MIT License
@@ -60,9 +62,8 @@ namespace ItemResearchSpawner.Models
                             _ => ToolFactory.getToolFromDescription(ToolFactory.fishingRod, quality));
                 }
 
-                yield return
-                    TryCreate(ItemType.Tool, CustomIDOffset,
-                        _ => new MilkPail()); // these don't have any sort of ID, so we'll just assign some arbitrary ones
+                // these don't have any sort of ID, so we'll just assign some arbitrary ones
+                yield return TryCreate(ItemType.Tool, CustomIDOffset, _ => new MilkPail());
                 yield return TryCreate(ItemType.Tool, CustomIDOffset + 1, _ => new Shears());
                 yield return TryCreate(ItemType.Tool, CustomIDOffset + 2, _ => new Pan());
                 yield return TryCreate(ItemType.Tool, CustomIDOffset + 3, _ => new Wand());

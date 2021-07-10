@@ -1,7 +1,8 @@
-﻿using StardewModdingAPI;
+﻿using ItemResearchSpawner.Models.Enums;
+using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 
-namespace ItemResearchSpawner.Models
+namespace ItemResearchSpawner
 {
     public class ModConfig
     {

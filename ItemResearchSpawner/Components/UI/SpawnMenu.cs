@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Force.DeepCloner;
+using ItemResearchSpawner.Components.UI.Helpers;
 using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,11 +12,10 @@ using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using StardewValley.Menus;
 using StardewValley.Objects;
 using Object = StardewValley.Object;
 
-namespace ItemResearchSpawner.Components
+namespace ItemResearchSpawner.Components.UI
 {
     /**
         MIT License
@@ -734,10 +734,10 @@ namespace ItemResearchSpawner.Components
                 _ => items.OrderBy(p => p.Item.DisplayName)
             };
 
-            if (!Helpers.EqualsCaseInsensitive(_categorySelector.SelectedCategory, I18n.Category_All()))
+            if (!Utils.Helpers.EqualsCaseInsensitive(_categorySelector.SelectedCategory, I18n.Category_All()))
             {
                 items = items.Where(item =>
-                    Helpers.EqualsCaseInsensitive(item.Item.Category, _categorySelector.SelectedCategory));
+                    Utils.Helpers.EqualsCaseInsensitive(item.Item.Category, _categorySelector.SelectedCategory));
             }
 
             var search = ModManager.Instance.SearchText.Trim();

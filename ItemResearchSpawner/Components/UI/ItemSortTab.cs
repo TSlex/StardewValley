@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,7 +8,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace ItemResearchSpawner.Components
+namespace ItemResearchSpawner.Components.UI
 {
     /**
         MIT License

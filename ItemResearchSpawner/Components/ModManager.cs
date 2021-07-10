@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;

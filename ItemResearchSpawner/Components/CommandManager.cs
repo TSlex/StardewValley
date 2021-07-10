@@ -1,5 +1,6 @@
 ﻿using System;
 using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
 using StardewModdingAPI;
 using StardewValley;

@@ -1,5 +1,6 @@
 ﻿using System;
 using ItemResearchSpawner.Components;
+using ItemResearchSpawner.Models.Enums;
 using Object = StardewValley.Object;
 
 namespace ItemResearchSpawner.Models

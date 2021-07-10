@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace ItemResearchSpawner.Components
+namespace ItemResearchSpawner.Components.UI
 {
     public class ItemMoneyTooltip
     {

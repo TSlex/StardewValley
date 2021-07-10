@@ -6,7 +6,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace ItemResearchSpawner.Components
+namespace ItemResearchSpawner.Components.UI
 {
     /**
         MIT License

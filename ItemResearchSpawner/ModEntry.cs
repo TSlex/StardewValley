@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using ItemResearchSpawner.Components;
+using ItemResearchSpawner.Components.UI;
 using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Models.Enums;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;

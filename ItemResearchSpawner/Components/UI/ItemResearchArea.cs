@@ -1,5 +1,4 @@
-﻿using System;
-using ItemResearchSpawner.Models;
+﻿using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,7 +6,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace ItemResearchSpawner.Components
+namespace ItemResearchSpawner.Components.UI
 {
     internal class ItemResearchArea
     {

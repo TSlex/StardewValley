@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Force.DeepCloner;
 using ItemResearchSpawner.Models;
+using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;

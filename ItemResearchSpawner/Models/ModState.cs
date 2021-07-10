@@ -1,4 +1,6 @@
-﻿namespace ItemResearchSpawner.Models
+﻿using ItemResearchSpawner.Models.Enums;
+
+namespace ItemResearchSpawner.Models
 {
     public class ModState
     {
