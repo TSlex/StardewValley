@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Models.Enums;
+using ItemResearchSpawner.Models.Messages;
 using ItemResearchSpawner.Utils;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -15,6 +16,7 @@ namespace ItemResearchSpawner.Components
 
         private readonly IMonitor _monitor;
         private readonly IModHelper _helper;
+        private readonly IManifest _modManifest;
 
         public readonly Dictionary<string, SpawnableItem> ItemRegistry =
             new Dictionary<string, SpawnableItem>();
@@ -86,7 +88,7 @@ namespace ItemResearchSpawner.Components
 
         public event UpdateMenuView OnUpdateMenuView;
 
-        public ModManager(IMonitor monitor, IModHelper helper)
+        public ModManager(IMonitor monitor, IModHelper helper, IManifest modManifest)
         {
             Instance ??= this;
 
@@ -98,9 +100,11 @@ namespace ItemResearchSpawner.Components
 
             _monitor = monitor;
             _helper = helper;
+            _modManifest = modManifest;
 
-            _helper.Events.GameLoop.Saving += OnSave;
+            _helper.Events.GameLoop.DayEnding += OnSave;
             _helper.Events.GameLoop.DayStarted += OnLoad;
+            _helper.Events.Multiplayer.ModMessageReceived += OnMessageReceived;
         }
 
         public void InitRegistry(SpawnableItem[] items)
@@ -205,7 +209,44 @@ namespace ItemResearchSpawner.Components
 
         #region Save/Load
 
-        private void OnSave(object sender, SavingEventArgs e)
+        private void OnMessageReceived(object sender, ModMessageReceivedEventArgs e)
+        {
+            if (e.FromModID == _modManifest.UniqueID)
+            {
+                ModStateMessage message;
+                switch (e.Type)
+                {
+                    case "ModState:SaveRequired":
+                        if (!Context.IsMainPlayer)
+                        {
+                          break;  
+                        }
+                        message = e.ReadAs<ModStateMessage>();
+                        SaveManager.Instance.CommitModState(message.PlayerID, message.ModState);
+                        break;
+                    case "ModState:LoadRequired":
+                        if (!Context.IsMainPlayer)
+                        {
+                            break;  
+                        }
+                        var playerID = e.ReadAs<string>();
+                        message = new ModStateMessage
+                        {
+                            ModState = SaveManager.Instance.GetModState(playerID),
+                            PlayerID = playerID
+                        };
+                        _helper.Multiplayer.SendMessage(message, "ModState:LoadAccepted",
+                            new[] {_modManifest.UniqueID}, new []{long.Parse(message.PlayerID)});
+                        break;
+                    case "ModState:LoadAccepted":
+                        message = e.ReadAs<ModStateMessage>();
+                        OnLoadState(message.ModState);
+                        break;
+                }
+            }
+        }
+
+        private void OnSave(object sender, DayEndingEventArgs dayEndingEventArgs)
         {
             var state = new ModState
             {
@@ -215,37 +256,52 @@ namespace ItemResearchSpawner.Components
                 SearchText = SearchText,
                 Category = Category
             };
-            
-            _helper.Data.WriteSaveData(SaveHelper.ModStateKey, state);
+
+            if (Context.IsMainPlayer)
+            {
+                SaveManager.Instance.CommitModState(Game1.player.uniqueMultiplayerID.ToString(), state);
+            }
+            else
+            {
+                var message = new ModStateMessage
+                {
+                    ModState = state,
+                    PlayerID = Game1.player.uniqueMultiplayerID.ToString()
+                };
+
+                _helper.Multiplayer.SendMessage(message, "ModState:SaveRequired", new[] {_modManifest.UniqueID});
+            }
 
             _helper.Data.WriteJsonFile($"price-config.json", CustomItemPriceList);
         }
 
         private void OnLoad(object sender, DayStartedEventArgs e)
         {
-            ModState state;
-
-            try
+            if (Context.IsMainPlayer)
             {
-                state = _helper.Data.ReadSaveData<ModState>(SaveHelper.ModStateKey) ?? new ModState
-                {
-                    ActiveMode = _helper.ReadConfig<ModConfig>().DefaultMode
-                };
+                var state = SaveManager.Instance.GetModState(Game1.player.uniqueMultiplayerID.ToString());
+                OnLoadState(state);
             }
-            catch (Exception _)
+            else
             {
-                state = new ModState
-                {
-                    ActiveMode = _helper.ReadConfig<ModConfig>().DefaultMode
-                };
+                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, "ModState:LoadRequired",
+                    new[] {_modManifest.UniqueID});
             }
 
+            OnLoadPrices();
+        }
+
+        private void OnLoadState(ModState state)
+        {
             ModMode = state.ActiveMode;
             Quality = state.Quality;
             SortOption = state.SortOption;
             SearchText = state.SearchText;
             Category = state.Category;
-
+        }
+        
+        private void OnLoadPrices()
+        {
             CustomItemPriceList = _helper.Data.ReadJsonFile<Dictionary<string, int>>(
                 $"price-config.json") ?? new Dictionary<string, int>();
         }

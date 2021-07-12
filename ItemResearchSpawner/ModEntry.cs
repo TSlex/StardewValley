@@ -22,6 +22,7 @@ namespace ItemResearchSpawner
 
         private ProgressionManager _progressionManager;
         private ModManager _modManager;
+        private SaveManager _saveManage;
 
         public override void Entry(IModHelper helper)
         {
@@ -32,8 +33,9 @@ namespace ItemResearchSpawner
 
             I18n.Init(helper.Translation);
 
-            _modManager ??= new ModManager(Monitor, _helper);
-            _progressionManager ??= new ProgressionManager(Monitor, _helper);
+            _modManager ??= new ModManager(Monitor, _helper, ModManifest);
+            _progressionManager ??= new ProgressionManager(Monitor, _helper, ModManifest);
+            _saveManage ??= new SaveManager(Monitor, _helper, ModManifest);
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
             helper.Events.GameLoop.DayStarted += OnDayStarted;

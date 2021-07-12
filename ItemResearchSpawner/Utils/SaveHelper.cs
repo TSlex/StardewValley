@@ -8,8 +8,8 @@ namespace ItemResearchSpawner.Utils
 
         public const string PriceConfigPath = "assets/config/pricelist";
         
-        public const string ModStateKey = "tslex-research-state";
-        public const string ProgressionKey = "tslex-research-progression";
+        public const string ModStatesKey = "tslex-research-states";
+        public const string ProgressionsKey = "tslex-research-progressions";
         
         public const string PriceConfigKey = "tslex-research-pricelist";
         public const string CategoriesConfigKey = "tslex-research-categories";

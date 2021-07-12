@@ -60,6 +60,7 @@
     <Compile Include="Components\ItemRepository.cs" />
     <Compile Include="Components\ModManager.cs" />
     <Compile Include="Components\ProgressionManager.cs" />
+    <Compile Include="Components\SaveManager.cs" />
     <Compile Include="Components\UI\CashTab.cs" />
     <Compile Include="Components\UI\Helpers\Dropdown.cs" />
     <Compile Include="Components\UI\Helpers\DropdownList.cs" />
@@ -83,6 +84,8 @@
     <Compile Include="Models\Enums\ModMode.cs" />
     <Compile Include="Models\GenericModConfigMenuAPI.cs" />
     <Compile Include="Models\MenuSettings.cs" />
+    <Compile Include="Models\Messages\ModStateMessage.cs" />
+    <Compile Include="Models\Messages\ResearchProgressionMessage.cs" />
     <Compile Include="Models\ModDataCategory.cs" />
     <Compile Include="Models\ModDataCategoryRule.cs" />
     <Compile Include="Models\ModItemData.cs" />
