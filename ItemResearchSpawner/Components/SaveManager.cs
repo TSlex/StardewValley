@@ -18,37 +18,49 @@ namespace ItemResearchSpawner.Components
         private Dictionary<string, Dictionary<string, ResearchProgression>> _progressions;
         private Dictionary<string, ModState> _modStates;
 
+        private Dictionary<string, int> _pricelist;
+
         public SaveManager(IMonitor monitor, IModHelper helper, IManifest modManifest)
         {
             Instance ??= this;
-            
+
             if (Instance != this)
             {
                 monitor.Log($"Another instance of {nameof(ProgressionManager)} is created", LogLevel.Warn);
                 return;
             }
-            
+
             _monitor = monitor;
             _helper = helper;
             _modManifest = modManifest;
 
             _helper.Events.GameLoop.Saving += OnSave;
-            _helper.Events.GameLoop.Saved += OnLoad;
+            _helper.Events.GameLoop.SaveLoaded += OnLoad;
         }
 
         public void CommitProgression(string playerID, Dictionary<string, ResearchProgression> commitProgression)
         {
-            var progression = _progressions[playerID] ?? new Dictionary<string, ResearchProgression>();
+            var progression = GetProgression(playerID);
 
             foreach (var key in commitProgression.Keys)
             {
                 progression[key] = commitProgression[key];
             }
+
+            if (!_progressions.ContainsKey(playerID))
+            {
+                _progressions[playerID] = progression;
+            }
         }
 
         public Dictionary<string, ResearchProgression> GetProgression(string playerID)
         {
-            return _progressions[playerID] ?? new Dictionary<string, ResearchProgression>();
+            if (_progressions.ContainsKey(playerID))
+            {
+                return _progressions[playerID] ?? new Dictionary<string, ResearchProgression>();
+            }
+
+            return new Dictionary<string, ResearchProgression>();
         }
 
         public void CommitModState(string playerID, ModState modState)
@@ -58,19 +70,48 @@ namespace ItemResearchSpawner.Components
 
         public ModState GetModState(string playerID)
         {
-            return _modStates[playerID] ?? new ModState()
+            if (_modStates.ContainsKey(playerID))
+            {
+                return _modStates[playerID] ?? new ModState()
+                {
+                    ActiveMode = _helper.ReadConfig<ModConfig>().DefaultMode
+                };
+            }
+
+            return new ModState()
             {
                 ActiveMode = _helper.ReadConfig<ModConfig>().DefaultMode
             };
+        }
+
+        public void CommitPricelist(Dictionary<string, int> pricelist)
+        {
+            foreach (var key in pricelist.Keys)
+            {
+                _pricelist[key] = pricelist[key];
+            }
+        }
+
+        public Dictionary<string, int> GetPricelist()
+        {
+            return _pricelist;
         }
 
         private void OnSave(object sender, SavingEventArgs e)
         {
             _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressions);
             _helper.Data.WriteSaveData(SaveHelper.ModStatesKey, _modStates);
+            _helper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, _pricelist);
         }
 
-        private void OnLoad(object sender, SavedEventArgs e)
+        private void OnLoad(object sender, SaveLoadedEventArgs saveLoadedEventArgs)
+        {
+            LoadProgression();
+            LoadState();
+            LoadPricelist();
+        }
+
+        private void LoadProgression()
         {
             try
             {
@@ -83,7 +124,10 @@ namespace ItemResearchSpawner.Components
             {
                 _progressions = new Dictionary<string, Dictionary<string, ResearchProgression>>();
             }
+        }
 
+        private void LoadState()
+        {
             try
             {
                 _modStates = _helper.Data.ReadSaveData<Dictionary<string, ModState>>(SaveHelper.ModStatesKey) ??
@@ -93,6 +137,24 @@ namespace ItemResearchSpawner.Components
             {
                 _modStates = new Dictionary<string, ModState>();
             }
+        }
+
+        private void LoadPricelist()
+        {
+            if (!_helper.ReadConfig<ModConfig>().UseDefaultConfig)
+            {
+                try
+                {
+                    _pricelist = _helper.Data.ReadGlobalData<Dictionary<string, int>>(SaveHelper.PriceConfigKey);
+                }
+                catch (Exception _)
+                {
+                    _pricelist = null;
+                }
+            }
+
+            _pricelist ??= _helper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
+                           new Dictionary<string, int>();
         }
     }
 }

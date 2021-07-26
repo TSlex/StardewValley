@@ -8,5 +8,6 @@ namespace ItemResearchSpawner
     {
         public KeybindList ShowMenuKey { get; set; } = KeybindList.ForSingle(SButton.R);
         public ModMode DefaultMode { get; set; } = ModMode.Spawn;
+        public bool UseDefaultConfig { get; set; } = true;
     }
 }

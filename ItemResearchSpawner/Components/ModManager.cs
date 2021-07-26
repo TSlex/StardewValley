@@ -21,7 +21,7 @@ namespace ItemResearchSpawner.Components
         public readonly Dictionary<string, SpawnableItem> ItemRegistry =
             new Dictionary<string, SpawnableItem>();
 
-        public Dictionary<string, int> CustomItemPriceList =
+        public Dictionary<string, int> Pricelist =
             new Dictionary<string, int>();
 
         #region Proprerties
@@ -154,9 +154,9 @@ namespace ItemResearchSpawner.Components
             var spawnableItem = GetSpawnableItem(item, out var key);
             var price = -1;
 
-            if (CustomItemPriceList.ContainsKey(key))
+            if (Pricelist.ContainsKey(key))
             {
-                price = CustomItemPriceList[key];
+                price = Pricelist[key];
             }
 
             if (price < 0)
@@ -164,7 +164,7 @@ namespace ItemResearchSpawner.Components
                 price = Utility.getSellToStorePriceOfItem(item, false);
             }
 
-            if (price <= 0 && !CustomItemPriceList.ContainsKey(key))
+            if (price <= 0 && !Pricelist.ContainsKey(key))
             {
                 price = spawnableItem.CategoryPrice;
             }
@@ -181,16 +181,16 @@ namespace ItemResearchSpawner.Components
         {
             var key = Helpers.GetItemUniqueKey(activeItem);
 
-            if (price < 0 && CustomItemPriceList.ContainsKey(key))
+            if (price < 0 && Pricelist.ContainsKey(key))
             {
-                CustomItemPriceList.Remove(key);
+                Pricelist.Remove(key);
             }
             else
             {
-                CustomItemPriceList[key] = price;
+                Pricelist[key] = price;
             }
 
-            _helper.Data.WriteJsonFile($"price-config.json", CustomItemPriceList);
+            _helper.Data.WriteJsonFile($"price-config.json", Pricelist);
         }
 
         public SpawnableItem GetSpawnableItem(Item item, out string key)
@@ -206,6 +206,22 @@ namespace ItemResearchSpawner.Components
 
             return spawnableItem;
         }
+        
+        public void DumpPricelist(){
+        
+        }
+        
+        public void LoadPricelist(){
+        
+        }
+        
+        public void DumpCategories(){
+        
+        }
+        
+        public void LoadCategories(){
+        
+        }
 
         #region Save/Load
 
@@ -219,16 +235,18 @@ namespace ItemResearchSpawner.Components
                     case "ModState:SaveRequired":
                         if (!Context.IsMainPlayer)
                         {
-                          break;  
+                            break;
                         }
+
                         message = e.ReadAs<ModStateMessage>();
                         SaveManager.Instance.CommitModState(message.PlayerID, message.ModState);
                         break;
                     case "ModState:LoadRequired":
                         if (!Context.IsMainPlayer)
                         {
-                            break;  
+                            break;
                         }
+
                         var playerID = e.ReadAs<string>();
                         message = new ModStateMessage
                         {
@@ -236,7 +254,7 @@ namespace ItemResearchSpawner.Components
                             PlayerID = playerID
                         };
                         _helper.Multiplayer.SendMessage(message, "ModState:LoadAccepted",
-                            new[] {_modManifest.UniqueID}, new []{long.Parse(message.PlayerID)});
+                            new[] {_modManifest.UniqueID}, new[] {long.Parse(message.PlayerID)});
                         break;
                     case "ModState:LoadAccepted":
                         message = e.ReadAs<ModStateMessage>();
@@ -272,7 +290,10 @@ namespace ItemResearchSpawner.Components
                 _helper.Multiplayer.SendMessage(message, "ModState:SaveRequired", new[] {_modManifest.UniqueID});
             }
 
-            _helper.Data.WriteJsonFile($"price-config.json", CustomItemPriceList);
+            if (Context.IsMainPlayer)
+            {
+                SaveManager.Instance.CommitPricelist(Pricelist);
+            }
         }
 
         private void OnLoad(object sender, DayStartedEventArgs e)
@@ -299,19 +320,12 @@ namespace ItemResearchSpawner.Components
             SearchText = state.SearchText;
             Category = state.Category;
         }
-        
+
         private void OnLoadPrices()
         {
-            CustomItemPriceList = _helper.Data.ReadJsonFile<Dictionary<string, int>>(
-                $"price-config.json") ?? new Dictionary<string, int>();
+            Pricelist = SaveManager.Instance.GetPricelist();
         }
 
         #endregion
-
-        public void ReloadPriceList()
-        {
-            CustomItemPriceList = _helper.Data.ReadJsonFile<Dictionary<string, int>>(
-                $"price-config.json") ?? new Dictionary<string, int>();
-        }
     }
 }

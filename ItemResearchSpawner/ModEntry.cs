@@ -22,7 +22,7 @@ namespace ItemResearchSpawner
 
         private ProgressionManager _progressionManager;
         private ModManager _modManager;
-        private SaveManager _saveManage;
+        private SaveManager _saveManager;
 
         public override void Entry(IModHelper helper)
         {
@@ -33,9 +33,10 @@ namespace ItemResearchSpawner
 
             I18n.Init(helper.Translation);
 
+            _saveManager ??= new SaveManager(Monitor, _helper, ModManifest);
+            
             _modManager ??= new ModManager(Monitor, _helper, ModManifest);
             _progressionManager ??= new ProgressionManager(Monitor, _helper, ModManifest);
-            _saveManage ??= new SaveManager(Monitor, _helper, ModManifest);
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
@@ -61,6 +62,9 @@ namespace ItemResearchSpawner
             
             api.RegisterChoiceOption(ModManifest, "Default mode", "Mod menu mode for the new games", 
                 () => availableModes[(int)_config.DefaultMode], val => _config.DefaultMode = (ModMode) availableModes.IndexOf(val), availableModes.ToArray());
+            
+            api.RegisterSimpleOption(ModManifest, "Apply default config", "If true, mod will use predefined config in assets folder",
+                () => _config.UseDefaultConfig, val => _config.UseDefaultConfig = val);
         }
 
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)

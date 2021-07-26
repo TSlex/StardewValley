@@ -39,11 +39,32 @@ namespace ItemResearchSpawner.Components
                 "reset hotbar active item price (globally, for mod menu only)",
                 ResetPrice);
 
-            helper.ConsoleCommands.Add("research_reload_prices", "reload pricelist file",
-                ReloadPriceList);
-            
             helper.ConsoleCommands.Add("research_get_key", "get hotbar active item unique key",
                 GetUniqueKey);
+            
+            helper.ConsoleCommands.Add("research_dump_progression", "dump player(s) progression to file",
+                DumpProgression
+                );
+            
+            helper.ConsoleCommands.Add("research_load_progression", "load player(s) progression from file",
+                LoadProgression
+            );
+            
+            helper.ConsoleCommands.Add("research_dump_pricelist", "dump pricelist to file",
+                DumpPricelist
+            );
+            
+            helper.ConsoleCommands.Add("research_load_pricelist", "load pricelist from file",
+                LoadPricelist
+            );
+            
+            helper.ConsoleCommands.Add("research_dump_categories", "dump categories to file",
+                DumpCategories
+            );
+            
+            helper.ConsoleCommands.Add("research_load_categories", "load categories from file",
+                LoadCategories
+            );
         }
 
         private void UnlockAllProgression(string command, string[] args)
@@ -74,7 +95,7 @@ namespace ItemResearchSpawner.Components
 
         private void SetMode(string command, string[] args)
         {
-            if (!CheckCommandInGame()) return;
+            if (!CheckIsHostPlayer()) return;
 
             try
             {
@@ -89,7 +110,7 @@ namespace ItemResearchSpawner.Components
 
         private void SetPrice(string command, string[] args)
         {
-            if (!CheckCommandInGame()) return;
+            if (!CheckIsHostPlayer()) return;
 
             var activeItem = Game1.player.CurrentItem;
 
@@ -120,7 +141,7 @@ namespace ItemResearchSpawner.Components
 
         private void ResetPrice(string command, string[] args)
         {
-            if (!CheckCommandInGame()) return;
+            if (!CheckIsHostPlayer()) return;
 
             var activeItem = Game1.player.CurrentItem;
 
@@ -135,13 +156,6 @@ namespace ItemResearchSpawner.Components
             }
         }
 
-        private void ReloadPriceList(string command, string[] args)
-        {
-            if (!CheckCommandInGame()) return;
-
-            ModManager.Instance.ReloadPriceList();
-        }
-        
         private void GetUniqueKey(string command, string[] args)
         {
             if (!CheckCommandInGame()) return;
@@ -157,12 +171,53 @@ namespace ItemResearchSpawner.Components
                 _monitor.Log($"{Helpers.GetItemUniqueKey(activeItem)}", LogLevel.Info);
             }
         }
+        
+        private void DumpProgression(string command, string[] args)
+        {
+            ProgressionManager.Instance.DumpPlayersProgression();
+        }
+
+        private void LoadProgression(string command, string[] args)
+        {
+            ProgressionManager.Instance.LoadPlayersProgression();
+        }
+
+        private void DumpPricelist(string command, string[] args)
+        {
+            ModManager.Instance.DumpPricelist();
+        }
+
+        private void LoadPricelist(string command, string[] args)
+        {
+            ModManager.Instance.LoadPricelist();
+        }
+        
+        private void DumpCategories(string command, string[] args)
+        {
+            ModManager.Instance.DumpCategories();
+        }
+
+        private void LoadCategories(string command, string[] args)
+        {
+            ModManager.Instance.LoadCategories();
+        }
 
         private bool CheckCommandInGame()
         {
             if (!Game1.hasLoadedGame)
             {
                 _monitor.Log($"Use this command in-game", LogLevel.Info);
+                return false;
+            }
+
+            return true;
+        }
+        
+        private bool CheckIsHostPlayer()
+        {
+            if (!CheckCommandInGame() && Context.IsMainPlayer)
+            {
+                _monitor.Log($"This command is for host player only ", LogLevel.Info);
                 return false;
             }
 
