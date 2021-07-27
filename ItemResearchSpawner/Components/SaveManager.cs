@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Force.DeepCloner;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
@@ -54,22 +55,19 @@ namespace ItemResearchSpawner.Components
         {
             var progression = GetProgression(playerID);
 
-            foreach (var key in commitProgression.Keys)
+            foreach (var key in commitProgression.Keys.ToArray())
             {
                 progression[key] = commitProgression[key];
             }
 
-            if (!_progressions.ContainsKey(playerID))
-            {
-                _progressions[playerID] = progression;
-            }
+            _progressions[playerID] = progression;
         }
 
         public Dictionary<string, ResearchProgression> GetProgression(string playerID)
         {
             if (_progressions.ContainsKey(playerID))
             {
-                return _progressions[playerID] ?? new Dictionary<string, ResearchProgression>();
+                return _progressions[playerID].DeepClone() ?? new Dictionary<string, ResearchProgression>();
             }
 
             return new Dictionary<string, ResearchProgression>();
@@ -98,7 +96,7 @@ namespace ItemResearchSpawner.Components
 
         public void CommitPricelist(Dictionary<string, int> pricelist)
         {
-            foreach (var key in pricelist.Keys)
+            foreach (var key in pricelist.Keys.ToArray())
             {
                 _pricelist[key] = pricelist[key];
             }
@@ -106,7 +104,7 @@ namespace ItemResearchSpawner.Components
 
         public Dictionary<string, int> GetPricelist()
         {
-            return _pricelist;
+            return _pricelist.DeepClone();
         }
 
         private void OnSave(object sender, SavingEventArgs e)
@@ -114,6 +112,7 @@ namespace ItemResearchSpawner.Components
             if (_progressToLoad != null)
             {
                 _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressToLoad);
+                _progressions = _progressToLoad.DeepClone();
                 _progressToLoad = null;
             }
             else
