@@ -174,32 +174,58 @@ namespace ItemResearchSpawner.Components
         
         private void DumpProgression(string command, string[] args)
         {
+            if (!CheckIsHostPlayer()) return;
+            
             ProgressionManager.Instance.DumpPlayersProgression();
+            
+            _monitor.Log($"Progressions were dumped", LogLevel.Info);
         }
 
         private void LoadProgression(string command, string[] args)
         {
+            if (!CheckIsHostPlayer()) return;
+            
             ProgressionManager.Instance.LoadPlayersProgression();
+            
+            _monitor.Log($"Player(s) progression was loaded", LogLevel.Info);
+            _monitor.Log($"Note: all changes will be applied next day", LogLevel.Info);
+            _monitor.Log($"All changes made in game will be ignored", LogLevel.Info);
         }
 
         private void DumpPricelist(string command, string[] args)
         {
+            if (!CheckIsHostPlayer()) return;
+            
             ModManager.Instance.DumpPricelist();
+            
+            _monitor.Log($"Pricelist was dumped to {SaveHelper.PricelistDumpPath}", LogLevel.Info);
         }
 
         private void LoadPricelist(string command, string[] args)
         {
+            if (!CheckIsHostPlayer()) return;
+            
             ModManager.Instance.LoadPricelist();
+            
+            _monitor.Log($"Pricelist was loaded", LogLevel.Info);
         }
         
         private void DumpCategories(string command, string[] args)
         {
+            if (!CheckIsHostPlayer()) return;
+            
             ModManager.Instance.DumpCategories();
+            
+            _monitor.Log($"Categories was dumped to {SaveHelper.CategoriesDumpPath}", LogLevel.Info);
         }
 
         private void LoadCategories(string command, string[] args)
         {
+            if (!CheckIsHostPlayer()) return;
+            
             ModManager.Instance.LoadCategories();
+            
+            _monitor.Log($"Categories was loaded", LogLevel.Info);
         }
 
         private bool CheckCommandInGame()
@@ -223,5 +249,5 @@ namespace ItemResearchSpawner.Components
 
             return true;
         }
-    }   
+    }
 }

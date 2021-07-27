@@ -243,25 +243,39 @@ namespace ItemResearchSpawner.Components
 
         public void DumpPlayersProgression()
         {
-            foreach (var connectedPlayer in _helper.Multiplayer.GetConnectedPlayers())
+            var progressions = SaveManager.Instance.GetProgressions();
+            var players = Game1.getAllFarmers()
+                .Where(farmer => progressions.Keys.Contains(farmer.uniqueMultiplayerID.ToString()))
+                .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
+            
+            foreach (var playerID in progressions.Keys)
             {
-                _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(connectedPlayer.PlayerID),
-                    SaveManager.Instance.GetProgression(connectedPlayer.PlayerID.ToString()));
+                _monitor.Log($"Dumping progression - player: {players[playerID].name}, location: {SaveHelper.ProgressionDumpPath(playerID)}", LogLevel.Info);
+                _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(playerID), progressions[playerID]);
             }
         }
 
         public void LoadPlayersProgression()
         {
-            foreach (var connectedPlayer in _helper.Multiplayer.GetConnectedPlayers())
+            var progressions = SaveManager.Instance.GetProgressions();
+            var progressToLoad = new Dictionary<string, Dictionary<string, ResearchProgression>>();
+            
+            foreach (var playerID in progressions.Keys)
             {
-                var data = _helper.Data.ReadJsonFile<Dictionary<string, ResearchProgression>>(
-                    SaveHelper.ProgressionDumpPath(connectedPlayer.PlayerID));
+                var playerData = _helper.Data.ReadJsonFile<Dictionary<string, ResearchProgression>>(
+                    SaveHelper.ProgressionDumpPath(playerID));
 
-                if (data != null)
+                if (playerData != null)
                 {
-                    
+                    progressToLoad[playerID] = playerData;
+                }
+                else
+                {
+                    progressToLoad[playerID] = progressions[playerID];
                 }
             }
+            
+            SaveManager.Instance.LoadProgressions(progressToLoad);
         }
 
         #region SaveLoad

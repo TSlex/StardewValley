@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Force.DeepCloner;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Utils;
 using StardewModdingAPI;
@@ -16,6 +17,7 @@ namespace ItemResearchSpawner.Components
         private readonly IManifest _modManifest;
 
         private Dictionary<string, Dictionary<string, ResearchProgression>> _progressions;
+        private Dictionary<string, Dictionary<string, ResearchProgression>> _progressToLoad;
         private Dictionary<string, ModState> _modStates;
 
         private Dictionary<string, int> _pricelist;
@@ -36,6 +38,16 @@ namespace ItemResearchSpawner.Components
 
             _helper.Events.GameLoop.Saving += OnSave;
             _helper.Events.GameLoop.SaveLoaded += OnLoad;
+        }
+
+        public Dictionary<string, Dictionary<string, ResearchProgression>> GetProgressions()
+        {
+            return _progressions.DeepClone();
+        }
+        
+        public void LoadProgressions(Dictionary<string, Dictionary<string, ResearchProgression>> progressToLoad)
+        {
+            _progressToLoad = progressToLoad;
         }
 
         public void CommitProgression(string playerID, Dictionary<string, ResearchProgression> commitProgression)
@@ -99,7 +111,16 @@ namespace ItemResearchSpawner.Components
 
         private void OnSave(object sender, SavingEventArgs e)
         {
-            _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressions);
+            if (_progressToLoad != null)
+            {
+                _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressToLoad);
+                _progressToLoad = null;
+            }
+            else
+            {
+               _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressions); 
+            }
+            
             _helper.Data.WriteSaveData(SaveHelper.ModStatesKey, _modStates);
             _helper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, _pricelist);
         }
