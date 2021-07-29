@@ -353,24 +353,6 @@ namespace ItemResearchSpawner.Components
                 _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, MessageKeys.PROGRESSION_LOAD_REQUIRED,
                     new[] {_modManifest.UniqueID});
             }
-
-            /*//save backward compatibility
-            _progression = new Dictionary<string, ResearchProgression>();
-
-            var regex = new Regex(@"([\d+-]+):(.+):([\d+-]+)", RegexOptions.IgnoreCase);
-
-            foreach (var pair in progressions)
-            {
-                var key = pair.Key;
-                var match = regex.Match(key);
-
-                if (match.Success)
-                {
-                    key = $"{match.Groups[2]}:{match.Groups[3]}";
-                }
-
-                _progression[key] = pair.Value;
-            }*/
         }
 
         private void OnLoadProgression(Dictionary<string, ResearchProgression> progression)

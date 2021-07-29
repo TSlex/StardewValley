@@ -189,8 +189,6 @@ namespace ItemResearchSpawner.Components
             {
                 _pricelist[key] = price;
             }
-
-            // _helper.Data.WriteJsonFile($"price-config.json", _pricelist);
         }
 
         public SpawnableItem GetSpawnableItem(Item item, out string key)
@@ -405,15 +403,7 @@ namespace ItemResearchSpawner.Components
         private IEnumerable<SpawnableItem> GetSpawnableItems()
         {
             var items = new ItemRepository().GetAll();
-
-            // if (_itemData?.ProblematicItems?.Any() == true)
-            // {
-            //     var problematicItems =
-            //         new HashSet<string>(_itemData.ProblematicItems, StringComparer.OrdinalIgnoreCase);
-            //
-            //     items = items.Where(item => !problematicItems.Contains($"{item.Type}:{item.ID}"));
-            // }
-
+            
             foreach (var entry in items)
             {
                 var category = _categories?.FirstOrDefault(rule => rule.IsMatch(entry));
