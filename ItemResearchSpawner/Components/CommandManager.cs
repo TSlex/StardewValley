@@ -65,6 +65,23 @@ namespace ItemResearchSpawner.Components
             helper.ConsoleCommands.Add("research_load_categories", "load categories from file",
                 LoadCategories
             );
+
+            helper.ConsoleCommands.Add("research_use_defaults", "change config option of uning default configuration" +
+                                                                "\n0 - false" +
+                                                                "\n1 - true",
+                (_, args) =>
+                {
+                    var config = _helper.ReadConfig<ModConfig>();
+
+                    config.UseDefaultConfig = args[0] switch
+                    {
+                        "0" => false,
+                        "1" => true,
+                        _ => config.UseDefaultConfig
+                    };
+
+                    _helper.WriteConfig(config);
+                });
         }
 
         private void UnlockAllProgression(string command, string[] args)

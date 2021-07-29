@@ -84,7 +84,9 @@
     <Compile Include="Models\Enums\ModMode.cs" />
     <Compile Include="Models\GenericModConfigMenuAPI.cs" />
     <Compile Include="Models\MenuSettings.cs" />
+    <Compile Include="Models\Messages\CategoriesMessage.cs" />
     <Compile Include="Models\Messages\ModStateMessage.cs" />
+    <Compile Include="Models\Messages\PricelistMessage.cs" />
     <Compile Include="Models\Messages\ResearchProgressionMessage.cs" />
     <Compile Include="Models\ModDataCategory.cs" />
     <Compile Include="Models\ModDataCategoryRule.cs" />

@@ -22,6 +22,7 @@ namespace ItemResearchSpawner.Components
         private Dictionary<string, ModState> _modStates;
 
         private Dictionary<string, int> _pricelist;
+        private ICollection<ModDataCategory> _categories;
 
         public SaveManager(IMonitor monitor, IModHelper helper, IManifest modManifest)
         {
@@ -106,6 +107,16 @@ namespace ItemResearchSpawner.Components
         {
             return _pricelist.DeepClone();
         }
+        
+        public void CommitCategories(ModDataCategory[] categories)
+        {
+            _categories = categories;
+        }
+        
+        public ModDataCategory[] GetCategories()
+        {
+            return _categories.ToArray();
+        }
 
         private void OnSave(object sender, SavingEventArgs e)
         {
@@ -122,6 +133,7 @@ namespace ItemResearchSpawner.Components
             
             _helper.Data.WriteSaveData(SaveHelper.ModStatesKey, _modStates);
             _helper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, _pricelist);
+            _helper.Data.WriteGlobalData(SaveHelper.CategoriesConfigKey, _categories);
         }
 
         private void OnLoad(object sender, SaveLoadedEventArgs saveLoadedEventArgs)
@@ -129,6 +141,7 @@ namespace ItemResearchSpawner.Components
             LoadProgression();
             LoadState();
             LoadPricelist();
+            LoadCategories();
         }
 
         private void LoadProgression()
@@ -175,6 +188,24 @@ namespace ItemResearchSpawner.Components
 
             _pricelist ??= _helper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
                            new Dictionary<string, int>();
+        }
+        
+        private void LoadCategories()
+        {
+            if (!_helper.ReadConfig<ModConfig>().UseDefaultConfig)
+            {
+                try
+                {
+                    _categories = _helper.Data.ReadGlobalData<List<ModDataCategory>>(SaveHelper.CategoriesConfigKey);
+                }
+                catch (Exception _)
+                {
+                    _categories = null;
+                }
+            }
+
+            _categories ??= _helper.Data.ReadJsonFile<List<ModDataCategory>>(SaveHelper.CategoriesConfigPath) ??
+                            new List<ModDataCategory>();
         }
     }
 }
