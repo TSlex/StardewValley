@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Models.Messages;
@@ -24,8 +22,7 @@ namespace ItemResearchSpawner.Components
 
         private readonly ModDataCategory[] _categories;
 
-        private Dictionary<string, ResearchProgression> _progression =
-            new Dictionary<string, ResearchProgression>();
+        private Dictionary<string, ResearchProgression> _progression = new();
 
         public delegate void StackChanged(int newCount);
 
@@ -247,10 +244,12 @@ namespace ItemResearchSpawner.Components
             var players = Game1.getAllFarmers()
                 .Where(farmer => progressions.Keys.Contains(farmer.uniqueMultiplayerID.ToString()))
                 .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
-            
+
             foreach (var playerID in progressions.Keys)
             {
-                _monitor.Log($"Dumping progression - player: {players[playerID].name}, location: {SaveHelper.ProgressionDumpPath(playerID)}", LogLevel.Info);
+                _monitor.Log(
+                    $"Dumping progression - player: {players[playerID].name}, location: {SaveHelper.ProgressionDumpPath(playerID)}",
+                    LogLevel.Info);
                 _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(playerID), progressions[playerID]);
             }
         }
@@ -259,7 +258,7 @@ namespace ItemResearchSpawner.Components
         {
             var progressions = SaveManager.Instance.GetProgressions();
             var progressToLoad = new Dictionary<string, Dictionary<string, ResearchProgression>>();
-            
+
             foreach (var playerID in progressions.Keys)
             {
                 var playerData = _helper.Data.ReadJsonFile<Dictionary<string, ResearchProgression>>(
@@ -274,7 +273,7 @@ namespace ItemResearchSpawner.Components
                     progressToLoad[playerID] = progressions[playerID];
                 }
             }
-            
+
             SaveManager.Instance.LoadProgressions(progressToLoad);
         }
 
@@ -287,7 +286,7 @@ namespace ItemResearchSpawner.Components
                 ResearchProgressionMessage message;
                 switch (e.Type)
                 {
-                    case "Progression:SaveRequired":
+                    case MessageKeys.PROGRESSION_SAVE_REQUIRED:
                         if (!Context.IsMainPlayer)
                         {
                             break;
@@ -296,7 +295,8 @@ namespace ItemResearchSpawner.Components
                         message = e.ReadAs<ResearchProgressionMessage>();
                         SaveManager.Instance.CommitProgression(message.PlayerID, message.Progression);
                         break;
-                    case "Progression:LoadRequired":
+
+                    case MessageKeys.PROGRESSION_LOAD_REQUIRED:
                         if (!Context.IsMainPlayer)
                         {
                             break;
@@ -308,10 +308,11 @@ namespace ItemResearchSpawner.Components
                             Progression = SaveManager.Instance.GetProgression(playerID),
                             PlayerID = playerID
                         };
-                        _helper.Multiplayer.SendMessage(message, "Progression:LoadAccepted",
+                        _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_LOAD_ACCEPTED,
                             new[] {_modManifest.UniqueID}, new[] {long.Parse(message.PlayerID)});
                         break;
-                    case "Progression:LoadAccepted":
+
+                    case MessageKeys.PROGRESSION_LOAD_ACCEPTED:
                         message = e.ReadAs<ResearchProgressionMessage>();
                         OnLoadProgression(message.Progression);
                         break;
@@ -333,7 +334,8 @@ namespace ItemResearchSpawner.Components
                     PlayerID = Game1.player.uniqueMultiplayerID.ToString()
                 };
 
-                _helper.Multiplayer.SendMessage(message, "Progression:SaveRequired", new[] {_modManifest.UniqueID});
+                _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_SAVE_REQUIRED,
+                    new[] {_modManifest.UniqueID});
             }
         }
 
@@ -341,12 +343,14 @@ namespace ItemResearchSpawner.Components
         {
             if (Context.IsMainPlayer)
             {
-                var progression = SaveManager.Instance.GetProgression(Game1.player.uniqueMultiplayerID.ToString());
+                var progression =
+                    SaveManager.Instance.GetProgression(Game1.player.uniqueMultiplayerID.ToString());
+                
                 OnLoadProgression(progression);
             }
             else
             {
-                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, "Progression:LoadRequired",
+                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, MessageKeys.PROGRESSION_LOAD_REQUIRED,
                     new[] {_modManifest.UniqueID});
             }
 

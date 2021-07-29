@@ -1,0 +1,25 @@
+﻿namespace ItemResearchSpawner.Utils
+{
+    public static  class MessageKeys
+    {
+        /*ProgressionManager*/
+        public const string PROGRESSION_SAVE_REQUIRED = "Progression:SaveRequired";
+        public const string PROGRESSION_LOAD_REQUIRED = "Progression:LoadRequired";
+        public const string PROGRESSION_LOAD_ACCEPTED = "Progression:LoadAccepted";
+        
+        public const string PROGRESSION_MANAGER_SYNC = "ProgressionManager:Sync";
+        
+        /*ModManager*/
+        public const string MOD_STATE_SAVE_REQUIRED = "ModState:SaveRequired";
+        public const string MOD_STATE_LOAD_REQUIRED = "ModState:LoadRequired";
+        public const string MOD_STATE_LOAD_ACCEPTED = "ModState:LoadAccepted";
+        
+        public const string PRICELIST_LOAD_REQUIRED = "Pricelist:LoadRequired";
+        public const string PRICELIST_LOAD_ACCEPTED = "Pricelist:LoadAccepted";
+        
+        public const string CATEGORIES_LOAD_REQUIRED = "Categories:LoadRequired";
+        public const string CATEGORIES_LOAD_ACCEPTED = "Categories:LoadAccepted";
+        
+        public const string MOD_MANAGER_SYNC = "ModManager:Sync";
+    }
+}

@@ -3,7 +3,7 @@ using StardewValley;
 
 namespace ItemResearchSpawner.Utils
 {
-    internal static class SaveHelper
+    public static class SaveHelper
     {
         public static readonly Func<string, string> PlayerPath = playerID => $"saves/{Game1.player.Name}_{Game1.getFarm().NameOrUniqueName}/{playerID}";
         

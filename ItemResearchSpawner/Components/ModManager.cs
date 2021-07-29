@@ -81,9 +81,7 @@ namespace ItemResearchSpawner.Components
                 RequestMenuUpdate(true);
             }
         }
-
-        public ModDataCategory[] AvailableCategories => _categories;
-
+        
         #endregion
 
         public delegate void UpdateMenuView(bool rebuild);
@@ -109,18 +107,18 @@ namespace ItemResearchSpawner.Components
             _helper.Events.Multiplayer.ModMessageReceived += OnMessageReceived;
         }
 
-        public void InitRegistry(SpawnableItem[] items)
+        private void InitRegistry(IEnumerable<SpawnableItem> items)
         {
             foreach (var spawnableItem in items)
             {
                 var key = Helpers.GetItemUniqueKey(spawnableItem.Item);
-        
+
                 // fix copper pan
                 if (key.Equals("Copper Pan:-1") && spawnableItem.Type == ItemType.Hat)
                 {
                     continue;
                 }
-        
+
                 ItemRegistry[key] = spawnableItem;
             }
         }
@@ -192,7 +190,7 @@ namespace ItemResearchSpawner.Components
                 _pricelist[key] = price;
             }
 
-            _helper.Data.WriteJsonFile($"price-config.json", _pricelist);
+            // _helper.Data.WriteJsonFile($"price-config.json", _pricelist);
         }
 
         public SpawnableItem GetSpawnableItem(Item item, out string key)
@@ -208,21 +206,31 @@ namespace ItemResearchSpawner.Components
 
             return spawnableItem;
         }
-        
-        public void DumpPricelist(){
-        
+
+        public void DumpPricelist()
+        {
+            _helper.Data.WriteJsonFile(SaveHelper.PricelistDumpPath, _pricelist);
         }
-        
-        public void LoadPricelist(){
-        
+
+        public void LoadPricelist()
+        {
+            SaveManager.Instance.CommitPricelist(_helper.Data.ReadJsonFile<Dictionary<string, int>>(
+                SaveHelper.PricelistDumpPath));
+            
+            _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
         }
-        
-        public void DumpCategories(){
-        
+
+        public void DumpCategories()
+        {
+            _helper.Data.WriteJsonFile(SaveHelper.CategoriesDumpPath, _categories);
         }
-        
-        public void LoadCategories(){
-        
+
+        public void LoadCategories()
+        {
+            SaveManager.Instance.CommitCategories(_helper.Data.ReadJsonFile<ModDataCategory[]>(
+                SaveHelper.CategoriesDumpPath));
+            
+            _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
         }
 
         #region Save/Load
@@ -235,11 +243,11 @@ namespace ItemResearchSpawner.Components
                 PricelistMessage pricelistMessage;
                 CategoriesMessage categoriesMessage;
                 string playerID;
-                
+
                 switch (e.Type)
                 {
                     /*ModState messages*/
-                    case "ModState:SaveRequired":
+                    case MessageKeys.MOD_STATE_SAVE_REQUIRED:
                         if (!Context.IsMainPlayer)
                         {
                             break;
@@ -248,7 +256,8 @@ namespace ItemResearchSpawner.Components
                         modStateMessage = e.ReadAs<ModStateMessage>();
                         SaveManager.Instance.CommitModState(modStateMessage.PlayerID, modStateMessage.ModState);
                         break;
-                    case "ModState:LoadRequired":
+                    
+                    case MessageKeys.MOD_STATE_LOAD_REQUIRED:
                         if (!Context.IsMainPlayer)
                         {
                             break;
@@ -260,15 +269,17 @@ namespace ItemResearchSpawner.Components
                             ModState = SaveManager.Instance.GetModState(playerID),
                             PlayerID = playerID
                         };
-                        _helper.Multiplayer.SendMessage(modStateMessage, "ModState:LoadAccepted",
+                        _helper.Multiplayer.SendMessage(modStateMessage, MessageKeys.MOD_STATE_LOAD_ACCEPTED,
                             new[] {_modManifest.UniqueID}, new[] {long.Parse(modStateMessage.PlayerID)});
                         break;
-                    case "ModState:LoadAccepted":
+                    
+                    case MessageKeys.MOD_STATE_LOAD_ACCEPTED:
                         modStateMessage = e.ReadAs<ModStateMessage>();
                         OnLoadState(modStateMessage.ModState);
                         break;
+                    
                     /*Pricelist messages*/
-                    case "Pricelist:LoadRequired":
+                    case MessageKeys.PRICELIST_LOAD_REQUIRED:
                         if (!Context.IsMainPlayer)
                         {
                             break;
@@ -280,15 +291,16 @@ namespace ItemResearchSpawner.Components
                             Pricelist = SaveManager.Instance.GetPricelist(),
                             PlayerID = playerID
                         };
-                        _helper.Multiplayer.SendMessage(pricelistMessage, "Pricelist:LoadAccepted",
+                        _helper.Multiplayer.SendMessage(pricelistMessage, MessageKeys.PRICELIST_LOAD_ACCEPTED,
                             new[] {_modManifest.UniqueID}, new[] {long.Parse(pricelistMessage.PlayerID)});
                         break;
-                    case "Pricelist:LoadAccepted":
+                    case MessageKeys.PRICELIST_LOAD_ACCEPTED:
                         pricelistMessage = e.ReadAs<PricelistMessage>();
                         OnLoadPrices(pricelistMessage.Pricelist);
                         break;
+                    
                     /*Categories messages*/
-                    case "Categories:LoadRequired":
+                    case MessageKeys.CATEGORIES_LOAD_REQUIRED:
                         if (!Context.IsMainPlayer)
                         {
                             break;
@@ -300,12 +312,18 @@ namespace ItemResearchSpawner.Components
                             Categories = SaveManager.Instance.GetCategories(),
                             PlayerID = playerID
                         };
-                        _helper.Multiplayer.SendMessage(categoriesMessage, "Categories:LoadAccepted",
+                        _helper.Multiplayer.SendMessage(categoriesMessage, MessageKeys.CATEGORIES_LOAD_ACCEPTED,
                             new[] {_modManifest.UniqueID}, new[] {long.Parse(categoriesMessage.PlayerID)});
                         break;
-                    case "Categories:LoadAccepted":
+                    
+                    case MessageKeys.CATEGORIES_LOAD_ACCEPTED:
                         categoriesMessage = e.ReadAs<CategoriesMessage>();
                         OnLoadCategories(categoriesMessage.Categories);
+                        break;
+                    
+                    /*Sync*/
+                    case MessageKeys.MOD_MANAGER_SYNC:
+                        OnLoad(null, null);
                         break;
                 }
             }
@@ -334,7 +352,7 @@ namespace ItemResearchSpawner.Components
                     PlayerID = Game1.player.uniqueMultiplayerID.ToString()
                 };
 
-                _helper.Multiplayer.SendMessage(message, "ModState:SaveRequired", new[] {_modManifest.UniqueID});
+                _helper.Multiplayer.SendMessage(message, MessageKeys.MOD_STATE_SAVE_REQUIRED, new[] {_modManifest.UniqueID});
             }
 
             if (Context.IsMainPlayer)
@@ -353,11 +371,11 @@ namespace ItemResearchSpawner.Components
             }
             else
             {
-                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, "ModState:LoadRequired",
+                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, MessageKeys.MOD_STATE_LOAD_REQUIRED,
                     new[] {_modManifest.UniqueID});
-                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, "Pricelist:LoadRequired",
+                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, MessageKeys.PRICELIST_LOAD_REQUIRED,
                     new[] {_modManifest.UniqueID});
-                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, "Categories:LoadRequired",
+                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, MessageKeys.CATEGORIES_LOAD_REQUIRED,
                     new[] {_modManifest.UniqueID});
             }
         }
@@ -375,7 +393,7 @@ namespace ItemResearchSpawner.Components
         {
             _pricelist = pricelist;
         }
-        
+
         private void OnLoadCategories(ModDataCategory[] categories)
         {
             _categories = categories;
@@ -383,11 +401,11 @@ namespace ItemResearchSpawner.Components
         }
 
         #endregion
-        
+
         private IEnumerable<SpawnableItem> GetSpawnableItems()
         {
             var items = new ItemRepository().GetAll();
-        
+
             // if (_itemData?.ProblematicItems?.Any() == true)
             // {
             //     var problematicItems =
@@ -395,14 +413,14 @@ namespace ItemResearchSpawner.Components
             //
             //     items = items.Where(item => !problematicItems.Contains($"{item.Type}:{item.ID}"));
             // }
-        
+
             foreach (var entry in items)
             {
                 var category = _categories?.FirstOrDefault(rule => rule.IsMatch(entry));
                 var label = category != null
                     ? I18n.GetByKey(category.Label).Default(category.Label)
                     : I18n.Category_Misc();
-        
+
                 yield return new SpawnableItem(entry, label ?? I18n.Category_Misc(), category?.BaseCost ?? 100,
                     category?.ResearchCount ?? 1);
             }
