@@ -120,10 +120,14 @@ namespace ItemResearchSpawner.Components
         private void OnSave(object sender, SavingEventArgs e)
         {
             _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressions);
-            
+
             _helper.Data.WriteSaveData(SaveHelper.ModStatesKey, _modStates);
-            _helper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, _pricelist);
-            _helper.Data.WriteGlobalData(SaveHelper.CategoriesConfigKey, _categories);
+
+            if (!_helper.ReadConfig<ModConfig>().UseDefaultConfig)
+            {
+                _helper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, _pricelist);
+                _helper.Data.WriteGlobalData(SaveHelper.CategoriesConfigKey, _categories);
+            }
         }
 
         private void OnLoad(object sender, SaveLoadedEventArgs saveLoadedEventArgs)
@@ -174,10 +178,15 @@ namespace ItemResearchSpawner.Components
                 {
                     _pricelist = null;
                 }
-            }
 
-            _pricelist ??= _helper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
-                           new Dictionary<string, int>();
+                _pricelist ??= _helper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
+                               new Dictionary<string, int>();
+            }
+            else
+            {
+                _pricelist = _helper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
+                             new Dictionary<string, int>();
+            }
         }
 
         private void LoadCategories()
@@ -192,10 +201,15 @@ namespace ItemResearchSpawner.Components
                 {
                     _categories = null;
                 }
-            }
 
-            _categories ??= _helper.Data.ReadJsonFile<List<ModDataCategory>>(SaveHelper.CategoriesConfigPath) ??
-                            new List<ModDataCategory>();
+                _categories ??= _helper.Data.ReadJsonFile<List<ModDataCategory>>(SaveHelper.CategoriesConfigPath) ??
+                                new List<ModDataCategory>();
+            }
+            else
+            {
+                _categories = _helper.Data.ReadJsonFile<List<ModDataCategory>>(SaveHelper.CategoriesConfigPath) ??
+                              new List<ModDataCategory>();
+            }
         }
     }
 }

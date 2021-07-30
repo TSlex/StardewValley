@@ -207,11 +207,24 @@ namespace ItemResearchSpawner.Components
 
         public void DumpPricelist()
         {
-            _helper.Data.WriteJsonFile(SaveHelper.PricelistDumpPath, _pricelist);
+            var prices = _pricelist;
+
+            if (!_helper.ReadConfig<ModConfig>().UseDefaultConfig)
+            {
+                prices = _helper.Data.ReadGlobalData<Dictionary<string, int>>(SaveHelper.PriceConfigKey) ?? _pricelist;
+            }
+            
+            _helper.Data.WriteJsonFile(SaveHelper.PricelistDumpPath, prices);
         }
 
         public void LoadPricelist()
         {
+            if (_helper.ReadConfig<ModConfig>().UseDefaultConfig)
+            {
+                _monitor.Log("Note: default config is being used, your changes will be ignored unless you turn the use of default config off");
+                return;
+            }
+            
             SaveManager.Instance.CommitPricelist(_helper.Data.ReadJsonFile<Dictionary<string, int>>(
                 SaveHelper.PricelistDumpPath));
             
@@ -227,11 +240,24 @@ namespace ItemResearchSpawner.Components
 
         public void DumpCategories()
         {
-            _helper.Data.WriteJsonFile(SaveHelper.CategoriesDumpPath, _categories);
+            var categories = _categories;
+
+            if (!_helper.ReadConfig<ModConfig>().UseDefaultConfig)
+            {
+                categories = _categories = _helper.Data.ReadGlobalData<ModDataCategory[]>(SaveHelper.CategoriesConfigKey) ?? _categories;
+            }
+
+            _helper.Data.WriteJsonFile(SaveHelper.CategoriesDumpPath, categories);
         }
 
         public void LoadCategories()
         {
+            if (_helper.ReadConfig<ModConfig>().UseDefaultConfig)
+            {
+                _monitor.Log("Note: default config is being used, your changes will be ignored unless you turn the use of default config off");
+                return;
+            }
+            
             SaveManager.Instance.CommitCategories(_helper.Data.ReadJsonFile<ModDataCategory[]>(
                 SaveHelper.CategoriesDumpPath));
 
