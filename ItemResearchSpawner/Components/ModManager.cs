@@ -341,6 +341,8 @@ namespace ItemResearchSpawner.Components
             if (Context.IsMainPlayer)
             {
                 SaveManager.Instance.CommitModState(Game1.player.uniqueMultiplayerID.ToString(), state);
+                SaveManager.Instance.CommitPricelist(_pricelist);
+                SaveManager.Instance.CommitCategories(_categories);
             }
             else
             {
@@ -351,11 +353,6 @@ namespace ItemResearchSpawner.Components
                 };
 
                 _helper.Multiplayer.SendMessage(message, MessageKeys.MOD_STATE_SAVE_REQUIRED, new[] {_modManifest.UniqueID});
-            }
-
-            if (Context.IsMainPlayer)
-            {
-                SaveManager.Instance.CommitPricelist(_pricelist);
             }
         }
 

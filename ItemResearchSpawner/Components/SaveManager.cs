@@ -18,7 +18,6 @@ namespace ItemResearchSpawner.Components
         private readonly IManifest _modManifest;
 
         private Dictionary<string, Dictionary<string, ResearchProgression>> _progressions;
-        private Dictionary<string, Dictionary<string, ResearchProgression>> _progressToLoad;
         private Dictionary<string, ModState> _modStates;
 
         private Dictionary<string, int> _pricelist;
@@ -46,10 +45,10 @@ namespace ItemResearchSpawner.Components
         {
             return _progressions.DeepClone();
         }
-        
+
         public void LoadProgressions(Dictionary<string, Dictionary<string, ResearchProgression>> progressToLoad)
         {
-            _progressToLoad = progressToLoad;
+            _progressions = progressToLoad;
         }
 
         public void CommitProgression(string playerID, Dictionary<string, ResearchProgression> commitProgression)
@@ -107,12 +106,12 @@ namespace ItemResearchSpawner.Components
         {
             return _pricelist.DeepClone();
         }
-        
+
         public void CommitCategories(ModDataCategory[] categories)
         {
             _categories = categories;
         }
-        
+
         public ModDataCategory[] GetCategories()
         {
             return _categories.ToArray();
@@ -120,16 +119,7 @@ namespace ItemResearchSpawner.Components
 
         private void OnSave(object sender, SavingEventArgs e)
         {
-            if (_progressToLoad != null)
-            {
-                _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressToLoad);
-                _progressions = _progressToLoad.DeepClone();
-                _progressToLoad = null;
-            }
-            else
-            {
-               _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressions); 
-            }
+            _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressions);
             
             _helper.Data.WriteSaveData(SaveHelper.ModStatesKey, _modStates);
             _helper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, _pricelist);
@@ -189,7 +179,7 @@ namespace ItemResearchSpawner.Components
             _pricelist ??= _helper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
                            new Dictionary<string, int>();
         }
-        
+
         private void LoadCategories()
         {
             if (!_helper.ReadConfig<ModConfig>().UseDefaultConfig)

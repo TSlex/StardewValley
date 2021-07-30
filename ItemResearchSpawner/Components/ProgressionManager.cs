@@ -241,16 +241,28 @@ namespace ItemResearchSpawner.Components
         public void DumpPlayersProgression()
         {
             var progressions = SaveManager.Instance.GetProgressions();
-            var players = Game1.getAllFarmers()
+
+            var onlinePlayers = Game1.getOnlineFarmers()
                 .Where(farmer => progressions.Keys.Contains(farmer.uniqueMultiplayerID.ToString()))
                 .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
 
-            foreach (var playerID in progressions.Keys)
+            var offlinePlayers = Game1.getAllFarmers()
+                .Where(farmer => !onlinePlayers.Keys.Contains(farmer.UniqueMultiplayerID.ToString()))
+                .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
+
+            _helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_DUMP_REQUIRED,
+                new[] {_modManifest.UniqueID});
+
+            foreach (var player in offlinePlayers)
             {
                 _monitor.Log(
-                    $"Dumping progression - player: {players[playerID].name}, location: {SaveHelper.ProgressionDumpPath(playerID)}",
+                    $"Dumping progression - player: {player.Value.name}, location: {SaveHelper.ProgressionDumpPath(player.Key)}",
                     LogLevel.Info);
-                _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(playerID), progressions[playerID]);
+
+                _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(player.Key),
+                    progressions.ContainsKey(player.Key)
+                        ? progressions[player.Key]
+                        : new Dictionary<string, ResearchProgression>());
             }
         }
 
@@ -275,6 +287,8 @@ namespace ItemResearchSpawner.Components
             }
 
             SaveManager.Instance.LoadProgressions(progressToLoad);
+            
+            _helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_MANAGER_SYNC, new[] {_modManifest.UniqueID});
         }
 
         #region SaveLoad
@@ -316,6 +330,52 @@ namespace ItemResearchSpawner.Components
                         message = e.ReadAs<ResearchProgressionMessage>();
                         OnLoadProgression(message.Progression);
                         break;
+
+                    case MessageKeys.PROGRESSION_DUMP_REQUIRED:
+                        if (Context.IsMainPlayer)
+                        {
+                            _monitor.Log(
+                                $"Dumping progression - player: {Game1.player.name}, " +
+                                $"location: {SaveHelper.ProgressionDumpPath(Game1.player.uniqueMultiplayerID.ToString())}",
+                                LogLevel.Info);
+
+                            _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(Game1.player.uniqueMultiplayerID.ToString()),
+                                _progression);
+                        }
+                        else
+                        {
+                            message = new ResearchProgressionMessage
+                            {
+                                Progression = _progression,
+                                PlayerID = Game1.player.UniqueMultiplayerID.ToString()
+                            };
+                            
+                            _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_DUMP_ACCEPTED,
+                                new[] {_modManifest.UniqueID});
+                        }
+                        break;
+                    
+                    case MessageKeys.PROGRESSION_DUMP_ACCEPTED:
+                        if (!Context.IsMainPlayer)
+                        {
+                            break;
+                        }
+                        
+                        message = e.ReadAs<ResearchProgressionMessage>();
+                        var farmer = Game1.getAllFarmers()
+                            .FirstOrDefault(f => f.UniqueMultiplayerID.ToString().Equals(message.PlayerID));
+                        
+                        _monitor.Log(
+                            $"Dumping progression - player: {farmer?.name ?? "???"}, " +
+                            $"location: {SaveHelper.ProgressionDumpPath(message.PlayerID)}",
+                            LogLevel.Info);
+
+                        _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(message.PlayerID), message.Progression);
+                        break;
+                    
+                    case MessageKeys.PROGRESSION_MANAGER_SYNC:
+                        OnLoad(null, null);
+                        break;
                 }
             }
         }
@@ -345,7 +405,7 @@ namespace ItemResearchSpawner.Components
             {
                 var progression =
                     SaveManager.Instance.GetProgression(Game1.player.uniqueMultiplayerID.ToString());
-                
+
                 OnLoadProgression(progression);
             }
             else

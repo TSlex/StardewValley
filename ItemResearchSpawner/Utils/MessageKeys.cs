@@ -7,6 +7,9 @@
         public const string PROGRESSION_LOAD_REQUIRED = "Progression:LoadRequired";
         public const string PROGRESSION_LOAD_ACCEPTED = "Progression:LoadAccepted";
         
+        public const string PROGRESSION_DUMP_REQUIRED = "Progression:DumpRequired";
+        public const string PROGRESSION_DUMP_ACCEPTED = "Progression:DumpAccepted";
+        
         public const string PROGRESSION_MANAGER_SYNC = "ProgressionManager:Sync";
         
         /*ModManager*/
