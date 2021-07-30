@@ -22,7 +22,7 @@ namespace ItemResearchSpawner.Components
 
         private readonly ModDataCategory[] _categories;
 
-        private Dictionary<string, ResearchProgression> _progression = new();
+        private Dictionary<string, ResearchProgression> _progression = new Dictionary<string, ResearchProgression>();
 
         public delegate void StackChanged(int newCount);
 
@@ -247,7 +247,7 @@ namespace ItemResearchSpawner.Components
                 .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
 
             var offlinePlayers = Game1.getAllFarmers()
-                .Where(farmer => !onlinePlayers.Keys.Contains(farmer.UniqueMultiplayerID.ToString()))
+                .Where(farmer => !Context.IsMultiplayer || !onlinePlayers.Keys.Contains(farmer.UniqueMultiplayerID.ToString()))
                 .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
 
             _helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_DUMP_REQUIRED,
@@ -287,8 +287,15 @@ namespace ItemResearchSpawner.Components
             }
 
             SaveManager.Instance.LoadProgressions(progressToLoad);
-            
-            _helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_MANAGER_SYNC, new[] {_modManifest.UniqueID});
+
+            if (Context.IsMultiplayer)
+            {
+                _helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_MANAGER_SYNC, new[] {_modManifest.UniqueID});
+            }
+            else
+            {
+                OnLoad(null, null);
+            }
         }
 
         #region SaveLoad

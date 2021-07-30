@@ -19,7 +19,7 @@ namespace ItemResearchSpawner.Components
         private readonly IModHelper _helper;
         private readonly IManifest _modManifest;
 
-        public readonly Dictionary<string, SpawnableItem> ItemRegistry = new();
+        public readonly Dictionary<string, SpawnableItem> ItemRegistry = new Dictionary<string, SpawnableItem>();
 
         private Dictionary<string, int> _pricelist;
         private ModDataCategory[] _categories;
@@ -215,7 +215,14 @@ namespace ItemResearchSpawner.Components
             SaveManager.Instance.CommitPricelist(_helper.Data.ReadJsonFile<Dictionary<string, int>>(
                 SaveHelper.PricelistDumpPath));
             
-            _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
+            if (Context.IsMultiplayer)
+            {
+                _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
+            }
+            else
+            {
+                OnLoad(null, null);
+            }
         }
 
         public void DumpCategories()
@@ -227,8 +234,15 @@ namespace ItemResearchSpawner.Components
         {
             SaveManager.Instance.CommitCategories(_helper.Data.ReadJsonFile<ModDataCategory[]>(
                 SaveHelper.CategoriesDumpPath));
-            
-            _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
+
+            if (Context.IsMultiplayer)
+            {
+                _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
+            }
+            else
+            {
+                OnLoad(null, null);
+            }
         }
 
         #region Save/Load

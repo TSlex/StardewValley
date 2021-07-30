@@ -205,8 +205,8 @@ namespace ItemResearchSpawner.Components
             ProgressionManager.Instance.LoadPlayersProgression();
             
             _monitor.Log($"Player(s) progression was loaded", LogLevel.Info);
-            _monitor.Log($"Note: all changes will be applied next day", LogLevel.Info);
-            _monitor.Log($"All changes made in game will be ignored", LogLevel.Info);
+            // _monitor.Log($"Note: all changes will be applied next day", LogLevel.Info);
+            // _monitor.Log($"All changes made in game will be ignored", LogLevel.Info);
         }
 
         private void DumpPricelist(string command, string[] args)

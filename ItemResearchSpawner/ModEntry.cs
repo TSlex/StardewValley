@@ -76,7 +76,7 @@ namespace ItemResearchSpawner
 
         private IClickableMenu GetSpawnMenu()
         {
-            return new SpawnMenu(_items, Helper.Content, _helper, Monitor);
+            return new SpawnMenu(_modManager.ItemRegistry.Values.ToArray(), Helper.Content, _helper, Monitor);
         }
     }
 }
