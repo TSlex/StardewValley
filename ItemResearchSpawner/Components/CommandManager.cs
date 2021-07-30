@@ -273,7 +273,7 @@ namespace ItemResearchSpawner.Components
         {
             if (_helper.ReadConfig<ModConfig>().UseDefaultConfig)
             {
-                _monitor.Log($"Currently default config is used for prices and categories. Please turn that off in config first", LogLevel.Info);
+                _monitor.Log($"Currently default config is used for prices and categories. Please turn that off in config first :O", LogLevel.Warn);
                 return false;
             }
 

@@ -16,7 +16,6 @@ namespace ItemResearchSpawner
     {
         private ModConfig _config;
         private IModHelper _helper;
-        private SpawnableItem[] _items;
 
         private ProgressionManager _progressionManager;
         private ModManager _modManager;
@@ -57,7 +56,7 @@ namespace ItemResearchSpawner
             api.RegisterChoiceOption(ModManifest, "Default mode", "Mod menu mode for the new games", 
                 () => availableModes[(int)_config.DefaultMode], val => _config.DefaultMode = (ModMode) availableModes.IndexOf(val), availableModes.ToArray());
             
-            api.RegisterSimpleOption(ModManifest, "Apply default config", "If true, mod will use predefined config in assets folder",
+            api.RegisterSimpleOption(ModManifest, "Force default config", "If true, mod will use predefined config in assets folder such as pricelist and categories",
                 () => _config.UseDefaultConfig, val => _config.UseDefaultConfig = val);
         }
 
