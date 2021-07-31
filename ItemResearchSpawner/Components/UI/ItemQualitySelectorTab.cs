@@ -1,4 +1,5 @@
-﻿using ItemResearchSpawner.Models.Enums;
+﻿using System.IO;
+using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,7 +17,8 @@ namespace ItemResearchSpawner.Components.UI
         
         public ItemQualitySelectorTab(IContentHelper content, IMonitor monitor, int x, int y)
         {
-            _emptyQualityTexture = content.Load<Texture2D>("assets/images/empty-quality-icon.png");
+            // _emptyQualityTexture = content.Load<Texture2D>("assets/images/empty-quality-icon.png");
+            _emptyQualityTexture = content.Load<Texture2D>(Path.Combine("assets", "images", "empty-quality-icon.png"));
 
             _qualityButton =
                 new ClickableComponent(

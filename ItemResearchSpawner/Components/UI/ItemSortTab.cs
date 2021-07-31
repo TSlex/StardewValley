@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
@@ -42,7 +43,8 @@ namespace ItemResearchSpawner.Components.UI
 
         public ItemSortTab(IContentHelper content, IMonitor monitor, int x, int y)
         {
-            _sortTexture = content.Load<Texture2D>("assets/images/sort-icon.png");
+            // _sortTexture = content.Load<Texture2D>("assets/images/sort-icon.png");
+            _sortTexture = content.Load<Texture2D>(Path.Combine("assets", "images", "sort-icon.png"));
             
             _sortButton =
                 new ClickableComponent(

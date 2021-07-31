@@ -1,4 +1,5 @@
-﻿using ItemResearchSpawner.Utils;
+﻿using System.IO;
+using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -18,7 +19,8 @@ namespace ItemResearchSpawner.Components.UI
         public CashTab(IContentHelper content, IMonitor monitor, int x, int y, int width)
         {
             _width = width;
-            _coinTexture = content.Load<Texture2D>("assets/images/coin-icon.png");
+            // _coinTexture = content.Load<Texture2D>("assets/images/coin-icon.png");
+            _coinTexture = content.Load<Texture2D>(Path.Combine("assets", "images", "coin-icon.png"));
 
             _balanceArea = new ClickableComponent(
                 new Rectangle(x, y, width, Game1.tileSize), "");

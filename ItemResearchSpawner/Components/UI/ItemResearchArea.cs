@@ -1,4 +1,5 @@
-﻿using ItemResearchSpawner.Models.Enums;
+﻿using System.IO;
+using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,8 +24,11 @@ namespace ItemResearchSpawner.Components.UI
 
         public ItemResearchArea(IContentHelper content, IMonitor monitor, int x, int y)
         {
-            _researchTexture = content.Load<Texture2D>("assets/images/search-button.png");
-            _sellTexture = content.Load<Texture2D>("assets/images/sell-button.png");
+            // _researchTexture = content.Load<Texture2D>("assets/images/search-button.png");
+            // _sellTexture = content.Load<Texture2D>("assets/images/sell-button.png");
+            
+            _researchTexture = content.Load<Texture2D>(Path.Combine("assets", "images", "search-button"));
+            _sellTexture = content.Load<Texture2D>(Path.Combine("assets", "images", "sell-button.png"));
 
             _researchArea = new ClickableComponent(new Rectangle(x, y, Game1.tileSize + 60, Game1.tileSize + 50), "");
 
