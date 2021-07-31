@@ -32,6 +32,8 @@ namespace ItemResearchSpawner.Components
         private string _searchText;
         private string _category;
 
+        public ModDataCategory[] AvailableCategories => _categories;
+
         public ItemQuality Quality
         {
             get => _quality;

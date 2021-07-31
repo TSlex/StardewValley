@@ -1,5 +1,4 @@
 ﻿using System;
-using ItemResearchSpawner.Models;
 using ItemResearchSpawner.Models.Enums;
 using ItemResearchSpawner.Utils;
 using StardewModdingAPI;
@@ -197,7 +196,7 @@ namespace ItemResearchSpawner.Components
             
             ProgressionManager.Instance.DumpPlayersProgression();
             
-            _monitor.Log($"Progressions were dumped", LogLevel.Info);
+            _monitor.Log($"Player(s) Progressions were dumped", LogLevel.Info);
         }
 
         private void LoadProgression(string command, string[] args)
@@ -206,7 +205,7 @@ namespace ItemResearchSpawner.Components
             
             ProgressionManager.Instance.LoadPlayersProgression();
             
-            _monitor.Log($"Player(s) progression was loaded", LogLevel.Info);
+            _monitor.Log($"Player(s) progressions was loaded", LogLevel.Info);
         }
 
         private void DumpPricelist(string command, string[] args)
