@@ -47,9 +47,9 @@ namespace ItemResearchSpawner.Components
 
         public void ResearchItem(Item item)
         {
-            var (itemProgression, progressionMax) = GetItemProgressionRaw(item, out var progressionItem);
+            var itemProgressionRaw = GetItemProgressionRaw(item, out var progressionItem);
 
-            if (progressionMax <= 0 || itemProgression >= progressionMax)
+            if (itemProgressionRaw.max <= 0 || itemProgressionRaw.current >= itemProgressionRaw.max)
             {
                 if (ModManager.Instance.ModMode == ModMode.Buy)
                 {
@@ -59,7 +59,7 @@ namespace ItemResearchSpawner.Components
                 return;
             }
 
-            var needCount = progressionMax - itemProgression;
+            var needCount = itemProgressionRaw.max - itemProgressionRaw.current;
 
             var progressCount = item.Stack > needCount ? needCount : item.Stack;
 
@@ -102,9 +102,9 @@ namespace ItemResearchSpawner.Components
 
         public bool ItemResearched(Item item)
         {
-            var (itemProgression, maxProgression) = GetItemProgressionRaw(item, out _);
+            var itemProgressionRaw = GetItemProgressionRaw(item, out _);
 
-            return maxProgression > 0 && itemProgression >= maxProgression;
+            return itemProgressionRaw.max > 0 && itemProgressionRaw.current >= itemProgressionRaw.max;
         }
 
         public void UnlockAllProgression()
@@ -156,14 +156,14 @@ namespace ItemResearchSpawner.Components
 
         public string GetItemProgression(Item item, bool itemActive = false)
         {
-            var (itemProgression, maxProgression) = GetItemProgressionRaw(item, out _, itemActive);
+            var itemProgressionRaw = GetItemProgressionRaw(item, out _, itemActive);
 
-            if (maxProgression <= 0)
+            if (itemProgressionRaw.max <= 0)
             {
                 return "???";
             }
 
-            return $"({itemProgression} / {maxProgression})";
+            return $"({itemProgressionRaw.current} / {itemProgressionRaw.current})";
         }
 
         private static void OnResearchCompleted()
@@ -171,7 +171,7 @@ namespace ItemResearchSpawner.Components
             ModManager.Instance.RequestMenuUpdate(true);
         }
 
-        private (int current, int max) GetItemProgressionRaw(Item item,
+        private ItemProgressionRaw GetItemProgressionRaw(Item item,
             out ResearchProgression progressionItem, bool itemActive = false)
         {
             var spawnableItem = ModManager.Instance.GetSpawnableItem(item, out _);
@@ -181,7 +181,7 @@ namespace ItemResearchSpawner.Components
             return GetItemProgressionRaw(spawnableItem, out progressionItem, itemQuality, itemActive);
         }
 
-        private (int current, int max) GetItemProgressionRaw(SpawnableItem item,
+        private ItemProgressionRaw GetItemProgressionRaw(SpawnableItem item,
             out ResearchProgression progressionItem, ItemQuality quality = ItemQuality.Normal, bool itemActive = false)
         {
             var category =
@@ -214,7 +214,11 @@ namespace ItemResearchSpawner.Components
 
             itemProgression = (int) MathHelper.Clamp(itemProgression, 0, maxProgression);
 
-            return (itemProgression, maxProgression);
+            return new ItemProgressionRaw
+            {
+                current = itemProgression,
+                max = maxProgression
+            };
         }
 
         private ResearchProgression TryInitAndReturnProgressionItem(Item item)
