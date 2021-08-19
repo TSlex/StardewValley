@@ -20,6 +20,7 @@ namespace ItemResearchSpawner.Utils
 
         public static string PricelistConfigPath => Path.Combine(AssetsConfigPath, "pricelist.json");
         public static string CategoriesConfigPath => Path.Combine(AssetsConfigPath, "categories.json");
+        public static string BannedItemsConfigPath => Path.Combine(AssetsConfigPath, "banlist.json");
 
         // public const string PricelistDumpPath = "saves/pricelist.json";
         // public const string CategoriesDumpPath = "saves/categories.json";

@@ -49,13 +49,18 @@ namespace ItemResearchSpawner.Components
         {
             var itemProgressionRaw = GetItemProgressionRaw(item, out var progressionItem);
 
-            if (itemProgressionRaw.max <= 0 || itemProgressionRaw.current >= itemProgressionRaw.max)
+            if (itemProgressionRaw.max < 0)
+            {
+                return;
+            }
+            
+            if (itemProgressionRaw.current >= itemProgressionRaw.max)
             {
                 if (ModManager.Instance.ModMode == ModMode.Buy)
                 {
                     OnStackChanged?.Invoke(0);
                 }
-
+            
                 return;
             }
 
@@ -160,7 +165,12 @@ namespace ItemResearchSpawner.Components
 
             if (itemProgressionRaw.max <= 0)
             {
-                return "???";
+                return "(X)";
+            }
+            
+            if (ModManager.Instance.ModMode == ModMode.Buy)
+            {
+                return "($$$)";
             }
 
             return $"({itemProgressionRaw.current} / {itemProgressionRaw.max})";
@@ -175,6 +185,17 @@ namespace ItemResearchSpawner.Components
             out ResearchProgression progressionItem, bool itemActive = false)
         {
             var spawnableItem = ModManager.Instance.GetSpawnableItem(item, out _);
+
+            if (spawnableItem == null)
+            {
+                progressionItem = null;
+                
+                return new ItemProgressionRaw
+                {
+                    current = -1,
+                    max = -1
+                };
+            }
 
             var itemQuality = (ItemQuality) ((item as Object)?.Quality ?? 0);
 

@@ -15,12 +15,16 @@ namespace ItemResearchSpawner.Components.UI
         {
             // _coinTexture = content.Load<Texture2D>("assets/images/coin-icon.png");
             _coinTexture = content.Load<Texture2D>(Path.Combine("assets", "images", "coin-icon.png"));
-            
         }
 
         public void Draw(SpriteBatch spriteBatch, Item hoveredItem)
         {
             var cost = ModManager.Instance.GetItemPrice(hoveredItem);
+
+            if (cost <= 0)
+            {
+                return;
+            }
 
             var costText = hoveredItem.Stack > 1 ? $"{cost * hoveredItem.Stack}({cost})" : $"{cost}";
 
