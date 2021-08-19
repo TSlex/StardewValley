@@ -84,6 +84,11 @@ namespace ItemResearchSpawner.Components
             {
                 progressionItem.ResearchCountIridium += progressCount;
             }
+            
+            if (item.Stack >= progressCount)
+            {
+                OnResearchCompleted();
+            }
 
             if (ModManager.Instance.ModMode == ModMode.Buy)
             {
@@ -92,11 +97,6 @@ namespace ItemResearchSpawner.Components
             else
             {
                 OnStackChanged?.Invoke(item.Stack - progressCount);
-            }
-
-            if (item.Stack >= progressCount)
-            {
-                OnResearchCompleted();
             }
         }
 
@@ -145,13 +145,13 @@ namespace ItemResearchSpawner.Components
         public IEnumerable<ResearchableItem> GetResearchedItems()
         {
             return ModManager.Instance.ItemRegistry.Values
-                .Select(item => new ResearchableItem
+                .Select(i => new ResearchableItem
                 {
-                    Item = item,
-                    Progression = TryInitAndReturnProgressionItem(item.Item)
+                    Item = i,
+                    Progression = TryInitAndReturnProgressionItem(i.Item)
                 })
-                .Where(item =>
-                    item.Progression.ResearchCount >= item.Item.ProgressionLimit && item.Item.ProgressionLimit > 0);
+                .Where(i =>
+                    i.Progression.ResearchCount >= i.Item.ProgressionLimit && i.Item.ProgressionLimit > 0);
         }
 
         public string GetItemProgression(Item item, bool itemActive = false)
@@ -163,7 +163,7 @@ namespace ItemResearchSpawner.Components
                 return "???";
             }
 
-            return $"({itemProgressionRaw.current} / {itemProgressionRaw.current})";
+            return $"({itemProgressionRaw.current} / {itemProgressionRaw.max})";
         }
 
         private static void OnResearchCompleted()
