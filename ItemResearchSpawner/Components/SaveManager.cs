@@ -37,6 +37,11 @@ namespace ItemResearchSpawner.Components
             _helper = helper;
             _modManifest = modManifest;
 
+            _progressions = new Dictionary<string, Dictionary<string, ResearchProgression>>();
+            _modStates = new Dictionary<string, ModState>();
+            _pricelist = new Dictionary<string, int>();
+            _categories = new List<ModDataCategory>();
+
             _helper.Events.GameLoop.Saving += OnSave;
             _helper.Events.GameLoop.SaveLoaded += OnLoad;
         }
@@ -107,14 +112,14 @@ namespace ItemResearchSpawner.Components
             return _pricelist.DeepClone();
         }
 
-        public void CommitCategories(ModDataCategory[] categories)
+        public void CommitCategories(List<ModDataCategory> categories)
         {
             _categories = categories;
         }
 
-        public ModDataCategory[] GetCategories()
+        public List<ModDataCategory> GetCategories()
         {
-            return _categories.ToArray();
+            return _categories.ToList();
         }
 
         private void OnSave(object sender, SavingEventArgs e)

@@ -1,8 +1,10 @@
-﻿namespace ItemResearchSpawner.Models.Messages
+﻿using System.Collections.Generic;
+
+namespace ItemResearchSpawner.Models.Messages
 {
     public class CategoriesMessage
     {
         public string PlayerID { get; set; }
-        public ModDataCategory[] Categories { get; set; }
+        public List<ModDataCategory> Categories { get; set; }
     }
 }

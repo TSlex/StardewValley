@@ -22,7 +22,7 @@ namespace ItemResearchSpawner.Components
         public readonly Dictionary<string, SpawnableItem> ItemRegistry = new Dictionary<string, SpawnableItem>();
 
         private Dictionary<string, int> _pricelist;
-        private ModDataCategory[] _categories;
+        private List<ModDataCategory> _categories;
 
         #region Proprerties
 
@@ -32,7 +32,7 @@ namespace ItemResearchSpawner.Components
         private string _searchText;
         private string _category;
 
-        public ModDataCategory[] AvailableCategories => _categories;
+        public ModDataCategory[] AvailableCategories => _categories.ToArray();
 
         public ItemQuality Quality
         {
@@ -103,6 +103,9 @@ namespace ItemResearchSpawner.Components
             _monitor = monitor;
             _helper = helper;
             _modManifest = modManifest;
+            
+            _pricelist = new Dictionary<string, int>();
+            _categories = new List<ModDataCategory>();
 
             _helper.Events.GameLoop.DayEnding += OnSave;
             _helper.Events.GameLoop.DayStarted += OnLoad;
@@ -246,7 +249,7 @@ namespace ItemResearchSpawner.Components
 
             if (!_helper.ReadConfig<ModConfig>().UseDefaultConfig)
             {
-                categories = _categories = _helper.Data.ReadGlobalData<ModDataCategory[]>(SaveHelper.CategoriesConfigKey) ?? _categories;
+                categories = _categories = _helper.Data.ReadGlobalData<List<ModDataCategory>>(SaveHelper.CategoriesConfigKey) ?? _categories;
             }
 
             _helper.Data.WriteJsonFile(SaveHelper.CategoriesDumpPath, categories);
@@ -260,7 +263,7 @@ namespace ItemResearchSpawner.Components
                 return;
             }
             
-            SaveManager.Instance.CommitCategories(_helper.Data.ReadJsonFile<ModDataCategory[]>(
+            SaveManager.Instance.CommitCategories(_helper.Data.ReadJsonFile<List<ModDataCategory>>(
                 SaveHelper.CategoriesDumpPath));
 
             if (Context.IsMultiplayer)
@@ -431,7 +434,7 @@ namespace ItemResearchSpawner.Components
             _pricelist = pricelist;
         }
 
-        private void OnLoadCategories(ModDataCategory[] categories)
+        private void OnLoadCategories(List<ModDataCategory> categories)
         {
             _categories = categories;
             InitRegistry(GetSpawnableItems().ToArray());
