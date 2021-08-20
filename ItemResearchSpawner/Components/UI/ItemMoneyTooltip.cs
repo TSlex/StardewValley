@@ -20,13 +20,13 @@ namespace ItemResearchSpawner.Components.UI
         public void Draw(SpriteBatch spriteBatch, Item hoveredItem)
         {
             var cost = ModManager.Instance.GetItemPrice(hoveredItem);
-
+            
+            var costText = hoveredItem.Stack > 1 ? $"{cost * hoveredItem.Stack}({cost})" : $"{cost}";
+            
             if (cost <= 0)
             {
-                return;
+                costText = "0";
             }
-
-            var costText = hoveredItem.Stack > 1 ? $"{cost * hoveredItem.Stack}({cost})" : $"{cost}";
 
             var mousePos = Game1.getMousePosition();
             var basePosition = new Vector2(mousePos.X, mousePos.Y) + new Vector2(-38, 0);

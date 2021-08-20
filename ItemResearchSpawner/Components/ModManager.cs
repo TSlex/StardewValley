@@ -218,7 +218,7 @@ namespace ItemResearchSpawner.Components
             {
                 _monitor.LogOnce(
                     $"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
-                    LogLevel.Alert);
+                    LogLevel.Debug);
             }
 
             return spawnableItem;
