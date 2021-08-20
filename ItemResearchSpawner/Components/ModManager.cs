@@ -216,9 +216,9 @@ namespace ItemResearchSpawner.Components
 
             if (!ItemRegistry.TryGetValue(key, out var spawnableItem))
             {
-                _monitor.LogOnce(
-                    $"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
-                    LogLevel.Debug);
+                // _monitor.LogOnce(
+                //     $"Item with - name: {item.Name}, ID: {item.parentSheetIndex}, key: {key} is missing in register!",
+                //     LogLevel.Debug);
             }
 
             return spawnableItem;

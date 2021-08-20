@@ -53,14 +53,14 @@ namespace ItemResearchSpawner.Components
             {
                 return;
             }
-            
+
             if (itemProgressionRaw.current >= itemProgressionRaw.max)
             {
                 if (ModManager.Instance.ModMode == ModMode.Buy)
                 {
                     OnStackChanged?.Invoke(0);
                 }
-            
+
                 return;
             }
 
@@ -89,7 +89,7 @@ namespace ItemResearchSpawner.Components
             {
                 progressionItem.ResearchCountIridium += progressCount;
             }
-            
+
             if (item.Stack >= progressCount)
             {
                 OnResearchCompleted();
@@ -167,7 +167,7 @@ namespace ItemResearchSpawner.Components
             {
                 return "(X)";
             }
-            
+
             if (ModManager.Instance.ModMode == ModMode.Buy)
             {
                 return "($$$)";
@@ -189,7 +189,7 @@ namespace ItemResearchSpawner.Components
             if (spawnableItem == null)
             {
                 progressionItem = null;
-                
+
                 return new ItemProgressionRaw
                 {
                     current = -1,
@@ -209,13 +209,13 @@ namespace ItemResearchSpawner.Components
                 ModManager.Instance.AvailableCategories.FirstOrDefault(c =>
                     I18n.GetByKey(c.Label).ToString().Equals(item.Category));
 
-            if (itemActive)
-            {
-                _monitor.Log($"Current item - name: {item.Name}, ID: {item.ID}, category: {item.Category}",
-                    LogLevel.Alert);
-                _monitor.Log($"Unique key: {Helpers.GetItemUniqueKey(item.Item)}",
-                    LogLevel.Alert);
-            }
+            // if (itemActive)
+            // {
+            //     _monitor.Log($"Current item - name: {item.Name}, ID: {item.ID}, category: {item.Category}",
+            //         LogLevel.Alert);
+            //     _monitor.Log($"Unique key: {Helpers.GetItemUniqueKey(item.Item)}",
+            //         LogLevel.Alert);
+            // }
 
             var maxProgression = ModManager.Instance.ModMode switch
             {
@@ -263,17 +263,7 @@ namespace ItemResearchSpawner.Components
 
         public void DumpPlayersProgression()
         {
-            var progressions = SaveManager.Instance.GetProgressions();
-
-            var onlinePlayers = Game1.getOnlineFarmers()
-                .Where(farmer => progressions.Keys.Contains(farmer.uniqueMultiplayerID.ToString()))
-                .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
-
-            var offlinePlayers = Game1.getAllFarmers()
-                .Where(farmer => !onlinePlayers.Keys.Contains(farmer.UniqueMultiplayerID.ToString()))
-                .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
-
-            if (!Context.IsMultiplayer && Context.IsMainPlayer)
+            if (!Context.IsMultiplayer)
             {
                 _monitor.Log(
                     $"Dumping progression - player: {Game1.player.name}, location: {SaveHelper.ProgressionDumpPath(Game1.player.uniqueMultiplayerID.ToString())}",
@@ -282,20 +272,32 @@ namespace ItemResearchSpawner.Components
                 _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(Game1.player.uniqueMultiplayerID.ToString()),
                     _progression);
             }
-
-            _helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_DUMP_REQUIRED,
-                new[] {_modManifest.UniqueID});
-
-            foreach (var player in offlinePlayers)
+            else
             {
-                _monitor.Log(
-                    $"Dumping progression - player: {player.Value.name}, location: {SaveHelper.ProgressionDumpPath(player.Key)}",
-                    LogLevel.Info);
-
-                _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(player.Key),
-                    progressions.ContainsKey(player.Key)
-                        ? progressions[player.Key]
-                        : new Dictionary<string, ResearchProgression>());
+                var progressions = SaveManager.Instance.GetProgressions();
+            
+                var onlinePlayers = Game1.getOnlineFarmers()
+                    .Where(farmer => progressions.Keys.Contains(farmer.uniqueMultiplayerID.ToString()))
+                    .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
+            
+                var offlinePlayers = Game1.getAllFarmers()
+                    .Where(farmer => !onlinePlayers.Keys.Contains(farmer.UniqueMultiplayerID.ToString()))
+                    .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
+                
+                _helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_DUMP_REQUIRED,
+                    new[] {_modManifest.UniqueID});
+            
+                foreach (var player in offlinePlayers)
+                {
+                    _monitor.Log(
+                        $"Dumping progression - player: {player.Value.name}, location: {SaveHelper.ProgressionDumpPath(player.Key)}",
+                        LogLevel.Info);
+            
+                    _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(player.Key),
+                        progressions.ContainsKey(player.Key)
+                            ? progressions[player.Key]
+                            : new Dictionary<string, ResearchProgression>());
+                }
             }
         }
 

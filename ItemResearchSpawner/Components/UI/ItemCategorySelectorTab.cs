@@ -80,7 +80,7 @@ namespace ItemResearchSpawner.Components.UI
 
                     if (!_categoryDropdown.TrySelect(category))
                     {
-                        _monitor.Log($"Failed selecting category filter category '{category}'.", LogLevel.Warn);
+                        // _monitor.Log($"Failed selecting category filter category '{category}'.", LogLevel.Warn);
                     }
 
                     ModManager.Instance.Category = category;
@@ -143,7 +143,7 @@ namespace ItemResearchSpawner.Components.UI
         {
             if (!_categoryDropdown.TrySelect(category))
             {
-                _monitor.LogOnce($"Failed selecting category '{category}'.", LogLevel.Warn);
+                // _monitor.LogOnce($"Failed selecting category '{category}'.", LogLevel.Warn);
                 
                 category = I18n.Category_All();
                 _categoryDropdown.TrySelect(category);
