@@ -228,7 +228,7 @@ namespace ItemResearchSpawner.Components
         {
             var prices = _pricelist;
 
-            if (!_helper.ReadConfig<ModConfig>().UseDefaultConfig)
+            if (_helper.ReadConfig<ModConfig>().UseDefaultConfig)
             {
                 prices = _helper.Data.ReadGlobalData<Dictionary<string, int>>(SaveHelper.PriceConfigKey) ?? _pricelist;
             }
@@ -262,7 +262,7 @@ namespace ItemResearchSpawner.Components
         {
             var categories = _categories;
 
-            if (!_helper.ReadConfig<ModConfig>().UseDefaultConfig)
+            if (_helper.ReadConfig<ModConfig>().UseDefaultConfig)
             {
                 categories = _categories =
                     _helper.Data.ReadGlobalData<List<ModDataCategory>>(SaveHelper.CategoriesConfigKey) ?? _categories;
