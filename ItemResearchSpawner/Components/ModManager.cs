@@ -450,12 +450,14 @@ namespace ItemResearchSpawner.Components
         private void OnLoadPrices(Dictionary<string, int> pricelist)
         {
             _pricelist = pricelist;
+            RequestMenuUpdate(true);
         }
 
         private void OnLoadCategories(List<ModDataCategory> categories)
         {
             _categories = categories;
             InitRegistry(GetSpawnableItems().ToArray());
+            RequestMenuUpdate(true);
         }
 
         #endregion

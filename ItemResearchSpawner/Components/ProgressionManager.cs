@@ -462,6 +462,7 @@ namespace ItemResearchSpawner.Components
         private void OnLoadProgression(Dictionary<string, ResearchProgression> progression)
         {
             _progression = progression;
+            ModManager.Instance.RequestMenuUpdate(true);
         }
 
         #endregion
