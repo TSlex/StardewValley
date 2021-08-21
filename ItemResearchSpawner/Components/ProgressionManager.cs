@@ -338,91 +338,96 @@ namespace ItemResearchSpawner.Components
 
         private void OnMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
-            if (e.FromModID == _modManifest.UniqueID)
+            if (e.FromModID != _modManifest.UniqueID) return;
+            
+            ResearchProgressionMessage message;
+            
+            var allowedTypes = new List<string> {"progression"};
+            
+            if (!allowedTypes.Any(t => e.Type.ToLower().Contains(t))) return;
+            
+            switch (e.Type)
             {
-                ResearchProgressionMessage message;
-                switch (e.Type)
-                {
-                    case MessageKeys.PROGRESSION_SAVE_REQUIRED:
-                        if (!Context.IsMainPlayer)
-                        {
-                            break;
-                        }
-
-                        message = e.ReadAs<ResearchProgressionMessage>();
-                        SaveManager.Instance.CommitProgression(message.PlayerID, message.Progression);
+                case MessageKeys.PROGRESSION_SAVE_REQUIRED:
+                    if (!Context.IsMainPlayer)
+                    {
                         break;
+                    }
 
-                    case MessageKeys.PROGRESSION_LOAD_REQUIRED:
-                        if (!Context.IsMainPlayer)
-                        {
-                            break;
-                        }
+                    message = e.ReadAs<ResearchProgressionMessage>();
+                    SaveManager.Instance.CommitProgression(message.PlayerID, message.Progression);
+                    break;
 
-                        var playerID = e.ReadAs<string>();
-                        message = new ResearchProgressionMessage
-                        {
-                            Progression = SaveManager.Instance.GetProgression(playerID),
-                            PlayerID = playerID
-                        };
-                        _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_LOAD_ACCEPTED,
-                            new[] {_modManifest.UniqueID}, new[] {long.Parse(message.PlayerID)});
+                case MessageKeys.PROGRESSION_LOAD_REQUIRED:
+                    if (!Context.IsMainPlayer)
+                    {
                         break;
+                    }
 
-                    case MessageKeys.PROGRESSION_LOAD_ACCEPTED:
-                        message = e.ReadAs<ResearchProgressionMessage>();
-                        OnLoadProgression(message.Progression);
-                        break;
+                    var playerID = e.FromPlayerID.ToString();
+                    message = new ResearchProgressionMessage
+                    {
+                        Progression = SaveManager.Instance.GetProgression(playerID),
+                        PlayerID = playerID
+                    };
+                    
+                    _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_LOAD_ACCEPTED,
+                        new[] {_modManifest.UniqueID}, new[] {long.Parse(message.PlayerID)});
+                    break;
 
-                    case MessageKeys.PROGRESSION_DUMP_REQUIRED:
-                        if (Context.IsMainPlayer)
-                        {
-                            _monitor.Log(
-                                $"Dumping progression - player: {Game1.player.name}, " +
-                                $"location: {SaveHelper.ProgressionDumpPath(Game1.player.uniqueMultiplayerID.ToString())}",
-                                LogLevel.Info);
+                case MessageKeys.PROGRESSION_LOAD_ACCEPTED:
+                    message = e.ReadAs<ResearchProgressionMessage>();
+                    OnLoadProgression(message.Progression);
+                    break;
 
-                            _helper.Data.WriteJsonFile(
-                                SaveHelper.ProgressionDumpPath(Game1.player.uniqueMultiplayerID.ToString()),
-                                _progression);
-                        }
-                        else
-                        {
-                            message = new ResearchProgressionMessage
-                            {
-                                Progression = _progression,
-                                PlayerID = Game1.player.UniqueMultiplayerID.ToString()
-                            };
-
-                            _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_DUMP_ACCEPTED,
-                                new[] {_modManifest.UniqueID});
-                        }
-
-                        break;
-
-                    case MessageKeys.PROGRESSION_DUMP_ACCEPTED:
-                        if (!Context.IsMainPlayer)
-                        {
-                            break;
-                        }
-
-                        message = e.ReadAs<ResearchProgressionMessage>();
-                        var farmer = Game1.getAllFarmers()
-                            .FirstOrDefault(f => f.UniqueMultiplayerID.ToString().Equals(message.PlayerID));
-
+                case MessageKeys.PROGRESSION_DUMP_REQUIRED:
+                    if (Context.IsMainPlayer)
+                    {
                         _monitor.Log(
-                            $"Dumping progression - player: {farmer?.name ?? "???"}, " +
-                            $"location: {SaveHelper.ProgressionDumpPath(message.PlayerID)}",
+                            $"Dumping progression - player: {Game1.player.name}, " +
+                            $"location: {SaveHelper.ProgressionDumpPath(Game1.player.uniqueMultiplayerID.ToString())}",
                             LogLevel.Info);
 
-                        _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(message.PlayerID),
-                            message.Progression);
-                        break;
+                        _helper.Data.WriteJsonFile(
+                            SaveHelper.ProgressionDumpPath(Game1.player.uniqueMultiplayerID.ToString()),
+                            _progression);
+                    }
+                    else
+                    {
+                        message = new ResearchProgressionMessage
+                        {
+                            Progression = _progression,
+                            PlayerID = Game1.player.UniqueMultiplayerID.ToString()
+                        };
 
-                    case MessageKeys.PROGRESSION_MANAGER_SYNC:
-                        OnLoad(null, null);
+                        _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_DUMP_ACCEPTED,
+                            new[] {_modManifest.UniqueID});
+                    }
+
+                    break;
+
+                case MessageKeys.PROGRESSION_DUMP_ACCEPTED:
+                    if (!Context.IsMainPlayer)
+                    {
                         break;
-                }
+                    }
+
+                    message = e.ReadAs<ResearchProgressionMessage>();
+                    var farmer = Game1.getAllFarmers()
+                        .FirstOrDefault(f => f.UniqueMultiplayerID.ToString().Equals(message.PlayerID));
+
+                    _monitor.Log(
+                        $"Dumping progression - player: {farmer?.name ?? "???"}, " +
+                        $"location: {SaveHelper.ProgressionDumpPath(message.PlayerID)}",
+                        LogLevel.Info);
+
+                    _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(message.PlayerID),
+                        message.Progression);
+                    break;
+
+                case MessageKeys.PROGRESSION_MANAGER_SYNC:
+                    OnLoad(null, null);
+                    break;
             }
         }
 
@@ -456,7 +461,7 @@ namespace ItemResearchSpawner.Components
             }
             else
             {
-                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, MessageKeys.PROGRESSION_LOAD_REQUIRED,
+                _helper.Multiplayer.SendMessage(0, MessageKeys.PROGRESSION_LOAD_REQUIRED,
                     new[] {_modManifest.UniqueID});
             }
         }

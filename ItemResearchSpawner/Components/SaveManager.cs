@@ -126,6 +126,8 @@ namespace ItemResearchSpawner.Components
 
         private void OnSave(object sender, SavingEventArgs e)
         {
+            if (!Context.IsMainPlayer) return;
+            
             _helper.Data.WriteSaveData(SaveHelper.ProgressionsKey, _progressions);
 
             _helper.Data.WriteSaveData(SaveHelper.ModStatesKey, _modStates);
@@ -139,6 +141,8 @@ namespace ItemResearchSpawner.Components
 
         private void OnLoad(object sender, SaveLoadedEventArgs saveLoadedEventArgs)
         {
+            if (!Context.IsMainPlayer) return;
+            
             LoadProgression();
             LoadState();
             LoadPricelist();

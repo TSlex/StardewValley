@@ -116,7 +116,7 @@ namespace ItemResearchSpawner.Components
         {
             var banlist = _helper.Data.ReadJsonFile<List<string>>(SaveHelper.BannedItemsConfigPath) ??
                           new List<string>();
-            
+
             foreach (var spawnableItem in items)
             {
                 var key = Helpers.GetItemUniqueKey(spawnableItem.Item);
@@ -170,7 +170,7 @@ namespace ItemResearchSpawner.Components
             {
                 return 0;
             }
-            
+
             var price = -1;
 
             if (_pricelist.ContainsKey(key))
@@ -297,95 +297,101 @@ namespace ItemResearchSpawner.Components
 
         private void OnMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
-            if (e.FromModID == _modManifest.UniqueID)
+            if (e.FromModID != _modManifest.UniqueID) return;
+
+            var allowedTypes = new List<string> {"modstate", "pricelist", "categories", "modmanager"};
+            
+            if (!allowedTypes.Any(t => e.Type.ToLower().Contains(t))) return;
+
+            ModStateMessage modStateMessage;
+            PricelistMessage pricelistMessage;
+            CategoriesMessage categoriesMessage;
+            string playerID;
+
+            switch (e.Type)
             {
-                ModStateMessage modStateMessage;
-                PricelistMessage pricelistMessage;
-                CategoriesMessage categoriesMessage;
-                string playerID;
-
-                switch (e.Type)
-                {
-                    /*ModState messages*/
-                    case MessageKeys.MOD_STATE_SAVE_REQUIRED:
-                        if (!Context.IsMainPlayer)
-                        {
-                            break;
-                        }
-
-                        modStateMessage = e.ReadAs<ModStateMessage>();
-                        SaveManager.Instance.CommitModState(modStateMessage.PlayerID, modStateMessage.ModState);
+                /*ModState messages*/
+                case MessageKeys.MOD_STATE_SAVE_REQUIRED:
+                    if (!Context.IsMainPlayer)
+                    {
                         break;
+                    }
 
-                    case MessageKeys.MOD_STATE_LOAD_REQUIRED:
-                        if (!Context.IsMainPlayer)
-                        {
-                            break;
-                        }
+                    modStateMessage = e.ReadAs<ModStateMessage>();
+                    SaveManager.Instance.CommitModState(modStateMessage.PlayerID, modStateMessage.ModState);
+                    break;
 
-                        playerID = e.ReadAs<string>();
-                        modStateMessage = new ModStateMessage
-                        {
-                            ModState = SaveManager.Instance.GetModState(playerID),
-                            PlayerID = playerID
-                        };
-                        _helper.Multiplayer.SendMessage(modStateMessage, MessageKeys.MOD_STATE_LOAD_ACCEPTED,
-                            new[] {_modManifest.UniqueID}, new[] {long.Parse(modStateMessage.PlayerID)});
+                case MessageKeys.MOD_STATE_LOAD_REQUIRED:
+                    if (!Context.IsMainPlayer)
+                    {
                         break;
+                    }
 
-                    case MessageKeys.MOD_STATE_LOAD_ACCEPTED:
-                        modStateMessage = e.ReadAs<ModStateMessage>();
-                        OnLoadState(modStateMessage.ModState);
+                    playerID = e.FromPlayerID.ToString();
+                    modStateMessage = new ModStateMessage
+                    {
+                        ModState = SaveManager.Instance.GetModState(playerID),
+                        PlayerID = playerID
+                    };
+
+                    _helper.Multiplayer.SendMessage(modStateMessage, MessageKeys.MOD_STATE_LOAD_ACCEPTED,
+                        new[] {_modManifest.UniqueID}, new[] {long.Parse(modStateMessage.PlayerID)});
+                    break;
+
+                case MessageKeys.MOD_STATE_LOAD_ACCEPTED:
+                    modStateMessage = e.ReadAs<ModStateMessage>();
+                    OnLoadState(modStateMessage.ModState);
+                    break;
+
+                /*Pricelist messages*/
+                case MessageKeys.PRICELIST_LOAD_REQUIRED:
+                    if (!Context.IsMainPlayer)
+                    {
                         break;
+                    }
 
-                    /*Pricelist messages*/
-                    case MessageKeys.PRICELIST_LOAD_REQUIRED:
-                        if (!Context.IsMainPlayer)
-                        {
-                            break;
-                        }
+                    playerID = e.FromPlayerID.ToString();
+                    pricelistMessage = new PricelistMessage
+                    {
+                        Pricelist = SaveManager.Instance.GetPricelist(),
+                        PlayerID = playerID
+                    };
 
-                        playerID = e.ReadAs<string>();
-                        pricelistMessage = new PricelistMessage
-                        {
-                            Pricelist = SaveManager.Instance.GetPricelist(),
-                            PlayerID = playerID
-                        };
-                        _helper.Multiplayer.SendMessage(pricelistMessage, MessageKeys.PRICELIST_LOAD_ACCEPTED,
-                            new[] {_modManifest.UniqueID}, new[] {long.Parse(pricelistMessage.PlayerID)});
+                    _helper.Multiplayer.SendMessage(pricelistMessage, MessageKeys.PRICELIST_LOAD_ACCEPTED,
+                        new[] {_modManifest.UniqueID}, new[] {long.Parse(pricelistMessage.PlayerID)});
+                    break;
+                case MessageKeys.PRICELIST_LOAD_ACCEPTED:
+                    pricelistMessage = e.ReadAs<PricelistMessage>();
+                    OnLoadPrices(pricelistMessage.Pricelist);
+                    break;
+
+                /*Categories messages*/
+                case MessageKeys.CATEGORIES_LOAD_REQUIRED:
+                    if (!Context.IsMainPlayer)
+                    {
                         break;
-                    case MessageKeys.PRICELIST_LOAD_ACCEPTED:
-                        pricelistMessage = e.ReadAs<PricelistMessage>();
-                        OnLoadPrices(pricelistMessage.Pricelist);
-                        break;
+                    }
 
-                    /*Categories messages*/
-                    case MessageKeys.CATEGORIES_LOAD_REQUIRED:
-                        if (!Context.IsMainPlayer)
-                        {
-                            break;
-                        }
+                    playerID = e.FromPlayerID.ToString();
+                    categoriesMessage = new CategoriesMessage
+                    {
+                        Categories = SaveManager.Instance.GetCategories(),
+                        PlayerID = playerID
+                    };
 
-                        playerID = e.ReadAs<string>();
-                        categoriesMessage = new CategoriesMessage
-                        {
-                            Categories = SaveManager.Instance.GetCategories(),
-                            PlayerID = playerID
-                        };
-                        _helper.Multiplayer.SendMessage(categoriesMessage, MessageKeys.CATEGORIES_LOAD_ACCEPTED,
-                            new[] {_modManifest.UniqueID}, new[] {long.Parse(categoriesMessage.PlayerID)});
-                        break;
+                    _helper.Multiplayer.SendMessage(categoriesMessage, MessageKeys.CATEGORIES_LOAD_ACCEPTED,
+                        new[] {_modManifest.UniqueID}, new[] {long.Parse(categoriesMessage.PlayerID)});
+                    break;
 
-                    case MessageKeys.CATEGORIES_LOAD_ACCEPTED:
-                        categoriesMessage = e.ReadAs<CategoriesMessage>();
-                        OnLoadCategories(categoriesMessage.Categories);
-                        break;
+                case MessageKeys.CATEGORIES_LOAD_ACCEPTED:
+                    categoriesMessage = e.ReadAs<CategoriesMessage>();
+                    OnLoadCategories(categoriesMessage.Categories);
+                    break;
 
-                    /*Sync*/
-                    case MessageKeys.MOD_MANAGER_SYNC:
-                        OnLoad(null, null);
-                        break;
-                }
+                /*Sync*/
+                case MessageKeys.MOD_MANAGER_SYNC:
+                    OnLoad(null, null);
+                    break;
             }
         }
 
@@ -429,11 +435,11 @@ namespace ItemResearchSpawner.Components
             }
             else
             {
-                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, MessageKeys.MOD_STATE_LOAD_REQUIRED,
+                _helper.Multiplayer.SendMessage(0, MessageKeys.MOD_STATE_LOAD_REQUIRED,
                     new[] {_modManifest.UniqueID});
-                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, MessageKeys.PRICELIST_LOAD_REQUIRED,
+                _helper.Multiplayer.SendMessage(0, MessageKeys.PRICELIST_LOAD_REQUIRED,
                     new[] {_modManifest.UniqueID});
-                _helper.Multiplayer.SendMessage(Game1.player.uniqueMultiplayerID, MessageKeys.CATEGORIES_LOAD_REQUIRED,
+                _helper.Multiplayer.SendMessage(0, MessageKeys.CATEGORIES_LOAD_REQUIRED,
                     new[] {_modManifest.UniqueID});
             }
         }
