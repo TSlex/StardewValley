@@ -262,7 +262,7 @@ namespace ItemResearchSpawner.Components
 
         private bool CheckIsHostPlayer()
         {
-            if (!CheckCommandInGame() && Context.IsMainPlayer)
+            if (CheckCommandInGame() && !Context.IsMainPlayer)
             {
                 _monitor.Log($"This command is for host player only ", LogLevel.Info);
                 return false;

@@ -51,6 +51,12 @@ namespace ItemResearchSpawner.Components
             {
                 _modMode = value;
                 RequestMenuUpdate(true);
+                
+                //sync with multiplayer
+                if (Context.IsMultiplayer)
+                {
+                    _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
+                }
             }
         }
 
@@ -208,6 +214,12 @@ namespace ItemResearchSpawner.Components
             {
                 _pricelist[key] = price;
             }
+            
+            //sync with multiplayer
+            if (Context.IsMultiplayer)
+            {
+                _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
+            }
         }
 
         public SpawnableItem GetSpawnableItem(Item item, out string key)
@@ -333,6 +345,9 @@ namespace ItemResearchSpawner.Components
                         ModState = SaveManager.Instance.GetModState(playerID),
                         PlayerID = playerID
                     };
+
+                    //sync mod mode
+                    modStateMessage.ModState.ActiveMode = ModMode;
 
                     _helper.Multiplayer.SendMessage(modStateMessage, MessageKeys.MOD_STATE_LOAD_ACCEPTED,
                         new[] {_modManifest.UniqueID}, new[] {long.Parse(modStateMessage.PlayerID)});
