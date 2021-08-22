@@ -54,6 +54,8 @@ namespace ItemResearchSpawner.Components
             get => _modMode;
             set
             {
+                if (_modMode == value) return;
+
                 _modMode = value;
                 RequestMenuUpdate(true);
 
@@ -247,6 +249,8 @@ namespace ItemResearchSpawner.Components
             {
                 _pricelist[key] = price;
             }
+            
+            SaveManager.Instance.CommitPricelist(_pricelist);
 
             //sync with multiplayer
             if (Context.IsMultiplayer)
@@ -293,13 +297,13 @@ namespace ItemResearchSpawner.Components
             SaveManager.Instance.CommitPricelist(_helper.Data.ReadJsonFile<Dictionary<string, int>>(
                 SaveHelper.PricelistDumpPath));
 
+            if (Context.IsMainPlayer)
+            {
+                OnLoad(null, null);
+            }
             if (Context.IsMultiplayer)
             {
                 _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
-            }
-            else
-            {
-                OnLoad(null, null);
             }
         }
 
@@ -328,13 +332,13 @@ namespace ItemResearchSpawner.Components
             SaveManager.Instance.CommitCategories(_helper.Data.ReadJsonFile<List<ModDataCategory>>(
                 SaveHelper.CategoriesDumpPath));
 
+            if (Context.IsMainPlayer)
+            {
+                OnLoad(null, null);
+            }
             if (Context.IsMultiplayer)
             {
                 _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
-            }
-            else
-            {
-                OnLoad(null, null);
             }
         }
 
@@ -499,11 +503,13 @@ namespace ItemResearchSpawner.Components
 
         private void OnLoadState(ModState state)
         {
-            ModMode = state.ActiveMode;
-            Quality = state.Quality;
-            SortOption = state.SortOption;
-            SearchText = state.SearchText;
-            Category = state.Category;
+            _modMode = state.ActiveMode;
+            _quality = state.Quality;
+            _sortOption = state.SortOption;
+            _searchText = state.SearchText;
+            _category = state.Category;
+            
+            RequestMenuUpdate(true);
         }
 
         private void OnLoadPrices(Dictionary<string, int> pricelist)
