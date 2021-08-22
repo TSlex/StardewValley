@@ -4,6 +4,8 @@
     {
         /*ProgressionManager*/
         public const string PROGRESSION_SAVE_REQUIRED = "Progression:SaveRequired";
+        public const string PROGRESSION_ITEM_RESEARCHED = "Progression:ItemResearched";
+        
         public const string PROGRESSION_LOAD_REQUIRED = "Progression:LoadRequired";
         public const string PROGRESSION_LOAD_ACCEPTED = "Progression:LoadAccepted";
         

@@ -55,6 +55,15 @@ namespace ItemResearchSpawner.Components
         {
             _progressions = progressToLoad;
         }
+        
+        public void CommitResearch(string playerID, string key, ResearchProgression itemProgression)
+        {
+            var progression = GetProgression(playerID);
+
+            progression[key] = itemProgression;
+
+            _progressions[playerID] = progression;
+        }
 
         public void CommitProgression(string playerID, Dictionary<string, ResearchProgression> commitProgression)
         {

@@ -85,6 +85,7 @@
     <Compile Include="Models\MenuSettings.cs" />
     <Compile Include="Models\Messages\CategoriesMessage.cs" />
     <Compile Include="Models\Messages\ItemProgressionRaw.cs" />
+    <Compile Include="Models\Messages\ItemResearchedMessage.cs" />
     <Compile Include="Models\Messages\ModStateMessage.cs" />
     <Compile Include="Models\Messages\PricelistMessage.cs" />
     <Compile Include="Models\Messages\ResearchProgressionMessage.cs" />

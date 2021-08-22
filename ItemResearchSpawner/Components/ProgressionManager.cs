@@ -90,6 +90,19 @@ namespace ItemResearchSpawner.Components
                 progressionItem.ResearchCountIridium += progressCount;
             }
 
+            //sync with host
+            if (!Context.IsMainPlayer)
+            {
+                var itemResearchedMessage = new ItemResearchedMessage
+                {
+                    Key = Helpers.GetItemUniqueKey(item),
+                    Progression = progressionItem
+                };
+
+                _helper.Multiplayer.SendMessage(itemResearchedMessage, MessageKeys.PROGRESSION_ITEM_RESEARCHED,
+                    new[] {_modManifest.UniqueID});
+            }
+
             if (item.Stack >= progressCount)
             {
                 OnResearchCompleted();
@@ -275,24 +288,24 @@ namespace ItemResearchSpawner.Components
             else
             {
                 var progressions = SaveManager.Instance.GetProgressions();
-            
+
                 var onlinePlayers = Game1.getOnlineFarmers()
                     .Where(farmer => progressions.Keys.Contains(farmer.uniqueMultiplayerID.ToString()))
                     .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
-            
+
                 var offlinePlayers = Game1.getAllFarmers()
                     .Where(farmer => !onlinePlayers.Keys.Contains(farmer.UniqueMultiplayerID.ToString()))
                     .ToDictionary(farmer => farmer.uniqueMultiplayerID.ToString());
-                
+
                 _helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_DUMP_REQUIRED,
                     new[] {_modManifest.UniqueID});
-            
+
                 foreach (var player in offlinePlayers)
                 {
                     _monitor.Log(
                         $"Dumping progression - player: {player.Value.name}, location: {SaveHelper.ProgressionDumpPath(player.Key)}",
                         LogLevel.Info);
-            
+
                     _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(player.Key),
                         progressions.ContainsKey(player.Key)
                             ? progressions[player.Key]
@@ -339,23 +352,47 @@ namespace ItemResearchSpawner.Components
         private void OnMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
             if (e.FromModID != _modManifest.UniqueID) return;
-            
-            ResearchProgressionMessage message;
-            
+
+            ResearchProgressionMessage researchProgressionMessage;
+            ItemResearchedMessage itemResearchedMessage;
+
             var allowedTypes = new List<string> {"progression"};
-            
+
             if (!allowedTypes.Any(t => e.Type.ToLower().Contains(t))) return;
-            
+
             switch (e.Type)
             {
+                // case MessageKeys.PROGRESSION_SAVE_REQUIRED:
+                //     if (!Context.IsMainPlayer)
+                //     {
+                //         break;
+                //     }
+                //
+                //     message = e.ReadAs<ResearchProgressionMessage>();
+                //     SaveManager.Instance.CommitProgression(message.PlayerID, message.Progression);
+                //     break;
+
+                case MessageKeys.PROGRESSION_ITEM_RESEARCHED:
+                    if (!Context.IsMainPlayer)
+                    {
+                        break;
+                    }
+
+                    itemResearchedMessage = e.ReadAs<ItemResearchedMessage>();
+
+                    SaveManager.Instance.CommitResearch(e.FromPlayerID.ToString(), itemResearchedMessage.Key,
+                        itemResearchedMessage.Progression);
+                    break;
+
                 case MessageKeys.PROGRESSION_SAVE_REQUIRED:
                     if (!Context.IsMainPlayer)
                     {
                         break;
                     }
 
-                    message = e.ReadAs<ResearchProgressionMessage>();
-                    SaveManager.Instance.CommitProgression(message.PlayerID, message.Progression);
+                    researchProgressionMessage = e.ReadAs<ResearchProgressionMessage>();
+                    SaveManager.Instance.CommitProgression(researchProgressionMessage.PlayerID,
+                        researchProgressionMessage.Progression);
                     break;
 
                 case MessageKeys.PROGRESSION_LOAD_REQUIRED:
@@ -365,19 +402,19 @@ namespace ItemResearchSpawner.Components
                     }
 
                     var playerID = e.FromPlayerID.ToString();
-                    message = new ResearchProgressionMessage
+                    researchProgressionMessage = new ResearchProgressionMessage
                     {
                         Progression = SaveManager.Instance.GetProgression(playerID),
                         PlayerID = playerID
                     };
-                    
-                    _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_LOAD_ACCEPTED,
-                        new[] {_modManifest.UniqueID}, new[] {long.Parse(message.PlayerID)});
+
+                    _helper.Multiplayer.SendMessage(researchProgressionMessage, MessageKeys.PROGRESSION_LOAD_ACCEPTED,
+                        new[] {_modManifest.UniqueID}, new[] {long.Parse(researchProgressionMessage.PlayerID)});
                     break;
 
                 case MessageKeys.PROGRESSION_LOAD_ACCEPTED:
-                    message = e.ReadAs<ResearchProgressionMessage>();
-                    OnLoadProgression(message.Progression);
+                    researchProgressionMessage = e.ReadAs<ResearchProgressionMessage>();
+                    OnLoadProgression(researchProgressionMessage.Progression);
                     break;
 
                 case MessageKeys.PROGRESSION_DUMP_REQUIRED:
@@ -394,13 +431,14 @@ namespace ItemResearchSpawner.Components
                     }
                     else
                     {
-                        message = new ResearchProgressionMessage
+                        researchProgressionMessage = new ResearchProgressionMessage
                         {
                             Progression = _progression,
                             PlayerID = Game1.player.UniqueMultiplayerID.ToString()
                         };
 
-                        _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_DUMP_ACCEPTED,
+                        _helper.Multiplayer.SendMessage(researchProgressionMessage,
+                            MessageKeys.PROGRESSION_DUMP_ACCEPTED,
                             new[] {_modManifest.UniqueID});
                     }
 
@@ -412,17 +450,18 @@ namespace ItemResearchSpawner.Components
                         break;
                     }
 
-                    message = e.ReadAs<ResearchProgressionMessage>();
+                    researchProgressionMessage = e.ReadAs<ResearchProgressionMessage>();
                     var farmer = Game1.getAllFarmers()
-                        .FirstOrDefault(f => f.UniqueMultiplayerID.ToString().Equals(message.PlayerID));
+                        .FirstOrDefault(f =>
+                            f.UniqueMultiplayerID.ToString().Equals(researchProgressionMessage.PlayerID));
 
                     _monitor.Log(
                         $"Dumping progression - player: {farmer?.name ?? "???"}, " +
-                        $"location: {SaveHelper.ProgressionDumpPath(message.PlayerID)}",
+                        $"location: {SaveHelper.ProgressionDumpPath(researchProgressionMessage.PlayerID)}",
                         LogLevel.Info);
 
-                    _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(message.PlayerID),
-                        message.Progression);
+                    _helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(researchProgressionMessage.PlayerID),
+                        researchProgressionMessage.Progression);
                     break;
 
                 case MessageKeys.PROGRESSION_MANAGER_SYNC:
@@ -433,21 +472,20 @@ namespace ItemResearchSpawner.Components
 
         private void OnSave(object sender, DayEndingEventArgs dayEndingEventArgs)
         {
-            if (Context.IsMainPlayer)
-            {
-                SaveManager.Instance.CommitProgression(Game1.player.uniqueMultiplayerID.ToString(), _progression);
-            }
-            else
-            {
-                var message = new ResearchProgressionMessage()
-                {
-                    Progression = _progression,
-                    PlayerID = Game1.player.uniqueMultiplayerID.ToString()
-                };
+            if (!Context.IsMainPlayer) return;
 
-                _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_SAVE_REQUIRED,
-                    new[] {_modManifest.UniqueID});
-            }
+            SaveManager.Instance.CommitProgression(Game1.player.uniqueMultiplayerID.ToString(), _progression);
+            // else
+            // {
+            //     var message = new ResearchProgressionMessage()
+            //     {
+            //         Progression = _progression,
+            //         PlayerID = Game1.player.uniqueMultiplayerID.ToString()
+            //     };
+            //
+            //     _helper.Multiplayer.SendMessage(message, MessageKeys.PROGRESSION_SAVE_REQUIRED,
+            //         new[] {_modManifest.UniqueID});
+            // }
         }
 
         private void OnLoad(object sender, DayStartedEventArgs e)

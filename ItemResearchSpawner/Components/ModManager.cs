@@ -52,8 +52,8 @@ namespace ItemResearchSpawner.Components
                 _modMode = value;
                 RequestMenuUpdate(true);
                 
-                //sync with multiplayer
-                if (Context.IsMultiplayer)
+                //sync with multiplayer (only by host or infinite messages)
+                if (Context.IsMultiplayer && Context.IsMainPlayer)
                 {
                     _helper.Multiplayer.SendMessage("", MessageKeys.MOD_MANAGER_SYNC, new[] {_modManifest.UniqueID});
                 }
