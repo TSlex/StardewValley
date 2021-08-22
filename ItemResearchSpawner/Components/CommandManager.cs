@@ -22,51 +22,51 @@ namespace ItemResearchSpawner.Components
             _progressionManager = progressionManager;
             _modManager = modManager;
 
-            helper.ConsoleCommands.Add("research_unlock_all", "unlock all items research progression",
+            helper.ConsoleCommands.Add("rns_unlock_all", "unlock all items research progression",
                 UnlockAllProgression);
 
-            helper.ConsoleCommands.Add("research_unlock_active", "unlock hotbar active item",
+            helper.ConsoleCommands.Add("rns_unlock_active", "unlock hotbar active item",
                 UnlockActiveProgression);
 
-            helper.ConsoleCommands.Add("research_set_mode", "change mode to \n 0 - Spawn Mode \n 1 - Buy/Sell Mode",
+            helper.ConsoleCommands.Add("rns_set_mode", "change mode to \n 0 - Spawn Mode \n 1 - Buy/Sell Mode",
                 SetMode);
 
-            helper.ConsoleCommands.Add("research_set_price",
+            helper.ConsoleCommands.Add("rns_set_price",
                 "set hotbar active item price (globally, for mod menu only) \n 0+ values only",
                 SetPrice);
 
-            helper.ConsoleCommands.Add("research_reset_price",
+            helper.ConsoleCommands.Add("rns_reset_price",
                 "reset hotbar active item price (globally, for mod menu only)",
                 ResetPrice);
 
-            helper.ConsoleCommands.Add("research_get_key", "get hotbar active item unique key",
+            helper.ConsoleCommands.Add("rns_get_key", "get hotbar active item unique key",
                 GetUniqueKey);
 
-            helper.ConsoleCommands.Add("research_dump_progression", "dump player(s) progression to file",
+            helper.ConsoleCommands.Add("rns_dump_progression", "dump player(s) progression to file",
                 DumpProgression
             );
 
-            helper.ConsoleCommands.Add("research_load_progression", "load player(s) progression from file",
+            helper.ConsoleCommands.Add("rns_load_progression", "load player(s) progression from file",
                 LoadProgression
             );
 
-            helper.ConsoleCommands.Add("research_dump_pricelist", "dump pricelist to file",
+            helper.ConsoleCommands.Add("rns_dump_pricelist", "dump pricelist to file",
                 DumpPricelist
             );
 
-            helper.ConsoleCommands.Add("research_load_pricelist", "load pricelist from file",
+            helper.ConsoleCommands.Add("rns_load_pricelist", "load pricelist from file",
                 LoadPricelist
             );
 
-            helper.ConsoleCommands.Add("research_dump_categories", "dump categories to file",
+            helper.ConsoleCommands.Add("rns_dump_categories", "dump categories to file",
                 DumpCategories
             );
 
-            helper.ConsoleCommands.Add("research_load_categories", "load categories from file",
+            helper.ConsoleCommands.Add("rns_load_categories", "load categories from file",
                 LoadCategories
             );
 
-            // helper.ConsoleCommands.Add("research_use_defaults", "change config option of uning default configuration" +
+            // helper.ConsoleCommands.Add("rns_use_defaults", "change config option of uning default configuration" +
             //                                                     "\n0 - false" +
             //                                                     "\n1 - true",
             //     (_, args) =>
