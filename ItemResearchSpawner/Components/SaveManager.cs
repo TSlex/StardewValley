@@ -110,11 +110,6 @@ namespace ItemResearchSpawner.Components
 
         public void CommitPricelist(Dictionary<string, int> pricelist)
         {
-            // foreach (var key in pricelist.Keys.ToArray())
-            // {
-            //     _pricelist[key] = pricelist[key];
-            // }
-
             _pricelist = new Dictionary<string, int>(pricelist);
         }
 

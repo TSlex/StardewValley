@@ -456,17 +456,6 @@ namespace ItemResearchSpawner.Components
             SaveManager.Instance.CommitModState(Game1.player.uniqueMultiplayerID.ToString(), state);
             SaveManager.Instance.CommitPricelist(_pricelist);
             SaveManager.Instance.CommitCategories(_categories);
-            // else
-            // {
-            //     var message = new ModStateMessage
-            //     {
-            //         ModState = state,
-            //         PlayerID = Game1.player.uniqueMultiplayerID.ToString()
-            //     };
-            //
-            //     _helper.Multiplayer.SendMessage(message, MessageKeys.MOD_STATE_SAVE_REQUIRED,
-            //         new[] {_modManifest.UniqueID});
-            // }
         }
 
         private ModState GetCurrentModState()
