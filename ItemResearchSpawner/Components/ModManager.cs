@@ -24,6 +24,8 @@ namespace ItemResearchSpawner.Components
         private Dictionary<string, int> _pricelist;
         private List<ModDataCategory> _categories;
 
+        private ModState _syncedModState;
+
         #region Proprerties
 
         private ItemQuality _quality;
@@ -40,6 +42,9 @@ namespace ItemResearchSpawner.Components
             set
             {
                 _quality = value;
+
+                SendStateSaveMessage();
+
                 RequestMenuUpdate(false);
             }
         }
@@ -51,7 +56,7 @@ namespace ItemResearchSpawner.Components
             {
                 _modMode = value;
                 RequestMenuUpdate(true);
-                
+
                 //sync with multiplayer (only by host or infinite messages)
                 if (Context.IsMultiplayer && Context.IsMainPlayer)
                 {
@@ -66,6 +71,9 @@ namespace ItemResearchSpawner.Components
             set
             {
                 _sortOption = value;
+
+                SendStateSaveMessage();
+                    
                 RequestMenuUpdate(true);
             }
         }
@@ -76,6 +84,9 @@ namespace ItemResearchSpawner.Components
             set
             {
                 _searchText = value;
+                
+                SendStateSaveMessage();
+                
                 RequestMenuUpdate(true);
             }
         }
@@ -86,11 +97,33 @@ namespace ItemResearchSpawner.Components
             set
             {
                 _category = value;
+                
+                SendStateSaveMessage();
+                
                 RequestMenuUpdate(true);
             }
         }
 
         #endregion
+        
+        private void SendStateSaveMessage()
+        {
+            var modState = GetCurrentModState();
+
+            if (!modState.Equals(_syncedModState))
+            {
+                var message = new ModStateMessage
+                {
+                    ModState = modState,
+                    PlayerID = Game1.player.uniqueMultiplayerID.ToString()
+                };
+
+                _helper.Multiplayer.SendMessage(message, MessageKeys.MOD_STATE_SAVE_REQUIRED,
+                    new[] {_modManifest.UniqueID});
+
+                _syncedModState = modState;
+            }
+        }
 
         public delegate void UpdateMenuView(bool rebuild);
 
@@ -214,7 +247,7 @@ namespace ItemResearchSpawner.Components
             {
                 _pricelist[key] = price;
             }
-            
+
             //sync with multiplayer
             if (Context.IsMultiplayer)
             {
@@ -312,7 +345,7 @@ namespace ItemResearchSpawner.Components
             if (e.FromModID != _modManifest.UniqueID) return;
 
             var allowedTypes = new List<string> {"modstate", "pricelist", "categories", "modmanager"};
-            
+
             if (!allowedTypes.Any(t => e.Type.ToLower().Contains(t))) return;
 
             ModStateMessage modStateMessage;
@@ -412,6 +445,28 @@ namespace ItemResearchSpawner.Components
 
         private void OnSave(object sender, DayEndingEventArgs dayEndingEventArgs)
         {
+            var state = GetCurrentModState();
+
+            if (!Context.IsMainPlayer) return;
+
+            SaveManager.Instance.CommitModState(Game1.player.uniqueMultiplayerID.ToString(), state);
+            SaveManager.Instance.CommitPricelist(_pricelist);
+            SaveManager.Instance.CommitCategories(_categories);
+            // else
+            // {
+            //     var message = new ModStateMessage
+            //     {
+            //         ModState = state,
+            //         PlayerID = Game1.player.uniqueMultiplayerID.ToString()
+            //     };
+            //
+            //     _helper.Multiplayer.SendMessage(message, MessageKeys.MOD_STATE_SAVE_REQUIRED,
+            //         new[] {_modManifest.UniqueID});
+            // }
+        }
+
+        private ModState GetCurrentModState()
+        {
             var state = new ModState
             {
                 ActiveMode = ModMode,
@@ -420,24 +475,7 @@ namespace ItemResearchSpawner.Components
                 SearchText = SearchText,
                 Category = Category
             };
-
-            if (Context.IsMainPlayer)
-            {
-                SaveManager.Instance.CommitModState(Game1.player.uniqueMultiplayerID.ToString(), state);
-                SaveManager.Instance.CommitPricelist(_pricelist);
-                SaveManager.Instance.CommitCategories(_categories);
-            }
-            else
-            {
-                var message = new ModStateMessage
-                {
-                    ModState = state,
-                    PlayerID = Game1.player.uniqueMultiplayerID.ToString()
-                };
-
-                _helper.Multiplayer.SendMessage(message, MessageKeys.MOD_STATE_SAVE_REQUIRED,
-                    new[] {_modManifest.UniqueID});
-            }
+            return state;
         }
 
         private void OnLoad(object sender, DayStartedEventArgs e)

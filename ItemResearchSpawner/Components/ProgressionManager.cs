@@ -93,14 +93,7 @@ namespace ItemResearchSpawner.Components
             //sync with host
             if (!Context.IsMainPlayer)
             {
-                var itemResearchedMessage = new ItemResearchedMessage
-                {
-                    Key = Helpers.GetItemUniqueKey(item),
-                    Progression = progressionItem
-                };
-
-                _helper.Multiplayer.SendMessage(itemResearchedMessage, MessageKeys.PROGRESSION_ITEM_RESEARCHED,
-                    new[] {_modManifest.UniqueID});
+                SendItemResearchMessage(item, progressionItem);
             }
 
             if (item.Stack >= progressCount)
@@ -129,18 +122,7 @@ namespace ItemResearchSpawner.Components
         {
             foreach (var item in ModManager.Instance.ItemRegistry.Values)
             {
-                var progression = TryInitAndReturnProgressionItem(item.Item);
-
-                progression.ResearchCount = 999;
-
-                if (item.Item is Object)
-                {
-                    progression.ResearchCountSilver = 999;
-                    progression.ResearchCountGold = 999;
-                    progression.ResearchCountIridium = 999;
-                }
-
-                OnResearchCompleted();
+                UnlockProgression(item.Item);
             }
         }
 
@@ -157,7 +139,25 @@ namespace ItemResearchSpawner.Components
                 progression.ResearchCountIridium = 999;
             }
 
+            //sync with host
+            if (!Context.IsMainPlayer)
+            {
+                SendItemResearchMessage(activeItem, progression);
+            }
+
             OnResearchCompleted();
+        }
+
+        private void SendItemResearchMessage(Item item, ResearchProgression progression)
+        {
+            var itemResearchedMessage = new ItemResearchedMessage
+            {
+                Key = Helpers.GetItemUniqueKey(item),
+                Progression = progression
+            };
+
+            _helper.Multiplayer.SendMessage(itemResearchedMessage, MessageKeys.PROGRESSION_ITEM_RESEARCHED,
+                new[] {_modManifest.UniqueID});
         }
 
         public IEnumerable<ResearchableItem> GetResearchedItems()
