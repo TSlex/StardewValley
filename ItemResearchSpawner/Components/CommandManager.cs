@@ -197,9 +197,17 @@ namespace ItemResearchSpawner.Components
         {
             if (!CheckIsHostPlayer()) return;
 
+            if (Context.IsMultiplayer)
+            {
+                _monitor.Log($"Wait until all clients response", LogLevel.Info);
+            }
+            
             ProgressionManager.Instance.DumpPlayersProgression();
 
-            _monitor.Log($"Player(s) Progressions were dumped", LogLevel.Info);
+            if (!Context.IsMultiplayer)
+            {
+                _monitor.Log($"Player(s) Progressions were dumped", LogLevel.Info);
+            }
         }
 
         private void LoadProgression(string command, string[] args)
