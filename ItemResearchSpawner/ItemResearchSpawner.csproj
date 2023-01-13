@@ -1,23 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <OutputType>Library</OutputType>
-    <LangVersion>default</LangVersion>
+    <Version>1.0.0</Version>
+    <RootNamespace>ItemResearchSpawner</RootNamespace>
+    <AssemblyName>ItemResearchSpawner</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.Build" />
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <Reference Include="System.IO.Compression" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="I18n.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>I18n.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
+  
   <ItemGroup>
     <Content Include="Assets\config\categories.json" />
     <Content Include="Assets\config\banlist.json" />
@@ -27,10 +19,6 @@
     <Content Include="Assets\images\search-button.png" />
     <Content Include="Assets\images\sell-button.png" />
     <Content Include="Assets\images\sort-icon.png" />
-    <Content Include="I18n.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>I18n.cs</LastGenOutput>
-    </Content>
     <Content Include="i18n\default.json" />
     <Content Include="i18n\ru.json" />
     <Content Include="LICENSE" />
@@ -39,12 +27,19 @@
     <Content Include="release-notes.md" />
     <Content Include="supporting.md" />
   </ItemGroup>
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.0" />
     <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <TranslationClassBuilder_AddGetByKey>True</TranslationClassBuilder_AddGetByKey>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GamePath>G:\SteamLibrary\steamapps\common\Stardew Valley\</GamePath>
+  </PropertyGroup>
+  
 </Project>
