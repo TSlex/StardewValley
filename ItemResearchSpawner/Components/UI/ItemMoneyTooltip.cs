@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Monsters;
 
 namespace ItemResearchSpawner.Components.UI
 {
@@ -19,14 +20,22 @@ namespace ItemResearchSpawner.Components.UI
 
         public void Draw(SpriteBatch spriteBatch, Item hoveredItem)
         {
-            var cost = ModManager.Instance.GetItemPrice(hoveredItem);
-            
-            var costText = hoveredItem.Stack > 1 ? $"{cost * hoveredItem.Stack}({cost})" : $"{cost}";
-            
-            if (cost <= 0)
+            var buyPrice = ModManager.Instance.GetItemBuyPrice(hoveredItem);
+            var sellPrice = ModManager.Instance.GetItemSellPrice(hoveredItem);
+
+            string costText;
+
+            if (buyPrice == sellPrice)
             {
-                costText = "0";
+                costText = hoveredItem.Stack > 1 ? $"{buyPrice * hoveredItem.Stack}({buyPrice})" : $"{buyPrice}";
             }
+            else
+            {
+                costText = hoveredItem.Stack > 1 ? 
+                    $"Buy {buyPrice * hoveredItem.Stack}({buyPrice}) \nSell {sellPrice * hoveredItem.Stack}({sellPrice})" : 
+                    $"Buy {buyPrice} \nSell {sellPrice}";
+            }
+
 
             var mousePos = Game1.getMousePosition();
             var basePosition = new Vector2(mousePos.X, mousePos.Y) + new Vector2(-38, 0);

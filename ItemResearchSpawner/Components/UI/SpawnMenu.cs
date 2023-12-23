@@ -94,10 +94,13 @@ namespace ItemResearchSpawner.Components.UI
             _spawnableItems = spawnableItems;
             _itemsInView = ItemsToGrabMenu.actualInventory;
 
-            ItemsToGrabMenu.highlightMethod = item =>
-                !_dropdownExpanded &&
-                (ModManager.Instance.ModMode == ModMode.Spawn ||
-                 ModManager.Instance.GetItemPrice(item, true) <= Game1.player._money);
+            ItemsToGrabMenu.highlightMethod = (item) =>
+            {
+                //monitor.Log($"{item.Name}:{ModManager.Instance.GetItemBuyPrice(item, true)}", LogLevel.Warn);
+                return !_dropdownExpanded &&
+                (ModManager.Instance.ModMode == ModMode.Research ||
+                 ModManager.Instance.GetItemBuyPrice(item, true) <= Game1.player._money);
+            };
 
             drawBG = false; // disable to draw default ui over new menu
             behaviorOnItemGrab = OnItemGrab;
@@ -206,7 +209,7 @@ namespace ItemResearchSpawner.Components.UI
             _categorySelector.Draw(spriteBatch);
             _searchBarTab.Draw(spriteBatch);
 
-            if (ModManager.Instance.ModMode == ModMode.Buy && hoveredItem != null)
+            if (ModManager.Instance.ModMode != ModMode.Research && hoveredItem != null)
             {
                 _moneyTooltip.Draw(spriteBatch, hoveredItem);
             }
@@ -245,7 +248,7 @@ namespace ItemResearchSpawner.Components.UI
             {
                 TryTrashItem();
             }
-            else if (ModManager.Instance.ModMode == ModMode.Buy && GrabMenuBounds.Contains(x, y) && heldItem != null &&
+            else if (ModManager.Instance.ModMode != ModMode.Research && GrabMenuBounds.Contains(x, y) && heldItem != null &&
                      ProgressionManager.Instance.ItemResearched(heldItem))
             {
                 ModManager.Instance.SellItem(heldItem);
@@ -443,9 +446,9 @@ namespace ItemResearchSpawner.Components.UI
                     ScrollView(direction);
                 }
             }
-            else if (key == Keys.Delete && ModManager.Instance.ModMode == ModMode.Spawn)
+            else if (key == Keys.Delete && ModManager.Instance.ModMode == ModMode.Research)
             {
-                if (heldItem != null && ModManager.Instance.ModMode == ModMode.Spawn)
+                if (heldItem != null && ModManager.Instance.ModMode == ModMode.Research)
                 {
                     if (TryTrashItem(heldItem))
                     {
@@ -487,7 +490,8 @@ namespace ItemResearchSpawner.Components.UI
                     {
                         switch (ModManager.Instance.ModMode)
                         {
-                            case ModMode.Buy:
+                            case ModMode.BuySell:
+                            case ModMode.Combined:
                                 ModManager.Instance.SellItem(item);
                                 Game1.player.removeItemFromInventory(item);
                                 break;
@@ -505,10 +509,19 @@ namespace ItemResearchSpawner.Components.UI
             {
                 if (ProgressionManager.Instance.ItemResearched(hoveredItem))
                 {
-                    if (ModManager.Instance.ModMode == ModMode.Buy)
+/*                    if (ModManager.Instance.ModMode == ModMode.Buy)
                     {
                         ModManager.Instance.SellItem(hoveredItem);
                         UpdateView();
+                    }*/
+
+                    switch (ModManager.Instance.ModMode) {
+                        case ModMode.BuySell:
+                        case ModMode.Combined:
+                            ModManager.Instance.SellItem(hoveredItem);
+                            UpdateView();
+                            break;
+                        default: break;
                     }
                     
                     // hereafter item will be deleted
@@ -548,6 +561,17 @@ namespace ItemResearchSpawner.Components.UI
         {
             if (ProgressionManager.Instance.ItemResearched(item))
             {
+
+                switch (ModManager.Instance.ModMode)
+                {
+                    case ModMode.BuySell:
+                    case ModMode.Combined:
+                        ModManager.Instance.SellItem(item);
+                        UpdateView();
+                        break;
+                    default: break;
+                }
+
                 Utility.trashItem(item);
 
                 return true;
@@ -600,8 +624,7 @@ namespace ItemResearchSpawner.Components.UI
 
         private void OnItemGrab(Item item, Farmer player)
         {
-            if (ModManager.Instance.ModMode == ModMode.Buy &&
-                ModManager.Instance.GetItemPrice(item, true) <= Game1.player._money)
+            if (ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.GetItemBuyPrice(item, true) <= Game1.player._money)
             {
                 ModManager.Instance.BuyItem(item);
             }
@@ -677,7 +700,8 @@ namespace ItemResearchSpawner.Components.UI
 
                 switch (ModManager.Instance.ModMode)
                 {
-                    case ModMode.Buy:
+                    case ModMode.Combined:
+                    case ModMode.BuySell:
                         item.Stack = prefab.GetAvailableQuantity(Game1.player._money, ModManager.Instance.Quality,
                             out var availableQuality);
 
@@ -688,7 +712,7 @@ namespace ItemResearchSpawner.Components.UI
                         break;
                 }
 
-                if (ModManager.Instance.ModMode != ModMode.Buy)
+                if (ModManager.Instance.ModMode == ModMode.Research)
                 {
                     quality = item is Object
                         ? prefab.GetAvailableQuality(ModManager.Instance.Quality)
