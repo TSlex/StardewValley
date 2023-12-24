@@ -35,6 +35,10 @@ namespace ItemResearchSpawner.Components
         private string _searchText;
         private string _category;
 
+        private readonly float researchMultiplier;
+        private readonly float buyPriceMultiplier;
+        private readonly float sellPriceMultiplier;
+
         public ModDataCategory[] AvailableCategories => _categories.ToArray();
 
         public ItemQuality Quality
@@ -152,6 +156,10 @@ namespace ItemResearchSpawner.Components
             _helper.Events.GameLoop.DayEnding += OnSave;
             _helper.Events.GameLoop.DayStarted += OnLoad;
             _helper.Events.Multiplayer.ModMessageReceived += OnMessageReceived;
+
+            researchMultiplier = _helper.ReadConfig<ModConfig>().ResearchAmountMultiplier;
+            buyPriceMultiplier = _helper.ReadConfig<ModConfig>().BuyPriceMultiplier;
+            sellPriceMultiplier = _helper.ReadConfig<ModConfig>().SellPriceMultiplier;
         }
 
         private void InitRegistry(IEnumerable<SpawnableItem> items)
@@ -202,15 +210,37 @@ namespace ItemResearchSpawner.Components
             Game1.player._money += GetItemSellPrice(item, true);
         }
 
+        public (int buy, int sell) GetItemPrices(Item item, bool countStack = false)
+        {
+            var price = GetItemPrice(item, false);
+
+            var buyPrice = (int)MathF.Round((float)price * buyPriceMultiplier);
+            buyPrice = buyPrice >= 0 ? buyPrice : 0;
+
+            var sellPrice = (int)MathF.Round((float)price * sellPriceMultiplier);
+            sellPrice = sellPrice >= 0 ? sellPrice : 0;
+
+            if (countStack)
+            {
+                buyPrice *= item.Stack;
+                sellPrice *= item.Stack;
+            }
+
+
+            return new (buyPrice, sellPrice);
+        }
+
         public int GetItemBuyPrice(Item item, bool countStack = false)
         {
-            var buyPrice = GetItemPrice(item, countStack, _helper.ReadConfig<ModConfig>().BuyPriceMultiplier);
+            var buyPrice = GetItemPrice(item, countStack, buyPriceMultiplier);
+
             return buyPrice >= 0 ? buyPrice : 0;
         }
 
         public int GetItemSellPrice(Item item, bool countStack = false)
         {
-            var sellPrice = GetItemPrice(item, countStack, _helper.ReadConfig<ModConfig>().SellPriceMultiplier);
+            var sellPrice = GetItemPrice(item, countStack, sellPriceMultiplier);
+
             return sellPrice >= 0 ? sellPrice : 0;
         }
 
@@ -242,7 +272,10 @@ namespace ItemResearchSpawner.Components
                 price = spawnableItem.CategoryPrice;
             }
 
-            price = (int)MathF.Round((float)price * multiplyBy);
+            if (multiplyBy != 1.0f)
+            {
+                price = (int)MathF.Round((float)price * multiplyBy);
+            }
 
 
             if (countStack)
@@ -545,7 +578,7 @@ namespace ItemResearchSpawner.Components
                     : I18n.Category_Misc();
 
                 int baseResearchCount = category?.ResearchCount ?? 1;
-                float researchMultiplier = _helper.ReadConfig<ModConfig>().ResearchAmountMultiplier;
+                //float researchMultiplier = _helper.ReadConfig<ModConfig>().ResearchAmountMultiplier;
 
                 yield return new SpawnableItem(entry, label ?? I18n.Category_Misc(), category?.BaseCost ?? 100,
                     (int)((float)baseResearchCount * researchMultiplier));

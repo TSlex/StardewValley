@@ -709,15 +709,14 @@ namespace ItemResearchSpawner.Components.UI
                         break;
                     default:
                         item.Stack = item.maximumStackSize();
+
+                        quality = item is Object
+                            ? prefab.GetAvailableQuality(ModManager.Instance.Quality)
+                            : ItemQuality.Normal;
+
                         break;
                 }
 
-                if (ModManager.Instance.ModMode == ModMode.Research)
-                {
-                    quality = item is Object
-                        ? prefab.GetAvailableQuality(ModManager.Instance.Quality)
-                        : ItemQuality.Normal;
-                }
 
                 if (item is Object obj)
                 {

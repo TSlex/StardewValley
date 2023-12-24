@@ -20,22 +20,22 @@ namespace ItemResearchSpawner.Components.UI
 
         public void Draw(SpriteBatch spriteBatch, Item hoveredItem)
         {
-            var buyPrice = ModManager.Instance.GetItemBuyPrice(hoveredItem);
-            var sellPrice = ModManager.Instance.GetItemSellPrice(hoveredItem);
+            var prices = ModManager.Instance.GetItemPrices(hoveredItem);
 
             string costText;
 
-            if (buyPrice == sellPrice)
+            if (prices.buy == prices.sell)
             {
-                costText = hoveredItem.Stack > 1 ? $"{buyPrice * hoveredItem.Stack}({buyPrice})" : $"{buyPrice}";
+                costText = hoveredItem.Stack > 1 ? $"{prices.buy * hoveredItem.Stack}({prices.buy})" : $"{prices.buy}";
             }
             else
             {
-                costText = hoveredItem.Stack > 1 ? 
-                    $"Buy {buyPrice * hoveredItem.Stack}({buyPrice}) \nSell {sellPrice * hoveredItem.Stack}({sellPrice})" : 
-                    $"Buy {buyPrice} \nSell {sellPrice}";
+                costText = hoveredItem.Stack > 1 ?
+                    $"Buy {prices.buy * hoveredItem.Stack}({prices.buy}) \nSell {prices.sell * hoveredItem.Stack}({prices.sell})" :
+                    $"Buy {prices.buy} \nSell {prices.sell}";
             }
 
+            //var costText = "0";
 
             var mousePos = Game1.getMousePosition();
             var basePosition = new Vector2(mousePos.X, mousePos.Y) + new Vector2(-38, 0);
