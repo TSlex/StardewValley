@@ -6,7 +6,7 @@ using StardewModdingAPI.Utilities;
 
 namespace ItemResearchSpawner.Models
 {
-    public interface GenericModConfigMenuAPI
+    public interface IGenericModConfigMenuAPI
     {
         void RegisterModConfig(IManifest mod, Action revertToDefault, Action saveToFile);
         void UnregisterModConfig(IManifest mod);
