@@ -26,6 +26,7 @@ namespace ItemResearchSpawner.Components
         private List<ModDataCategory> _categories;
 
         private ModState _syncedModState;
+        private ModConfig _config;
 
         #region Proprerties
 
@@ -34,10 +35,6 @@ namespace ItemResearchSpawner.Components
         private ItemSortOption _sortOption;
         private string _searchText;
         private string _category;
-
-        private readonly float researchMultiplier;
-        private readonly float buyPriceMultiplier;
-        private readonly float sellPriceMultiplier;
 
         public ModDataCategory[] AvailableCategories => _categories.ToArray();
 
@@ -136,7 +133,7 @@ namespace ItemResearchSpawner.Components
 
         public event UpdateMenuView OnUpdateMenuView;
 
-        public ModManager(IMonitor monitor, IModHelper helper, IManifest modManifest)
+        public ModManager(IMonitor monitor, IModHelper helper, IManifest modManifest, ModConfig config)
         {
             Instance ??= this;
 
@@ -157,9 +154,7 @@ namespace ItemResearchSpawner.Components
             _helper.Events.GameLoop.DayStarted += OnLoad;
             _helper.Events.Multiplayer.ModMessageReceived += OnMessageReceived;
 
-            researchMultiplier = _helper.ReadConfig<ModConfig>().ResearchAmountMultiplier;
-            buyPriceMultiplier = _helper.ReadConfig<ModConfig>().BuyPriceMultiplier;
-            sellPriceMultiplier = _helper.ReadConfig<ModConfig>().SellPriceMultiplier;
+            _config = config;
         }
 
         private void InitRegistry(IEnumerable<SpawnableItem> items)
@@ -214,10 +209,10 @@ namespace ItemResearchSpawner.Components
         {
             var price = GetItemPrice(item, false);
 
-            var buyPrice = (int)MathF.Round((float)price * buyPriceMultiplier);
+            var buyPrice = (int)MathF.Round((float)price * _config.BuyPriceMultiplier);
             buyPrice = buyPrice >= 0 ? buyPrice : 0;
 
-            var sellPrice = (int)MathF.Round((float)price * sellPriceMultiplier);
+            var sellPrice = (int)MathF.Round((float)price * _config.SellPriceMultiplier);
             sellPrice = sellPrice >= 0 ? sellPrice : 0;
 
             if (countStack)
@@ -232,14 +227,14 @@ namespace ItemResearchSpawner.Components
 
         public int GetItemBuyPrice(Item item, bool countStack = false)
         {
-            var buyPrice = GetItemPrice(item, countStack, buyPriceMultiplier);
+            var buyPrice = GetItemPrice(item, countStack, _config.BuyPriceMultiplier);
 
             return buyPrice >= 0 ? buyPrice : 0;
         }
 
         public int GetItemSellPrice(Item item, bool countStack = false)
         {
-            var sellPrice = GetItemPrice(item, countStack, sellPriceMultiplier);
+            var sellPrice = GetItemPrice(item, countStack, _config.SellPriceMultiplier);
 
             return sellPrice >= 0 ? sellPrice : 0;
         }
@@ -581,7 +576,7 @@ namespace ItemResearchSpawner.Components
                 //float researchMultiplier = _helper.ReadConfig<ModConfig>().ResearchAmountMultiplier;
 
                 yield return new SpawnableItem(entry, label ?? I18n.Category_Misc(), category?.BaseCost ?? 100,
-                    (int)((float)baseResearchCount * researchMultiplier));
+                    (int)((float)baseResearchCount * _config.ResearchAmountMultiplier));
             }
         }
     }

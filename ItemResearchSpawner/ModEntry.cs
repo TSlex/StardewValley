@@ -40,7 +40,7 @@ namespace ItemResearchSpawner
             I18n.Init(helper.Translation);
 
             _saveManager ??= new SaveManager(Monitor, _helper, ModManifest);
-            _modManager ??= new ModManager(Monitor, _helper, ModManifest);
+            _modManager ??= new ModManager(Monitor, _helper, ModManifest, _config);
             _progressionManager ??= new ProgressionManager(Monitor, _helper, ModManifest);
 
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
