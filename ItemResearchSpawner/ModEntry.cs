@@ -35,7 +35,7 @@ namespace ItemResearchSpawner
                 helper.WriteConfig(_config);
                 Monitor.LogOnce("Failed to load config.json, replaced with default one");
             }
-            
+
 
             I18n.Init(helper.Translation);
 
@@ -67,11 +67,11 @@ namespace ItemResearchSpawner
             api.RegisterSimpleOption(ModManifest, "Menu open key", "Key to open mod menu",
                 () => _config.ShowMenuButton, val => _config.ShowMenuButton = val);
 
-            var availableModes = new List<string>(){"Research (Spawn) mode", "Buy/Sell mode", "Combined (Research->Sell/Buy) mode" };
-            
-            api.RegisterChoiceOption(ModManifest, "Default mode", "Mod menu mode for the new games", 
-                () => availableModes[(int)_config.DefaultMode], val => _config.DefaultMode = (ModMode) availableModes.IndexOf(val), availableModes.ToArray());
-            
+            var availableModes = new List<string>() { "Research (Spawn) mode", "Buy/Sell mode", "Combined (Research->Sell/Buy) mode" };
+
+            api.RegisterChoiceOption(ModManifest, "Default mode", "Mod menu mode for the new games",
+                () => availableModes[(int)_config.DefaultMode], val => _config.DefaultMode = (ModMode)availableModes.IndexOf(val), availableModes.ToArray());
+
             api.RegisterSimpleOption(ModManifest, "Force default config", "If true, mod will use predefined config in assets folder such as pricelist and categories",
                 () => _config.UseDefaultBalanceConfig, val => _config.UseDefaultBalanceConfig = val);
 

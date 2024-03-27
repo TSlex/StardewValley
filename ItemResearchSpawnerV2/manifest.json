@@ -4,7 +4,7 @@
   "Version": "2.0.0",
   "Description": "Give any item you want as long as you've researched it!",
   "UniqueID": "TSlex.ItemResearchSpawner",
-  "EntryDll": "ItemResearchSpawner.dll",
+  "EntryDll": "ItemResearchSpawnerV2.dll",
   "MinimumApiVersion": "4.0.0",
   "UpdateKeys": [ "Nexus:8933" ],
   "Dependencies": [
