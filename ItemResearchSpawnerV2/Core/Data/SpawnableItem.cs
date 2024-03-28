@@ -1,8 +1,7 @@
-﻿using ItemResearchSpawner.Components;
-using ItemResearchSpawner.Models.Enums;
+﻿
+using ItemResearchSpawnerV2.Core.Data;
 
-namespace ItemResearchSpawner.Models
-{
+namespace ItemResearchSpawnerV2.Models {
     /**
         MIT License
 
@@ -27,21 +26,24 @@ namespace ItemResearchSpawner.Models
         SOFTWARE.
      **/
 
-    internal class SpawnableItem : SearchableItem
-    {
-        private readonly int _progressionLimit;
-        
-        public string Category { get; }
-        
-        public int CategoryPrice { get; }
+    internal class SpawnableItem : SearchableItem {
 
-        public int ProgressionLimit => ModManager.Instance.ModMode == ModMode.BuySell ? 1 : _progressionLimit;
+        public string Category {
+            get;
+        }
 
-        public SpawnableItem(SearchableItem item, string category, int categoryPrice, int progressionLimit) : base(item)
-        {
+        public int CategoryPrice {
+            get;
+        }
+
+        public int ProgressionLimit {
+            get;
+        }
+
+        public SpawnableItem(SearchableItem item, string category, int categoryPrice, int progressionLimit) : base(item) {
             Category = category;
             CategoryPrice = categoryPrice;
-            _progressionLimit = progressionLimit;
+            ProgressionLimit = progressionLimit;
         }
     }
 }

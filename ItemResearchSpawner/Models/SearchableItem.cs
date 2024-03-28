@@ -3,12 +3,11 @@ using ItemResearchSpawner.Models.Enums;
 using StardewValley;
 using Object = StardewValley.Object;
 
-namespace ItemResearchSpawner.Models
-{
+namespace ItemResearchSpawner.Models {
     /**
         MIT License
 
-        Copyright (c) 2018 CJBok
+        Copyright (c) 2018 Pathoschild, CJBok
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -28,47 +27,47 @@ namespace ItemResearchSpawner.Models
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
      **/
-    public class SearchableItem
-    {
-        public ItemType Type { get; }
-        public Item Item { get; }
-        public Func<Item> CreateItem { get; }
-        public int ID { get; }
+    public class SearchableItem {
+        public ItemType Type {
+            get;
+        }
+        public Item Item {
+            get;
+        }
+        public Func<Item> CreateItem {
+            get;
+        }
+        public int ID {
+            get;
+        }
         public string Name => Item.Name;
         public string DisplayName => Item.DisplayName;
 
-        public SearchableItem(ItemType type, int id, Func<SearchableItem, Item> createItem)
-        {
+        public SearchableItem(ItemType type, int id, Func<SearchableItem, Item> createItem) {
             Type = type;
             ID = id;
             CreateItem = () => createItem(this);
             Item = createItem(this);
         }
 
-        public SearchableItem(SearchableItem item)
-        {
+        public SearchableItem(SearchableItem item) {
             Type = item.Type;
             ID = item.ID;
             CreateItem = item.CreateItem;
             Item = item.Item;
         }
 
-        public bool EqualsToSItem(Item item)
-        {
-            if (!Item.Category.Equals(item.category))
-            {
+        public bool EqualsToSItem(Item item) {
+            if (!Item.Category.Equals(item.category)) {
                 return false;
             }
 
-            if (!Item.Name.Equals(item.Name))
-            {
+            if (!Item.Name.Equals(item.Name)) {
                 return false;
             }
 
-            if (Item.ParentSheetIndex.Equals(item.ParentSheetIndex))
-            {
-                if (Item is Object item1 && Item is Object item2)
-                {
+            if (Item.ParentSheetIndex.Equals(item.ParentSheetIndex)) {
+                if (Item is Object item1 && Item is Object item2) {
                     return item1.quality.Equals(item2.quality);
                 }
 

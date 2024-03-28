@@ -5,6 +5,7 @@
         Research,
         BuySell,
         Combined,
+        God
     }
 
     internal static class ModModeExtensions
@@ -17,6 +18,7 @@
                 ModMode.Research => "Research (Spawn) mode",
                 ModMode.BuySell => "Buy/Sell mode",
                 ModMode.Combined => "Combined mode",
+                ModMode.God => "God mode",
                 _ => "???"
             };
         }

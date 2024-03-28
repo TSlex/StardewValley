@@ -1,10 +1,6 @@
-﻿using System;
-using ItemResearchSpawnerV2.Core;
-using Microsoft.Xna.Framework;
+﻿using ItemResearchSpawnerV2.Core;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewModdingAPI.Utilities;
-using StardewValley;
 
 
 namespace ItemResearchSpawnerV2 {
@@ -26,7 +22,7 @@ namespace ItemResearchSpawnerV2 {
 
             // -----------------------------------------------
 
-            _manager = new ModManager(helper);
+            _manager = new ModManager(helper, _config, Monitor, ModManifest);
 
             // -----------------------------------------------
 
