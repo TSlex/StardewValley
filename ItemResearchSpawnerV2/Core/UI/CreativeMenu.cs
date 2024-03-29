@@ -80,8 +80,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     //    location2 += 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
                     //}
 
-                    actualInventory[l].drawInMenu(b, location2, 1f, 
-                        (!flag) ? 0.25f : 1f, 0.865f, StackDrawType.Draw, Color.White, flag);
+                    //var item = actualInventory[l];
+                    //var itemData = ItemRegistry.GetDataOrErrorItem(item.QualifiedItemId);
+                    //var scale = 1f;
+
+                    //b.Draw(itemData.GetTexture(), location2 + new Vector2(32f, 32f) * scale, new Rectangle?(itemData.GetSourceRect()), 
+                    //    Color.Black * 0.5f, 0.0f, Vector2.Zero, 4f * scale, SpriteEffects.None, 0.9f);
+
+                    //// this drawn quality icons and stack
+                    //item.DrawMenuIcons(b, location2, 1f, 1f, 0.9f, StackDrawType.HideButShowQuality, Color.White);
+
+                    actualInventory[l].drawInMenu(b, location2, 1f, 1f, 0.865f, StackDrawType.HideButShowQuality, Color.White, flag);
 
                     //Utility.drawTinyDigits(num, sb, 
                     //    location + new Vector2((float)(64 - Utility.getWidthOfTinyDigitString(num, 3f * scale_size)) + 3f * scale_size, 

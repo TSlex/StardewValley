@@ -40,7 +40,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
                 var quality = ItemQuality.Normal;
 
-                switch (ModManager.Instance.modMode) {
+                switch (ModManager.Instance.ModMode) {
                     case ModMode.Combined:
                     case ModMode.BuySell:
                         item.Stack = item.maximumStackSize();
@@ -50,7 +50,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                         item.Stack = item.maximumStackSize();
 
                         quality = item is SObject
-                            ? ItemQuality.Normal
+                            ? ItemQuality.Iridium
                             : ItemQuality.Normal;
 
                         break;

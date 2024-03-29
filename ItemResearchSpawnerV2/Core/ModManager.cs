@@ -8,15 +8,15 @@ namespace ItemResearchSpawnerV2.Core {
     internal class ModManager {
         public static ModManager Instance;
 
-        private readonly IModHelper helper;
-        private readonly IMonitor monitor;
-        private readonly IManifest manifest;
-        private readonly ModConfig config;
+        public readonly IModHelper helper;
+        public readonly IMonitor monitor;
+        public readonly IManifest manifest;
+        public readonly ModConfig config;
 
         private readonly ProgressionManager progressionManager;
 
-        public readonly ModMode modMode = ModMode.Research;
-        public readonly ItemQuality itemQuality = ItemQuality.Normal;
+        public ModMode ModMode = ModMode.Research;
+        public ItemQuality ItemQuality = ItemQuality.Normal;
 
         // ===========================================================================================
 

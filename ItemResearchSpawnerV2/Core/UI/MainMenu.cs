@@ -1,15 +1,23 @@
-﻿using ItemResearchSpawnerV2.Core.Utils;
+﻿using ItemResearchSpawnerV2.Components.UI;
+using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Extensions;
 using StardewValley.Menus;
+using System.Threading;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     internal class MainMenu : ItemGrabMenu {
 
         protected readonly CreativeMenu CreativeMenu;
+
+        private CashTab CashTab;
+        private QualityButton QualityButton;
+        private FavoriteButton FavoriteButton;
+        private DisplayButton DisplayButton;
+        private SettingsButton SettingsButton;
 
         private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
@@ -36,12 +44,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // =========================================================================
 
-            CreativeMenu = new(ItemsToGrabMenu);
-            CreativeMenu.rows = 2;
+            CreativeMenu = new(ItemsToGrabMenu) {
+                rows = 2
+            };
             CreativeMenu.capacity = CreativeMenu.rows * 8;
-
             CreativeMenu.verticalGap += 40;
             CreativeMenu.horizontalGap += 20;
+
+            // ----------------------------------------------------
+
+            CashTab = new CashTab(() =>  xPositionOnScreen + width - borderWidth + 10, () => yPositionOnScreen - borderWidth + 16, 180);
+
+            QualityButton = new QualityButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4);
+            FavoriteButton = new FavoriteButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72);
+            DisplayButton = new DisplayButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 2);
+            SettingsButton = new SettingsButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3);
         }
 
         public override void draw(SpriteBatch b) {
@@ -60,6 +77,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             DrawInventoryMenu(b);
             DrawCreativeMenu(b);
+
+            CashTab.Draw(b);
+            QualityButton.Draw(b);
+            FavoriteButton.Draw(b);
+            DisplayButton.Draw(b);
+            SettingsButton.Draw(b);
+
             DrawItems(b);
 
             // ----------------------------------------------------
@@ -158,9 +182,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 );
 
 
-            b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 100, yPositionOnScreen + 64 + 16), new Rectangle(16, 368, 12, 16), Color.White, 4.712389f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
-            b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 100, yPositionOnScreen + 64 - 16), new Rectangle(21, 368, 11, 16), Color.White, 4.712389f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
-            b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 84, yPositionOnScreen + 64 - 44), new Rectangle(146, 447, 11, 10), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
+            //b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 100, yPositionOnScreen + 64 + 16), new Rectangle(16, 368, 12, 16), Color.White, 4.712389f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
+            //b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 100, yPositionOnScreen + 64 - 16), new Rectangle(21, 368, 11, 16), Color.White, 4.712389f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
+            //b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 84, yPositionOnScreen + 64 - 44), new Rectangle(146, 447, 11, 10), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
         }
 
         private void DrawInventoryMenu(SpriteBatch b) {

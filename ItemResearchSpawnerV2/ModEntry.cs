@@ -1,6 +1,7 @@
 ﻿using ItemResearchSpawnerV2.Core;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley;
 
 
 namespace ItemResearchSpawnerV2 {
