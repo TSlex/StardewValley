@@ -1,47 +1,92 @@
 ﻿using ItemResearchSpawnerV2.Core.Enums;
+using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace ItemResearchSpawnerV2.Core.UI
-{
-    internal class ItemResearchArea
-    {
-        private readonly ClickableComponent _researchArea;
-        private readonly ClickableTextureComponent _researchButton;
+namespace ItemResearchSpawnerV2.Core.UI {
+    internal class ItemResearchArea {
+        private readonly ClickableComponent ResearchArea;
+        private readonly ClickableTextureComponent ResearchButton;
 
-        private readonly Texture2D _researchTexture;
-        private readonly Texture2D _sellTexture;
-        private readonly Texture2D _combinedTexture;
+        private readonly Texture2D ResearchTexture;
+        private readonly Texture2D SellTexture;
+        private readonly Texture2D CombinedTexture;
 
-        private Item _researchItem;
+        private Item ResearchItem;
+        private Item LastItem;
+        private string ItemProgression;
 
-        private Item _lastItem;
-        private string _itemProgression;
+        private readonly Func<int> GetXPos;
+        private readonly Func<int> GetYPos;
+        private readonly int Width;
 
-        //public ItemResearchArea(IContentHelper content, IMonitor monitor, int x, int y)
-        //{
-        //    // _researchTexture = content.Load<Texture2D>("assets/images/search-button.png");
-        //    // _sellTexture = content.Load<Texture2D>("assets/images/sell-button.png");
+        private static IModContentHelper Content => ModManager.Instance.helper.ModContent;
 
-        //    _researchTexture = content.Load<Texture2D>(Path.Combine("assets", "images", "search-button"));
-        //    _sellTexture = content.Load<Texture2D>(Path.Combine("assets", "images", "sell-button.png"));
-        //    _combinedTexture = content.Load<Texture2D>(Path.Combine("assets", "images", "combined-button.png"));
+        public ItemResearchArea(Func<int> getXPos, Func<int> getYPos, int width) {
 
-        //    _researchArea = new ClickableComponent(new Rectangle(x, y, Game1.tileSize + 60, Game1.tileSize + 50), "");
+            GetXPos = getXPos;
+            GetYPos = getYPos;
+            Width = width;
 
-        //    _researchButton = new ClickableTextureComponent(
-        //        new Rectangle(
-        //            RenderHelpers.GetChildCenterPosition(x, _researchArea.bounds.Width + 2 * UIConstants.BorderWidth,
-        //                _researchTexture.Width),
-        //            _researchArea.bounds.Height + 38 + y, _researchTexture.Width,
-        //            _researchTexture.Height), _researchTexture,
-        //        new Rectangle(0, 0, _researchTexture.Width, _researchTexture.Height), 1f);
+            ResearchTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "search-button"));
+            SellTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "sell-button.png"));
+            CombinedTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "combined-button.png"));
 
-        //    ProgressionManager.OnStackChanged += OnStackChanged;
-        //}
+            ResearchArea = new ClickableComponent(new Rectangle(getXPos(), getYPos(), width, Game1.tileSize + 50), "");
+
+            ResearchButton = new ClickableTextureComponent(
+                new Rectangle(
+                    DrawHelper.GetChildCenterPosition(getXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),
+                    ResearchArea.bounds.Height + 38 + getYPos(), ResearchTexture.Width, ResearchTexture.Height),
+                ResearchTexture, new Rectangle(0, 0, ResearchTexture.Width, ResearchTexture.Height), 1f);
+
+            //ProgressionManager.OnStackChanged += OnStackChanged;
+        }
+        public void Draw(SpriteBatch spriteBatch) {
+
+            ResearchArea.bounds.X = GetXPos();
+            ResearchArea.bounds.Y = GetYPos();
+
+            var buttonNewLocation = new Rectangle(
+                    DrawHelper.GetChildCenterPosition(GetXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),
+                    ResearchArea.bounds.Height + 38 + GetYPos(), ResearchTexture.Width, ResearchTexture.Height);
+
+            ResearchButton.bounds.X = buttonNewLocation.X;
+            ResearchButton.bounds.Y = buttonNewLocation.Y;
+
+            // ------------------------------------------------------------------------------------------------------
+
+            DrawHelper.DrawMenuBox(ResearchArea.bounds.X, ResearchArea.bounds.Y,
+                ResearchArea.bounds.Width, ResearchArea.bounds.Height, out var areaInnerAnchors);
+
+            var researchItemCellX = areaInnerAnchors.X + ResearchArea.bounds.Width / 2f - Game1.tileSize / 2f;
+
+            DrawHelper.DrawItemBox((int)researchItemCellX, (int)areaInnerAnchors.Y + 10, Game1.tileSize,
+                Game1.tileSize,
+                out _);
+
+            var researchProgressString = GetItemProgression();
+
+            var progressFont = Game1.smallFont;
+            var progressPositionX = areaInnerAnchors.X + ResearchArea.bounds.Width / 2f -
+                                    progressFont.MeasureString(researchProgressString).X / 2f;
+
+            spriteBatch.DrawString(progressFont, researchProgressString,
+                new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
+
+
+            var buttonTexture = ModManager.Instance.ModMode switch {
+                ModMode.BuySell => SellTexture,
+                ModMode.Combined => CombinedTexture,
+                _ => ResearchTexture
+            };
+
+            spriteBatch.Draw(buttonTexture, ResearchButton.bounds, ResearchButton.sourceRect, Color.White);
+            ResearchItem?.drawInMenu(spriteBatch, new Vector2(researchItemCellX, areaInnerAnchors.Y + 10), 1f);
+        }
 
         //public Rectangle Bounds => _researchArea.bounds;
 
@@ -85,47 +130,14 @@ namespace ItemResearchSpawnerV2.Core.UI
         //    }
         //}
 
-        //public void Draw(SpriteBatch spriteBatch)
-        //{
-        //    RenderHelpers.DrawMenuBox(_researchArea.bounds.X, _researchArea.bounds.Y,
-        //        _researchArea.bounds.Width, _researchArea.bounds.Height, out var areaInnerAnchors);
 
-        //    var researchItemCellX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f - Game1.tileSize / 2f;
-        //    RenderHelpers.DrawItemBox((int)researchItemCellX, (int)areaInnerAnchors.Y + 10, Game1.tileSize,
-        //        Game1.tileSize,
-        //        out _);
-
-        //    var researchProgressString = GetItemProgression();
-
-        //    var progressFont = Game1.smallFont;
-        //    var progressPositionX = areaInnerAnchors.X + _researchArea.bounds.Width / 2f -
-        //                            progressFont.MeasureString(researchProgressString).X / 2f;
-
-        //    spriteBatch.DrawString(progressFont, researchProgressString,
-        //        new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
-
-
-        //    var buttonTexture = ModManager.Instance.ModMode switch
-        //    {
-        //        ModMode.BuySell => _sellTexture,
-        //        ModMode.Combined => _combinedTexture,
-        //        _ => _researchTexture
-        //    };
-
-
-
-        //    spriteBatch.Draw(buttonTexture, _researchButton.bounds, _researchButton.sourceRect, Color.White);
-
-        //    _researchItem?.drawInMenu(spriteBatch, new Vector2(researchItemCellX, areaInnerAnchors.Y + 10), 1f);
-        //}
 
         //public void PrepareToBeKilled()
         //{
         //    ProgressionManager.OnStackChanged -= OnStackChanged;
         //}
 
-        private string GetItemProgression()
-        {
+        private string GetItemProgression() {
             return "(0 / 0)";
 
             //if (_researchItem == null)
@@ -142,17 +154,14 @@ namespace ItemResearchSpawnerV2.Core.UI
             //return _itemProgression;
         }
 
-        private void OnStackChanged(int newCount)
-        {
-            _lastItem = null;
+        private void OnStackChanged(int newCount) {
+            LastItem = null;
 
-            if (newCount <= 0)
-            {
-                _researchItem = null;
+            if (newCount <= 0) {
+                ResearchItem = null;
             }
-            else if (_researchItem != null)
-            {
-                _researchItem.Stack = newCount % _researchItem.maximumStackSize();
+            else if (ResearchItem != null) {
+                ResearchItem.Stack = newCount % ResearchItem.maximumStackSize();
             }
         }
     }

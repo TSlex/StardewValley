@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Extensions;
+using StardewValley.Inventories;
 using StardewValley.Menus;
 using System.Threading;
 
@@ -13,11 +14,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         protected readonly CreativeMenu CreativeMenu;
 
-        private CashTab CashTab;
-        private QualityButton QualityButton;
-        private FavoriteButton FavoriteButton;
-        private DisplayButton DisplayButton;
-        private SettingsButton SettingsButton;
+        private readonly CashTab CashTab;
+        private readonly QualityButton QualityButton;
+        private readonly FavoriteButton FavoriteButton;
+        private readonly DisplayButton DisplayButton;
+        private readonly SettingsButton SettingsButton;
+        private readonly Dropdown<string> CategoryDropdown;
+        private readonly Dropdown<string> SortDropdown;
+        private readonly SearchBar ItemSearchBarTab;
+        private readonly ItemResearchArea ItemResearchArea;
+        private readonly ClickableTextureComponent LeftArrow;
+        private readonly ClickableTextureComponent RightArrow;
 
         private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
@@ -44,6 +51,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // =========================================================================
 
+            xPositionOnScreen -= 32;
+            inventory.xPositionOnScreen -= 32;
+            foreach (var item in inventory.inventory) {
+                item.bounds.X -= 32;
+            }
+            
+
+            trashCan.bounds.X += 8;
+            okButton.bounds.X += 8;
+
+
             CreativeMenu = new(ItemsToGrabMenu) {
                 rows = 2
             };
@@ -53,12 +71,28 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // ----------------------------------------------------
 
-            CashTab = new CashTab(() =>  xPositionOnScreen + width - borderWidth + 10, () => yPositionOnScreen - borderWidth + 16, 180);
+            CashTab = new CashTab(() => xPositionOnScreen + width - borderWidth + 10, () => yPositionOnScreen - borderWidth + 16, 180);
 
             QualityButton = new QualityButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4);
             FavoriteButton = new FavoriteButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72);
             DisplayButton = new DisplayButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 2);
             SettingsButton = new SettingsButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3);
+
+            CategoryDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 
+                Game1.smallFont, CategoryDropdown?.Selected ?? "ALL", Enumerable.Repeat("_CATEGORY_", 20).ToArray(), p => p, maxTabWidth: 200);
+
+            SortDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40 + 200 + 72, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 
+                Game1.smallFont, SortDropdown?.Selected ?? "DEFAULT", Enumerable.Repeat("_SORT_OPTION_", 20).ToArray(), p => p, maxTabWidth: 300);
+
+            ItemSearchBarTab = new SearchBar(() => xPositionOnScreen - borderWidth - 40 + 500 + 72 * 2, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 464);
+            ItemResearchArea = new ItemResearchArea(() => xPositionOnScreen + width - borderWidth + 10, () => yPositionOnScreen - borderWidth + 88, 180);
+
+            LeftArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + 20, 
+                yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11, 10), 
+                Game1.mouseCursors, new Rectangle(353, 495, 11, 10), 4f);
+            RightArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8, 
+                yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11, 10), 
+                Game1.mouseCursors, new Rectangle(366, 495, 11, 10), 4f);
         }
 
         public override void draw(SpriteBatch b) {
@@ -83,6 +117,22 @@ namespace ItemResearchSpawnerV2.Core.UI {
             FavoriteButton.Draw(b);
             DisplayButton.Draw(b);
             SettingsButton.Draw(b);
+            CategoryDropdown.Draw(b);
+            SortDropdown.Draw(b);
+            ItemSearchBarTab.Draw(b);
+            ItemResearchArea.Draw(b);
+
+            // ----------------------------------------------------
+
+            LeftArrow.bounds.X = xPositionOnScreen + 20;
+            LeftArrow.bounds.Y = yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4;
+            RightArrow.bounds.X = xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8;
+            RightArrow.bounds.Y = LeftArrow.bounds.Y;
+
+            LeftArrow.draw(b);
+            RightArrow.draw(b);
+
+            // ----------------------------------------------------
 
             DrawItems(b);
 
@@ -237,8 +287,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (hoveredItem != null) {
                 drawToolTip(b, hoveredItem.getDescription(), hoveredItem.DisplayName, hoveredItem, heldItem != null);
             }
-            else if (hoveredItem != null && ItemsToGrabMenu != null) {
-                drawToolTip(b, ItemsToGrabMenu.descriptionText, ItemsToGrabMenu.descriptionTitle, hoveredItem, heldItem != null);
+            else if (hoveredItem != null) {
+                drawToolTip(b, CreativeMenu.descriptionText, CreativeMenu.descriptionTitle, hoveredItem, heldItem != null);
             }
 
             heldItem?.drawInMenu(b, new Vector2(Game1.getOldMouseX() + 8, Game1.getOldMouseY() + 8), 1f);

@@ -300,5 +300,31 @@ namespace ItemResearchSpawnerV2.Core.Utils {
         }
 
         #endregion
+
+        public static void DrawTab(int x, int y, SpriteFont font, string text, int align = 0, float alpha = 1, bool drawShadow = true) {
+            SpriteBatch spriteBatch = Game1.spriteBatch;
+            Vector2 bounds = font.MeasureString(text);
+
+            DrawTab(x, y, (int)bounds.X, (int)bounds.Y, out Vector2 drawPos, align, alpha, drawShadow: drawShadow);
+            Utility.drawTextWithShadow(spriteBatch, text, font, drawPos, Game1.textColor);
+        }
+
+
+        public static void DrawTab(int x, int y, int innerWidth, int innerHeight, out Vector2 innerDrawPosition, int align = 0, float alpha = 1, bool drawShadow = true) {
+            SpriteBatch spriteBatch = Game1.spriteBatch;
+
+            // calculate outer coordinates
+            int outerWidth = innerWidth + UIConstants.BorderWidth * 2;
+            int outerHeight = innerHeight + Game1.tileSize / 3;
+            int offsetX = align switch {
+                1 => -outerWidth / 2,
+                2 => -outerWidth,
+                _ => 0
+            };
+
+            // draw texture
+            IClickableMenu.drawTextureBox(spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x + offsetX, y, outerWidth, outerHeight + Game1.tileSize / 16, Color.White * alpha, drawShadow: drawShadow);
+            innerDrawPosition = new Vector2(x + UIConstants.BorderWidth + offsetX, y + UIConstants.BorderWidth);
+        }
     }
 }

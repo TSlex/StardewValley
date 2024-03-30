@@ -17,6 +17,7 @@ namespace ItemResearchSpawnerV2.Core {
 
         public ModMode ModMode = ModMode.Research;
         public ItemQuality ItemQuality = ItemQuality.Normal;
+        public string SearchText;
 
         // ===========================================================================================
 

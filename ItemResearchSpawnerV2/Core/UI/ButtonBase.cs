@@ -8,16 +8,16 @@ using StardewValley.Menus;
 namespace ItemResearchSpawnerV2.Components.UI {
     internal abstract class ButtonBase {
 
-        private readonly Func<int> getXPos;
-        private readonly Func<int> getYPos;
+        private readonly Func<int> GetXPos;
+        private readonly Func<int> GetYPos;
 
         public readonly ClickableComponent Component;
         public Rectangle Bounds => Component.bounds;
         protected static IModContentHelper Content => ModManager.Instance.helper.ModContent;
 
         public ButtonBase(Func<int> getXPos, Func<int> getYPos) {
-            this.getXPos = getXPos;
-            this.getYPos = getYPos;
+            GetXPos = getXPos;
+            GetYPos = getYPos;
 
             Component = new ClickableComponent(new Rectangle(getXPos(), getYPos(), 36 + UIConstants.BorderWidth, 36 + UIConstants.BorderWidth - 2), "");
         }
@@ -27,8 +27,8 @@ namespace ItemResearchSpawnerV2.Components.UI {
         public abstract void HandleRightClick();
 
         public virtual void Draw(SpriteBatch b) {
-            Component.bounds.X = getXPos();
-            Component.bounds.Y = getYPos();
+            Component.bounds.X = GetXPos();
+            Component.bounds.Y = GetYPos();
         }
     }
 }
