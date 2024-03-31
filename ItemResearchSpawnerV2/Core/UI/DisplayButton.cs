@@ -15,14 +15,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 Component.bounds.Width - UIConstants.BorderWidth,
                 Component.bounds.Height - UIConstants.BorderWidth, out var buttonInnerLocation);
 
-            b.Draw(Game1.mouseCursors, new Rectangle((int)buttonInnerLocation.X, (int)buttonInnerLocation.Y, 32, 32),
+            b.Draw(Game1.mouseCursors, new Rectangle((int)buttonInnerLocation.X, (int)buttonInnerLocation.Y, 
+                (int)(32 * Scale), (int)(32 * Scale)),
                 new Rectangle(208, 321, 14, 15), Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
-        }
-
-        public override void HandleLeftClick() {
-        }
-
-        public override void HandleRightClick() {
         }
     }
 }

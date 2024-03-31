@@ -35,15 +35,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         private readonly TextBox SearchBox;
         private readonly ClickableComponent SearchBoxArea;
-        private readonly ClickableTextureComponent SearchIcon;
 
-        private float IconOpacity;
-        private bool PersistFocus;
+        private readonly ClickableTextureComponent SearchBarButton;
+
+        private readonly Rectangle SearchTexture = new(80, 0, 13, 13);
+        private readonly Rectangle ClearTexture = new(290, 344, 9, 9);
+
 
         private readonly Func<int> GetXPos;
         private readonly Func<int> GetYPos;
 
-        private readonly Rectangle IconTexture = new(80, 0, 13, 13);
+        private float IconOpacity;
+
+        public bool PersistFocus {
+            get; private set;
+        }
 
         public bool Selected => SearchBox.Selected;
         public bool IsSearchBoxSelectionChanging => IconOpacity > 0 && IconOpacity < 1;
@@ -70,12 +76,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 Text = "_SAMLE SEARCH TEXT_"
             };
 
-            var iconLocation = new Rectangle((int)(SearchBoxArea.bounds.Right - IconTexture.Width * 2f),
+            var iconLocation = new Rectangle((int)(SearchBoxArea.bounds.Right - SearchTexture.Width * 2f),
                 (int)(SearchBoxArea.bounds.Y + 16),
-                (int)(IconTexture.Width * 2f), (int)(IconTexture.Height * 2f)
+                (int)(SearchTexture.Width * 2f), (int)(SearchTexture.Height * 2f)
             );
 
-            SearchIcon = new ClickableTextureComponent(iconLocation, Game1.mouseCursors, IconTexture, 2f);
+            SearchBarButton = new ClickableTextureComponent(iconLocation, Game1.mouseCursors, SearchTexture, 2f);
         }
 
         public void Focus(bool persist) {
@@ -84,11 +90,22 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public void Blur() {
+            Game1.closeTextEntry();
             SearchBox.Selected = false;
             PersistFocus = false;
         }
 
+        public bool Contains(int x, int y) {
+            return Bounds.Contains(x, y);
+        }
 
+        public void HandleLeftClick(int x, int y) {
+            if (SearchBarButton.bounds.Contains(x, y)) {
+                SearchBox.Text = "";
+            }
+
+            Focus(true);
+        }
 
         public void Draw(SpriteBatch b) {
 
@@ -98,10 +115,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
             SearchBox.X = SearchBoxArea.bounds.X;
             SearchBox.Y = SearchBoxArea.bounds.Y;
 
-            var iconNewLocation = new Rectangle((int)(SearchBoxArea.bounds.Right - IconTexture.Width * 2f), SearchBoxArea.bounds.Y + 16, 0, 0);
+            var iconNewLocation = new Rectangle((int)(SearchBoxArea.bounds.Right - SearchTexture.Width * 2f), SearchBoxArea.bounds.Y + 16, 0, 0);
 
-            SearchIcon.bounds.X = iconNewLocation.X;
-            SearchIcon.bounds.Y = iconNewLocation.Y;
+            SearchBarButton.bounds.X = iconNewLocation.X;
+            SearchBarButton.bounds.Y = iconNewLocation.Y;
 
             // --------------------------------------------------------------------------------------------
 
@@ -110,7 +127,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 SearchBoxArea.bounds.Height - UIConstants.BorderWidth - 8, out _);
 
             SearchBox.Draw(b);
-            b.Draw(SearchIcon.texture, SearchIcon.bounds, SearchIcon.sourceRect, Color.White * IconOpacity);
+
+            if (SearchBox.Text != "") {
+                b.Draw(Game1.mouseCursors, SearchBarButton.bounds, ClearTexture, Color.White * IconOpacity);
+            }
+            else {
+                b.Draw(SearchBarButton.texture, SearchBarButton.bounds, SearchBarButton.sourceRect, Color.White * IconOpacity);
+            }
         }
 
         public void Update(GameTime time) {

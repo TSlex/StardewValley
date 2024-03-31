@@ -14,11 +14,11 @@ namespace ItemResearchSpawnerV2.Components.UI {
             _emptyQualityTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "empty-quality-icon.png"));
         }
 
-        public override void HandleLeftClick() {
+        public override void HandleLeftClick(int x, int y) {
             ModManager.Instance.ItemQuality = ModManager.Instance.ItemQuality.GetNext();
         }
 
-        public override void HandleRightClick() {
+        public override void HandleRightClick(int x, int y) {
             ModManager.Instance.ItemQuality = ModManager.Instance.ItemQuality.GetPrevious();
         }
 
@@ -31,7 +31,7 @@ namespace ItemResearchSpawnerV2.Components.UI {
                 Component.bounds.Height - UIConstants.BorderWidth, out var buttonInnerLocation);
 
             b.Draw(texture, new Vector2(buttonInnerLocation.X, buttonInnerLocation.Y), sourceRect, color, 0,
-                Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f);
+                Vector2.Zero, Game1.pixelZoom * Scale, SpriteEffects.None, 1f);
         }
 
         private void GetCurrentQualityIcon(out Texture2D texture, out Rectangle sourceRect, out Color color) {

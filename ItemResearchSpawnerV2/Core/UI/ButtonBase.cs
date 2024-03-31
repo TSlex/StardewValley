@@ -15,6 +15,9 @@ namespace ItemResearchSpawnerV2.Components.UI {
         public Rectangle Bounds => Component.bounds;
         protected static IModContentHelper Content => ModManager.Instance.helper.ModContent;
 
+        public bool HoveredOver { get; protected set; } = false;
+        protected float Scale => HoveredOver ? 1.1f : 1f;
+
         public ButtonBase(Func<int> getXPos, Func<int> getYPos) {
             GetXPos = getXPos;
             GetYPos = getYPos;
@@ -22,13 +25,29 @@ namespace ItemResearchSpawnerV2.Components.UI {
             Component = new ClickableComponent(new Rectangle(getXPos(), getYPos(), 36 + UIConstants.BorderWidth, 36 + UIConstants.BorderWidth - 2), "");
         }
 
-        public abstract void HandleLeftClick();
+        public virtual void HandleLeftClick(int x, int y) { }
 
-        public abstract void HandleRightClick();
+        public virtual void HandleRightClick(int x, int y) { }
+
+        public virtual void HandleHover(int x, int y) { 
+            HoveredOver = Bounds.Contains(x, y);
+        }
 
         public virtual void Draw(SpriteBatch b) {
-            Component.bounds.X = GetXPos();
-            Component.bounds.Y = GetYPos();
+            var baseWidth = 36 + UIConstants.BorderWidth;
+            var baseHeight = 36 + UIConstants.BorderWidth;
+
+            var scaledWidth = (int)(baseWidth * Scale);
+            var scaledHeight = (int)((baseHeight) * Scale);
+
+            var offX = (baseWidth - scaledWidth) / 2;
+            var offY = (baseHeight - scaledHeight) / 2;
+
+            Component.bounds.X = GetXPos() + offX;
+            Component.bounds.Y = GetYPos() + offY;
+
+            Component.bounds.Width = scaledWidth;
+            Component.bounds.Height = scaledHeight;
         }
     }
 }

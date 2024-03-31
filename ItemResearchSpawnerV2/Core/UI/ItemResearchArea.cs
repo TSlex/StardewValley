@@ -9,7 +9,9 @@ using StardewValley.Menus;
 namespace ItemResearchSpawnerV2.Core.UI {
     internal class ItemResearchArea {
         private readonly ClickableComponent ResearchArea;
-        private readonly ClickableTextureComponent ResearchButton;
+
+        public readonly ResearchButton ResearchButton;
+        //private readonly ClickableTextureComponent ResearchButton;
 
         private readonly Texture2D ResearchTexture;
         private readonly Texture2D SellTexture;
@@ -25,6 +27,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         private static IModContentHelper Content => ModManager.Instance.helper.ModContent;
 
+        private Rectangle GetButtonPosition => new Rectangle(
+                    DrawHelper.GetChildCenterPosition(GetXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),
+                    ResearchArea.bounds.Height + 38 + GetYPos(), ResearchTexture.Width, ResearchTexture.Height);
+
         public ItemResearchArea(Func<int> getXPos, Func<int> getYPos, int width) {
 
             GetXPos = getXPos;
@@ -37,25 +43,28 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             ResearchArea = new ClickableComponent(new Rectangle(getXPos(), getYPos(), width, Game1.tileSize + 50), "");
 
-            ResearchButton = new ClickableTextureComponent(
-                new Rectangle(
-                    DrawHelper.GetChildCenterPosition(getXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),
-                    ResearchArea.bounds.Height + 38 + getYPos(), ResearchTexture.Width, ResearchTexture.Height),
-                ResearchTexture, new Rectangle(0, 0, ResearchTexture.Width, ResearchTexture.Height), 1f);
+            ResearchButton = new ResearchButton(() => GetButtonPosition.X, () => GetButtonPosition.Y);
+
+            //ResearchButton = new ClickableTextureComponent(
+            //    new Rectangle(
+            //        DrawHelper.GetChildCenterPosition(getXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),
+            //        ResearchArea.bounds.Height + 38 + getYPos(), ResearchTexture.Width, ResearchTexture.Height),
+            //    ResearchTexture, new Rectangle(0, 0, ResearchTexture.Width, ResearchTexture.Height), 1f);
 
             //ProgressionManager.OnStackChanged += OnStackChanged;
         }
-        public void Draw(SpriteBatch spriteBatch) {
+
+        public void Draw(SpriteBatch b) {
 
             ResearchArea.bounds.X = GetXPos();
             ResearchArea.bounds.Y = GetYPos();
 
-            var buttonNewLocation = new Rectangle(
-                    DrawHelper.GetChildCenterPosition(GetXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),
-                    ResearchArea.bounds.Height + 38 + GetYPos(), ResearchTexture.Width, ResearchTexture.Height);
+            //var buttonNewLocation = new Rectangle(
+            //        DrawHelper.GetChildCenterPosition(GetXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),
+            //        ResearchArea.bounds.Height + 38 + GetYPos(), ResearchTexture.Width, ResearchTexture.Height);
 
-            ResearchButton.bounds.X = buttonNewLocation.X;
-            ResearchButton.bounds.Y = buttonNewLocation.Y;
+            //ResearchButton.bounds.X = buttonNewLocation.X;
+            //ResearchButton.bounds.Y = buttonNewLocation.Y;
 
             // ------------------------------------------------------------------------------------------------------
 
@@ -74,18 +83,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
             var progressPositionX = areaInnerAnchors.X + ResearchArea.bounds.Width / 2f -
                                     progressFont.MeasureString(researchProgressString).X / 2f;
 
-            spriteBatch.DrawString(progressFont, researchProgressString,
+            b.DrawString(progressFont, researchProgressString,
                 new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
 
 
-            var buttonTexture = ModManager.Instance.ModMode switch {
-                ModMode.BuySell => SellTexture,
-                ModMode.Combined => CombinedTexture,
-                _ => ResearchTexture
-            };
+            //var buttonTexture = ModManager.Instance.ModMode switch {
+            //    ModMode.BuySell => SellTexture,
+            //    ModMode.Combined => CombinedTexture,
+            //    _ => ResearchTexture
+            //};
 
-            spriteBatch.Draw(buttonTexture, ResearchButton.bounds, ResearchButton.sourceRect, Color.White);
-            ResearchItem?.drawInMenu(spriteBatch, new Vector2(researchItemCellX, areaInnerAnchors.Y + 10), 1f);
+            //spriteBatch.Draw(buttonTexture, ResearchButton.bounds, ResearchButton.sourceRect, Color.White);
+
+            ResearchButton.Draw(b);
+
+            ResearchItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y + 10), 1f);
         }
 
         //public Rectangle Bounds => _researchArea.bounds;

@@ -4,29 +4,39 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Extensions;
-using StardewValley.Inventories;
+using StardewValley.Buildings;
 using StardewValley.Menus;
-using System.Threading;
+using StardewValley.Objects;
+using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     internal class MainMenu : ItemGrabMenu {
 
         protected readonly CreativeMenu CreativeMenu;
 
-        private readonly CashTab CashTab;
-        private readonly QualityButton QualityButton;
-        private readonly FavoriteButton FavoriteButton;
-        private readonly DisplayButton DisplayButton;
-        private readonly SettingsButton SettingsButton;
-        private readonly Dropdown<string> CategoryDropdown;
-        private readonly Dropdown<string> SortDropdown;
-        private readonly SearchBar ItemSearchBarTab;
-        private readonly ItemResearchArea ItemResearchArea;
-        private readonly ClickableTextureComponent LeftArrow;
-        private readonly ClickableTextureComponent RightArrow;
+        protected readonly CashTab CashTab;
+        protected readonly QualityButton QualityButton;
+        protected readonly FavoriteButton FavoriteButton;
+        protected readonly DisplayButton DisplayButton;
+        protected readonly SettingsButton SettingsButton;
+        protected readonly Dropdown<string> CategoryDropdown;
+        protected readonly Dropdown<string> SortDropdown;
+        protected readonly SearchBar SearchBar;
+        protected readonly ItemResearchArea ItemResearchArea;
 
-        private static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
+        protected readonly ClickableTextureComponent LeftArrow;
+        protected readonly ClickableTextureComponent RightArrow;
+
+        protected int TopRowIndex;
+        protected int MaxTopRowIndex;
+
+        protected bool ShowRightButton => TopRowIndex < MaxTopRowIndex;
+        protected bool ShowLeftButton => TopRowIndex > 0;
+
+        protected bool LeftButtonHovered = false;
+        protected bool RightButtonHovered = false;
+
+        protected static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
         public MainMenu() :
             base(
@@ -56,7 +66,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             foreach (var item in inventory.inventory) {
                 item.bounds.X -= 32;
             }
-            
+
 
             trashCan.bounds.X += 8;
             okButton.bounds.X += 8;
@@ -68,6 +78,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             CreativeMenu.capacity = CreativeMenu.rows * 8;
             CreativeMenu.verticalGap += 40;
             CreativeMenu.horizontalGap += 20;
+            CreativeMenu.drawSlots = false;
 
             // ----------------------------------------------------
 
@@ -78,20 +89,20 @@ namespace ItemResearchSpawnerV2.Core.UI {
             DisplayButton = new DisplayButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 2);
             SettingsButton = new SettingsButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3);
 
-            CategoryDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 
+            CategoryDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
                 Game1.smallFont, CategoryDropdown?.Selected ?? "ALL", Enumerable.Repeat("_CATEGORY_", 20).ToArray(), p => p, maxTabWidth: 200);
 
-            SortDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40 + 200 + 72, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 
+            SortDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40 + 200 + 72, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
                 Game1.smallFont, SortDropdown?.Selected ?? "DEFAULT", Enumerable.Repeat("_SORT_OPTION_", 20).ToArray(), p => p, maxTabWidth: 300);
 
-            ItemSearchBarTab = new SearchBar(() => xPositionOnScreen - borderWidth - 40 + 500 + 72 * 2, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 464);
+            SearchBar = new SearchBar(() => xPositionOnScreen - borderWidth - 40 + 500 + 72 * 2, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 464);
             ItemResearchArea = new ItemResearchArea(() => xPositionOnScreen + width - borderWidth + 10, () => yPositionOnScreen - borderWidth + 88, 180);
 
-            LeftArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + 20, 
-                yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11, 10), 
+            LeftArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + 20,
+                yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
                 Game1.mouseCursors, new Rectangle(353, 495, 11, 10), 4f);
-            RightArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8, 
-                yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11, 10), 
+            RightArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8,
+                yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
                 Game1.mouseCursors, new Rectangle(366, 495, 11, 10), 4f);
         }
 
@@ -101,7 +112,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         // --------------------------------------------------------------------------------------------------
 
-        private void DrawMenu(SpriteBatch b) {
+        protected void DrawMenu(SpriteBatch b) {
 
             if (drawBG && !Game1.options.showClearBackgrounds) {
                 b.Draw(Game1.fadeToBlackRect, new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height), Color.Black * 0.5f);
@@ -111,6 +122,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             DrawInventoryMenu(b);
             DrawCreativeMenu(b);
+            CreativeMenu.RecreateItemSlots();
 
             CashTab.Draw(b);
             QualityButton.Draw(b);
@@ -119,18 +131,27 @@ namespace ItemResearchSpawnerV2.Core.UI {
             SettingsButton.Draw(b);
             CategoryDropdown.Draw(b);
             SortDropdown.Draw(b);
-            ItemSearchBarTab.Draw(b);
+            SearchBar.Draw(b);
             ItemResearchArea.Draw(b);
 
             // ----------------------------------------------------
 
-            LeftArrow.bounds.X = xPositionOnScreen + 20;
-            LeftArrow.bounds.Y = yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4;
-            RightArrow.bounds.X = xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8;
-            RightArrow.bounds.Y = LeftArrow.bounds.Y;
+            //LeftArrow.bounds.Width = (int)(11 * 4f * (LeftButtonHovered ? 1.1f : 1f));
+            //RightArrow.bounds.Width = (int)(11 * 4f * (RightButtonHovered ? 1.1f : 1f));
+            //LeftArrow.bounds.Height = (int)(10 * 4f * (LeftButtonHovered ? 1.1f : 1f));
+            //RightArrow.bounds.Height = (int)(10 * 4f * (RightButtonHovered ? 1.1f : 1f));
 
-            LeftArrow.draw(b);
-            RightArrow.draw(b);
+            //LeftArrow.bounds.X = xPositionOnScreen + 20 - (LeftButtonHovered ? 4 : 0);
+            //LeftArrow.bounds.Y = yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4 - (LeftButtonHovered ? 4 : 0);
+            //RightArrow.bounds.X = xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8 - (RightButtonHovered ? 4 : 0);
+            //RightArrow.bounds.Y = LeftArrow.bounds.Y - (RightButtonHovered ? 4 : 0);
+
+            if (ShowLeftButton) {
+                LeftArrow.draw(b);
+            }
+            if (ShowRightButton) {
+                RightArrow.draw(b);
+            }
 
             // ----------------------------------------------------
 
@@ -141,7 +162,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             drawMouse(b);
         }
 
-        private void DrawCreativeMenu(SpriteBatch b) {
+        protected void DrawCreativeMenu(SpriteBatch b) {
 
             // ---- ItemsToGrabMenu drawing (receiving menu) --------------------------
 
@@ -153,7 +174,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             CreativeMenu.draw(b);
         }
 
-        private void DrawCreativeMenuBackground(SpriteBatch b) {
+        protected void DrawCreativeMenuBackground(SpriteBatch b) {
             DrawHelper.drawDialogueBox(
             CreativeMenu.xPositionOnScreen - borderWidth - spaceToClearSideBorder,
             CreativeMenu.yPositionOnScreen - borderWidth - spaceToClearTopBorder + storageSpaceTopBorderOffset,
@@ -237,7 +258,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 84, yPositionOnScreen + 64 - 44), new Rectangle(146, 447, 11, 10), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
         }
 
-        private void DrawInventoryMenu(SpriteBatch b) {
+        protected void DrawInventoryMenu(SpriteBatch b) {
 
             // ---- MenuWithInventory drawing --------------------------
 
@@ -267,7 +288,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             b.Draw(Game1.mouseCursors, new Vector2(xPositionOnScreen - 40, yPositionOnScreen + height / 2 + 64 - 44), new Rectangle(4, 372, 8, 11), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
         }
 
-        private void DrawItems(SpriteBatch b) {
+        protected void DrawItems(SpriteBatch b) {
 
             //poof?.draw(b, localPosition: true);
 
@@ -275,7 +296,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 transferredItemSprite.Draw(b);
             }
 
-            if (hoverText != null && (hoveredItem == null || hoveredItem == null || ItemsToGrabMenu == null)) {
+            if (hoverText != null && (hoveredItem == null || hoveredItem == null || CreativeMenu == null)) {
                 if (hoverAmount > 0) {
                     drawToolTip(b, hoverText, "", null, heldItem: true, -1, 0, null, -1, null, hoverAmount);
                 }
@@ -292,6 +313,177 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             heldItem?.drawInMenu(b, new Vector2(Game1.getOldMouseX() + 8, Game1.getOldMouseY() + 8), 1f);
+        }
+
+        // ----------------------------------------------------------------------------------
+
+        public override void performHoverAction(int x, int y) {
+            base.performHoverAction(x, y);
+
+            var item = CreativeMenu.hover(x, y, heldItem);
+            if (item != null) {
+                hoveredItem = item;
+            }
+        }
+
+        public override void receiveLeftClick(int x, int y, bool playSound = true) {
+            if (heldItem == null) {
+                heldItem = CreativeMenu.leftClick(x, y, heldItem, true);
+
+                if (heldItem != null && behaviorOnItemGrab != null) {
+                    behaviorOnItemGrab(heldItem, Game1.player);
+
+                    if (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu) {
+
+                        itemGrabMenu.setSourceItem(sourceItem);
+
+                        if (Game1.options.SnappyMenus) {
+                            itemGrabMenu.currentlySnappedComponent = currentlySnappedComponent;
+                            itemGrabMenu.snapCursorToCurrentSnappedComponent();
+                        }
+                    }
+                }
+
+                string text = heldItem?.QualifiedItemId;
+                if (!(text == "(O)326")) {
+                    if (text == "(O)102") {
+                        heldItem = null;
+                        Game1.player.foundArtifact("102", 1);
+                        poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
+                        Game1.playSound("fireball");
+                    }
+                }
+                else {
+                    heldItem = null;
+                    Game1.player.canUnderstandDwarves = true;
+                    poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
+                    Game1.playSound("fireball");
+                }
+
+                if (heldItem is SObject @object && @object?.QualifiedItemId == "(O)434") {
+                    heldItem = null;
+                    exitThisMenu(playSound: false);
+                    Game1.player.eatObject(@object, overrideFullness: true);
+                }
+                else if (heldItem != null && heldItem.IsRecipe) {
+                    string key = heldItem.Name.Substring(0, heldItem.Name.IndexOf("Recipe") - 1);
+                    try {
+                        if (heldItem.Category == -7) {
+                            Game1.player.cookingRecipes.Add(key, 0);
+                        }
+                        else {
+                            Game1.player.craftingRecipes.Add(key, 0);
+                        }
+
+                        poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
+                        Game1.playSound("newRecipe");
+                    }
+                    catch (Exception) {
+                    }
+
+                    heldItem = null;
+                }
+                else if (Game1.player.addItemToInventoryBool(heldItem)) {
+                    heldItem = null;
+                    Game1.playSound("discoverMineral");
+                }
+            }
+
+            else if ((reverseGrab || behaviorFunction != null) && isWithinBounds(x, y)) {
+
+                behaviorFunction(heldItem, Game1.player);
+
+                if (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu2) {
+                    itemGrabMenu2.setSourceItem(sourceItem);
+                    if (Game1.options.SnappyMenus) {
+                        itemGrabMenu2.currentlySnappedComponent = currentlySnappedComponent;
+                        itemGrabMenu2.snapCursorToCurrentSnappedComponent();
+                    }
+                }
+
+                if (destroyItemOnClick) {
+                    heldItem = null;
+                    return;
+                }
+            }
+
+            else if (heldItem != null && !isWithinBounds(x, y) && heldItem.canBeTrashed()) {
+                DropHeldItem();
+            }
+
+            base.receiveLeftClick(x, y, playSound);
+        }
+
+        public override void receiveRightClick(int x, int y, bool playSound = true) {
+            if (!allowRightClick) {
+                receiveRightClickOnlyToolAttachments(x, y);
+                return;
+            }
+
+            if (heldItem == null) {
+                heldItem = CreativeMenu.rightClick(x, y, heldItem, true);
+
+                if (heldItem != null && behaviorOnItemGrab != null) {
+                    behaviorOnItemGrab(heldItem, Game1.player);
+                    if (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu) {
+                        itemGrabMenu.setSourceItem(sourceItem);
+                        if (Game1.options.SnappyMenus) {
+                            itemGrabMenu.currentlySnappedComponent = currentlySnappedComponent;
+                            itemGrabMenu.snapCursorToCurrentSnappedComponent();
+                        }
+                    }
+                }
+
+                if (heldItem?.QualifiedItemId == "(O)326") {
+                    heldItem = null;
+                    Game1.player.canUnderstandDwarves = true;
+                    poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
+                    Game1.playSound("fireball");
+                }
+
+                else if (heldItem is SObject @object && @object?.QualifiedItemId == "(O)434") {
+                    heldItem = null;
+                    exitThisMenu(playSound: false);
+                    Game1.player.eatObject(@object, overrideFullness: true);
+                }
+
+                else if (heldItem != null && heldItem.IsRecipe) {
+                    string key = heldItem.Name.Substring(0, heldItem.Name.IndexOf("Recipe") - 1);
+                    try {
+                        if (heldItem.Category == -7) {
+                            Game1.player.cookingRecipes.Add(key, 0);
+                        }
+                        else {
+                            Game1.player.craftingRecipes.Add(key, 0);
+                        }
+
+                        poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
+                        Game1.playSound("newRecipe");
+                    }
+                    catch (Exception) {
+                    }
+
+                    heldItem = null;
+                }
+
+                else if (Game1.player.addItemToInventoryBool(heldItem)) {
+                    heldItem = null;
+                    Game1.playSound("discoverMineral");
+                }
+            }
+
+            else if (reverseGrab || behaviorFunction != null) {
+                behaviorFunction(heldItem, Game1.player);
+                if (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu2) {
+                    itemGrabMenu2.setSourceItem(sourceItem);
+                }
+
+                if (destroyItemOnClick) {
+                    heldItem = null;
+                }
+            }
+
+            base.receiveRightClick(x, y, playSound && playRightClickSound);
         }
     }
 }
