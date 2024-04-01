@@ -2,7 +2,7 @@
 
 namespace ItemResearchSpawnerV2.Models.Enums
 {
-    public enum ItemQuality
+    internal enum ItemQuality
     {
         Normal = StardewValley.Object.lowQuality,
         Silver = StardewValley.Object.medQuality,

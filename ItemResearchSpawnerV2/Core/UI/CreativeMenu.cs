@@ -88,14 +88,15 @@ namespace ItemResearchSpawnerV2.Core.UI {
             for (int j = 0; j < capacity; j++) {
 
                 var slot = inventory[j];
-                var flag = highlightMethod(actualInventory[j]);
                 var location = new Vector2(slot.bounds.X, slot.bounds.Y);
 
                 b.Draw(texture, location - new Vector2(12, 12), new Rectangle(648, 841, 30, 30), color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0.5f);
 
-                if (actualInventory[j] == null) {
+                if (actualInventory.Count <= j || actualInventory[j] == null) {
                     continue;
                 }
+
+                var flag = highlightMethod(actualInventory[j]);
 
                 if (_iconShakeTimer.ContainsKey(j)) {
                     location += 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));

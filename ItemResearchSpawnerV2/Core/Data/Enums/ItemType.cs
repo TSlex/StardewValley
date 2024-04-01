@@ -1,6 +1,6 @@
 namespace ItemResearchSpawnerV2.Models.Enums
 {
-    public enum ItemType
+    internal enum ItemType
     {
         BigCraftable,
         Boots,

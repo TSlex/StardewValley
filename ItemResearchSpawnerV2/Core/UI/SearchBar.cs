@@ -55,13 +55,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public bool IsSearchBoxSelectionChanging => IconOpacity > 0 && IconOpacity < 1;
 
         public Rectangle Bounds => SearchBoxArea.bounds;
+        public string Text => SearchBox.Text.Trim();
 
         public SearchBar(Func<int> getXPos, Func<int> getYPos, int width) {
 
             GetXPos = getXPos;
             GetYPos = getYPos;
 
-            ModManager.Instance.SearchText = "";
             IconOpacity = 1f;
 
             SearchBoxArea = new ClickableComponent(
@@ -73,7 +73,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 Y = SearchBoxArea.bounds.Y + 2,
                 Height = 0,
                 Width = SearchBoxArea.bounds.Width,
-                Text = "_SAMLE SEARCH TEXT_"
+                Text = ""
             };
 
             var iconLocation = new Rectangle((int)(SearchBoxArea.bounds.Right - SearchTexture.Width * 2f),
@@ -95,13 +95,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
             PersistFocus = false;
         }
 
+        public void Clear() {
+            SearchBox.Text = "";
+        }
+
+        public void SetText(string text) {
+            SearchBox.Text = text;
+        }
+
         public bool Contains(int x, int y) {
             return Bounds.Contains(x, y);
         }
 
         public void HandleLeftClick(int x, int y) {
             if (SearchBarButton.bounds.Contains(x, y)) {
-                SearchBox.Text = "";
+                Clear();
             }
 
             Focus(true);
@@ -129,7 +137,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             SearchBox.Draw(b);
 
             if (SearchBox.Text != "") {
-                b.Draw(Game1.mouseCursors, SearchBarButton.bounds, ClearTexture, Color.White * IconOpacity);
+                b.Draw(Game1.mouseCursors, SearchBarButton.bounds, ClearTexture, Color.White);
             }
             else {
                 b.Draw(SearchBarButton.texture, SearchBarButton.bounds, SearchBarButton.sourceRect, Color.White * IconOpacity);
@@ -141,10 +149,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 Blur();
             }
 
-            if (ModManager.Instance.SearchText != SearchBox.Text.Trim()) {
-                ModManager.Instance.SearchText = SearchBox.Text.Trim();
-            }
-
             var delta = 1.5f / time.ElapsedGameTime.Milliseconds;
 
             if (!SearchBox.Selected && IconOpacity < 1f) {
@@ -153,14 +157,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
             else if (SearchBox.Selected && IconOpacity > 0f) {
                 IconOpacity = Math.Max(0f, IconOpacity - delta);
             }
-        }
-
-        public void Clear() {
-            SearchBox.Text = "";
-        }
-
-        public void SetText(string text) {
-            SearchBox.Text = text;
         }
     }
 }

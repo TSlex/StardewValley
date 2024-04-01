@@ -1,4 +1,5 @@
 ﻿using ItemResearchSpawnerV2.Core.Componets;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Enums;
 using ItemResearchSpawnerV2.Models.Enums;
 using StardewModdingAPI;
@@ -13,11 +14,12 @@ namespace ItemResearchSpawnerV2.Core {
         public readonly IManifest manifest;
         public readonly ModConfig config;
 
-        private readonly ProgressionManager progressionManager;
+        public readonly ProgressionManager ProgressionManager;
 
         public ModMode ModMode = ModMode.Research;
         public ItemQuality ItemQuality = ItemQuality.Normal;
-        public string SearchText;
+        public ProgressionDisplayMode ProgressionDisplay = ProgressionDisplayMode.ResearchedOnly;
+        public FavoriteDisplayMode FavoriteDisplay = FavoriteDisplayMode.All;
 
         // ===========================================================================================
 
@@ -38,13 +40,17 @@ namespace ItemResearchSpawnerV2.Core {
             this.monitor = monitor;
             this.manifest = manifest;
 
-            progressionManager = new ProgressionManager(helper, monitor, manifest);
+            ProgressionManager = new ProgressionManager();
         }
 
         // ===========================================================================================
 
         public void OpenMenu() {
-            Game1.activeClickableMenu = new MainMenuController(progressionManager.GetSpawnableItems());
+            Game1.activeClickableMenu = new MainMenuController();
+        }
+
+        public IEnumerable<Models.SpawnableItem> GetProgressionItems() {
+            return ProgressionManager.GetSpawnableItems();
         }
 
         #region Price/Money

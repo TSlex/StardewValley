@@ -1,28 +1,14 @@
-﻿using ItemResearchSpawnerV2.Core.Data;
-using ItemResearchSpawnerV2.Core.Enums;
-using ItemResearchSpawnerV2.Models;
-using ItemResearchSpawnerV2.Models.Enums;
-using StardewModdingAPI;
-using StardewValley;
-using SObject = StardewValley.Object;
+﻿using ItemResearchSpawnerV2.Models;
 
 namespace ItemResearchSpawnerV2.Core {
     internal class ProgressionManager {
 
-        private readonly IModHelper helper;
-        private readonly IMonitor monitor;
-        private readonly IManifest manifest;
-
-        private readonly IEnumerable<SpawnableItem> allItems;
+        //private readonly IEnumerable<SpawnableItem> Items;
 
         // ========================================================================================================
 
-        public ProgressionManager(IModHelper helper, IMonitor monitor, IManifest manifest) {
-            this.helper = helper;
-            this.monitor = monitor;
-            this.manifest = manifest;
-
-            this.allItems = GetSpawnableItems();
+        public ProgressionManager() {
+            //Items = GetSpawnableItems();
         }
 
         // ========================================================================================================

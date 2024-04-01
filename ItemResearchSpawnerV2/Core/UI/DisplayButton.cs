@@ -1,5 +1,7 @@
 ﻿using ItemResearchSpawnerV2.Components.UI;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
+using ItemResearchSpawnerV2.Models.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -15,9 +17,36 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 Component.bounds.Width - UIConstants.BorderWidth,
                 Component.bounds.Height - UIConstants.BorderWidth, out var buttonInnerLocation);
 
-            b.Draw(Game1.mouseCursors, new Rectangle((int)buttonInnerLocation.X, (int)buttonInnerLocation.Y, 
-                (int)(32 * Scale), (int)(32 * Scale)),
-                new Rectangle(208, 321, 14, 15), Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+            switch (ModManager.Instance.ProgressionDisplay) {
+                case Data.Enums.ProgressionDisplayMode.ResearchedOnly:
+
+                    b.Draw(Game1.mouseCursors, new Rectangle((int)buttonInnerLocation.X, (int)buttonInnerLocation.Y,
+                        (int)(32 * Scale), (int)(32 * Scale)),
+                        new Rectangle(208, 321, 14, 15), Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                    break;
+
+                case Data.Enums.ProgressionDisplayMode.ResearchStarted:
+
+                    b.Draw(Game1.mouseCursors, new Rectangle((int)buttonInnerLocation.X, (int)buttonInnerLocation.Y,
+                        (int)(32 * Scale), (int)(32 * Scale)),
+                        new Rectangle(208, 321, 14, 15), Color.Blue, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                    break;
+
+                case Data.Enums.ProgressionDisplayMode.Combined:
+
+                    b.Draw(Game1.mouseCursors, new Rectangle((int)buttonInnerLocation.X, (int)buttonInnerLocation.Y,
+                        (int)(32 * Scale), (int)(32 * Scale)),
+                        new Rectangle(208, 321, 14, 15), Color.Red, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                    break;
+            }
+        }
+
+        public override void HandleLeftClick(int x, int y) {
+            ModManager.Instance.ProgressionDisplay = ModManager.Instance.ProgressionDisplay.GetNext();
+        }
+
+        public override void HandleRightClick(int x, int y) {
+            ModManager.Instance.ProgressionDisplay = ModManager.Instance.ProgressionDisplay.GetPrevious();
         }
     }
 }

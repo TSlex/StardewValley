@@ -2,7 +2,7 @@
 
 namespace ItemResearchSpawnerV2.Models.Enums
 {
-    public enum ItemSortOption
+    internal enum ItemSortOption
     {
         Name,
         Category,

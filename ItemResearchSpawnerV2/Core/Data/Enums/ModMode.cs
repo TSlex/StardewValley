@@ -1,6 +1,6 @@
 ﻿namespace ItemResearchSpawnerV2.Core.Enums
 {
-    public enum ModMode
+    internal enum ModMode
     {
         Research,
         BuySell,

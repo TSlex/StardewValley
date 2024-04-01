@@ -27,7 +27,7 @@ namespace ItemResearchSpawnerV2 {
 
             // -----------------------------------------------
 
-            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
