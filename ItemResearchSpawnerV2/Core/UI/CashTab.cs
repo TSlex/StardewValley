@@ -21,7 +21,7 @@ namespace ItemResearchSpawnerV2.Components.UI
         private readonly Func<int> GetYPos;
         private readonly int Width;
 
-        private static IModContentHelper Content => ModManager.Instance.helper.ModContent;
+        private static IModContentHelper Content => ModManager.Instance.Helper.ModContent;
 
         public CashTab(Func<int> getXPos, Func<int> getYPos, int width)
         {

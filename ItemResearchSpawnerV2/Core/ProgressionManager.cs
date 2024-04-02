@@ -1,14 +1,30 @@
-﻿using ItemResearchSpawnerV2.Models;
+﻿using ItemResearchSpawnerV2.Core.Data;
+using ItemResearchSpawnerV2.Core.Data.Serializable;
+using ItemResearchSpawnerV2.Core.Utils;
+using ItemResearchSpawnerV2.Models;
+using StardewModdingAPI;
 
 namespace ItemResearchSpawnerV2.Core {
     internal class ProgressionManager {
+        public List<ItemCategoryMeta> Categories { get; private set; }
+        public ItemCategoryMeta DefaultCategory { get; private set; }
 
         //private readonly IEnumerable<SpawnableItem> Items;
 
         // ========================================================================================================
 
         public ProgressionManager() {
-            //Items = GetSpawnableItems();
+        }
+
+        public void LoadCategories() {
+            var categories = ModManager.Instance.Helper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath);
+            if (categories == null) {
+                ModManager.Instance.Monitor.LogOnce("One of the mod files (assets/categories.json) is missing or invalid. Some features may not work correctly; consider reinstalling the mod.", LogLevel.Warn);
+            }
+
+            Categories = categories ?? new List<ItemCategoryMeta>();
+            DefaultCategory = new ItemCategoryMeta("category.misc", 1, 1, null, null);
+            Categories.Add(DefaultCategory);
         }
 
         // ========================================================================================================
@@ -71,21 +87,19 @@ namespace ItemResearchSpawnerV2.Core {
         //    }
         //}
 
-        public IEnumerable<SpawnableItem> GetSpawnableItems() {
-            foreach (var item in new ItemRepository().GetAll()) {
+        public IEnumerable<ProgressionItem> GetProgressionItems() {
+            foreach (var item in ItemRepository.GetAll()) {
 
-                //var category = _categories?.FirstOrDefault(rule => rule.IsMatch(entry));
-                //var label = category != null
-                //    ? I18n.GetByKey(category.Label).Default(category.Label)
-                //    : I18n.Category_Misc();
+                var category = Categories.FirstOrDefault(rule => rule.IsMatch(item));
+                category ??= DefaultCategory;
 
-                //int baseResearchCount = category?.ResearchCount ?? 1;
-                ////float researchMultiplier = _helper.ReadConfig<ModConfig>().ResearchAmountMultiplier;
+                var itemCategory = new ItemCategory {
+                    Label = I18n.GetByKey(category.Label),
+                    BasePrice = category.BaseCost,
+                    BaseResearchCount = category.ResearchCount
+                };
 
-                //yield return new SpawnableItem(entry, label ?? I18n.Category_Misc(), category?.BaseCost ?? 100,
-                //    (int)((float)baseResearchCount * _config.ResearchAmountMultiplier));
-
-                yield return new SpawnableItem(item, "_CATEGORY_", 100, 10);
+                yield return new ProgressionItem(item, new ProgressionData(), itemCategory);
             }
         }
     }

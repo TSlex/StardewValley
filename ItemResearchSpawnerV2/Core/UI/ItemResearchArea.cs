@@ -25,7 +25,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private readonly Func<int> GetYPos;
         private readonly int Width;
 
-        private static IModContentHelper Content => ModManager.Instance.helper.ModContent;
+        private static IModContentHelper Content => ModManager.Instance.Helper.ModContent;
 
         private Rectangle GetButtonPosition => new Rectangle(
                     DrawHelper.GetChildCenterPosition(GetXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),

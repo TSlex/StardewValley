@@ -18,5 +18,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
             b.Draw(Game1.mouseCursors, new Vector2(buttonInnerLocation.X, buttonInnerLocation.Y),
                 new Rectangle(370, 377, 8, 8), Color.White, 0f, Vector2.Zero, Game1.pixelZoom * Scale, SpriteEffects.None, 1f);
         }
+
+        public override void HandleLeftClick(int x, int y) {
+            Game1.playSound("drumkit6");
+        }
+
+        public override void HandleRightClick(int x, int y) {
+            Game1.playSound("drumkit6");
+        }
     }
 }

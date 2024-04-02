@@ -89,11 +89,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
             DisplayButton = new DisplayButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 2);
             SettingsButton = new SettingsButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3);
 
-            CategoryDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
-                Game1.smallFont, CategoryDropdown?.Selected ?? "ALL", Enumerable.Repeat("_CATEGORY_", 20).ToArray(), p => p, maxTabWidth: 200);
+            SortDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
+                Game1.smallFont, SortDropdown?.Selected ?? "DEFAULT", Enumerable.Repeat("BY CATEGORY", 20).ToArray(), p => p, tabWidth: 236);
 
-            SortDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40 + 200 + 72, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
-                Game1.smallFont, SortDropdown?.Selected ?? "DEFAULT", Enumerable.Repeat("_SORT_OPTION_", 20).ToArray(), p => p, maxTabWidth: 300);
+            CategoryDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40 + 236 + 36, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
+                Game1.smallFont, I18n.Category_All(), new[] { I18n.Category_All() }, p => p, tabWidth: 336);
 
             SearchBar = new SearchBar(() => xPositionOnScreen - borderWidth - 40 + 500 + 72 * 2, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 464);
             ItemResearchArea = new ItemResearchArea(() => xPositionOnScreen + width - borderWidth + 10, () => yPositionOnScreen - borderWidth + 88, 180);
@@ -129,8 +129,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             FavoriteButton.Draw(b);
             DisplayButton.Draw(b);
             SettingsButton.Draw(b);
-            CategoryDropdown.Draw(b);
-            SortDropdown.Draw(b);
+
             SearchBar.Draw(b);
             ItemResearchArea.Draw(b);
 
@@ -156,6 +155,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
             // ----------------------------------------------------
 
             DrawItems(b);
+
+            // ----------------------------------------------------
+
+            CategoryDropdown.Draw(b);
+            SortDropdown.Draw(b);
 
             // ----------------------------------------------------
 

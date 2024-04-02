@@ -1,17 +1,19 @@
 ﻿using ItemResearchSpawnerV2.Core.Enums;
 using ItemResearchSpawnerV2.Core.UI;
+using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
 using ItemResearchSpawnerV2.Models.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 using StardewValley;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.Componets {
     internal class MainMenuController : MainMenu {
-        private IEnumerable<SpawnableItem> ProgressionItems;
+        private IEnumerable<ProgressionItem> ProgressionItems;
 
-        private readonly List<SpawnableItem> FilteredProgressionItems = new();
+        private readonly List<ProgressionItem> FilteredProgressionItems = new();
 
         private string LastSearchQuery;
 
@@ -19,7 +21,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
             behaviorOnItemGrab = OnItemGrab;
             LastSearchQuery = SearchBar.Text;
 
-            UpdateView(true, true, true);
+            UpdateView(true);
         }
 
         // ===============================================================================================
@@ -29,7 +31,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
             if (SearchBar.Text != LastSearchQuery) {
                 LastSearchQuery = SearchBar.Text;
-                UpdateView(rebuild: false, filter: true, resetScroll: true);
+                UpdateView(rebuild: false, filter: true, resetScroll: true, reloadCategories: true);
             }
 
             base.update(time);
@@ -37,13 +39,19 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
         // -----------------------------------------------------------------------------------------------
 
+        private void UpdateCategories() {
+            var displayCategories = ModManager.Instance.GetDisplayCategories(FilteredProgressionItems);
+
+            CategoryDropdown.SetOptions(new List<string>(displayCategories));
+        }
+
         private void UpdateCreativeMenu() {
             CreativeMenu.actualInventory.Clear();
 
             foreach (var prefab in FilteredProgressionItems
                 .Skip(TopRowIndex * CreativeMenu.ItemsPerRow).Take(CreativeMenu.ItemsPerView)) {
 
-                var item = prefab.CreateItem();
+                var item = prefab.Item.CreateItem();
                 var quality = ModManager.Instance.ItemQuality;
 
                 switch (ModManager.Instance.ModMode) {
@@ -73,75 +81,61 @@ namespace ItemResearchSpawnerV2.Core.Componets {
         private void FilterProgressionItems() {
             var items = ProgressionItems;
 
-            //var predicate = PredicateBuilder.True<SpawnableItem>();
-
             var search = SearchBar.Text;
             if (search != "") {
                 items = items.Where(item =>
                     item.Item.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
                     || item.Item.DisplayName.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                ).ToList();
-
-                //predicate = predicate.And(item =>
-                //    item.Item.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                //    || item.Item.DisplayName.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                //);
+                );
             }
+
+            if (!CommonHelper.EqualsCaseInsensitive(CategoryDropdown.Selected, I18n.Category_All())) {
+                items = items.Where(item => CommonHelper.EqualsCaseInsensitive(item.Category.Label, this.CategoryDropdown.Selected));
+            }
+
 
             switch (ModManager.Instance.FavoriteDisplay) {
                 case Data.Enums.FavoriteDisplayMode.FavoriteOnly:
-                    search = "di";
+                    var fsearch = "di";
                     items = items.Where(item =>
-                        item.Item.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                        || item.Item.DisplayName.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                    ).ToList();
-                    //predicate = predicate.And(item =>
-                    //    item.Item.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                    //    || item.Item.DisplayName.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                    //);
+                        item.Item.Name.Contains(fsearch, StringComparison.InvariantCultureIgnoreCase)
+                        || item.Item.DisplayName.Contains(fsearch, StringComparison.InvariantCultureIgnoreCase)
+                    );
                     break;
             }
 
             switch (ModManager.Instance.ProgressionDisplay) {
                 case Data.Enums.ProgressionDisplayMode.ResearchStarted:
-                    search = "pi";
+                    var dasearch = "pi";
                     items = items.Where(item =>
-                        item.Item.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                        || item.Item.DisplayName.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                    ).ToList();
-                    //predicate = predicate.And(item =>
-                    //    item.Item.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                    //    || item.Item.DisplayName.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                    //);
+                        item.Item.Name.Contains(dasearch, StringComparison.InvariantCultureIgnoreCase)
+                        || item.Item.DisplayName.Contains(dasearch, StringComparison.InvariantCultureIgnoreCase)
+                    );
                     break;
                 case Data.Enums.ProgressionDisplayMode.Combined:
-                    search = "op";
+                    var dbsearch = "op";
                     items = items.Where(item =>
-                        item.Item.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                        || item.Item.DisplayName.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                    ).ToList();
-                    //predicate = predicate.And(item =>
-                    //    item.Item.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                    //    || item.Item.DisplayName.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                    //);
+                        item.Item.Name.Contains(dbsearch, StringComparison.InvariantCultureIgnoreCase)
+                        || item.Item.DisplayName.Contains(dbsearch, StringComparison.InvariantCultureIgnoreCase)
+                    );
                     break;
             }
-
-            //items = items.Where(predicate.Compile());
 
             FilteredProgressionItems.Clear();
             FilteredProgressionItems.AddRange(items);
         }
 
-        private void UpdateView(bool rebuild = false, bool filter = false, bool resetScroll = false) {
+        private void UpdateView(bool rebuild = false, bool filter = false, bool resetScroll = false, bool reloadCategories = false) {
 
             if (rebuild) {
                 ProgressionItems = ModManager.Instance.GetProgressionItems();
                 FilterProgressionItems();
                 TopRowIndex = 0;
+                UpdateCategories();
                 UpdateCreativeMenu();
-                MaxTopRowIndex = Math.Max(0,
-                    (int)Math.Ceiling(FilteredProgressionItems.Count() / (CreativeMenu.ItemsPerRow * 1m)) - 3);
+                MaxTopRowIndex = Math.Max(0, (int)Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 1m)) - 3);
+
+                return;
             }
 
             if (filter) {
@@ -152,11 +146,68 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 TopRowIndex = 0;
             }
 
+            //if (reloadCategories) {
+            //    UpdateCategories();
+            //}
+
             UpdateCreativeMenu();
 
-            MaxTopRowIndex = Math.Max(0,
-                (int)Math.Ceiling(FilteredProgressionItems.Count() / (CreativeMenu.ItemsPerRow * 1m)) - 3);
+            MaxTopRowIndex = Math.Max(0, (int)Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 1m)) - 3);
         }
+
+        // ------------------------------------------------------------------------------------------------
+
+        protected void SetCategoryDropdown(bool expanded) {
+            if (expanded) {
+                SetSortDropdown(false);
+            }
+
+            CategoryDropdown.IsExpanded = expanded;
+            inventory.highlightMethod = _ => !expanded;
+            CreativeMenu.highlightMethod = _ => !expanded;
+
+            if (!expanded && !Game1.lastCursorMotionWasMouse) {
+                setCurrentlySnappedComponentTo(CategoryDropdown.myID);
+                snapCursorToCurrentSnappedComponent();
+            }
+        }
+
+        protected void SetSortDropdown(bool expanded) {
+            if (expanded) {
+                SetCategoryDropdown(false);
+            }
+
+            SortDropdown.IsExpanded = expanded;
+            inventory.highlightMethod = _ => !expanded;
+            CreativeMenu.highlightMethod = _ => !expanded;
+
+            if (!expanded && !Game1.lastCursorMotionWasMouse) {
+                setCurrentlySnappedComponentTo(SortDropdown.myID);
+                snapCursorToCurrentSnappedComponent();
+            }
+        }
+
+        protected void SetCategory(string category) {
+            if (!CategoryDropdown.TrySelect(category)) {
+                ModManager.Instance.Monitor.Log($"Failed selecting category filter category '{category}'.", LogLevel.Warn);
+                if (category != I18n.Category_All()) {
+                    SetCategory(I18n.Category_All());
+                }
+            }
+
+            UpdateView(filter: true, resetScroll: true);
+        }
+
+        //protected void SetSortOption(string sortOption) {
+        //    if (!CategoryDropdown.TrySelect(sortOption)) {
+        //        ModManager.Instance.Monitor.Log($"Failed selecting category filter category '{sortOption}'.", LogLevel.Warn);
+        //        if (category != I18n.Filter_All())
+        //            this.SetCategory(I18n.Filter_All());
+        //        return;
+        //    }
+
+        //    this.ResetItemView(rebuild: true);
+        //}
 
         // ------------------------------------------------------------------------------------------------
 
@@ -224,14 +275,6 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 TrashHeldItem();
             }
 
-            //else if (this.SortButton.bounds.Contains(x, y)) {
-
-            //    this.SortBy = this.SortBy.GetNext();
-            //    this.SortButton.label = this.SortButton.name = this.GetSortLabel(this.SortBy);
-
-            //    UpdateView(rebuild: true);
-            //}
-
             else if (LeftArrow.bounds.Contains(x, y)) {
                 receiveScrollWheelAction(1);
             }
@@ -240,15 +283,23 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 receiveScrollWheelAction(-1);
             }
 
-            //else if (CategoryDropdown.TryClick(x, y, out bool itemClicked, out bool dropdownToggled)) {
-            //    if (dropdownToggled) {
-            //        this.SetDropdown(CategoryDropdown.IsExpanded);
-            //    }
-            //    if (itemClicked) {
-            //        this.SetCategory(CategoryDropdown.Selected);
-            //    }
+            else if (CategoryDropdown.TryClick(x, y, out bool itemClicked1, out bool dropdownToggled1)) {
+                if (dropdownToggled1) {
+                    SetCategoryDropdown(CategoryDropdown.IsExpanded);
+                }
+                if (itemClicked1) {
+                    SetCategory(CategoryDropdown.Selected);
+                }
+            }
 
-            //}
+            else if (SortDropdown.TryClick(x, y, out bool itemClicked2, out bool dropdownToggled2)) {
+                if (dropdownToggled2) {
+                    SetSortDropdown(SortDropdown.IsExpanded);
+                }
+                if (itemClicked2) {
+                    //SetCategory(CategoryDropdown.Selected);
+                }
+            }
 
             else if (SearchBar.Contains(x, y)) {
                 SearchBar.HandleLeftClick(x, y);
@@ -261,12 +312,12 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
             else if (FavoriteButton.HoveredOver) {
                 FavoriteButton.HandleLeftClick(x, y);
-                UpdateView(filter: true, resetScroll: true);
+                UpdateView(filter: true, resetScroll: true, reloadCategories: true);
             }
 
             else if (DisplayButton.HoveredOver) {
                 DisplayButton.HandleLeftClick(x, y);
-                UpdateView(filter: true, resetScroll: true);
+                UpdateView(filter: true, resetScroll: true, reloadCategories: true);
             }
 
             else if (SettingsButton.HoveredOver) {
@@ -294,12 +345,12 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
             else if (FavoriteButton.HoveredOver) {
                 FavoriteButton.HandleRightClick(x, y);
-                UpdateView(filter: true, resetScroll: true);
+                UpdateView(filter: true, resetScroll: true, reloadCategories: true);
             }
 
             else if (DisplayButton.HoveredOver) {
                 DisplayButton.HandleRightClick(x, y);
-                UpdateView(filter: true, resetScroll: true);
+                UpdateView(filter: true, resetScroll: true, reloadCategories: true);
             }
 
             else {
@@ -375,6 +426,5 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
             heldItem = null;
         }
-
     }
 }

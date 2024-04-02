@@ -9,31 +9,7 @@ using Object = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core {
 
-    /**
-        MIT License
-
-        Copyright (c) 2018 Pathoschild, CJBok
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-    **/
-
-    internal class ItemRepository {
+    internal static class ItemRepository {
         /*********
         ** Public methods
         *********/
@@ -41,7 +17,7 @@ namespace ItemResearchSpawnerV2.Core {
         /// <param name="onlyType">Only include items for the given <see cref="IItemDataDefinition.Identifier"/>.</param>
         /// <param name="includeVariants">Whether to include flavored variants like "Sunflower Honey".</param>
         [SuppressMessage("ReSharper", "AccessToModifiedClosure", Justification = $"{nameof(ItemRepository.TryCreate)} invokes the lambda immediately.")]
-        public IEnumerable<SearchableItem> GetAll(string? onlyType = null, bool includeVariants = true) {
+        public static IEnumerable<SpawnableItem> GetAll(string? onlyType = null, bool includeVariants = true) {
             //
             //
             // Be careful about closure variable capture here!
@@ -52,7 +28,7 @@ namespace ItemResearchSpawnerV2.Core {
             //
             //
 
-            IEnumerable<SearchableItem?> GetAllRaw() {
+            IEnumerable<SpawnableItem?> GetAllRaw() {
                 // get from item data definitions
                 foreach (IItemDataDefinition itemType in ItemRegistry.ItemTypes) {
                     if (onlyType != null && itemType.Identifier != onlyType)
@@ -65,7 +41,7 @@ namespace ItemResearchSpawnerV2.Core {
 
                             foreach (string id in itemType.GetAllIds()) {
                                 // base item
-                                SearchableItem? result = TryCreate(itemType.Identifier, id, p => ItemRegistry.Create(itemType.Identifier + p.Id));
+                                SpawnableItem? result = TryCreate(itemType.Identifier, id, p => ItemRegistry.Create(itemType.Identifier + p.Id));
 
                                 // ring
                                 if (result?.Item is Ring)
@@ -73,13 +49,13 @@ namespace ItemResearchSpawnerV2.Core {
 
                                 // journal scraps
                                 else if (result?.QualifiedItemId == "(O)842") {
-                                    foreach (SearchableItem? journalScrap in GetSecretNotes(itemType, isJournalScrap: true))
+                                    foreach (SpawnableItem? journalScrap in GetSecretNotes(itemType, isJournalScrap: true))
                                         yield return journalScrap;
                                 }
 
                                 // secret notes
                                 else if (result?.QualifiedItemId == "(O)79") {
-                                    foreach (SearchableItem? secretNote in GetSecretNotes(itemType, isJournalScrap: false))
+                                    foreach (SpawnableItem? secretNote in GetSecretNotes(itemType, isJournalScrap: false))
                                         yield return secretNote;
                                 }
 
@@ -90,7 +66,7 @@ namespace ItemResearchSpawnerV2.Core {
                                         : result;
 
                                     if (includeVariants) {
-                                        foreach (SearchableItem? variant in GetFlavoredObjectVariants(objectDataDefinition, result?.Item as Object, itemType))
+                                        foreach (SpawnableItem? variant in GetFlavoredObjectVariants(objectDataDefinition, result?.Item as Object, itemType))
                                             yield return variant;
                                     }
                                 }
@@ -134,7 +110,7 @@ namespace ItemResearchSpawnerV2.Core {
         /// <param name="itemType">The object data definition.</param>
         /// <param name="isJournalScrap">Whether to get journal scraps.</param>
         /// <remarks>Derived from <see cref="GameLocation.tryToCreateUnseenSecretNote"/>.</remarks>
-        private IEnumerable<SearchableItem?> GetSecretNotes(IItemDataDefinition itemType, bool isJournalScrap) {
+        private static IEnumerable<SpawnableItem?> GetSecretNotes(IItemDataDefinition itemType, bool isJournalScrap) {
             // get base item ID
             string baseId = isJournalScrap ? "842" : "79";
 
@@ -167,7 +143,7 @@ namespace ItemResearchSpawnerV2.Core {
         /// <param name="objectDataDefinition">The item data definition for object items.</param>
         /// <param name="item">A sample of the base item.</param>
         /// <param name="itemType">The object data definition.</param>
-        private IEnumerable<SearchableItem?> GetFlavoredObjectVariants(ObjectDataDefinition objectDataDefinition, Object? item, IItemDataDefinition itemType) {
+        private static IEnumerable<SpawnableItem?> GetFlavoredObjectVariants(ObjectDataDefinition objectDataDefinition, Object? item, IItemDataDefinition itemType) {
             if (item is null)
                 yield break;
 
@@ -211,7 +187,7 @@ namespace ItemResearchSpawnerV2.Core {
                             continue;
 
                         // create roe
-                        SearchableItem? roe = TryCreate(itemType.Identifier, $"812/{input.ItemId}", _ => objectDataDefinition.CreateFlavoredRoe(input));
+                        SpawnableItem? roe = TryCreate(itemType.Identifier, $"812/{input.ItemId}", _ => objectDataDefinition.CreateFlavoredRoe(input));
                         yield return roe;
 
                         // create aged roe
@@ -230,7 +206,7 @@ namespace ItemResearchSpawnerV2.Core {
         /// <summary>Get optimized lookups to match items which produce roe in a fish pond.</summary>
         /// <param name="simpleTags">A lookup of simple singular tags which match a roe-producing fish.</param>
         /// <param name="complexTags">A list of tag sets which match roe-producing fish.</param>
-        private void GetRoeContextTagLookups(out HashSet<string> simpleTags, out List<List<string>> complexTags) {
+        private static void GetRoeContextTagLookups(out HashSet<string> simpleTags, out List<List<string>> complexTags) {
             simpleTags = new HashSet<string>();
             complexTags = new List<List<string>>();
 
@@ -248,7 +224,7 @@ namespace ItemResearchSpawnerV2.Core {
         /// <summary>Try to load a data asset, and return empty data if it's invalid.</summary>
         /// <typeparam name="TAsset">The asset type.</typeparam>
         /// <param name="load">A callback which loads the asset.</param>
-        private TAsset TryLoad<TAsset>(Func<TAsset> load)
+        private static TAsset TryLoad<TAsset>(Func<TAsset> load)
             where TAsset : new() {
             try {
                 return load();
@@ -263,9 +239,9 @@ namespace ItemResearchSpawnerV2.Core {
         /// <param name="type">The item type.</param>
         /// <param name="key">The locally unique item key.</param>
         /// <param name="createItem">Create an item instance.</param>
-        private SearchableItem? TryCreate(string type, string key, Func<SearchableItem, Item> createItem) {
+        private static SpawnableItem? TryCreate(string type, string key, Func<SpawnableItem, Item> createItem) {
             try {
-                SearchableItem item = new SearchableItem(type, key, createItem);
+                SpawnableItem item = new SpawnableItem(type, key, createItem);
                 item.Item.getDescription(); // force-load item data, so it crashes here if it's invalid
 
                 if (item.Item.Name is null or "Error Item")

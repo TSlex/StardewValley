@@ -11,7 +11,6 @@ namespace ItemResearchSpawnerV2 {
         private ModManager _manager;
 
         public override void Entry(IModHelper helper) {
-
             try {
                 _config = helper.ReadConfig<ModConfig>();
             }
@@ -24,6 +23,7 @@ namespace ItemResearchSpawnerV2 {
             // -----------------------------------------------
 
             _manager = new ModManager(helper, _config, Monitor, ModManifest);
+            I18n.Init(helper.Translation);
 
             // -----------------------------------------------
 
@@ -36,12 +36,20 @@ namespace ItemResearchSpawnerV2 {
             if (!Context.IsWorldReady || !Context.IsPlayerFree || !Context.CanPlayerMove)
                 return;
 
+            if (Game1.player.ActiveItem != null) {
+                Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
+            }
+
             // print button presses to the console window
             // this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
 
             if (_config.ShowMenuButton.JustPressed()) {
                 _manager.OpenMenu();
             }
+        }
+
+        public static string GetItemUniqueKey(Item item) {
+            return $"{item.Name}:" + $"{item.ParentSheetIndex} | {item.Category}";
         }
     }
 }

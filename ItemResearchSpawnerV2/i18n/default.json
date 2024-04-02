@@ -37,8 +37,8 @@
   "category.usable": "Usable",
   "category.weapons": "Weapons",
   "category.cooking": "Cooking",
-  "category.special-book": "Special book",
   "category.junk": "Junk",
+  "category.special-book": "Special book",
   "category.misc": "Misc",
 
   //commands

@@ -13,7 +13,7 @@ namespace ItemResearchSpawnerV2.Components.UI {
 
         public readonly ClickableComponent Component;
         public Rectangle Bounds => Component.bounds;
-        protected static IModContentHelper Content => ModManager.Instance.helper.ModContent;
+        protected static IModContentHelper Content => ModManager.Instance.Helper.ModContent;
 
         public bool HoveredOver { get; protected set; } = false;
         protected float Scale => HoveredOver ? 1.1f : 1f;

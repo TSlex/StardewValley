@@ -102,9 +102,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     location += 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
                 }
 
-                actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.HideButShowQuality, Color.White, flag);
+                actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.HideButShowQuality, Color.White * (flag ? 1f: 0.25f), flag);
 
-                Utility.drawTextWithColoredShadow(b, "100%", Game1.smallFont, location + new Vector2(4, -32), Color.Gold, Color.Red, 0.9f);
+                Utility.drawTextWithColoredShadow(b, "100%", Game1.smallFont, location + new Vector2(4, -32), Color.Gold, Color.Red * (flag ? 1f : 0.25f), 0.9f);
             }
         }
 

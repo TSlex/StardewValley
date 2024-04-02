@@ -549,6 +549,10 @@
     "When": {
       "ObjCategory": [
         -24
+      ],
+      "UniqueKey": [
+        "Flooring",
+        "Wallpaper"
       ]
     },
     "ResearchCount": 1,
@@ -568,5 +572,15 @@
     },
     "ResearchCount": 1,
     "BaseCost": 10
+  },
+  {
+    "Label": "category.special-book",
+    "When": {
+      "ObjCategory": [
+        -102
+      ]
+    },
+    "ResearchCount": 1,
+    "BaseCost": 10000
   }
 ]

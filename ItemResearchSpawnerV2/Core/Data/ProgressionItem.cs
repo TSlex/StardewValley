@@ -1,30 +1,31 @@
 ﻿using ItemResearchSpawnerV2.Core;
+using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Models.Enums;
-using Object = StardewValley.Object;
+using SObject = StardewValley.Object;
 
-namespace ItemResearchSpawnerV2.Models
-{
-    internal class ResearchableItem
-    {
-        public SpawnableItem Item { get; set; }
+namespace ItemResearchSpawnerV2.Models {
+    internal class ProgressionItem {
 
-        public ResearchProgression Progression { get; set; }
+        public SpawnableItem Item;
+        public ProgressionData Progression;
+        public ItemCategory Category;
 
-        public int GetAvailableQuantity(int money, ItemQuality requestedQuality, out ItemQuality maxAvailableQuality)
-        {
-            while (true)
-            {
+        public ProgressionItem(SpawnableItem item, ProgressionData progression, ItemCategory category) {
+            Item = item;
+            Progression = progression;
+            Category = category;
+        }
+
+        public int GetAvailableQuantity(int money, ItemQuality requestedQuality, out ItemQuality maxAvailableQuality) {
+            while (true) {
                 int quantity;
 
-                switch (requestedQuality)
-                {
+                switch (requestedQuality) {
                     case ItemQuality.Silver:
-                        if (Progression.ResearchCountSilver >= Item.ProgressionLimit)
-                        {
+                        if (Progression.ResearchCountSilver >= Category.BaseResearchCount) {
                             quantity = GetQuantityForQuality(money, requestedQuality);
 
-                            if (quantity > 0)
-                            {
+                            if (quantity > 0) {
                                 maxAvailableQuality = requestedQuality;
                                 return quantity;
                             }
@@ -34,12 +35,10 @@ namespace ItemResearchSpawnerV2.Models
                         continue;
 
                     case ItemQuality.Gold:
-                        if (Progression.ResearchCountGold >= Item.ProgressionLimit)
-                        {
+                        if (Progression.ResearchCountGold >= Category.BaseResearchCount) {
                             quantity = GetQuantityForQuality(money, requestedQuality);
 
-                            if (quantity > 0)
-                            {
+                            if (quantity > 0) {
                                 maxAvailableQuality = requestedQuality;
                                 return quantity;
                             }
@@ -49,12 +48,10 @@ namespace ItemResearchSpawnerV2.Models
                         continue;
 
                     case ItemQuality.Iridium:
-                        if (Progression.ResearchCountIridium >= Item.ProgressionLimit)
-                        {
+                        if (Progression.ResearchCountIridium >= Category.BaseResearchCount) {
                             quantity = GetQuantityForQuality(money, requestedQuality);
 
-                            if (quantity > 0)
-                            {
+                            if (quantity > 0) {
                                 maxAvailableQuality = requestedQuality;
                                 return quantity;
                             }
@@ -63,8 +60,7 @@ namespace ItemResearchSpawnerV2.Models
                         requestedQuality = requestedQuality.GetPrevious();
                         continue;
 
-                    default:
-                    {
+                    default: {
                         maxAvailableQuality = requestedQuality;
                         return GetQuantityForQuality(money, ItemQuality.Normal);
                     }
@@ -72,42 +68,38 @@ namespace ItemResearchSpawnerV2.Models
             }
         }
 
-        private int GetQuantityForQuality(int money, ItemQuality requestedQuality)
-        {
+        private int GetQuantityForQuality(int money, ItemQuality requestedQuality) {
             var item = Item.CreateItem();
 
-            if (item is Object obj)
-            {
-                obj.Quality = (int) requestedQuality;
+            if (item is SObject obj) {
+                obj.Quality = (int)requestedQuality;
             }
 
-            try
-            {
+            try {
                 return money / ModManager.Instance.GetItemBuyPrice(item);
             }
-            
-            catch (Exception)
-            {
+
+            catch (Exception) {
                 return item.maximumStackSize();
             }
         }
 
-        public ItemQuality GetAvailableQuality(ItemQuality requestedQuality)
-        {
-            while (true)
-            {
-                switch (requestedQuality)
-                {
+        public ItemQuality GetAvailableQuality(ItemQuality requestedQuality) {
+            while (true) {
+                switch (requestedQuality) {
                     case ItemQuality.Silver:
-                        if (Progression.ResearchCountSilver >= Item.ProgressionLimit) return requestedQuality;
+                        if (Progression.ResearchCountSilver >= Category.BaseResearchCount)
+                            return requestedQuality;
                         requestedQuality = requestedQuality.GetPrevious();
                         continue;
                     case ItemQuality.Gold:
-                        if (Progression.ResearchCountGold >= Item.ProgressionLimit) return requestedQuality;
+                        if (Progression.ResearchCountGold >= Category.BaseResearchCount)
+                            return requestedQuality;
                         requestedQuality = requestedQuality.GetPrevious();
                         continue;
                     case ItemQuality.Iridium:
-                        if (Progression.ResearchCountIridium >= Item.ProgressionLimit) return requestedQuality;
+                        if (Progression.ResearchCountIridium >= Category.BaseResearchCount)
+                            return requestedQuality;
                         requestedQuality = requestedQuality.GetPrevious();
                         continue;
                     default:

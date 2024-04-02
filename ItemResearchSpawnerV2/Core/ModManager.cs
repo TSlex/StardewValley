@@ -1,6 +1,7 @@
 ﻿using ItemResearchSpawnerV2.Core.Componets;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Enums;
+using ItemResearchSpawnerV2.Models;
 using ItemResearchSpawnerV2.Models.Enums;
 using StardewModdingAPI;
 using StardewValley;
@@ -9,10 +10,10 @@ namespace ItemResearchSpawnerV2.Core {
     internal class ModManager {
         public static ModManager Instance;
 
-        public readonly IModHelper helper;
-        public readonly IMonitor monitor;
-        public readonly IManifest manifest;
-        public readonly ModConfig config;
+        public readonly IModHelper Helper;
+        public readonly IMonitor Monitor;
+        public readonly IManifest Manifest;
+        public readonly ModConfig Config;
 
         public readonly ProgressionManager ProgressionManager;
 
@@ -35,10 +36,10 @@ namespace ItemResearchSpawnerV2.Core {
 
             // ---------------------------------------------------------------------
 
-            this.helper = helper;
-            this.config = config;
-            this.monitor = monitor;
-            this.manifest = manifest;
+            Helper = helper;
+            Config = config;
+            Monitor = monitor;
+            Manifest = manifest;
 
             ProgressionManager = new ProgressionManager();
         }
@@ -46,12 +47,42 @@ namespace ItemResearchSpawnerV2.Core {
         // ===========================================================================================
 
         public void OpenMenu() {
+            ProgressionManager.LoadCategories();
             Game1.activeClickableMenu = new MainMenuController();
         }
 
-        public IEnumerable<Models.SpawnableItem> GetProgressionItems() {
-            return ProgressionManager.GetSpawnableItems();
+        public IEnumerable<ProgressionItem> GetProgressionItems() {
+            return ProgressionManager.GetProgressionItems();
         }
+
+        #region SortingOptions
+
+        public IEnumerable<string> GetDisplayCategories(List<ProgressionItem> items) {
+
+            var categories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var item in items) {
+                categories.Add(item.Category.Label);
+            }
+
+            yield return I18n.Category_All();
+
+            foreach (string category in categories.OrderBy(p => p, StringComparer.OrdinalIgnoreCase)) {
+                if (category == I18n.Category_Misc()) {
+                    continue;
+                }
+
+                yield return category;
+            }
+
+            yield return I18n.Category_Misc();
+        }
+
+        private bool EqualsCaseInsensitive(string a, string b) {
+            return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
+        }
+
+        #endregion
 
         #region Price/Money
 
@@ -74,10 +105,10 @@ namespace ItemResearchSpawnerV2.Core {
 
             var price = GetItemPrice(item, false);
 
-            var buyPrice = (int)MathF.Round(price * config.BuyPriceMultiplier);
+            var buyPrice = (int)MathF.Round(price * Config.BuyPriceMultiplier);
             buyPrice = buyPrice >= 0 ? buyPrice : 0;
 
-            var sellPrice = (int)MathF.Round(price * config.SellPriceMultiplier);
+            var sellPrice = (int)MathF.Round(price * Config.SellPriceMultiplier);
             sellPrice = sellPrice >= 0 ? sellPrice : 0;
 
             if (countStack) {
@@ -90,13 +121,13 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         public int GetItemBuyPrice(Item item, bool countStack = false) {
-            var buyPrice = GetItemPrice(item, countStack, config.BuyPriceMultiplier);
+            var buyPrice = GetItemPrice(item, countStack, Config.BuyPriceMultiplier);
 
             return buyPrice >= 0 ? buyPrice : 0;
         }
 
         public int GetItemSellPrice(Item item, bool countStack = false) {
-            var sellPrice = GetItemPrice(item, countStack, config.SellPriceMultiplier);
+            var sellPrice = GetItemPrice(item, countStack, Config.SellPriceMultiplier);
 
             return sellPrice >= 0 ? sellPrice : 0;
         }

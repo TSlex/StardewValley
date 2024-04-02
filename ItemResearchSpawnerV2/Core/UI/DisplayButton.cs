@@ -43,10 +43,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public override void HandleLeftClick(int x, int y) {
             ModManager.Instance.ProgressionDisplay = ModManager.Instance.ProgressionDisplay.GetNext();
+            Game1.playSound("drumkit6");
         }
 
         public override void HandleRightClick(int x, int y) {
             ModManager.Instance.ProgressionDisplay = ModManager.Instance.ProgressionDisplay.GetPrevious();
+            Game1.playSound("drumkit6");
         }
     }
 }

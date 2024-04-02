@@ -37,8 +37,8 @@
   "category.usable": "Расходники",
   "category.weapons": "Оружие",
   "category.cooking": "Готовка",
-  "category.special-book": "Особая книга",
   "category.junk": "Мусор",
+  "category.special-book": "Особая книга",
   "category.misc": "Разное",
 
   //commands
