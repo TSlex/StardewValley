@@ -51,13 +51,13 @@ namespace ItemResearchSpawnerV2.Core {
             Game1.activeClickableMenu = new MainMenuController();
         }
 
-        public IEnumerable<ProgressionItem> GetProgressionItems() {
-            return ProgressionManager.GetProgressionItems();
+        public List<ProgressionItem> GetProgressionItems() {
+            return ProgressionManager.GetProgressionItems().ToList();
         }
 
         #region SortingOptions
 
-        public IEnumerable<string> GetDisplayCategories(List<ProgressionItem> items) {
+        public IEnumerable<string> GetDisplayCategories(IEnumerable<ProgressionItem> items) {
 
             var categories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 

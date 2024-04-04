@@ -99,7 +99,10 @@ namespace ItemResearchSpawnerV2.Core {
                     BaseResearchCount = category.ResearchCount
                 };
 
-                yield return new ProgressionItem(item, new ProgressionData(), itemCategory);
+                var itemPrice = ModManager.Instance.GetItemBuyPrice(item.Item);
+                itemPrice = itemPrice <= 0 ? category.BaseCost : itemPrice;
+
+                yield return new ProgressionItem(item, new ProgressionData(), itemCategory, itemPrice);
             }
         }
     }

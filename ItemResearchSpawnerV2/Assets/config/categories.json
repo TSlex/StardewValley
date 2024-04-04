@@ -14,10 +14,10 @@
     "Label": "category.ammo",
     "When": {
       "ItemId": [
-        "Object:286",
-        "Object:287",
-        "Object:288",
-        "Object:441"
+        "(O):286",
+        "(O):287",
+        "(O):288",
+        "(O):441"
       ]
     },
     "ResearchCount": 10,
@@ -31,13 +31,17 @@
         -99
       ],
       "ItemId": [
-        "Object:261",
-        "Object:297",
-        "Object:681",
-        "Object:688",
-        "Object:689",
-        "Object:690",
-        "Object:886"
+        "(O):261",
+        "(O):297",
+        "(O):681",
+        "(O):688",
+        "(O):689",
+        "(O):690",
+        "(O):886"
+      ],
+      "UniqueKey": [
+        "Grass Starter",
+        "Treasure Totem:71"
       ]
     },
     "Except": {
@@ -76,6 +80,9 @@
     "When": {
       "ObjCategory": [
         -100
+      ],
+      "UniqueKey": [
+        "Trimmed Lucky Purple Shorts"
       ]
     },
     "ResearchCount": 1,
@@ -109,7 +116,7 @@
         "Ancient Fruit:454"
       ],
       "ItemId": [
-        "Object:417"
+        "(O):417"
       ]
     },
     "ResearchCount": 100,
@@ -153,7 +160,7 @@
     },
     "Except": {
       "ItemId": [
-        "Object:92"
+        "(O):92"
       ]
     },
     "ResearchCount": 5,
@@ -186,15 +193,14 @@
     "Label": "category.saplings",
     "When": {
       "ItemId": [
-        "Object:69",
-        "Object:251",
-        "Object:628",
-        "Object:629",
-        "Object:630",
-        "Object:631",
-        "Object:632",
-        "Object:633",
-        "Object:835"
+        "(O):251",
+        "(O):628",
+        "(O):629",
+        "(O):630",
+        "(O):631",
+        "(O):632",
+        "(O):633",
+        "(O):835"
       ]
     },
     "ResearchCount": 1,
@@ -217,11 +223,11 @@
         -28
       ],
       "ItemId": [
-        "Object:413",
-        "Object:437",
-        "Object:439",
-        "Object:680",
-        "Object:857"
+        "(O):413",
+        "(O):437",
+        "(O):439",
+        "(O):680",
+        "(O):857"
       ]
     },
     "ResearchCount": 25,
@@ -283,14 +289,15 @@
     "Label": "category.geodes",
     "When": {
       "ItemId": [
-        "Object:535",
-        "Object:536",
-        "Object:537",
-        "Object:749",
-        "Object:791"
+        "(O):535",
+        "(O):536",
+        "(O):537",
+        "(O):749",
+        "(O):791"
       ],
       "UniqueKey": [
-        "Artifact Trove:275"
+        "Artifact Trove:275",
+        "Mystery Box"
       ]
     },
     "ResearchCount": 5,
@@ -332,9 +339,6 @@
       "ObjCategory": [
         -15,
         -16
-      ],
-      "ItemId": [
-        "Object:92"
       ],
       "UniqueKey": [
         "Dragon Tooth:852"
@@ -472,9 +476,9 @@
         -8
       ],
       "ItemId": [
-        "Object:710",
-        "Object:463",
-        "Object:464"
+        "(O):710",
+        "(O):463",
+        "(O):464"
       ],
       "UniqueKey": [
         "Staircase:71",
@@ -518,17 +522,18 @@
         -7
       ],
       "ItemId": [
-        "Object:245",
-        "Object:246",
-        "Object:247",
-        "Object:349",
-        "Object:395",
-        "Object:403",
-        "Object:419",
-        "Object:423"
+        "(O):349",
+        "(O):351",
+        "(O):395",
+        "(O):403",
+        "(O):419",
+        "(O):423"
       ],
       "UniqueKey": [
-        "Bug Steak:874"
+        "Bug Steak:874",
+        "Sugar:245",
+        "Wheat Flour:246",
+        "Oil:247"
       ]
     },
     "ResearchCount": 5,
@@ -577,10 +582,22 @@
     "Label": "category.special-book",
     "When": {
       "ObjCategory": [
-        -102
+        -102,
+        -103
       ]
     },
     "ResearchCount": 1,
     "BaseCost": 10000
+  },
+  {
+    "Label": "category.secret-note",
+    "When": {
+      "UniqueKey": [
+        "Secret Note",
+        "Journal Scrap"
+      ]
+    },
+    "ResearchCount": 1,
+    "BaseCost": 1
   }
 ]

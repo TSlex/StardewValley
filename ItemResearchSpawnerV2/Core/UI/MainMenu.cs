@@ -1,12 +1,12 @@
 ﻿using ItemResearchSpawnerV2.Components.UI;
 using ItemResearchSpawnerV2.Core.Utils;
+using ItemResearchSpawnerV2.Models.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Buildings;
 using StardewValley.Menus;
-using StardewValley.Objects;
+using System;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.UI {
@@ -19,8 +19,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         protected readonly FavoriteButton FavoriteButton;
         protected readonly DisplayButton DisplayButton;
         protected readonly SettingsButton SettingsButton;
-        protected readonly Dropdown<string> CategoryDropdown;
-        protected readonly Dropdown<string> SortDropdown;
+        protected readonly Dropdown CategoryDropdown;
+        protected readonly Dropdown SortDropdown;
         protected readonly SearchBar SearchBar;
         protected readonly ItemResearchArea ItemResearchArea;
 
@@ -73,9 +73,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
 
             CreativeMenu = new(ItemsToGrabMenu) {
-                rows = 2
+                rows = 4
             };
-            CreativeMenu.capacity = CreativeMenu.rows * 8;
+            CreativeMenu.capacity = CreativeMenu.rows * 4;
             CreativeMenu.verticalGap += 40;
             CreativeMenu.horizontalGap += 20;
             CreativeMenu.drawSlots = false;
@@ -89,10 +89,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
             DisplayButton = new DisplayButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 2);
             SettingsButton = new SettingsButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3);
 
-            SortDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
-                Game1.smallFont, SortDropdown?.Selected ?? "DEFAULT", Enumerable.Repeat("BY CATEGORY", 20).ToArray(), p => p, tabWidth: 236);
+            SortDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
+                Game1.smallFont, ItemSortOption.CategoryUp.GetString(), 
+                Enum.GetValues(typeof(ItemSortOption)).Cast<ItemSortOption>().Select(option => option.GetString()).ToArray(), 
+                p => p, tabWidth: 236);
 
-            CategoryDropdown = new Dropdown<string>(() => xPositionOnScreen - borderWidth - 40 + 236 + 36, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
+            CategoryDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40 + 236 + 36, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
                 Game1.smallFont, I18n.Category_All(), new[] { I18n.Category_All() }, p => p, tabWidth: 336);
 
             SearchBar = new SearchBar(() => xPositionOnScreen - borderWidth - 40 + 500 + 72 * 2, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 464);

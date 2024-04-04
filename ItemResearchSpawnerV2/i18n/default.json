@@ -1,8 +1,13 @@
 ﻿{
   //sort buttons
-  "sort.by-name": "Name",
-  "sort.by-category": "Category",
-  "sort.by-id": "ID",
+  "sort.by-name-asc": "Name [A > Z]",
+  "sort.by-name-desc": "Name [Z > A]",
+  "sort.by-category-asc": "Category [A > Z]",
+  "sort.by-category-desc": "Category [Z > A]",
+  "sort.by-id-asc": "ID [0 > 9]",
+  "sort.by-id-desc": "ID [9 > 0]",
+  "sort.by-price-asc": "Price [0 > 9]",
+  "sort.by-price-desc": "Price [9 > 0]",
 
   //categories
   "category.all": "All",
@@ -39,6 +44,7 @@
   "category.cooking": "Cooking",
   "category.junk": "Junk",
   "category.special-book": "Special book",
+  "category.secret-note": "Secret Notes",
   "category.misc": "Misc",
 
   //commands

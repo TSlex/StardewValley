@@ -11,9 +11,8 @@ using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.Componets {
     internal class MainMenuController : MainMenu {
-        private IEnumerable<ProgressionItem> ProgressionItems;
-
-        private readonly List<ProgressionItem> FilteredProgressionItems = new();
+        private List<ProgressionItem> ProgressionItems;
+        private List<ProgressionItem> FilteredProgressionItems;
 
         private string LastSearchQuery;
 
@@ -31,7 +30,8 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
             if (SearchBar.Text != LastSearchQuery) {
                 LastSearchQuery = SearchBar.Text;
-                UpdateView(rebuild: false, filter: true, resetScroll: true, reloadCategories: true);
+                Game1.playSound("drumkit6");
+                UpdateView(rebuild: false, filter: true, resetScroll: true, reloadCategories: false);
             }
 
             base.update(time);
@@ -48,8 +48,14 @@ namespace ItemResearchSpawnerV2.Core.Componets {
         private void UpdateCreativeMenu() {
             CreativeMenu.actualInventory.Clear();
 
+            //if (FilteredProgressionItems.Count() == 0) {
+            //    return;
+            //}
+
             foreach (var prefab in FilteredProgressionItems
-                .Skip(TopRowIndex * CreativeMenu.ItemsPerRow).Take(CreativeMenu.ItemsPerView)) {
+                .Skip(TopRowIndex * CreativeMenu.ItemsPerRow * 2)
+                .Take(CreativeMenu.ItemsPerView)
+                ) {
 
                 var item = prefab.Item.CreateItem();
                 var quality = ModManager.Instance.ItemQuality;
@@ -79,9 +85,10 @@ namespace ItemResearchSpawnerV2.Core.Componets {
         }
 
         private void FilterProgressionItems() {
-            var items = ProgressionItems;
+            IEnumerable<ProgressionItem> items = ProgressionItems;
 
             var search = SearchBar.Text;
+
             if (search != "") {
                 items = items.Where(item =>
                     item.Item.Name.Contains(search, StringComparison.InvariantCultureIgnoreCase)
@@ -90,9 +97,23 @@ namespace ItemResearchSpawnerV2.Core.Componets {
             }
 
             if (!CommonHelper.EqualsCaseInsensitive(CategoryDropdown.Selected, I18n.Category_All())) {
-                items = items.Where(item => CommonHelper.EqualsCaseInsensitive(item.Category.Label, this.CategoryDropdown.Selected));
+                items = items.Where(item => CommonHelper.EqualsCaseInsensitive(item.Category.Label, CategoryDropdown.Selected));
             }
 
+            var activeSortOption = Enum.GetValues(typeof(ItemSortOption)).Cast<ItemSortOption>()
+                .Where(op => op.GetString() == SortDropdown.Selected).FirstOrDefault();
+
+            items = activeSortOption switch {
+                ItemSortOption.NameUp => items.OrderBy(p => p.Item.DisplayName),
+                ItemSortOption.NameDown => items.OrderByDescending(p => p.Item.DisplayName),
+                ItemSortOption.CategoryUp => items.OrderBy(p => p.Item.Item.Category),
+                ItemSortOption.CategoryDown => items.OrderByDescending(p => p.Item.Item.Category),
+                ItemSortOption.IDUp => items.OrderBy(p => p.Item.Item.ParentSheetIndex),
+                ItemSortOption.IDDown => items.OrderByDescending(p => p.Item.Item.ParentSheetIndex),
+                ItemSortOption.PriceUp => items.OrderBy(p => p.Price),
+                ItemSortOption.PriceDown => items.OrderByDescending(p => p.Price),
+                _ => items.OrderBy(p => p.Item.DisplayName)
+            };
 
             switch (ModManager.Instance.FavoriteDisplay) {
                 case Data.Enums.FavoriteDisplayMode.FavoriteOnly:
@@ -121,8 +142,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                     break;
             }
 
-            FilteredProgressionItems.Clear();
-            FilteredProgressionItems.AddRange(items);
+            FilteredProgressionItems = items.ToList();
         }
 
         private void UpdateView(bool rebuild = false, bool filter = false, bool resetScroll = false, bool reloadCategories = false) {
@@ -133,7 +153,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 TopRowIndex = 0;
                 UpdateCategories();
                 UpdateCreativeMenu();
-                MaxTopRowIndex = Math.Max(0, (int)Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 1m)) - 3);
+                MaxTopRowIndex = Math.Max(0, (int)Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 2m) - 2));
 
                 return;
             }
@@ -152,7 +172,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
             UpdateCreativeMenu();
 
-            MaxTopRowIndex = Math.Max(0, (int)Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 1m)) - 3);
+            MaxTopRowIndex = Math.Max(0, (int)Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 2m) - 2));
         }
 
         // ------------------------------------------------------------------------------------------------
@@ -189,7 +209,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
         protected void SetCategory(string category) {
             if (!CategoryDropdown.TrySelect(category)) {
-                ModManager.Instance.Monitor.Log($"Failed selecting category filter category '{category}'.", LogLevel.Warn);
+                ModManager.Instance.Monitor.Log($"Failed selecting category '{category}'.", LogLevel.Warn);
                 if (category != I18n.Category_All()) {
                     SetCategory(I18n.Category_All());
                 }
@@ -198,16 +218,16 @@ namespace ItemResearchSpawnerV2.Core.Componets {
             UpdateView(filter: true, resetScroll: true);
         }
 
-        //protected void SetSortOption(string sortOption) {
-        //    if (!CategoryDropdown.TrySelect(sortOption)) {
-        //        ModManager.Instance.Monitor.Log($"Failed selecting category filter category '{sortOption}'.", LogLevel.Warn);
-        //        if (category != I18n.Filter_All())
-        //            this.SetCategory(I18n.Filter_All());
-        //        return;
-        //    }
+        protected void SetSortOption(string sortOption) {
+            if (!SortDropdown.TrySelect(sortOption)) {
+                ModManager.Instance.Monitor.Log($"Failed selecting sort option '{sortOption}'.", LogLevel.Warn);
+                if (sortOption != I18n.Sort_ByCategoryAsc())
+                    SetCategory(I18n.Sort_ByCategoryAsc());
+                return;
+            }
 
-        //    this.ResetItemView(rebuild: true);
-        //}
+            UpdateView(filter: true, resetScroll: true);
+        }
 
         // ------------------------------------------------------------------------------------------------
 
@@ -283,7 +303,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 receiveScrollWheelAction(-1);
             }
 
-            else if (CategoryDropdown.TryClick(x, y, out bool itemClicked1, out bool dropdownToggled1)) {
+            else if (CategoryDropdown.TryLeftClick(x, y, out bool itemClicked1, out bool dropdownToggled1)) {
                 if (dropdownToggled1) {
                     SetCategoryDropdown(CategoryDropdown.IsExpanded);
                 }
@@ -292,12 +312,12 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 }
             }
 
-            else if (SortDropdown.TryClick(x, y, out bool itemClicked2, out bool dropdownToggled2)) {
+            else if (SortDropdown.TryLeftClick(x, y, out bool itemClicked2, out bool dropdownToggled2)) {
                 if (dropdownToggled2) {
                     SetSortDropdown(SortDropdown.IsExpanded);
                 }
                 if (itemClicked2) {
-                    //SetCategory(CategoryDropdown.Selected);
+                    SetSortOption(SortDropdown.Selected);
                 }
             }
 
@@ -338,7 +358,21 @@ namespace ItemResearchSpawnerV2.Core.Componets {
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true) {
-            if (QualityButton.HoveredOver) {
+            if (CategoryDropdown.IsExpanded || CategoryDropdown.containsPoint(x, y)) {
+                if (CategoryDropdown.Selected != I18n.Category_All()) {
+                    SetCategory(I18n.Category_All());
+                }
+                SetCategoryDropdown(false);
+            }
+            else if (SortDropdown.IsExpanded || SortDropdown.containsPoint(x, y)) {
+                if (SortDropdown.Selected != I18n.Sort_ByCategoryAsc()) {
+                    SetSortOption(I18n.Sort_ByCategoryAsc());
+                }
+
+                SetSortDropdown(false);
+            }
+
+            else if (QualityButton.HoveredOver) {
                 QualityButton.HandleRightClick(x, y);
                 UpdateView();
             }
@@ -383,17 +417,24 @@ namespace ItemResearchSpawnerV2.Core.Componets {
         }
 
         public override void receiveScrollWheelAction(int direction) {
-            //base.receiveScrollWheelAction(direction);
-            ScrollView(-direction);
+            if (CategoryDropdown.IsExpanded) {
+                CategoryDropdown.OnScrollWheel(direction);
+            }
+            else if (SortDropdown.IsExpanded) {
+                SortDropdown.OnScrollWheel(direction);
+            }
+            else {
+                ScrollView(-direction);
+            }
         }
 
         public void ScrollView(int direction, bool updateView = true) {
-            if (direction < 0) {
-                TopRowIndex--;
+            if (direction < 0 && ShowLeftButton) {
+                TopRowIndex -= 1;
                 Game1.playSound("newRecipe");
             }
-            else if (direction > 0) {
-                TopRowIndex++;
+            else if (direction > 0 && ShowRightButton) {
+                TopRowIndex += 1;
                 Game1.playSound("newRecipe");
             }
 

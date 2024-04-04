@@ -10,10 +10,13 @@ namespace ItemResearchSpawnerV2.Models {
         public ProgressionData Progression;
         public ItemCategory Category;
 
-        public ProgressionItem(SpawnableItem item, ProgressionData progression, ItemCategory category) {
+        public int Price;
+
+        public ProgressionItem(SpawnableItem item, ProgressionData progression, ItemCategory category, int price) {
             Item = item;
             Progression = progression;
             Category = category;
+            Price = price;
         }
 
         public int GetAvailableQuantity(int money, ItemQuality requestedQuality, out ItemQuality maxAvailableQuality) {

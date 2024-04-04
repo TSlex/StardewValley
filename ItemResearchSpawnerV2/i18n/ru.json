@@ -1,8 +1,13 @@
 ﻿{
   //sort buttons
-  "sort.by-name": "Имя",
-  "sort.by-category": "Категория",
-  "sort.by-id": "ID",
+  "sort.by-name-asc": "Название [A > Я]",
+  "sort.by-name-desc": "Название [Я > А]",
+  "sort.by-category-asc": "Категория [A > Я]",
+  "sort.by-category-desc": "Категория [Я > А]",
+  "sort.by-id-asc": "ID [0 > 9]",
+  "sort.by-id-desc": "ID [9 > 0]",
+  "sort.by-price-asc": "Цена [0 > 9]",
+  "sort.by-price-desc": "Цена [9 > 0]",
 
   //categories
   "category.all": "Все",
@@ -39,6 +44,7 @@
   "category.cooking": "Готовка",
   "category.junk": "Мусор",
   "category.special-book": "Особая книга",
+  "category.secret-note": "Таинственные заметки",
   "category.misc": "Разное",
 
   //commands

@@ -18,16 +18,30 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public void RecreateItemSlots() {
             inventory.Clear();
 
+            var middleID = capacity / 2;
+            var rowsPerPage = rows / 2;
+
             for (int j = 0; j < capacity; j++) {
                 (int top_id, int bottom_id, int left_id, int right_id) = GetNeightSlotsId(j);
+
+                //var itemBounds = new Rectangle(
+                //    38 + xPositionOnScreen + j % ItemsPerRow * 64 + horizontalGap * (j % ItemsPerRow),
+                //    12 + yPositionOnScreen + j / ItemsPerRow * (64 + verticalGap) + (j / ItemsPerRow - 1) * 4 -
+                //    ((j <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0), 64, 64);
+
+                //if ((j / (ItemsPerRow / 2) + 1) % 2 == 0) {
+                //    itemBounds.X += 40;
+                //}
 
                 var itemBounds = new Rectangle(
                     38 + xPositionOnScreen + j % ItemsPerRow * 64 + horizontalGap * (j % ItemsPerRow),
                     12 + yPositionOnScreen + j / ItemsPerRow * (64 + verticalGap) + (j / ItemsPerRow - 1) * 4 -
                     ((j <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0), 64, 64);
 
-                if ((j / (ItemsPerRow / 2) + 1) % 2 == 0) {
-                    itemBounds.X += 40;
+                if (j >= middleID) {
+                    itemBounds.X += ItemsPerRow * 84 + 40;
+                    itemBounds.Y = 12 + yPositionOnScreen + (j - middleID) / ItemsPerRow * (64 + verticalGap) + ((j - middleID) / ItemsPerRow - 1) * 4 -
+                    (((j - middleID) <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0);
                 }
 
                 inventory.Add(new ClickableComponent(itemBounds, j.ToString() ?? "") {

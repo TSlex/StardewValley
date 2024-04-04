@@ -6,39 +6,12 @@ using ItemResearchSpawnerV2.Core.Utils;
 using StardewModdingAPI;
 
 namespace ItemResearchSpawnerV2.Core.UI {
-
-    /**
-        MIT License
-
-        Copyright (c) 2018 Pathoschild, CJBok
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-    **/
-
-    internal class Dropdown<TItem> : ClickableComponent {
-
+    internal class Dropdown : ClickableComponent {
         // https://github.com/CJBok/SDV-Mods/blob/master/Common/UI/Dropdown.cs
 
         private readonly SpriteFont Font;
-        private readonly Func<TItem, string> GetLabel;
-        private DropdownList<TItem> List;
-        private readonly int BorderWidth = 5 * 2 * Game1.pixelZoom;
+        private readonly Func<string, string> GetLabel;
+        private DropdownList List;
         private readonly int TabWidth;
         private bool IsExpandedImpl;
         private bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
@@ -60,19 +33,22 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 //bounds.Width = (value ? List.MaxLabelWidth : GetTabWidth()) + BorderWidth;
             }
         }
-        public TItem Selected => List.SelectedValue;
+        public string Selected => List.SelectedValue;
         public IEnumerable<ClickableComponent> GetChildComponents() => List.GetChildComponents();
 
-
-        public Dropdown(Func<int> getXPos, Func<int> getYPos, SpriteFont font, TItem selectedItem, IList<TItem> items, 
-            Func<TItem, string> getLabel, int tabWidth = 100): base(Rectangle.Empty, getLabel(selectedItem)) {
+        public Dropdown(Func<int> getXPos, Func<int> getYPos, SpriteFont font, string selectedItem, IList<string> items,
+            Func<string, string> getLabel, int tabWidth = 100) : base(Rectangle.Empty, getLabel(selectedItem)) {
 
             GetXPos = getXPos;
             GetYPos = getYPos;
+
             Font = font;
+
             GetLabel = getLabel;
+
             bounds.X = getXPos();
             bounds.Y = getYPos();
+
             TabWidth = tabWidth;
 
             SetOptions(selectedItem, items);
@@ -80,20 +56,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         // -------------------------------------------------------------------------------------
 
-        public void SetOptions(TItem selectedItem, IList<TItem> items) {
-            List = new DropdownList<TItem>(selectedItem, items, GetLabel, GetXPos(), GetYPos(), Font);
-            ReinitializeComponents();
+        public void SetOptions(string selectedItem, IList<string> items) {
+            List = new DropdownList(selectedItem, items, GetLabel, GetXPos(), GetYPos(), TabWidth - 3 * 4, Font);
+            Update();
         }
 
-        public void SetOptions(IList<TItem> items) {
+        public void SetOptions(IList<string> items) {
             SetOptions(List.SelectedValue, items);
         }
 
-        public bool TryClick(int x, int y) {
-            return TryClick(x, y, out _, out _);
+        public bool TryLeftClick(int x, int y) {
+            return TryLeftClick(x, y, out _, out _);
         }
 
-        public bool TryClick(int x, int y, out bool itemClicked, out bool dropdownToggled) {
+        public bool TryLeftClick(int x, int y, out bool itemClicked, out bool dropdownToggled) {
+
             itemClicked = false;
             dropdownToggled = false;
 
@@ -114,33 +91,48 @@ namespace ItemResearchSpawnerV2.Core.UI {
             return false;
         }
 
-        public bool TrySelect(TItem value) {
-            return List.TrySelect(value);
+        public bool TrySelect(string value) {
+            if (Selected == value) { 
+                return true;
+            }
+
+            var succ = List.TrySelect(value);
+
+            Update();
+
+            return succ;
         }
 
-        public void ReceiveScrollWheelAction(int direction) {
+        public void OnScrollWheel(int direction) {
             if (IsExpanded) {
-                List.ReceiveScrollWheelAction(direction);
+                List.OnScrollWheel(direction);
             }
         }
 
         public void Draw(SpriteBatch b, float opacity = 1) {
 
-            bounds.X = GetXPos();
-            bounds.Y = GetYPos();
-            List.bounds.X = bounds.X;
-            List.bounds.Y = bounds.Y;
+            var newX = GetXPos();
+            var newY = GetYPos();
+
+            if (bounds.X != newX || bounds.Y != newY) {
+                bounds.X = newX;
+                bounds.Y = newY;
+
+                Update();
+            }
 
             // -------------------------------------------------------------------------------------
 
             DrawHelper.DrawTab(bounds.X, bounds.Y, TabWidth, List.MaxLabelHeight, out Vector2 textPos, drawShadow: IsAndroid);
 
-            b.DrawString(Font, List.SelectedLabel, textPos, Color.Black * opacity);
+            //b.DrawString(Font, List.SelectedLabel, textPos, Color.Black * opacity);
+            b.DrawString(Font, DrawHelper.TruncateString(List.SelectedLabel, Font, TabWidth), textPos,
+                Color.Black * opacity);
 
             var sourceRect = new Rectangle(439, 453, 5, 5);
-            var position = new Vector2(x: bounds.X + TabWidth - sourceRect.Width, y: bounds.Y + 20);
+            var position = new Vector2(bounds.X + TabWidth - sourceRect.Width, bounds.Y + 20);
 
-            b.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom, 
+            b.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
                 IsExpanded ? SpriteEffects.FlipVertically : SpriteEffects.None, 1f);
 
             if (IsExpanded) {
@@ -148,21 +140,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
         }
 
-        public void ReinitializeComponents() {
-            bounds.Height = (int)Font.MeasureString("ABCDEFGHIJKLMNOPQRSTUVWXYZ").Y - 10 + BorderWidth;
-
-            bounds.Width = TabWidth + BorderWidth;
+        public void Update() {
+            bounds.Height = (int)Font.MeasureString("ABCDEFGHIJKLMNOPQRSTUVWXYZ").Y - 10 + 4 * 9;
+            bounds.Width = TabWidth + 4 * 7;
 
             List.bounds.X = bounds.X;
             List.bounds.Y = bounds.Bottom;
-
-            List.ReinitializeComponents();
-            ReinitializeControllerFlow();
-        }
-
-        public void ReinitializeControllerFlow() {
-            List.ReinitializeControllerFlow();
-            IsExpanded = IsExpanded;
+            List.Update();
         }
 
         public override bool containsPoint(int x, int y) {
@@ -172,26 +156,23 @@ namespace ItemResearchSpawnerV2.Core.UI {
         // -------------------------------------------------------------------------------------
     }
 
-    internal class DropdownList<TValue> : ClickableComponent {
+    internal class DropdownList : ClickableComponent {
 
         // https://github.com/CJBok/SDV-Mods/blob/master/Common/UI/DropdownList.cs
 
-        private const int DropdownPadding = 5;
-        private DropListOption<TValue> SelectedOption;
+        private DropListOption SelectedOption;
 
-        private List<DropListOption<TValue>> Options = new List<DropListOption<TValue>>();
+        private readonly List<DropListOption> Options = new();
 
         private int FirstVisibleIndex;
         private int MaxItems;
-        private readonly Func<TValue, string> GetLabel;
+        private readonly Func<string, string> GetLabel;
         private readonly SpriteFont Font;
         private ClickableTextureComponent UpArrow;
         private ClickableTextureComponent DownArrow;
 
         public int MaxLabelHeight;
-        public int MaxLabelWidth {
-            get; private set;
-        }
+        public int BaseWidth;
 
         private int LastVisibleIndex => FirstVisibleIndex + MaxItems - 1;
         private int MaxFirstVisibleIndex => Options.Count - MaxItems;
@@ -199,32 +180,37 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private bool CanScrollDown => FirstVisibleIndex < MaxFirstVisibleIndex;
 
         public IEnumerable<ClickableComponent> GetChildComponents() => Options;
-        public TValue SelectedValue => SelectedOption.Value;
+        public string SelectedValue => SelectedOption.Value;
         public string SelectedLabel => SelectedOption.label;
         public int TopComponentId => Options.First(p => p.visible).myID;
 
+        private readonly string DefaultValue;
 
-        public DropdownList(TValue selectedValue, IList<TValue> items, Func<TValue, string> getLabel, int x, int y, SpriteFont font)
-            : base(new Rectangle(), nameof(DropdownList<TValue>)) {
 
+        public DropdownList(string selectedValue, IList<string> items, Func<string, string> getLabel, int x, int y, int baseWidth, SpriteFont font)
+            : base(new Rectangle(), nameof(DropdownList)) {
+
+            BaseWidth = baseWidth;
             GetLabel = getLabel;
             Font = font;
+
+            DefaultValue = selectedValue;
 
             SetOptions(selectedValue, items);
 
             bounds.X = x;
             bounds.Y = y;
 
-            ReinitializeComponents();
+            Update();
         }
 
         // -------------------------------------------------------------------------------------
 
-        public void SetOptions(TValue selectedValue, IList<TValue> items) {
+        public void SetOptions(string selectedValue, IList<string> items) {
             Options.Clear();
-            Options.AddRange(
-                items.Select((item, index) => new DropListOption<TValue>(Rectangle.Empty, index, GetLabel(item), item, Font))
-                );
+            Options.AddRange(items.Select(
+                (item, index) => new DropListOption(Rectangle.Empty, index, GetLabel(item), item, Font))
+            );
 
             MaxLabelHeight = Options.Max(p => p.LabelHeight);
 
@@ -232,11 +218,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
             SelectedOption = selectedIndex >= 0 ? Options[selectedIndex] : Options.First();
         }
 
-        public void SetOptions(IList<TValue> items) {
+        public void SetOptions(IList<string> items) {
             SetOptions(SelectedValue, items);
         }
 
-        public void ReceiveScrollWheelAction(int direction) {
+        public void OnScrollWheel(int direction) {
             Scroll(direction > 0 ? -1 : 1);
         }
 
@@ -246,6 +232,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (option != null) {
                 SelectedOption = option;
                 itemClicked = true;
+
                 return true;
             }
 
@@ -263,7 +250,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             return false;
         }
 
-        public bool TrySelect(TValue value) {
+        public bool TrySelect(string value) {
             var entry = Options.FirstOrDefault(p =>
                 (p.Value == null && value == null) || p.Value?.Equals(value) == true
             );
@@ -272,7 +259,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 return false;
             }
 
+            if (entry.label == DefaultValue) {
+                FirstVisibleIndex = 0;
+            }
+
             SelectedOption = entry;
+            Game1.playSound("smallSelect");
 
             return true;
         }
@@ -282,7 +274,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public void Draw(SpriteBatch b, float opacity = 1) {
-            foreach (DropListOption<TValue> option in Options) {
+            foreach (DropListOption option in Options) {
                 if (!option.visible) {
                     continue;
                 }
@@ -297,9 +289,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     b.Draw(Game1.mouseCursors, option.bounds, new Rectangle(269, 258, 4, 4), Color.White * opacity);
                 }
 
-                Vector2 position = new(option.bounds.X + DropdownPadding, option.bounds.Y + Game1.tileSize / 16);
+                Vector2 position = new(option.bounds.X + 10, option.bounds.Y + Game1.tileSize / 16);
 
-                b.DrawString(Font, option.label, position, Color.Black * opacity);
+                //b.DrawString(Font, option.label, position, Color.Black * opacity);
+                b.DrawString(Font, DrawHelper.TruncateString(option.label, Font, option.bounds.Width), position,
+                    Color.Black * opacity);
             }
 
             if (CanScrollUp) {
@@ -310,23 +304,23 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
         }
 
-        public void ReinitializeComponents() {
-            int x = bounds.X;
-            int y = bounds.Y;
+        public void Update() {
+            var x = bounds.X + 4 * 3;
+            var y = bounds.Y + 4 * -3;
 
-            int itemWidth = MaxLabelWidth = Math.Max(Options.Max(p => p.LabelWidth), Game1.tileSize * 2) + DropdownPadding * 2;
-            int itemHeight = MaxLabelHeight;
+            var itemWidth = Math.Max(Options.Max(p => p.LabelWidth) - 80, BaseWidth) + 20;
+            var itemHeight = MaxLabelHeight;
 
             MaxItems = Math.Min(10, Options.Count);
 
-            FirstVisibleIndex = GetValidFirstItem(FirstVisibleIndex, MaxFirstVisibleIndex);
+            FirstVisibleIndex = GetFirstValidItem(FirstVisibleIndex, MaxFirstVisibleIndex);
 
             bounds.Width = itemWidth;
             bounds.Height = itemHeight * MaxItems;
 
-            int itemY = y;
+            var itemY = y;
 
-            foreach (DropListOption<TValue> option in Options) {
+            foreach (DropListOption option in Options) {
                 option.visible = option.Index >= FirstVisibleIndex && option.Index <= LastVisibleIndex;
 
                 if (option.visible) {
@@ -339,54 +333,40 @@ namespace ItemResearchSpawnerV2.Core.UI {
             var downSource = new Rectangle(12, 76, 40, 44);
 
             UpArrow = new ClickableTextureComponent("up-arrow",
-                new Rectangle(x - upSource.Width, y, upSource.Width, upSource.Height), "", "", Game1.mouseCursors, upSource, 1);
+                new Rectangle(x - upSource.Width - 4 * 3, y + 4 * 8, upSource.Width, upSource.Height), "", "", Game1.mouseCursors, upSource, 1);
             DownArrow = new ClickableTextureComponent("down-arrow",
-                new Rectangle(x - downSource.Width, y + bounds.Height - downSource.Height, downSource.Width, downSource.Height), "", "", Game1.mouseCursors, downSource, 1);
-
-            ReinitializeControllerFlow();
-        }
-
-        public void ReinitializeControllerFlow() {
-            int firstIndex = FirstVisibleIndex;
-            int lastIndex = LastVisibleIndex;
-
-            int initialId = 1_100_000;
-            foreach (DropListOption<TValue> option in Options) {
-                int index = option.Index;
-                int id = initialId + index;
-
-                option.myID = id;
-                option.upNeighborID = index > firstIndex ? id - 1 : -99999;
-                option.downNeighborID = index < lastIndex ? id + 1 : -1;
-            }
+                new Rectangle(x - downSource.Width - 4 * 3, y + bounds.Height - downSource.Height - 4 * 8, downSource.Width, downSource.Height), "", "", Game1.mouseCursors, downSource, 1);
         }
 
         // -------------------------------------------------------------------------------------
 
 
         private void Scroll(int amount) {
-            int firstItem = GetValidFirstItem(FirstVisibleIndex + amount, MaxFirstVisibleIndex);
+            var firstItem = GetFirstValidItem(FirstVisibleIndex + amount, MaxFirstVisibleIndex);
 
             if (firstItem == FirstVisibleIndex) {
                 return;
             }
 
             FirstVisibleIndex = firstItem;
-            ReinitializeComponents();
+
+            Update();
+
+            Game1.playSound("boulderCrack");
         }
 
-        private static int GetValidFirstItem(int value, int maxIndex) {
+        private static int GetFirstValidItem(int value, int maxIndex) {
             return Math.Max(Math.Min(value, maxIndex), 0);
         }
     }
 
-    internal class DropListOption<TValue> : ClickableComponent {
+    internal class DropListOption : ClickableComponent {
         public int Index;
-        public TValue Value;
+        public string Value;
         public int LabelWidth;
         public int LabelHeight;
 
-        public DropListOption(Rectangle bounds, int index, string label, TValue value, SpriteFont font)
+        public DropListOption(Rectangle bounds, int index, string label, string value, SpriteFont font)
             : base(bounds, index.ToString(), label) {
             Index = index;
             Value = value;
