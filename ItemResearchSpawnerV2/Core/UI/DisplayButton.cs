@@ -14,8 +14,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public override void Draw(SpriteBatch b) {
             base.Draw(b);
             DrawHelper.DrawMenuBox(Component.bounds.X, Component.bounds.Y,
-                Component.bounds.Width - UIConstants.BorderWidth,
-                Component.bounds.Height - UIConstants.BorderWidth, out var buttonInnerLocation);
+                Component.bounds.Width - UIConstants.BorderWidth * 2,
+                Component.bounds.Height - UIConstants.BorderWidth * 2, out var buttonInnerLocation);
 
             switch (ModManager.Instance.ProgressionDisplay) {
                 case Data.Enums.ProgressionDisplayMode.ResearchedOnly:

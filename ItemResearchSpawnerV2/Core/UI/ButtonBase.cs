@@ -11,18 +11,26 @@ namespace ItemResearchSpawnerV2.Components.UI {
         private readonly Func<int> GetXPos;
         private readonly Func<int> GetYPos;
 
-        public readonly ClickableComponent Component;
+        protected int BaseWidth;
+        protected int BaseHeight;
+
+        public ClickableComponent Component;
         public Rectangle Bounds => Component.bounds;
         protected static IModContentHelper Content => ModManager.Instance.Helper.ModContent;
 
         public bool HoveredOver { get; protected set; } = false;
         protected float Scale => HoveredOver ? 1.1f : 1f;
 
-        public ButtonBase(Func<int> getXPos, Func<int> getYPos) {
+        public ButtonBase(Func<int> getXPos, Func<int> getYPos, 
+            int baseWidth = 36 + UIConstants.BorderWidth * 2, int baseHeight = 36 + UIConstants.BorderWidth * 2) {
+
             GetXPos = getXPos;
             GetYPos = getYPos;
 
-            Component = new ClickableComponent(new Rectangle(getXPos(), getYPos(), 36 + UIConstants.BorderWidth, 36 + UIConstants.BorderWidth - 2), "");
+            BaseWidth = baseWidth;
+            BaseHeight = baseHeight;
+
+            Component = new ClickableComponent(new Rectangle(getXPos(), getYPos(), BaseWidth, BaseHeight), "");
         }
 
         public virtual void HandleLeftClick(int x, int y) { }
@@ -34,14 +42,11 @@ namespace ItemResearchSpawnerV2.Components.UI {
         }
 
         public virtual void Draw(SpriteBatch b) {
-            var baseWidth = 36 + UIConstants.BorderWidth;
-            var baseHeight = 36 + UIConstants.BorderWidth;
+            var scaledWidth = (int)(BaseWidth * Scale);
+            var scaledHeight = (int)((BaseHeight) * Scale);
 
-            var scaledWidth = (int)(baseWidth * Scale);
-            var scaledHeight = (int)((baseHeight) * Scale);
-
-            var offX = (baseWidth - scaledWidth) / 2;
-            var offY = (baseHeight - scaledHeight) / 2;
+            var offX = (BaseWidth - scaledWidth) / 2;
+            var offY = (BaseHeight - scaledHeight) / 2;
 
             Component.bounds.X = GetXPos() + offX;
             Component.bounds.Y = GetYPos() + offY;

@@ -19,7 +19,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
             inventory.Clear();
 
             var middleID = capacity / 2;
-            var rowsPerPage = rows / 2;
 
             for (int j = 0; j < capacity; j++) {
                 (int top_id, int bottom_id, int left_id, int right_id) = GetNeightSlotsId(j);

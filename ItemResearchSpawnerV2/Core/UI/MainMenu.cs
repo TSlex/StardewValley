@@ -90,8 +90,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
             SettingsButton = new SettingsButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3);
 
             SortDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
-                Game1.smallFont, ItemSortOption.CategoryUp.GetString(), 
-                Enum.GetValues(typeof(ItemSortOption)).Cast<ItemSortOption>().Select(option => option.GetString()).ToArray(), 
+                Game1.smallFont, ItemSortOption.CategoryUp.GetString(),
+                Enum.GetValues(typeof(ItemSortOption)).Cast<ItemSortOption>().Select(option => option.GetString()).ToArray(),
                 p => p, tabWidth: 236);
 
             CategoryDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40 + 236 + 36, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
@@ -153,6 +153,20 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (ShowRightButton) {
                 RightArrow.draw(b);
             }
+
+            var page_left = (TopRowIndex + 1).ToString();
+            var page_right = (TopRowIndex + 2).ToString();
+            var font = Game1.smallFont;
+
+            Utility.drawTextWithColoredShadow(b, page_left, font,
+                new Vector2(LeftArrow.bounds.X + LeftArrow.bounds.Width + 170 - font.MeasureString(page_left).X / 2, LeftArrow.bounds.Y + 16),
+                Color.Black, Color.White * 1f, 0.7f);
+
+
+            Utility.drawTextWithColoredShadow(b, page_right.ToString(), font,
+                new Vector2(RightArrow.bounds.X - 160 - font.MeasureString(page_right).X / 2, RightArrow.bounds.Y + 16),
+                Color.Black, Color.White * 1f, 0.7f);
+
 
             // ----------------------------------------------------
 

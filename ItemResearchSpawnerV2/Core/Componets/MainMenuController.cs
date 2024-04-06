@@ -231,6 +231,14 @@ namespace ItemResearchSpawnerV2.Core.Componets {
 
         // ------------------------------------------------------------------------------------------------
 
+        protected override void cleanupBeforeExit() {
+            if (ItemResearchArea.ResearchItem != null) {
+                TryReturnItemToInventory(ItemResearchArea.ReturnItem());
+            }
+
+            base.cleanupBeforeExit();
+        }
+
         public override void receiveKeyPress(Keys key) {
             var isEscape = key == Keys.Escape;
             var isExitButton =
@@ -293,6 +301,11 @@ namespace ItemResearchSpawnerV2.Core.Componets {
         public override void receiveLeftClick(int x, int y, bool playSound = true) {
             if (trashCan.containsPoint(x, y) && heldItem != null) {
                 TrashHeldItem();
+            }
+
+            if (ItemResearchArea.Bounds.Contains(x, y)) {
+                ItemResearchArea.SetItem(heldItem, out var returnItem);
+                heldItem = returnItem;
             }
 
             else if (LeftArrow.bounds.Contains(x, y)) {
@@ -447,6 +460,22 @@ namespace ItemResearchSpawnerV2.Core.Componets {
         }
 
         // --------------------------------------------------------------------------------------
+
+        private void TryReturnItemToInventory(Item item) {
+            if (item != null) {
+                if (Game1.player.isInventoryFull()) {
+                    DropItem(item);
+                }
+                else {
+                    Game1.player.addItemByMenuIfNecessary(item);
+                }
+            }
+        }
+
+        private static void DropItem(Item item) {
+            Game1.createItemDebris(item, Game1.player.getStandingPosition(), Game1.player.FacingDirection);
+        }
+
 
         private void OnItemGrab(Item item, Farmer player) {
             //if (ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.GetItemBuyPrice(item, true) <= Game1.player._money) {

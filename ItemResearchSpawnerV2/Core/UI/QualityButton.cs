@@ -30,8 +30,8 @@ namespace ItemResearchSpawnerV2.Components.UI {
             GetCurrentQualityIcon(out var texture, out var sourceRect, out var color);
 
             DrawHelper.DrawMenuBox(Component.bounds.X, Component.bounds.Y,
-                Component.bounds.Width - UIConstants.BorderWidth,
-                Component.bounds.Height - UIConstants.BorderWidth, out var buttonInnerLocation);
+                Component.bounds.Width - UIConstants.BorderWidth * 2,
+                Component.bounds.Height - UIConstants.BorderWidth * 2, out var buttonInnerLocation);
 
             b.Draw(texture, new Vector2(buttonInnerLocation.X, buttonInnerLocation.Y), sourceRect, color, 0,
                 Vector2.Zero, Game1.pixelZoom * Scale, SpriteEffects.None, 1f);
