@@ -18,11 +18,14 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private readonly Texture2D SellTexture;
         private readonly Texture2D CombinedTexture;
 
-        public ResearchButton(Func<int> getXPos, Func<int> getYPos) : base(getXPos, getYPos) {
+        private readonly ItemResearchArea researchArea;
+
+        public ResearchButton(ItemResearchArea researchArea, Func<int> getXPos, Func<int> getYPos) : base(getXPos, getYPos) {
 
             ResearchTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "search-button"));
             SellTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "sell-button.png"));
             CombinedTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "combined-button.png"));
+            this.researchArea = researchArea;
         }
 
         public override void Draw(SpriteBatch b) {
@@ -46,7 +49,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public override void HandleLeftClick(int x, int y) {
-            Game1.playSound("reward");
+            researchArea.HandleResearch();
         }
     }
 }

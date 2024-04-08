@@ -137,15 +137,15 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // ----------------------------------------------------
 
-            //LeftArrow.bounds.Width = (int)(11 * 4f * (LeftButtonHovered ? 1.1f : 1f));
-            //RightArrow.bounds.Width = (int)(11 * 4f * (RightButtonHovered ? 1.1f : 1f));
-            //LeftArrow.bounds.Height = (int)(10 * 4f * (LeftButtonHovered ? 1.1f : 1f));
-            //RightArrow.bounds.Height = (int)(10 * 4f * (RightButtonHovered ? 1.1f : 1f));
+            LeftArrow.bounds.Width = (int)(11 * 4f * (LeftButtonHovered ? 1.1f : 1f));
+            RightArrow.bounds.Width = (int)(11 * 4f * (RightButtonHovered ? 1.1f : 1f));
+            LeftArrow.bounds.Height = (int)(10 * 4f * (LeftButtonHovered ? 1.1f : 1f));
+            RightArrow.bounds.Height = (int)(10 * 4f * (RightButtonHovered ? 1.1f : 1f));
 
-            //LeftArrow.bounds.X = xPositionOnScreen + 20 - (LeftButtonHovered ? 4 : 0);
-            //LeftArrow.bounds.Y = yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4 - (LeftButtonHovered ? 4 : 0);
-            //RightArrow.bounds.X = xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8 - (RightButtonHovered ? 4 : 0);
-            //RightArrow.bounds.Y = LeftArrow.bounds.Y - (RightButtonHovered ? 4 : 0);
+            LeftArrow.bounds.X = xPositionOnScreen + 20 - (LeftButtonHovered ? 4 : 0);
+            LeftArrow.bounds.Y = yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4 - (LeftButtonHovered ? 4 : 0);
+            RightArrow.bounds.X = xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8 - (RightButtonHovered ? 4 : 0);
+            RightArrow.bounds.Y = LeftArrow.bounds.Y - (RightButtonHovered ? 4 : 0);
 
             if (ShowLeftButton) {
                 LeftArrow.draw(b);

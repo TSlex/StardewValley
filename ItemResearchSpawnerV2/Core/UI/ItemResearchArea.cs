@@ -17,6 +17,20 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         private readonly Texture2D BookAnimations;
         private readonly int BookTextureSize = 20;
+        private int BookSpriteID = 0;
+        private int TimeCounter = 0;
+        private int AnimWait = 150;
+        private bool BookOpenAnimComplete = false;
+
+        public bool BookTurnLeftRequested = false;
+        private bool BookTurnLeftPending = false;
+        private bool BookTurnLeftPendingC = false;
+
+        public bool BookTurnRightRequested = false;
+        private bool BookTurnRightPending = false;
+        private bool BookTurnRightPendingC = false;
+
+        private int ResearchProcessCounter = 0;
 
         public Item ResearchItem;
         //private Item LastItem;
@@ -50,7 +64,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             ResearchArea = new ClickableComponent(new Rectangle(getXPos(), getYPos(), width, Game1.tileSize + 50), "");
 
-            ResearchButton = new ResearchButton(() => GetButtonPosition.X + 3, () => GetButtonPosition.Y);
+            ResearchButton = new ResearchButton(this, () => GetButtonPosition.X + 3, () => GetButtonPosition.Y);
 
             //BookAnimations = ModManager.Instance.Helper.GameContent.Load<Texture2D>("LooseSprites\\Book_Animation");
             BookAnimations = ModManager.Instance.Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "images", "Book_Animation"));
@@ -78,6 +92,123 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         // ---------------------------------------------------------------------------------------------------
 
+        public void Update(GameTime time) {
+
+            TimeCounter += time.ElapsedGameTime.Milliseconds;
+
+            if (ResearchProcessCounter < 1000) {
+                ResearchProcessCounter += time.ElapsedGameTime.Milliseconds;
+            }
+
+            if (TimeCounter < AnimWait) {
+                return;
+            }
+
+            if (!BookOpenAnimComplete) {
+                if (BookSpriteID < 1) {
+                    AnimWait = 100;
+                }
+                else if (BookSpriteID > 8) {
+                    AnimWait = 30;
+                }
+                else if (BookSpriteID > 14) {
+                    AnimWait = 50;
+                }
+                else {
+                    AnimWait = 15;
+                }
+                BookSpriteID++;
+
+                if (BookSpriteID > 20) {
+                    BookSpriteID--;
+                    BookOpenAnimComplete = true;
+                }
+
+                if (BookSpriteID % 3 == 0) {
+                    Game1.playSound("newRecipe");
+                }
+            }
+            else if (ResearchItem != null) {
+                BookSpriteID = 8;
+                BookTurnRightPending = false;
+                BookTurnLeftPending = false;
+                BookTurnLeftRequested = false;
+                BookTurnRightRequested = false;
+            }
+            else {
+                if (BookTurnLeftRequested) {
+                    BookTurnRightPending = false;
+                    BookTurnRightPendingC = false;
+
+                    if (!BookTurnLeftPending) {
+                        AnimWait = 10;
+                        BookSpriteID = 14;
+                        BookTurnLeftPendingC = false;
+                    }
+                    else {
+                        BookTurnLeftPendingC = true;
+                    }
+
+                    BookTurnLeftRequested = false;
+                    BookTurnLeftPending = true;
+                }
+                else if (BookTurnRightRequested) {
+                    BookTurnLeftPending = false;
+                    BookTurnLeftPendingC = false;
+
+                    if (!BookTurnRightPending) {
+                        AnimWait = 10;
+                        BookSpriteID = 8;
+                        BookTurnRightPendingC = false;
+                    }
+                    else {
+                        BookTurnRightPendingC = true;
+                    }
+
+                    BookTurnRightRequested = false;
+                    BookTurnRightPending = true;
+                }
+                if (BookTurnRightPending) {
+                    AnimWait = 10;
+                    BookSpriteID++;
+
+                    if (BookSpriteID > 14) {
+                        if (!BookTurnRightPendingC) {
+                            BookSpriteID--;
+                            BookTurnRightPending = false;
+                        }
+                        else {
+                            BookTurnRightPendingC = false;
+                            BookSpriteID = 8;
+                        }
+                    }
+                }
+                else if (BookTurnLeftPending) {
+                    AnimWait = 10;
+                    BookSpriteID--;
+
+                    if (BookSpriteID < 8) {
+                        if (!BookTurnLeftPendingC) {
+                            BookSpriteID++;
+                            BookTurnLeftPending = false;
+                        }
+                        else {
+                            BookTurnLeftPendingC = false;
+                            BookSpriteID = 14;
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+            TimeCounter = 0;
+            //BookSpriteID++;
+            //BookSpriteID = BookSpriteID > 13 ? 8 : BookSpriteID;
+        }
+
         public void Draw(SpriteBatch b) {
 
             ResearchArea.bounds.X = GetXPos();
@@ -99,7 +230,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             b.Draw(BookAnimations,
                 new Vector2(ResearchArea.bounds.X + 4 * 6 - 1, ResearchArea.bounds.Y - 4 * 6),
-                new Rectangle(BookTextureSize * 8, 0, BookTextureSize, BookTextureSize), Color.White, 0f, Vector2.Zero, 8f, SpriteEffects.None, 1f);
+                new Rectangle(BookTextureSize * BookSpriteID, 0, BookTextureSize, BookTextureSize), Color.White, 0f, Vector2.Zero, 8f, SpriteEffects.None, 1f);
 
             var researchItemCellX = areaInnerAnchors.X + ResearchArea.bounds.Width / 2f - Game1.tileSize / 2f;
 
@@ -136,23 +267,20 @@ namespace ItemResearchSpawnerV2.Core.UI {
             ResearchItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f);
         }
 
-        //public void HandleResearch()
-        //{
-        //    if (_researchItem != null)
-        //    {
-        //        if (ModManager.Instance.ModMode == ModMode.Combined)
-        //        {
-        //            ModManager.Instance.SellItem(_researchItem);
-        //        }
+        public void HandleResearch() {
+            if (ResearchItem != null) {
+                //if (ModManager.Instance.ModMode == ModMode.Combined) {
+                //    ModManager.Instance.SellItem(_researchItem);
+                //}
 
-        //        if (ModManager.Instance.ModMode == ModMode.BuySell)
-        //        {
-        //            ModManager.Instance.SellItem(_researchItem);
-        //        }
+                //if (ModManager.Instance.ModMode == ModMode.BuySell) {
+                //    ModManager.Instance.SellItem(_researchItem);
+                //}
 
-        //        ProgressionManager.Instance.ResearchItem(_researchItem);
-        //    }
-        //}
+                //ProgressionManager.Instance.ResearchItem(_researchItem);
+                Game1.playSound("reward");
+            }
+        }
 
         private string GetItemProgression() {
             return "(0 / 0)";

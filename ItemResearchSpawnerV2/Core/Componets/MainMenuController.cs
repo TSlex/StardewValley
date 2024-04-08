@@ -34,6 +34,8 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 UpdateView(rebuild: false, filter: true, resetScroll: true, reloadCategories: false);
             }
 
+            ItemResearchArea.Update(time);
+
             base.update(time);
         }
 
@@ -154,12 +156,15 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 UpdateCategories();
                 UpdateCreativeMenu();
                 MaxTopRowIndex = Math.Max(0, (int)Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 2m) - 2));
+                ItemResearchArea.BookTurnRightRequested = true;
 
                 return;
             }
 
             if (filter) {
                 FilterProgressionItems();
+                ItemResearchArea.BookTurnRightRequested = true;
+                Game1.playSound("newRecipe");
             }
 
             if (resetScroll || TopRowIndex > MaxTopRowIndex) {
@@ -444,10 +449,12 @@ namespace ItemResearchSpawnerV2.Core.Componets {
         public void ScrollView(int direction, bool updateView = true) {
             if (direction < 0 && ShowLeftButton) {
                 TopRowIndex -= 1;
+                ItemResearchArea.BookTurnLeftRequested = true;
                 Game1.playSound("newRecipe");
             }
             else if (direction > 0 && ShowRightButton) {
                 TopRowIndex += 1;
+                ItemResearchArea.BookTurnRightRequested = true;
                 Game1.playSound("newRecipe");
             }
 
