@@ -14,6 +14,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private readonly Texture2D ResearchTexture;
         private readonly Texture2D SellTexture;
         private readonly Texture2D CombinedTexture;
+        private readonly Texture2D ResearchItemLightTexture;
 
         private readonly Texture2D BookAnimations;
         private readonly int BookTextureSize = 20;
@@ -30,7 +31,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private bool BookTurnRightPending = false;
         private bool BookTurnRightPendingC = false;
 
-        private int ResearchProcessCounter = 0;
+        private double ResearchProcessTime = 0;
+        private bool ResearchStarted = false;
 
         public Item ResearchItem;
         //private Item LastItem;
@@ -68,6 +70,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             //BookAnimations = ModManager.Instance.Helper.GameContent.Load<Texture2D>("LooseSprites\\Book_Animation");
             BookAnimations = ModManager.Instance.Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "images", "Book_Animation"));
+            ResearchItemLightTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "pinpointLight"));
 
             //ResearchButton = new ClickableTextureComponent(
             //    new Rectangle(
@@ -94,11 +97,16 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public void Update(GameTime time) {
 
-            TimeCounter += time.ElapsedGameTime.Milliseconds;
-
-            if (ResearchProcessCounter < 1000) {
-                ResearchProcessCounter += time.ElapsedGameTime.Milliseconds;
+            if (ResearchStarted && time.TotalGameTime.TotalSeconds >= ResearchProcessTime) {
+                OnResearchCompleted();
             }
+            else if (ResearchStarted && !ModManager.Instance.Helper.Input.IsDown(SButton.MouseLeft)) {
+                OnResearchInterrupted();
+            }
+
+            // ------------------------------------------------------------------
+
+            TimeCounter += time.ElapsedGameTime.Milliseconds;
 
             if (TimeCounter < AnimWait) {
                 return;
@@ -262,13 +270,40 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             //spriteBatch.Draw(buttonTexture, ResearchButton.bounds, ResearchButton.sourceRect, Color.White);
 
-            ResearchButton.Draw(b);
+            ResearchButton.Draw(b, shake: ResearchStarted);
 
-            ResearchItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f);
+            if (ResearchStarted && ResearchItem != null) {
+                float deltatime = ((float)(ResearchProcessTime - Game1.currentGameTime.TotalGameTime.TotalSeconds)) / 2f;
+
+                for (int i = 0; i < 5; i++) {
+                    b.Draw(ResearchItemLightTexture,
+                        new Rectangle((int)researchItemCellX, (int)(areaInnerAnchors.Y - 10), 64, 64),
+                        ResearchItemLightTexture.Bounds, Color.White * (1f - deltatime));
+                }
+
+                ResearchItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f,
+                    1f, 0.9f, StackDrawType.Draw, Color.White * deltatime, drawShadow: true);
+
+                //var itemData = ItemRegistry.GetDataOrErrorItem(ResearchItem.QualifiedItemId);
+                //var location = new Vector2(researchItemCellX, areaInnerAnchors.Y - 10);
+                //var scale = 1f;
+
+                //b.Draw(itemData.GetTexture(), location, new Rectangle?(itemData.GetSourceRect()),
+                //    Color.White, 0.0f, Vector2.Zero, 4f * scale, SpriteEffects.None, 0.9f);
+
+                //// this drawn quality icons and stack
+                //ResearchItem.DrawMenuIcons(b, location, 1f, 1f, 0.9f, StackDrawType.HideButShowQuality, Color.White);
+            }
+            else {
+                ResearchItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f);
+            }
+
         }
 
         public void HandleResearch() {
             if (ResearchItem != null) {
+                ResearchProcessTime = Game1.currentGameTime.TotalGameTime.TotalSeconds + 1f;
+                ResearchStarted = true;
                 //if (ModManager.Instance.ModMode == ModMode.Combined) {
                 //    ModManager.Instance.SellItem(_researchItem);
                 //}
@@ -278,8 +313,19 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 //}
 
                 //ProgressionManager.Instance.ResearchItem(_researchItem);
-                Game1.playSound("reward");
             }
+        }
+
+        public void OnResearchInterrupted() {
+            ResearchStarted = false;
+            Game1.playSound("fireball");
+        }
+
+        public void OnResearchCompleted() {
+            ResearchStarted = false;
+            Game1.playSound("reward");
+            ResearchItem = null;
+            BookTurnLeftRequested = true;
         }
 
         private string GetItemProgression() {

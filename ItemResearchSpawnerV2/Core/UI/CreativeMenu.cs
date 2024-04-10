@@ -5,14 +5,56 @@ using StardewValley;
 using StardewValley.Menus;
 
 namespace ItemResearchSpawnerV2.Core.UI {
+
+    internal struct ItemEffects {
+
+    }
+
     internal class CreativeMenu : InventoryMenu {
 
         public int ItemsPerView => capacity;
         public int ItemsPerRow => capacity / rows;
 
+        public float[] ItemOpacity;
+        public bool AppearAnimComplete = false;
+        public float InitialOpacity = 0.1f;
+
         public CreativeMenu(InventoryMenu menu) :
             base(menu.xPositionOnScreen, menu.yPositionOnScreen, menu.playerInventory, menu.actualInventory,
                 menu.highlightMethod, menu.capacity, menu.rows, menu.horizontalGap, menu.verticalGap, menu.drawSlots) {
+
+            ItemOpacity = new float[capacity];
+            Array.Fill(ItemOpacity, InitialOpacity);
+        }
+
+        public void Update(GameTime time) {
+            float availableValue = 1.5f;
+            float availablePerItem = 0f;
+            float valueToAdd = 0;
+
+            if (!AppearAnimComplete) {
+                for (int i = 0; i < capacity; i++) {
+                    availablePerItem = availableValue * 0.2f;
+
+                    valueToAdd = ItemOpacity[i] + availablePerItem;
+                    valueToAdd = valueToAdd >= 1f ? 1f - ItemOpacity[i] : availablePerItem;
+
+                    ItemOpacity[i] = ItemOpacity[i] + valueToAdd;
+                    availableValue -= valueToAdd;
+                }
+
+                AppearAnimComplete = !ItemOpacity.Any(x => x < 1f);
+            }
+        }
+
+        public void OnInventoryChange() {
+            AppearAnimComplete = false;
+            Array.Fill(ItemOpacity, InitialOpacity);
+
+            //for (int i = 0; i < capacity; i++)
+            //{
+            //    _iconShakeTimer[i] = Game1.currentGameTime.TotalGameTime.TotalSeconds + 0.1f;
+            //}
         }
 
         public void RecreateItemSlots() {
@@ -109,13 +151,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     continue;
                 }
 
+                var opacity = ItemOpacity[j];
                 var flag = highlightMethod(actualInventory[j]);
 
                 if (_iconShakeTimer.ContainsKey(j)) {
-                    location += 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
+                    location += 2f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2)) * (1f - opacity);
+                    //location += 10f * new Vector2(0, 1) * (1f - opacity) * MathF.Cos(j);
                 }
 
-                actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.HideButShowQuality, Color.White * (flag ? 1f: 0.25f), flag);
+                opacity = MathF.Min(opacity, flag ? 1f : 0.25f);
+
+                actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.HideButShowQuality, Color.White * opacity, flag);
 
                 Utility.drawTextWithColoredShadow(b, "100%", Game1.smallFont, location + new Vector2(4, -32), Color.Gold, Color.Red * (flag ? 1f : 0.25f), 0.9f);
             }

@@ -35,6 +35,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
             }
 
             ItemResearchArea.Update(time);
+            CreativeMenu.Update(time);
 
             base.update(time);
         }
@@ -83,6 +84,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 }
 
                 CreativeMenu.actualInventory.Add(item);
+                CreativeMenu.OnInventoryChange();
             }
         }
 
@@ -227,7 +229,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
             if (!SortDropdown.TrySelect(sortOption)) {
                 ModManager.Instance.Monitor.Log($"Failed selecting sort option '{sortOption}'.", LogLevel.Warn);
                 if (sortOption != I18n.Sort_ByCategoryAsc())
-                    SetCategory(I18n.Sort_ByCategoryAsc());
+                    SetSortOption(I18n.Sort_ByCategoryAsc());
                 return;
             }
 
@@ -327,6 +329,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 }
                 if (itemClicked1) {
                     SetCategory(CategoryDropdown.Selected);
+                    Game1.playSound("drumkit6");
                 }
             }
 
@@ -336,6 +339,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
                 }
                 if (itemClicked2) {
                     SetSortOption(SortDropdown.Selected);
+                    Game1.playSound("drumkit6");
                 }
             }
 
@@ -446,24 +450,21 @@ namespace ItemResearchSpawnerV2.Core.Componets {
             }
         }
 
-        public void ScrollView(int direction, bool updateView = true) {
+        public void ScrollView(int direction) {
             if (direction < 0 && ShowLeftButton) {
                 TopRowIndex -= 1;
                 ItemResearchArea.BookTurnLeftRequested = true;
                 Game1.playSound("newRecipe");
+                UpdateView();
             }
             else if (direction > 0 && ShowRightButton) {
                 TopRowIndex += 1;
                 ItemResearchArea.BookTurnRightRequested = true;
                 Game1.playSound("newRecipe");
-            }
-
-            TopRowIndex = MathHelper.Clamp(TopRowIndex, 0, MaxTopRowIndex);
-
-            if (updateView) {
                 UpdateView();
             }
 
+            TopRowIndex = MathHelper.Clamp(TopRowIndex, 0, MaxTopRowIndex);
         }
 
         // --------------------------------------------------------------------------------------

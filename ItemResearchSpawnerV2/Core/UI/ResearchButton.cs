@@ -28,7 +28,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             this.researchArea = researchArea;
         }
 
-        public override void Draw(SpriteBatch b) {
+        public void Draw(SpriteBatch b, bool shake = false) {
             base.Draw(b);
 
             var buttonTexture = ModManager.Instance.ModMode switch {
@@ -44,6 +44,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
             var buttonBounds = new Rectangle(Component.bounds.X, Component.bounds.Y,
                 Component.bounds.Width,
                 Component.bounds.Height);
+
+            if (shake) {
+                var buttonOff = 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
+                buttonBounds.X += (int)buttonOff.X;
+                buttonBounds.Y += (int)buttonOff.Y;
+            }
 
             b.Draw(buttonTexture, buttonBounds, buttonTexture.Bounds, Color.White);
         }
