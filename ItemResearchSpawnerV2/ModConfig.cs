@@ -1,9 +1,8 @@
 ﻿using StardewModdingAPI.Utilities;
 using StardewModdingAPI;
-using ItemResearchSpawnerV2.Core.Enums;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 
-namespace ItemResearchSpawnerV2
-{
+namespace ItemResearchSpawnerV2 {
     internal class ModConfig
     {
         public KeybindList ShowMenuButton { get; set; } = KeybindList.ForSingle(SButton.R);

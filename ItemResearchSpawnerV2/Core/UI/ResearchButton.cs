@@ -1,5 +1,5 @@
 ﻿using ItemResearchSpawnerV2.Components.UI;
-using ItemResearchSpawnerV2.Core.Enums;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

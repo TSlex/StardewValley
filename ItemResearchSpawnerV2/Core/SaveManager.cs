@@ -1,10 +1,217 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ItemResearchSpawnerV2.Core.Data.Serializable;
+using ItemResearchSpawnerV2.Core.Utils;
+using ItemResearchSpawnerV2.Models;
+using StardewModdingAPI;
+using Force.DeepCloner;
+using StardewModdingAPI.Events;
 
 namespace ItemResearchSpawnerV2.Core {
     internal class SaveManager {
+
+        private Dictionary<string, Dictionary<string, ItemSaveData>> Progressions;
+        private Dictionary<string, ModManagerState> ModStates;
+        private Dictionary<string, int> PriceList;
+        private ICollection<ItemCategoryMeta> Categories;
+
+        private IModHelper ModHelper => ModManager.Instance.Helper;
+
+
+        public SaveManager() {
+            Progressions = new Dictionary<string, Dictionary<string, ItemSaveData>>();
+            ModStates = new Dictionary<string, ModManagerState>();
+            PriceList = new Dictionary<string, int>();
+            Categories = new List<ItemCategoryMeta>();
+        }
+
+        #region Getter/Setter
+
+        // ----------------------------------------------------------------------------------------------------------------
+
+        public Dictionary<string, Dictionary<string, ItemSaveData>> GetAllProgressions() {
+            return Progressions.DeepClone();
+        }
+
+        public Dictionary<string, ItemSaveData> GetProgression(string playerID) {
+            if (Progressions.ContainsKey(playerID)) {
+                return Progressions[playerID].DeepClone() ?? new Dictionary<string, ItemSaveData>();
+            }
+
+            return new Dictionary<string, ItemSaveData>();
+        }
+
+        public void CommitResearch(string playerID, string key, ItemSaveData itemProgression) {
+            var progression = GetProgression(playerID);
+
+            progression[key] = itemProgression;
+
+            Progressions[playerID] = progression;
+        }
+
+        public void CommitProgression(string playerID, Dictionary<string, ItemSaveData> commitProgression) {
+            var progression = GetProgression(playerID);
+
+            foreach (var key in commitProgression.Keys.ToArray()) {
+                progression[key] = commitProgression[key];
+            }
+
+            Progressions[playerID] = progression;
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------
+
+        public ModManagerState GetModState(string playerID) {
+            if (ModStates.ContainsKey(playerID)) {
+                return ModStates[playerID] ?? new ModManagerState() {
+                    ActiveMode = ModHelper.ReadConfig<ModConfig>().DefaultMode
+                };
+            }
+
+            return new ModManagerState() {
+                ActiveMode = ModHelper.ReadConfig<ModConfig>().DefaultMode
+            };
+        }
+
+        public void CommitModState(string playerID, ModManagerState modState) {
+            ModStates[playerID] = modState;
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------
+
+        public Dictionary<string, int> GetPricelist() {
+            return PriceList.DeepClone();
+        }
+
+        public void CommitPricelist(Dictionary<string, int> pricelist) {
+            PriceList = new Dictionary<string, int>(pricelist);
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------
+
+        public List<ItemCategoryMeta> GetCategories() {
+            return Categories.ToList();
+        }
+
+        public void CommitCategories(List<ItemCategoryMeta> categories) {
+            Categories = categories;
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------
+
+        #endregion
+
+        #region Load
+
+        public void OnLoad() {
+            if (!Context.IsMainPlayer)
+                return;
+
+            LoadProgression();
+            LoadModState();
+            LoadPricelist();
+            LoadCategories();
+        }
+
+        private void LoadProgression() {
+            try {
+                Progressions =
+                    ModHelper.Data.ReadSaveData<Dictionary<string, Dictionary<string, ItemSaveData>>>(SaveHelper
+                        .ProgressionsKey)
+                    ?? new Dictionary<string, Dictionary<string, ItemSaveData>>();
+            }
+            catch (Exception _) {
+                Progressions = new Dictionary<string, Dictionary<string, ItemSaveData>>();
+            }
+        }
+
+        private void LoadModState() {
+
+            try {
+                ModStates = ModHelper.Data.ReadSaveData<Dictionary<string, ModManagerState>>(SaveHelper.ModStatesKey) ??
+                             new Dictionary<string, ModManagerState>();
+            }
+            catch (Exception _) {
+                ModStates = new Dictionary<string, ModManagerState>();
+            }
+
+        }
+
+        private void LoadPricelist() {
+
+            if (!ModHelper.ReadConfig<ModConfig>().UseDefaultBalanceConfig) {
+
+                try {
+                    PriceList = ModHelper.Data.ReadGlobalData<Dictionary<string, int>>(SaveHelper.PriceConfigKey);
+                }
+                catch (Exception _) {
+                    PriceList = null;
+                }
+
+                PriceList ??= ModHelper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
+                               new Dictionary<string, int>();
+            }
+
+            else {
+                PriceList = ModHelper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
+                             new Dictionary<string, int>();
+            }
+        }
+
+        private void LoadCategories() {
+
+            if (!ModHelper.ReadConfig<ModConfig>().UseDefaultBalanceConfig) {
+
+                try {
+                    Categories = ModHelper.Data.ReadGlobalData<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigKey);
+                }
+                catch (Exception _) {
+                    Categories = null;
+                }
+
+                Categories ??= ModHelper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath) ??
+                                new List<ItemCategoryMeta>();
+            }
+
+            else {
+                Categories = ModHelper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath) ??
+                              new List<ItemCategoryMeta>();
+            }
+
+        }
+
+        #endregion
+
+        #region Save
+
+        public void OnSave() {
+            if (!Context.IsMainPlayer)
+                return;
+
+            SaveProgression();
+            SaveModState();
+            SavePricelist();
+            SaveCategories();
+        }
+
+        private void SaveProgression() {
+            ModHelper.Data.WriteSaveData(SaveHelper.ProgressionsKey, Progressions);
+        }
+
+        private void SaveModState() {
+            ModHelper.Data.WriteSaveData(SaveHelper.ModStatesKey, ModStates);
+        }
+
+        private void SavePricelist() {
+            if (!ModHelper.ReadConfig<ModConfig>().UseDefaultBalanceConfig) {
+                ModHelper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, PriceList);
+            }
+        }
+
+        private void SaveCategories() {
+            if (!ModHelper.ReadConfig<ModConfig>().UseDefaultBalanceConfig) {
+                ModHelper.Data.WriteGlobalData(SaveHelper.CategoriesConfigKey, Categories);
+            }
+        }
+
+        #endregion
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
 
-namespace ItemResearchSpawnerV2.Models.Enums
-{
-    internal enum ItemSortOption
-    {
+namespace ItemResearchSpawnerV2.Core.Data.Enums {
+    internal enum ItemSortOption {
         NameUp,
         NameDown,
         CategoryUp,

@@ -1,7 +1,6 @@
 ﻿using ItemResearchSpawnerV2.Components.UI;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
-using ItemResearchSpawnerV2.Models.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;

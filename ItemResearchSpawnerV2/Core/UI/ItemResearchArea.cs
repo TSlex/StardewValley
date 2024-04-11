@@ -1,5 +1,4 @@
-﻿using ItemResearchSpawnerV2.Core.Enums;
-using ItemResearchSpawnerV2.Core.Utils;
+﻿using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -246,18 +245,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //    Game1.tileSize,
             //    out _);
 
-            var researchProgressString = GetItemProgression();
-
-            var progressFont = Game1.smallFont;
-            var progressPositionX = areaInnerAnchors.X + ResearchArea.bounds.Width / 2f -
-                                    progressFont.MeasureString(researchProgressString).X / 2f;
-
             //b.DrawString(progressFont, researchProgressString,
             //    new Vector2(progressPositionX, areaInnerAnchors.Y + Game1.tileSize + 10), Color.Black);
 
             if (ResearchItem != null) {
-                Utility.drawTextWithColoredShadow(b, "1 предмет остался!", Game1.smallFont,
-                    new Vector2(ResearchArea.bounds.X, ResearchArea.bounds.Y + 124),
+                var researchProgressString = GetItemProgression();
+                var progressFont = Game1.smallFont;
+                var progressPositionX = researchItemCellX + 42 -
+                                        progressFont.MeasureString(researchProgressString).X / 2f;
+
+                Utility.drawTextWithColoredShadow(b, researchProgressString, progressFont,
+                    new Vector2(progressPositionX, ResearchArea.bounds.Y + 124),
                     Color.Cyan, Color.Red * (false ? 1f : 0.25f), 0.9f);
 
             }
@@ -329,7 +327,15 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         private string GetItemProgression() {
-            return "(0 / 0)";
+            //return "(0 / 0)";
+            var left = 1;
+
+            if (left > 1) {
+                return String.Format(I18n.Ui_ResearchMoreLeft(), left);
+            }
+            else {
+                return I18n.Ui_ResearchOneLeft();
+            }
 
             //if (_researchItem == null)
             //{

@@ -1,8 +1,6 @@
 ﻿using ItemResearchSpawnerV2.Core.Componets;
 using ItemResearchSpawnerV2.Core.Data.Enums;
-using ItemResearchSpawnerV2.Core.Enums;
 using ItemResearchSpawnerV2.Models;
-using ItemResearchSpawnerV2.Models.Enums;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -16,6 +14,7 @@ namespace ItemResearchSpawnerV2.Core {
         public readonly ModConfig Config;
 
         public readonly ProgressionManager ProgressionManager;
+        private readonly SaveManager SaveManager;
 
         public ModMode ModMode = ModMode.Research;
         public ItemQuality ItemQuality = ItemQuality.Normal;
@@ -42,6 +41,7 @@ namespace ItemResearchSpawnerV2.Core {
             Manifest = manifest;
 
             ProgressionManager = new ProgressionManager();
+            SaveManager = new SaveManager();
         }
 
         // ===========================================================================================
@@ -179,5 +179,25 @@ namespace ItemResearchSpawnerV2.Core {
         //}
 
         #endregion
+
+        #region Save/Load
+
+        public void OnSave() {
+            SaveManager.OnSave();
+        }
+
+        public void OnLoad() {
+            SaveManager.OnLoad();
+
+            var modState = SaveManager.GetModState(Game1.player.UniqueMultiplayerID.ToString());
+
+            ModMode = modState.ActiveMode;
+            ItemQuality = modState.Quality;
+            ProgressionDisplay = modState.ProgressionDisplayMode;
+            FavoriteDisplay = modState.FavoriteDisplayMode;
+        }
+
+
+        #endregion`
     }
 }

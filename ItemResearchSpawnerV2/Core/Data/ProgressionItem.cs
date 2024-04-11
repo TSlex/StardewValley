@@ -1,18 +1,24 @@
 ﻿using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data;
-using ItemResearchSpawnerV2.Models.Enums;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Models {
+    internal class ItemCategory {
+        public string Label;
+        public int BasePrice;
+        public int BaseResearchCount;
+    }
+
     internal class ProgressionItem {
 
         public SpawnableItem Item;
-        public ProgressionData Progression;
+        public ItemSaveData Progression;
         public ItemCategory Category;
 
         public int Price;
 
-        public ProgressionItem(SpawnableItem item, ProgressionData progression, ItemCategory category, int price) {
+        public ProgressionItem(SpawnableItem item, ItemSaveData progression, ItemCategory category, int price) {
             Item = item;
             Progression = progression;
             Category = category;

@@ -1,5 +1,5 @@
 ﻿{
-  //sort buttons
+  //sort options
   "sort.by-name-asc": "Name [A > Z]",
   "sort.by-name-desc": "Name [Z > A]",
   "sort.by-category-asc": "Category [A > Z]",
@@ -46,6 +46,10 @@
   "category.special-book": "Special book",
   "category.secret-note": "Secret Notes",
   "category.misc": "Misc",
+
+  //ui
+  "ui.research-one-left": "last item needed!",
+  "ui.research-more-left": "{0} items needed",
 
   //commands
   "command.unlock-all.desc": "Research (unlock) all items",

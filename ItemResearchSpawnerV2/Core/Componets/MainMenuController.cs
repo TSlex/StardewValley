@@ -1,8 +1,7 @@
-﻿using ItemResearchSpawnerV2.Core.Enums;
+﻿using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.UI;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
-using ItemResearchSpawnerV2.Models.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
@@ -120,7 +119,7 @@ namespace ItemResearchSpawnerV2.Core.Componets {
             };
 
             switch (ModManager.Instance.FavoriteDisplay) {
-                case Data.Enums.FavoriteDisplayMode.FavoriteOnly:
+                case FavoriteDisplayMode.FavoriteOnly:
                     var fsearch = "di";
                     items = items.Where(item =>
                         item.Item.Name.Contains(fsearch, StringComparison.InvariantCultureIgnoreCase)
@@ -130,14 +129,14 @@ namespace ItemResearchSpawnerV2.Core.Componets {
             }
 
             switch (ModManager.Instance.ProgressionDisplay) {
-                case Data.Enums.ProgressionDisplayMode.ResearchStarted:
+                case ProgressionDisplayMode.ResearchStarted:
                     var dasearch = "pi";
                     items = items.Where(item =>
                         item.Item.Name.Contains(dasearch, StringComparison.InvariantCultureIgnoreCase)
                         || item.Item.DisplayName.Contains(dasearch, StringComparison.InvariantCultureIgnoreCase)
                     );
                     break;
-                case Data.Enums.ProgressionDisplayMode.Combined:
+                case ProgressionDisplayMode.Combined:
                     var dbsearch = "op";
                     items = items.Where(item =>
                         item.Item.Name.Contains(dbsearch, StringComparison.InvariantCultureIgnoreCase)

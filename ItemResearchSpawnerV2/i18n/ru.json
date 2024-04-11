@@ -1,5 +1,5 @@
 ﻿{
-  //sort buttons
+  //sort options
   "sort.by-name-asc": "Название [A > Я]",
   "sort.by-name-desc": "Название [Я > А]",
   "sort.by-category-asc": "Категория [A > Я]",
@@ -46,6 +46,10 @@
   "category.special-book": "Особая книга",
   "category.secret-note": "Таинственные заметки",
   "category.misc": "Разное",
+
+  //ui
+  "ui.research-one-left": "всего 1 остался!",
+  "ui.research-more-left": "eще {0} надо",
 
   //commands
   "command.unlock-all.desc": "Разблокировать все предметы",

@@ -1,7 +1,5 @@
-﻿namespace ItemResearchSpawnerV2.Core.Enums
-{
-    internal enum ModMode
-    {
+﻿namespace ItemResearchSpawnerV2.Core.Data.Enums {
+    internal enum ModMode {
         Research,
         BuySell,
         Combined,
@@ -9,13 +7,10 @@
         BuySellPlus
     }
 
-    internal static class ModModeExtensions
-    {
+    internal static class ModModeExtensions {
 
-        public static string GetString(this ModMode current)
-        {
-            return current switch
-            {
+        public static string GetString(this ModMode current) {
+            return current switch {
                 ModMode.Research => "Research (Spawn) mode",
                 ModMode.BuySell => "Buy/Sell mode",
                 ModMode.Combined => "Combined mode",

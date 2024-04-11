@@ -23,11 +23,30 @@ namespace ItemResearchSpawnerV2 {
             // -----------------------------------------------
 
             _manager = new ModManager(helper, _config, Monitor, ModManifest);
+
             I18n.Init(helper.Translation);
 
             // -----------------------------------------------
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
+            helper.Events.GameLoop.Saving += OnSave;
+            helper.Events.GameLoop.SaveLoaded += OnLoad;
+        }
+
+        public void OnSave(object sender, SavingEventArgs saveLoadedEventArgs) {
+            if (!Context.IsMainPlayer) {
+                return;
+            }
+
+            _manager.OnSave();
+        }
+
+        public void OnLoad(object sender, SaveLoadedEventArgs saveLoadedEventArgs) {
+            if (!Context.IsMainPlayer) {
+                return;
+            }
+
+            _manager.OnLoad();
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
