@@ -37,7 +37,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
 
         /// <summary>A sample item instance.</summary>
         public Item Item {
-            get;
+            get; set;
         }
 
         /// <summary>Create an item instance.</summary>

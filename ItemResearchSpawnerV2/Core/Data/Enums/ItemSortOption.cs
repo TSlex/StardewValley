@@ -2,14 +2,14 @@
 
 namespace ItemResearchSpawnerV2.Core.Data.Enums {
     internal enum ItemSortOption {
-        NameUp,
-        NameDown,
-        CategoryUp,
-        CategoryDown,
-        IDUp,
-        IDDown,
-        PriceUp,
-        PriceDown
+        NameASC,
+        NameDESC,
+        CategoryASC,
+        CategoryDESC,
+        IDASC,
+        IDDESC,
+        PriceASC,
+        PriceDESC
     }
 
     internal static class ItemSortOptionExtensions {
@@ -33,14 +33,14 @@ namespace ItemResearchSpawnerV2.Core.Data.Enums {
 
         public static string GetString(this ItemSortOption current) {
             return current switch {
-                ItemSortOption.NameUp => I18n.Sort_ByNameAsc(),
-                ItemSortOption.NameDown => I18n.Sort_ByNameDesc(),
-                ItemSortOption.CategoryUp => I18n.Sort_ByCategoryAsc(),
-                ItemSortOption.CategoryDown => I18n.Sort_ByCategoryDesc(),
-                ItemSortOption.IDUp => I18n.Sort_ByIdAsc(),
-                ItemSortOption.IDDown => I18n.Sort_ByIdDesc(),
-                ItemSortOption.PriceUp => I18n.Sort_ByPriceAsc(),
-                ItemSortOption.PriceDown => I18n.Sort_ByPriceDesc(),
+                ItemSortOption.NameASC => I18n.Sort_ByNameAsc(),
+                ItemSortOption.NameDESC => I18n.Sort_ByNameDesc(),
+                ItemSortOption.CategoryASC => I18n.Sort_ByCategoryAsc(),
+                ItemSortOption.CategoryDESC => I18n.Sort_ByCategoryDesc(),
+                ItemSortOption.IDASC => I18n.Sort_ByIdAsc(),
+                ItemSortOption.IDDESC => I18n.Sort_ByIdDesc(),
+                ItemSortOption.PriceASC => I18n.Sort_ByPriceAsc(),
+                ItemSortOption.PriceDESC => I18n.Sort_ByPriceDesc(),
                 _ => "???"
             };
         }

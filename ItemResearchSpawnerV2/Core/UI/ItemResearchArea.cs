@@ -1,4 +1,5 @@
 ﻿using ItemResearchSpawnerV2.Core.Utils;
+using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -33,7 +34,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private double ResearchProcessTime = 0;
         private bool ResearchStarted = false;
 
-        public Item ResearchItem;
+        public ProgressionItem ResearchItem;
         //private Item LastItem;
 
         //private string ItemProgression;
@@ -83,8 +84,29 @@ namespace ItemResearchSpawnerV2.Core.UI {
         // ===================================================================================================
 
         public void SetItem(Item item, out Item returnItem) {
-            returnItem = ResearchItem;
-            ResearchItem = item;
+            returnItem = ResearchItem?.GameItem ?? null;
+            ResearchItem = item != null ? ModManager.ProgressionManagerInstance.GetProgressionItem(item) : null;
+
+            if (returnItem != null && ResearchItem?.GameItem != null && CommonHelper.GetItemUniqueKey(returnItem) == CommonHelper.GetItemUniqueKey(ResearchItem.GameItem)) {
+                var resIStack = ResearchItem.Stack;
+                var retIStack = returnItem.Stack;
+                var maxStack = returnItem.maximumStackSize();
+
+                var moveAmount = resIStack + retIStack;
+                moveAmount = moveAmount > maxStack ? maxStack : moveAmount;
+                moveAmount -= resIStack;
+
+                if (moveAmount > 0) {
+                    ResearchItem.GameItem.Stack += moveAmount;
+                    
+                    if (retIStack == moveAmount) {
+                        returnItem = null;
+                    }
+                    else {
+                        returnItem.Stack -= moveAmount;
+                    }
+                }
+            }
         }
 
         public Item ReturnItem() {
@@ -279,7 +301,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         ResearchItemLightTexture.Bounds, Color.White * (1f - deltatime));
                 }
 
-                ResearchItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f,
+                ResearchItem?.GameItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f,
                     1f, 0.9f, StackDrawType.Draw, Color.White * deltatime, drawShadow: true);
 
                 //var itemData = ItemRegistry.GetDataOrErrorItem(ResearchItem.QualifiedItemId);
@@ -293,7 +315,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 //ResearchItem.DrawMenuIcons(b, location, 1f, 1f, 0.9f, StackDrawType.HideButShowQuality, Color.White);
             }
             else {
-                ResearchItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f);
+                ResearchItem?.GameItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f);
             }
 
         }
@@ -320,6 +342,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public void OnResearchCompleted() {
+            ModManager.ProgressionManagerInstance.ResearchItem(ResearchItem, out var _);
+
             ResearchStarted = false;
             Game1.playSound("reward");
             ResearchItem = null;
@@ -327,39 +351,22 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         private string GetItemProgression() {
-            //return "(0 / 0)";
-            var left = 1;
+
+            if (ResearchItem == null) {
+                return "";
+            }
+
+            var left = ResearchItem.ResearchLeftAmount;
 
             if (left > 1) {
-                return String.Format(I18n.Ui_ResearchMoreLeft(), left);
+                return string.Format(I18n.Ui_ResearchMoreLeft(), left);
             }
-            else {
+            else if (left == 1){
                 return I18n.Ui_ResearchOneLeft();
             }
-
-            //if (_researchItem == null)
-            //{
-            //    return "(0 / 0)";
-            //}
-
-            //if (_lastItem == null || !_lastItem.Equals(_researchItem))
-            //{
-            //    _itemProgression = ProgressionManager.Instance.GetItemProgression(_researchItem, true);
-            //    _lastItem = _researchItem;
-            //}
-
-            //return _itemProgression;
+            else {
+                return I18n.Ui_ResearchCompleted();
+            }
         }
-
-        //private void OnStackChanged(int newCount) {
-        //    LastItem = null;
-
-        //    if (newCount <= 0) {
-        //        ResearchItem = null;
-        //    }
-        //    else if (ResearchItem != null) {
-        //        ResearchItem.Stack = newCount % ResearchItem.maximumStackSize();
-        //    }
-        //}
     }
 }

@@ -264,7 +264,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             SelectedOption = entry;
-            Game1.playSound("smallSelect");
+            //Game1.playSound("smallSelect");
 
             return true;
         }

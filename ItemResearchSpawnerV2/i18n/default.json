@@ -50,6 +50,7 @@
   //ui
   "ui.research-one-left": "last item needed!",
   "ui.research-more-left": "{0} items needed",
+  "ui.research-completed": "research completed",
 
   //commands
   "command.unlock-all.desc": "Research (unlock) all items",

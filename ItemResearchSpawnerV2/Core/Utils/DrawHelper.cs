@@ -323,7 +323,7 @@ namespace ItemResearchSpawnerV2.Core.Utils {
             };
 
             // draw texture
-            IClickableMenu.drawTextureBox(spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x + offsetX, y, outerWidth, outerHeight + Game1.tileSize / 16, Color.White * alpha, drawShadow: drawShadow);
+            IClickableMenu.drawTextureBox(spriteBatch, Game1.uncoloredMenuTexture, new Rectangle(0, 256, 60, 60), x + offsetX, y, outerWidth, outerHeight + Game1.tileSize / 16, Color.White * alpha, drawShadow: drawShadow);
             innerDrawPosition = new Vector2(x + UIConstants.BorderWidth + offsetX, y + UIConstants.BorderWidth);
         }
     }

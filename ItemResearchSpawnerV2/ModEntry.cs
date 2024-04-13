@@ -11,6 +11,10 @@ namespace ItemResearchSpawnerV2 {
         private ModManager _manager;
 
         public override void Entry(IModHelper helper) {
+            I18n.Init(helper.Translation);
+
+            // -----------------------------------------------
+
             try {
                 _config = helper.ReadConfig<ModConfig>();
             }
@@ -23,8 +27,6 @@ namespace ItemResearchSpawnerV2 {
             // -----------------------------------------------
 
             _manager = new ModManager(helper, _config, Monitor, ModManifest);
-
-            I18n.Init(helper.Translation);
 
             // -----------------------------------------------
 

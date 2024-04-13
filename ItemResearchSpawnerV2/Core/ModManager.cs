@@ -1,5 +1,7 @@
-﻿using ItemResearchSpawnerV2.Core.Componets;
+﻿using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
+using ItemResearchSpawnerV2.Core.UI;
+using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
 using StardewModdingAPI;
 using StardewValley;
@@ -7,6 +9,9 @@ using StardewValley;
 namespace ItemResearchSpawnerV2.Core {
     internal class ModManager {
         public static ModManager Instance;
+        public static ProgressionManager ProgressionManagerInstance => Instance.ProgressionManager;
+        public static SaveManager SaveManagerInstance => Instance.SaveManager;
+
 
         public readonly IModHelper Helper;
         public readonly IMonitor Monitor;
@@ -14,12 +19,18 @@ namespace ItemResearchSpawnerV2.Core {
         public readonly ModConfig Config;
 
         public readonly ProgressionManager ProgressionManager;
-        private readonly SaveManager SaveManager;
+        public readonly SaveManager SaveManager;
 
+
+        public readonly Dictionary<string, SpawnableItem> ItemRegistry = new Dictionary<string, SpawnableItem>();
+
+        public string SelectedCategory = I18n.Category_All();
+        public string SortOption = ItemSortOption.CategoryDESC.GetString();
+        public string SearchText = "";
         public ModMode ModMode = ModMode.Research;
         public ItemQuality ItemQuality = ItemQuality.Normal;
-        public ProgressionDisplayMode ProgressionDisplay = ProgressionDisplayMode.ResearchedOnly;
         public FavoriteDisplayMode FavoriteDisplay = FavoriteDisplayMode.All;
+        public ProgressionDisplayMode ProgressionDisplay = ProgressionDisplayMode.ResearchedOnly;
 
         // ===========================================================================================
 
@@ -53,6 +64,21 @@ namespace ItemResearchSpawnerV2.Core {
 
         public List<ProgressionItem> GetProgressionItems() {
             return ProgressionManager.GetProgressionItems().ToList();
+        }
+
+        private void InitRegistry() {
+            var blacklist = SaveManager.GetBannedItems();
+
+            foreach (var item in ItemRepository.GetAll()) {
+
+                var key = CommonHelper.GetItemUniqueKey(item.Item);
+
+                if (blacklist.Contains(key)) {
+                    continue;
+                }
+
+                ItemRegistry[key] = item;
+            }
         }
 
         #region SortingOptions
@@ -188,6 +214,9 @@ namespace ItemResearchSpawnerV2.Core {
 
         public void OnLoad() {
             SaveManager.OnLoad();
+            InitRegistry();
+
+            // -------------------------------------------------------------------------------------
 
             var modState = SaveManager.GetModState(Game1.player.UniqueMultiplayerID.ToString());
 
@@ -195,6 +224,13 @@ namespace ItemResearchSpawnerV2.Core {
             ItemQuality = modState.Quality;
             ProgressionDisplay = modState.ProgressionDisplayMode;
             FavoriteDisplay = modState.FavoriteDisplayMode;
+            SearchText = modState.SearchText;
+            SelectedCategory = modState.Category;
+            SortOption = modState.SortOption.GetString();
+
+            // -------------------------------------------------------------------------------------
+
+            ProgressionManager.ResearchProgressions = SaveManager.GetProgression(Game1.player.UniqueMultiplayerID.ToString());
         }
 
 

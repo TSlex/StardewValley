@@ -11,6 +11,8 @@ namespace ItemResearchSpawnerV2.Core {
         private Dictionary<string, Dictionary<string, ItemSaveData>> Progressions;
         private Dictionary<string, ModManagerState> ModStates;
         private Dictionary<string, int> PriceList;
+        private List<string> ItemBlacklist;
+
         private ICollection<ItemCategoryMeta> Categories;
 
         private IModHelper ModHelper => ModManager.Instance.Helper;
@@ -97,6 +99,12 @@ namespace ItemResearchSpawnerV2.Core {
 
         // ----------------------------------------------------------------------------------------------------------------
 
+        public List<string> GetBannedItems() {
+            return ItemBlacklist;
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------
+
         #endregion
 
         #region Load
@@ -109,6 +117,7 @@ namespace ItemResearchSpawnerV2.Core {
             LoadModState();
             LoadPricelist();
             LoadCategories();
+            LoadItemBlacklist();
         }
 
         private void LoadProgression() {
@@ -174,6 +183,18 @@ namespace ItemResearchSpawnerV2.Core {
             else {
                 Categories = ModHelper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath) ??
                               new List<ItemCategoryMeta>();
+            }
+
+        }
+
+        private void LoadItemBlacklist() {
+
+            try {
+                ItemBlacklist = ModHelper.Data.ReadJsonFile<List<string>>(SaveHelper.BannedItemsConfigPath) ??
+                             new List<string>();
+            }
+            catch (Exception _) {
+                ItemBlacklist = new List<string>();
             }
 
         }

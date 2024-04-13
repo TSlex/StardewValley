@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     /**

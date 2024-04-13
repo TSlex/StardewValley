@@ -90,7 +90,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             SettingsButton = new SettingsButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3);
 
             SortDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
-                Game1.smallFont, ItemSortOption.CategoryUp.GetString(),
+                Game1.smallFont, ItemSortOption.CategoryASC.GetString(),
                 Enum.GetValues(typeof(ItemSortOption)).Cast<ItemSortOption>().Select(option => option.GetString()).ToArray(),
                 p => p, tabWidth: 236);
 

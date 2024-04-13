@@ -1,13 +1,19 @@
-﻿using ItemResearchSpawnerV2.Core.Data;
+﻿using Force.DeepCloner;
+using ItemResearchSpawnerV2.Core.Data;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
 using StardewModdingAPI;
+using StardewValley;
+using SObject = StardewValley.Object;
+
 
 namespace ItemResearchSpawnerV2.Core {
     internal class ProgressionManager {
         public List<ItemCategoryMeta> Categories { get; private set; }
         public ItemCategoryMeta DefaultCategory { get; private set; }
+        public Dictionary<string, ItemSaveData> ResearchProgressions { get; set; }
 
         //private readonly IEnumerable<SpawnableItem> Items;
 
@@ -29,81 +35,115 @@ namespace ItemResearchSpawnerV2.Core {
 
         // ========================================================================================================
 
-        //public void ResearchItem(Item item) {
-
-        //    var itemProgressionRaw = GetItemProgressionRaw(item, out var progressionItem);
-
-        //    if (itemProgressionRaw.max < 0) {
-        //        return;
-        //    }
-
-        //    if (itemProgressionRaw.current >= itemProgressionRaw.max) {
-
-        //        switch (modManager.modMode) {
-        //            case ModMode.BuySell:
-        //            case ModMode.Combined:
-        //                //OnStackChanged?.Invoke(0);
-        //                break;
-        //            default:
-        //                break;
-        //        }
-
-        //        return;
-        //    }
-
-        //    var needCount = itemProgressionRaw.max - itemProgressionRaw.current;
-
-        //    var progressCount = item.Stack > needCount ? needCount : item.Stack;
-
-        //    var itemQuality = (ItemQuality)((item as SObject)?.Quality ?? 0);
-
-        //    if (itemQuality >= ItemQuality.Normal) {
-        //        progressionItem.ResearchCount += progressCount;
-        //    }
-
-        //    if (itemQuality >= ItemQuality.Silver) {
-        //        progressionItem.ResearchCountSilver += progressCount;
-        //    }
-
-        //    if (itemQuality >= ItemQuality.Gold) {
-        //        progressionItem.ResearchCountGold += progressCount;
-        //    }
-
-        //    if (itemQuality >= ItemQuality.Iridium) {
-        //        progressionItem.ResearchCountIridium += progressCount;
-        //    }
+        public void ResearchItem(ProgressionItem item, out int leftAmount) {
+            leftAmount = item.Stack;
 
 
-        //    switch (modManager.modMode) {
-        //        case ModMode.BuySell:
-        //        case ModMode.Combined:
-        //            //OnStackChanged?.Invoke(0);
-        //            break;
-        //        case ModMode.Research:
-        //            //OnStackChanged?.Invoke(item.Stack - progressCount);
-        //            break;
-        //        default:
-        //            break;
-        //    }
-        //}
+            if (item.RequiredResearch < 0) {
+                return;
+            }
+
+            //if (itemProgressionRaw.current >= itemProgressionRaw.max) {
+
+            //    switch (ModManager.Instance.ModMode) {
+            //        case ModMode.BuySell:
+            //        case ModMode.Combined:
+            //            //OnStackChanged?.Invoke(0);
+            //            break;
+            //        default:
+            //            break;
+            //    }
+
+            //    return;
+            //}
+
+            var needAmount = item.RequiredResearch - item.CurrentResearchAmount;
+
+            var progressCount = item.Stack > needAmount ? needAmount : item.Stack;
+
+            if (item.Quality >= ItemQuality.Normal) {
+                item.SaveData.ResearchCount += progressCount;
+            }
+
+            if (item.Quality >= ItemQuality.Silver) {
+                item.SaveData.ResearchCountSilver += progressCount;
+            }
+
+            if (item.Quality >= ItemQuality.Gold) {
+                item.SaveData.ResearchCountGold += progressCount;
+            }
+
+            if (item.Quality >= ItemQuality.Iridium) {
+                item.SaveData.ResearchCountIridium += progressCount;
+            }
+
+            leftAmount -= leftAmount;
+
+            ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.SaveData;
+
+
+            switch (ModManager.Instance.ModMode) {
+                case ModMode.BuySell:
+                case ModMode.Combined:
+                    //OnStackChanged?.Invoke(0);
+                    break;
+                case ModMode.Research:
+                    //OnStackChanged?.Invoke(item.Stack - progressCount);
+                    break;
+                default:
+                    break;
+            }
+        }
 
         public IEnumerable<ProgressionItem> GetProgressionItems() {
-            foreach (var item in ItemRepository.GetAll()) {
-
-                var category = Categories.FirstOrDefault(rule => rule.IsMatch(item));
-                category ??= DefaultCategory;
-
-                var itemCategory = new ItemCategory {
-                    Label = I18n.GetByKey(category.Label),
-                    BasePrice = category.BaseCost,
-                    BaseResearchCount = category.ResearchCount
-                };
-
-                var itemPrice = ModManager.Instance.GetItemBuyPrice(item.Item);
-                itemPrice = itemPrice <= 0 ? category.BaseCost : itemPrice;
-
-                yield return new ProgressionItem(item, new ItemSaveData(), itemCategory, itemPrice);
+            foreach (var item in ModManager.Instance.ItemRegistry.Values) {
+                yield return GetProgressionItem(item);
             }
+        }
+
+        public ProgressionItem GetProgressionItem(Item item) {
+            var key = CommonHelper.GetItemUniqueKey(item);
+            var succ = ModManager.Instance.ItemRegistry.TryGetValue(key, out var spawnableItem);
+
+            spawnableItem.Item = item;
+
+            return GetProgressionItem(spawnableItem);
+        }
+        public ProgressionItem GetProgressionItem(SpawnableItem item) {
+
+            var category = Categories.FirstOrDefault(rule => rule.IsMatch(item));
+            category ??= DefaultCategory;
+
+            var itemCategory = new ItemCategory {
+                Label = I18n.GetByKey(category.Label),
+                BasePrice = category.BaseCost,
+                BaseResearchCount = category.ResearchCount
+            };
+
+            var itemPrice = ModManager.Instance.GetItemBuyPrice(item.Item);
+            itemPrice = itemPrice <= 0 ? category.BaseCost : itemPrice;
+
+            var progressionData = GetProgressionDataOrDefault(item.Item);
+
+            return new ProgressionItem(item, progressionData, itemCategory, itemPrice);
+
+        }
+
+        public ItemSaveData GetProgressionDataOrDefault(Item item) {
+
+            var key = CommonHelper.GetItemUniqueKey(item);
+
+            ItemSaveData progressionItem;
+
+            if (ResearchProgressions.ContainsKey(key)) {
+                progressionItem = ResearchProgressions[key].DeepClone();
+            }
+            else {
+                progressionItem = new ItemSaveData();
+                ResearchProgressions[key] = progressionItem.DeepClone();
+            }
+
+            return progressionItem;
         }
     }
 }

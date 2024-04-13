@@ -50,6 +50,7 @@
   //ui
   "ui.research-one-left": "всего 1 остался!",
   "ui.research-more-left": "eще {0} надо",
+  "ui.research-completed": "исследование завершено",
 
   //commands
   "command.unlock-all.desc": "Разблокировать все предметы",

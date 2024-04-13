@@ -1,6 +1,7 @@
 ﻿using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
+using StardewValley;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Models {
@@ -13,16 +14,61 @@ namespace ItemResearchSpawnerV2.Models {
     internal class ProgressionItem {
 
         public SpawnableItem Item;
-        public ItemSaveData Progression;
+        public ItemSaveData SaveData;
         public ItemCategory Category;
 
         public int Price;
 
-        public ProgressionItem(SpawnableItem item, ItemSaveData progression, ItemCategory category, int price) {
+        public int RequiredResearch => Category.BaseResearchCount;
+        public int CurrentResearchAmount => GetResearchProgress(Quality);
+        public int ResearchLeftAmount => RequiredResearch - CurrentResearchAmount;
+        public bool ResearchCompleted => ResearchLeftAmount <= 0;
+
+        public bool Favorited => SaveData.Favorite;
+        public int Stack => Item.Item.Stack;
+        public ItemQuality Quality => (ItemQuality)((Item.Item as SObject)?.Quality ?? 0);
+
+        public Item GameItem => Item.Item;
+
+        public ProgressionItem(SpawnableItem item, ItemSaveData saveData, ItemCategory category, int price) {
             Item = item;
-            Progression = progression;
+            SaveData = saveData;
             Category = category;
             Price = price;
+        }
+
+        public int GetResearchProgress(ItemQuality requestedQuality) {
+
+            return requestedQuality switch {
+                ItemQuality.Silver => SaveData.ResearchCountSilver,
+                ItemQuality.Gold => SaveData.ResearchCountGold,
+                ItemQuality.Iridium => SaveData.ResearchCountIridium,
+                _ => SaveData.ResearchCount,
+            };
+        }
+
+        public ItemQuality GetAvailableQuality(ItemQuality requestedQuality) {
+            while (true) {
+                switch (requestedQuality) {
+                    case ItemQuality.Silver:
+                        if (SaveData.ResearchCountSilver >= RequiredResearch)
+                            return requestedQuality;
+                        requestedQuality = requestedQuality.GetPrevious();
+                        continue;
+                    case ItemQuality.Gold:
+                        if (SaveData.ResearchCountGold >= RequiredResearch)
+                            return requestedQuality;
+                        requestedQuality = requestedQuality.GetPrevious();
+                        continue;
+                    case ItemQuality.Iridium:
+                        if (SaveData.ResearchCountIridium >= RequiredResearch)
+                            return requestedQuality;
+                        requestedQuality = requestedQuality.GetPrevious();
+                        continue;
+                    default:
+                        return ItemQuality.Normal;
+                }
+            }
         }
 
         public int GetAvailableQuantity(int money, ItemQuality requestedQuality, out ItemQuality maxAvailableQuality) {
@@ -31,7 +77,7 @@ namespace ItemResearchSpawnerV2.Models {
 
                 switch (requestedQuality) {
                     case ItemQuality.Silver:
-                        if (Progression.ResearchCountSilver >= Category.BaseResearchCount) {
+                        if (SaveData.ResearchCountSilver >= RequiredResearch) {
                             quantity = GetQuantityForQuality(money, requestedQuality);
 
                             if (quantity > 0) {
@@ -44,7 +90,7 @@ namespace ItemResearchSpawnerV2.Models {
                         continue;
 
                     case ItemQuality.Gold:
-                        if (Progression.ResearchCountGold >= Category.BaseResearchCount) {
+                        if (SaveData.ResearchCountGold >= RequiredResearch) {
                             quantity = GetQuantityForQuality(money, requestedQuality);
 
                             if (quantity > 0) {
@@ -57,7 +103,7 @@ namespace ItemResearchSpawnerV2.Models {
                         continue;
 
                     case ItemQuality.Iridium:
-                        if (Progression.ResearchCountIridium >= Category.BaseResearchCount) {
+                        if (SaveData.ResearchCountIridium >= RequiredResearch) {
                             quantity = GetQuantityForQuality(money, requestedQuality);
 
                             if (quantity > 0) {
@@ -77,7 +123,11 @@ namespace ItemResearchSpawnerV2.Models {
             }
         }
 
+
+
+
         private int GetQuantityForQuality(int money, ItemQuality requestedQuality) {
+
             var item = Item.CreateItem();
 
             if (item is SObject obj) {
@@ -90,30 +140,6 @@ namespace ItemResearchSpawnerV2.Models {
 
             catch (Exception) {
                 return item.maximumStackSize();
-            }
-        }
-
-        public ItemQuality GetAvailableQuality(ItemQuality requestedQuality) {
-            while (true) {
-                switch (requestedQuality) {
-                    case ItemQuality.Silver:
-                        if (Progression.ResearchCountSilver >= Category.BaseResearchCount)
-                            return requestedQuality;
-                        requestedQuality = requestedQuality.GetPrevious();
-                        continue;
-                    case ItemQuality.Gold:
-                        if (Progression.ResearchCountGold >= Category.BaseResearchCount)
-                            return requestedQuality;
-                        requestedQuality = requestedQuality.GetPrevious();
-                        continue;
-                    case ItemQuality.Iridium:
-                        if (Progression.ResearchCountIridium >= Category.BaseResearchCount)
-                            return requestedQuality;
-                        requestedQuality = requestedQuality.GetPrevious();
-                        continue;
-                    default:
-                        return ItemQuality.Normal;
-                }
             }
         }
     }
