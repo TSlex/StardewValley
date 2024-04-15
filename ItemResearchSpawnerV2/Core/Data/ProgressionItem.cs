@@ -18,14 +18,12 @@ namespace ItemResearchSpawnerV2.Models {
         public ItemCategory Category;
 
         public int Price;
-
         public int RequiredResearch => Category.BaseResearchCount;
         public int CurrentResearchAmount => GetResearchProgress(Quality);
         public int ResearchLeftAmount => RequiredResearch - CurrentResearchAmount;
         public bool ResearchCompleted => ResearchLeftAmount <= 0;
-
         public bool Favorited => SaveData.Favorite;
-        public int Stack => Item.Item.Stack;
+        public int Stack { get => Item.Item.Stack; set => Item.Item.Stack = value; }
         public ItemQuality Quality => (ItemQuality)((Item.Item as SObject)?.Quality ?? 0);
 
         public Item GameItem => Item.Item;
@@ -122,9 +120,6 @@ namespace ItemResearchSpawnerV2.Models {
                 }
             }
         }
-
-
-
 
         private int GetQuantityForQuality(int money, ItemQuality requestedQuality) {
 

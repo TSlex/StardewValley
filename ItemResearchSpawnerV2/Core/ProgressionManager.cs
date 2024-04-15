@@ -95,6 +95,12 @@ namespace ItemResearchSpawnerV2.Core {
             }
         }
 
+        public void FavoriteItem(ProgressionItem item) {
+            item.SaveData.Favorite = !item.SaveData.Favorite;
+            ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.SaveData;
+            ModManager.Instance.UpdateMenu(filter: true);
+        }
+
         public IEnumerable<ProgressionItem> GetProgressionItems() {
             foreach (var item in ModManager.Instance.ItemRegistry.Values) {
                 yield return GetProgressionItem(item);

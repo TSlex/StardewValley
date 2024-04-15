@@ -1,6 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Force.DeepCloner;
+using ItemResearchSpawnerV2.Models;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -18,6 +21,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public float[] ItemOpacity;
         public bool AppearAnimComplete = false;
         public float InitialOpacity = 0.1f;
+
+        public List<ProgressionItem> ProgressionItems = new List<ProgressionItem>();
 
         public CreativeMenu(InventoryMenu menu) :
             base(menu.xPositionOnScreen, menu.yPositionOnScreen, menu.playerInventory, menu.actualInventory,
@@ -47,14 +52,22 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
         }
 
+        public void SetItems(IEnumerable<ProgressionItem> items) {
+            ProgressionItems.Clear();
+            ProgressionItems.AddRange(items);
+
+            actualInventory.Clear();
+
+            foreach (var item in items) {
+                actualInventory.Add(item.GameItem);
+            }
+
+            OnInventoryChange();
+        }
+
         public void OnInventoryChange() {
             AppearAnimComplete = false;
-            Array.Fill(ItemOpacity, InitialOpacity);
-
-            //for (int i = 0; i < capacity; i++)
-            //{
-            //    _iconShakeTimer[i] = Game1.currentGameTime.TotalGameTime.TotalSeconds + 0.1f;
-            //}
+            Array.Fill(ItemOpacity, 1f);
         }
 
         public void RecreateItemSlots() {
@@ -145,7 +158,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 var slot = inventory[j];
                 var location = new Vector2(slot.bounds.X, slot.bounds.Y);
 
-                b.Draw(texture, location - new Vector2(12, 12), new Rectangle(648, 841, 30, 30), color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0.5f);
+                var c = (ProgressionItems.ElementAtOrDefault(j)?.Favorited ?? false) ? Color.Red : Color.White;
+
+                b.Draw(texture, location - new Vector2(12, 12), new Rectangle(648, 841, 30, 30), c, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0.5f);
 
                 if (actualInventory.Count <= j || actualInventory[j] == null) {
                     continue;
@@ -167,6 +182,53 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
         }
 
+        public Item HandleLeftClick(int x, int y, Item toPlace, bool playSound = true) {
+
+            foreach (var (item, i) in inventory.Select((value, i) => (value, i))) {
+                if (!item.containsPoint(x, y)) {
+                    continue;
+                }
+
+                int num = Convert.ToInt32(item.name);
+                if (num >= actualInventory.Count || (actualInventory[num] != null && !highlightMethod(actualInventory[num]) && !actualInventory[num].canStackWith(toPlace))) {
+                    continue;
+                }
+
+                if (actualInventory[num] != null) {
+                    if (ModManager.Instance.Helper.Input.IsDown(SButton.LeftAlt)) {
+                        ModManager.ProgressionManagerInstance.FavoriteItem(ProgressionItems[i]);
+                        return toPlace;
+                    }
+
+                    if (toPlace != null) {
+                        if (playSound) {
+                            Game1.playSound("stoneStep");
+                        }
+
+                        return Utility.addItemToInventory(toPlace, num, actualInventory, onAddItem);
+                    }
+
+                    if (playSound) {
+                        Game1.playSound(moveItemSound);
+                    }
+
+                    return Utility.removeItemFromInventory(num, actualInventory);
+                }
+
+                if (toPlace != null) {
+                    if (playSound) {
+                        Game1.playSound("stoneStep");
+                    }
+
+                    return Utility.addItemToInventory(toPlace, num, actualInventory, onAddItem);
+                }
+            }
+
+            return toPlace;
+        }
+
+        #region OtherMethods
+
         public override void receiveLeftClick(int x, int y, bool playSound = true) {
             base.receiveLeftClick(x, y, playSound);
         }
@@ -175,7 +237,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
             base.receiveRightClick(x, y, playSound);
         }
 
-        #region OtherMethods
         public override void draw(SpriteBatch b) {
             base.draw(b);
         }

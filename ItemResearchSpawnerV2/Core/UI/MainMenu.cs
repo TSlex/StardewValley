@@ -348,7 +348,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public override void receiveLeftClick(int x, int y, bool playSound = true) {
             if (heldItem == null) {
-                heldItem = CreativeMenu.leftClick(x, y, heldItem, true);
+                heldItem = CreativeMenu.HandleLeftClick(x, y, heldItem, true);
 
                 if (heldItem != null && behaviorOnItemGrab != null) {
                     behaviorOnItemGrab(heldItem, Game1.player);
