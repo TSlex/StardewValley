@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
+using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.UI {
 
@@ -176,9 +177,28 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                 opacity = MathF.Min(opacity, flag ? 1f : 0.25f);
 
-                actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.HideButShowQuality, Color.White * opacity, flag);
+                if (!(ProgressionItems.ElementAtOrDefault(j)?.ResearchCompleted ?? false)) {
+                    actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Hide, Color.Black * 0.25f, flag);
 
-                Utility.drawTextWithColoredShadow(b, "100%", Game1.smallFont, location + new Vector2(4, -32), Color.Gold, Color.Red * (flag ? 1f : 0.25f), 0.9f);
+                    var progressText = $"{ProgressionItems[j].ResearchPerc}%";
+
+                    Utility.drawTextWithColoredShadow(b,
+                        progressText,
+                        Game1.smallFont, location + new Vector2(Game1.smallFont.MeasureString(progressText).X * 0.01f + 16f, 32 / 2 + 4f),
+                        Color.Gold, Color.Red * 0.5f, 0.9f);
+
+                    Utility.drawTextWithColoredShadow(b,
+                        progressText,
+                        Game1.smallFont, location + new Vector2(Game1.smallFont.MeasureString(progressText).X * 0.01f + 17f, 32 / 2 + 4f),
+                        Color.Gold, Color.Red * 0.5f, 0.9f);
+                }
+                else { 
+                    actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw, Color.White * opacity, flag); 
+                }
+
+                //actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw_OneInclusive, Color.White * opacity, flag);
+
+                //Utility.drawTextWithColoredShadow(b, "100%", Game1.smallFont, location + new Vector2(4, -32), Color.Gold, Color.Red * (flag ? 1f : 0.25f), 0.9f);
             }
         }
 
@@ -197,6 +217,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 if (actualInventory[num] != null) {
                     if (ModManager.Instance.Helper.Input.IsDown(SButton.LeftAlt)) {
                         ModManager.ProgressionManagerInstance.FavoriteItem(ProgressionItems[i]);
+                        return toPlace;
+                    }
+
+                    if (ProgressionItems[i] == null || !ProgressionItems[i].ResearchCompleted) {
                         return toPlace;
                     }
 
@@ -225,6 +249,95 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             return toPlace;
+        }
+
+        public Item HandleRightClick(int x, int y, Item toAddTo, bool playSound = true, bool onlyCheckToolAttachments = false) {
+            foreach (var (item, i) in inventory.Select((value, i) => (value, i))) {
+                int num = Convert.ToInt32(item.name);
+                if (!item.containsPoint(x, y) || num >= actualInventory.Count || (actualInventory[num] != null && !highlightMethod(actualInventory[num])) || num >= actualInventory.Count || actualInventory[num] == null) {
+                    continue;
+                }
+
+                if (ProgressionItems[i] == null || !ProgressionItems[i].ResearchCompleted) {
+                    return toAddTo;
+                }
+
+                if (actualInventory[num] is Tool tool && (toAddTo == null || toAddTo is SObject) && tool.canThisBeAttached((SObject)toAddTo)) {
+                    return tool.attach((SObject)toAddTo);
+                }
+
+                if (onlyCheckToolAttachments) {
+                    return toAddTo;
+                }
+
+                if (toAddTo == null) {
+                    if (actualInventory[num].maximumStackSize() != -1) {
+                        if (num == Game1.player.CurrentToolIndex && actualInventory[num] != null && actualInventory[num].Stack == 1) {
+                            actualInventory[num].actionWhenStopBeingHeld(Game1.player);
+                        }
+
+                        Item one = actualInventory[num].getOne();
+                        if (actualInventory[num].Stack > 1 && Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1]
+                        {
+                        new InputButton(Keys.LeftShift)
+                        })) {
+                            one.Stack = (int)Math.Ceiling((double)actualInventory[num].Stack / 2.0);
+                            actualInventory[num].Stack = actualInventory[num].Stack / 2;
+                        }
+                        else if (actualInventory[num].Stack == 1) {
+                            actualInventory[num] = null;
+                        }
+                        else {
+                            actualInventory[num].Stack--;
+                        }
+
+                        if (actualInventory[num] != null && actualInventory[num].Stack <= 0) {
+                            actualInventory[num] = null;
+                        }
+
+                        if (playSound) {
+                            Game1.playSound(moveItemSound);
+                        }
+
+                        return one;
+                    }
+                }
+                else {
+                    if (!actualInventory[num].canStackWith(toAddTo) || toAddTo.Stack >= toAddTo.maximumStackSize()) {
+                        continue;
+                    }
+
+                    if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1]
+                    {
+                    new InputButton(Keys.LeftShift)
+                    })) {
+                        int val = (int)Math.Ceiling((double)actualInventory[num].Stack / 2.0);
+                        val = Math.Min(toAddTo.maximumStackSize() - toAddTo.Stack, val);
+                        toAddTo.Stack += val;
+                        actualInventory[num].Stack -= val;
+                    }
+                    else {
+                        toAddTo.Stack++;
+                        actualInventory[num].Stack--;
+                    }
+
+                    if (playSound) {
+                        Game1.playSound(moveItemSound);
+                    }
+
+                    if (actualInventory[num].Stack <= 0) {
+                        if (num == Game1.player.CurrentToolIndex) {
+                            actualInventory[num].actionWhenStopBeingHeld(Game1.player);
+                        }
+
+                        actualInventory[num] = null;
+                    }
+
+                    return toAddTo;
+                }
+            }
+
+            return toAddTo;
         }
 
         #region OtherMethods

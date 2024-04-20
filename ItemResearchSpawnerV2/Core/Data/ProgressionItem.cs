@@ -2,6 +2,7 @@
 using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using StardewValley;
+using System.Transactions;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Models {
@@ -18,12 +19,24 @@ namespace ItemResearchSpawnerV2.Models {
         public ItemCategory Category;
 
         public int Price;
+
         public int RequiredResearch => Category.BaseResearchCount;
+
         public int CurrentResearchAmount => GetResearchProgress(Quality);
         public int ResearchLeftAmount => RequiredResearch - CurrentResearchAmount;
         public bool ResearchCompleted => ResearchLeftAmount <= 0;
+        public bool ResearchStarted => !ResearchCompleted && ResearchLeftAmount < RequiredResearch;
+
+        public int BaseResearchAmount => GetResearchProgress(ItemQuality.Normal);
+        public int BaseResearchLeftAmount => RequiredResearch - BaseResearchAmount;
+        public bool BaseResearchCompleted => BaseResearchLeftAmount <= 0;
+        public bool BaseResearchStarted => !BaseResearchCompleted && BaseResearchLeftAmount < RequiredResearch;
+
+        public int ResearchPerc => (int)((CurrentResearchAmount * 1f) / (RequiredResearch * 1f) * 100f);
+
         public bool Favorited => SaveData.Favorite;
         public int Stack { get => Item.Item.Stack; set => Item.Item.Stack = value; }
+
         public ItemQuality Quality => (ItemQuality)((Item.Item as SObject)?.Quality ?? 0);
 
         public Item GameItem => Item.Item;
@@ -36,7 +49,6 @@ namespace ItemResearchSpawnerV2.Models {
         }
 
         public int GetResearchProgress(ItemQuality requestedQuality) {
-
             return requestedQuality switch {
                 ItemQuality.Silver => SaveData.ResearchCountSilver,
                 ItemQuality.Gold => SaveData.ResearchCountGold,

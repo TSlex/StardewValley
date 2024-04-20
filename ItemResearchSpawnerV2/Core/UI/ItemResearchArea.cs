@@ -19,7 +19,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private readonly int BookTextureSize = 20;
         private int BookSpriteID = 0;
         private int TimeCounter = 0;
-        private int AnimWait = 150;
+        private int AnimWait = 10;
         private bool BookOpenAnimComplete = false;
 
         public bool BookTurnLeftRequested = false;
@@ -133,8 +133,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             if (!BookOpenAnimComplete) {
-                if (BookSpriteID < 1) {
-                    AnimWait = 100;
+                if (BookSpriteID < 2) {
+                    AnimWait = 80;
                 }
                 else if (BookSpriteID > 8) {
                     AnimWait = 30;
@@ -341,12 +341,18 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public void OnResearchCompleted() {
-            ModManager.ProgressionManagerInstance.ResearchItem(ResearchItem, out var _);
+            ModManager.ProgressionManagerInstance.ResearchItem(ResearchItem, out var leftAmount);
 
             ResearchStarted = false;
             Game1.playSound("reward");
-            ResearchItem = null;
             BookTurnLeftRequested = true;
+
+            if (leftAmount > 0) {
+                ResearchItem.Stack = leftAmount;
+                CommonHelper.TryReturnItemToInventory(ResearchItem.GameItem);
+            }
+
+            ResearchItem = null;
         }
 
         private string GetItemProgression() {

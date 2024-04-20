@@ -130,7 +130,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             QualityButton.Draw(b);
             FavoriteButton.Draw(b);
             DisplayButton.Draw(b);
-            SettingsButton.Draw(b);
+            //SettingsButton.Draw(b);
 
             SearchBar.Draw(b);
             ItemResearchArea.Draw(b);
@@ -441,7 +441,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             if (heldItem == null) {
-                heldItem = CreativeMenu.rightClick(x, y, heldItem, true);
+                heldItem = CreativeMenu.HandleRightClick(x, y, heldItem, true);
 
                 if (heldItem != null && behaviorOnItemGrab != null) {
                     behaviorOnItemGrab(heldItem, Game1.player);

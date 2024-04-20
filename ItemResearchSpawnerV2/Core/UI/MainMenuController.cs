@@ -1,4 +1,5 @@
-﻿using ItemResearchSpawnerV2.Core.Data.Enums;
+﻿using Force.DeepCloner;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
@@ -12,6 +13,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private List<ProgressionItem> ProgressionItems;
         private List<ProgressionItem> FilteredProgressionItems;
 
+        private static bool ShiftPressed => ModManager.Instance.Helper.Input.IsDown(SButton.LeftShift);
+
         private string LastSearchQuery;
 
         private bool MenuWasBuild = false;
@@ -21,7 +24,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // -----------------------------------------------------------------
 
-            UpdateView(true);
+            UpdateView(rebuild: true);
 
             // -----------------------------------------------------------------
 
@@ -99,12 +102,19 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //    CreativeMenu.OnInventoryChange();
             //}
 
-            var items = FilteredProgressionItems
-                .Skip(TopRowIndex * CreativeMenu.ItemsPerRow * 2)
-                .Take(CreativeMenu.ItemsPerView).ToList()
-                .Select(pi => {
+            IEnumerable<ProgressionItem> GetMenuItems() {
+                var items = FilteredProgressionItems
+                    .Skip(TopRowIndex * CreativeMenu.ItemsPerRow * 2)
+                    .Take(CreativeMenu.ItemsPerView).ToList();
+
+                foreach (var pi in items) {
+
                     pi.Item.Item = pi.Item.CreateItem();
-                    pi.GameItem.Quality = (int)ModManager.Instance.ItemQuality;
+
+                    var availableQuality = pi.GetAvailableQuality(ModManager.Instance.ItemQuality);
+
+                    pi.GameItem.Quality = (int)availableQuality;
+
                     pi.Stack = ModManager.Instance.ModMode switch {
                         ModMode.BuySell => pi.GameItem.maximumStackSize(),
                         ModMode.Combined => pi.GameItem.maximumStackSize(),
@@ -112,10 +122,41 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         _ => pi.GameItem.maximumStackSize()
                     };
 
-                    return pi;
-                });
+                    yield return pi;
 
-            CreativeMenu.SetItems(items);
+                    if (availableQuality != ModManager.Instance.ItemQuality && ModManager.Instance.ProgressionDisplay != ProgressionDisplayMode.ResearchedOnly) {
+                        // var pi_c = ModManager.ProgressionManagerInstance.GetProgressionItem(pi.GameItem);
+                        var pi_c = new ProgressionItem(pi.Item.ShallowClone(), pi.SaveData, pi.Category, pi.Price);
+
+                        pi_c.Item.Item = pi_c.Item.CreateItem();
+                        pi_c.GameItem.Quality = (int)ModManager.Instance.ItemQuality;
+                        pi_c.Stack = pi_c.GameItem.maximumStackSize();
+
+                        yield return pi_c;
+                    }
+                }
+            }
+
+            //var items = FilteredProgressionItems
+            //    .Skip(TopRowIndex * CreativeMenu.ItemsPerRow * 2)
+            //    .Take(CreativeMenu.ItemsPerView).ToList()
+            //    .Select(pi => {
+            //        pi.Item.Item = pi.Item.CreateItem();
+
+            //        //pi.GameItem.Quality = (int)ModManager.Instance.ItemQuality;
+            //        pi.GameItem.Quality = (int)pi.GetAvailableQuality(ModManager.Instance.ItemQuality);
+
+            //        pi.Stack = ModManager.Instance.ModMode switch {
+            //            ModMode.BuySell => pi.GameItem.maximumStackSize(),
+            //            ModMode.Combined => pi.GameItem.maximumStackSize(),
+            //            ModMode.BuySellPlus => pi.GameItem.maximumStackSize(),
+            //            _ => pi.GameItem.maximumStackSize()
+            //        };
+
+            //        return pi;
+            //    });
+
+            CreativeMenu.SetItems(GetMenuItems().ToList());
         }
 
         private void FilterProgressionItems() {
@@ -149,26 +190,24 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 _ => items.OrderBy(p => p.Item.DisplayName)
             };
 
+            items = items.ToList();
+
+            // ------------------------------------------------------------------------------------------------
+
             switch (ModManager.Instance.FavoriteDisplay) {
                 case FavoriteDisplayMode.FavoriteOnly:
                     items = items.Where(item => item.Favorited);
                     break;
             }
 
+            items = items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
+
             switch (ModManager.Instance.ProgressionDisplay) {
                 case ProgressionDisplayMode.ResearchStarted:
-                    var dasearch = "pi";
-                    items = items.Where(item =>
-                        item.Item.Name.Contains(dasearch, StringComparison.InvariantCultureIgnoreCase)
-                        || item.Item.DisplayName.Contains(dasearch, StringComparison.InvariantCultureIgnoreCase)
-                    );
+                    items = items.Where(item => item.BaseResearchStarted);
                     break;
-                case ProgressionDisplayMode.Combined:
-                    var dbsearch = "op";
-                    items = items.Where(item =>
-                        item.Item.Name.Contains(dbsearch, StringComparison.InvariantCultureIgnoreCase)
-                        || item.Item.DisplayName.Contains(dbsearch, StringComparison.InvariantCultureIgnoreCase)
-                    );
+                case ProgressionDisplayMode.ResearchedOnly:
+                    items = items.Where(item => item.BaseResearchCompleted);
                     break;
             }
 
@@ -343,17 +382,14 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 TrashHeldItem();
             }
 
-            if (ItemResearchArea.Bounds.Contains(x, y)) {
-                ItemResearchArea.SetItem(heldItem, out var returnItem);
-                heldItem = returnItem;
-            }
-
-            else if (LeftArrow.bounds.Contains(x, y)) {
-                receiveScrollWheelAction(1);
-            }
-
-            else if (RightArrow.bounds.Contains(x, y)) {
-                receiveScrollWheelAction(-1);
+            else if (SortDropdown.TryLeftClick(x, y, out bool itemClicked2, out bool dropdownToggled2)) {
+                if (dropdownToggled2) {
+                    SetSortDropdown(SortDropdown.IsExpanded);
+                }
+                if (itemClicked2) {
+                    SetSortOption(SortDropdown.Selected);
+                    Game1.playSound("drumkit6");
+                }
             }
 
             else if (CategoryDropdown.TryLeftClick(x, y, out bool itemClicked1, out bool dropdownToggled1)) {
@@ -366,14 +402,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
             }
 
-            else if (SortDropdown.TryLeftClick(x, y, out bool itemClicked2, out bool dropdownToggled2)) {
-                if (dropdownToggled2) {
-                    SetSortDropdown(SortDropdown.IsExpanded);
-                }
-                if (itemClicked2) {
-                    SetSortOption(SortDropdown.Selected);
-                    Game1.playSound("drumkit6");
-                }
+            else if (ItemResearchArea.Bounds.Contains(x, y)) {
+                ItemResearchArea.SetItem(heldItem, out var returnItem);
+                heldItem = returnItem;
+            }
+
+            else if (LeftArrow.bounds.Contains(x, y)) {
+                receiveScrollWheelAction(1);
+            }
+
+            else if (RightArrow.bounds.Contains(x, y)) {
+                receiveScrollWheelAction(-1);
             }
 
             else if (SearchBar.Contains(x, y)) {
@@ -395,9 +434,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 UpdateView(filter: true, resetScroll: true, reloadCategories: true);
             }
 
-            else if (SettingsButton.HoveredOver) {
-                SettingsButton.HandleLeftClick(x, y);
-            }
+            //else if (SettingsButton.HoveredOver) {
+            //    SettingsButton.HandleLeftClick(x, y);
+            //}
 
             else if (ItemResearchArea.ResearchButton.HoveredOver) {
                 ItemResearchArea.ResearchButton.HandleLeftClick(x, y);
@@ -408,7 +447,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     SearchBar.Blur();
                 }
 
-                base.receiveLeftClick(x, y, playSound);
+                if (ShiftPressed && OnShiftLeftClickPressed(x, y)) {
+                }
+
+                else {
+                    base.receiveLeftClick(x, y, playSound);
+                }
             }
         }
 
@@ -473,6 +517,65 @@ namespace ItemResearchSpawnerV2.Core.UI {
             base.performHoverAction(x, y);
         }
 
+        private bool OnShiftLeftClickPressed(int x, int y) {
+            if (ItemResearchArea.Bounds.Contains(x, y)) {
+                if (ItemResearchArea.ResearchItem != null) {
+                    TryReturnItemToInventory(ItemResearchArea.ReturnItem());
+                }
+
+                return true;
+            }
+
+            //if (trashCan.containsPoint(x, y)) {
+            //    foreach (var item in Game1.player.items.Where(item => item != null)) {
+            //        if (ProgressionManager.Instance.ItemResearched(item)) {
+            //            switch (ModManager.Instance.ModMode) {
+            //                case ModMode.BuySell:
+            //                case ModMode.Combined:
+            //                    ModManager.Instance.SellItem(item);
+            //                    Game1.player.removeItemFromInventory(item);
+            //                    break;
+            //                default:
+            //                    Game1.player.removeItemFromInventory(item);
+            //                    break;
+            //            }
+            //        }
+            //    }
+
+            //    return true;
+            //}
+
+            if (hoveredItem != null && Game1.player.Items.Contains(hoveredItem)) {
+                if (ModManager.ProgressionManagerInstance.GetProgressionItem(hoveredItem).ResearchCompleted) {
+                    switch (ModManager.Instance.ModMode) {
+                        case ModMode.BuySell:
+                        case ModMode.Combined:
+                            ModManager.Instance.SellItem(hoveredItem);
+                            UpdateView();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                else if (ItemResearchArea.ResearchItem != null) {
+                    TryReturnItemToInventory(ItemResearchArea.ReturnItem());
+
+                    ItemResearchArea.SetItem(hoveredItem, out var _);
+                }
+
+                else {
+                    ItemResearchArea.SetItem(hoveredItem, out var _);
+                }
+
+                Game1.player.removeItemFromInventory(hoveredItem);
+
+                return true;
+            }
+
+            return false;
+        }
+
         public override void receiveScrollWheelAction(int direction) {
             if (CategoryDropdown.IsExpanded) {
                 CategoryDropdown.OnScrollWheel(direction);
@@ -503,21 +606,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         // --------------------------------------------------------------------------------------
-
-        private void TryReturnItemToInventory(Item item) {
-            if (item != null) {
-                if (Game1.player.isInventoryFull()) {
-                    DropItem(item);
-                }
-                else {
-                    Game1.player.addItemByMenuIfNecessary(item);
-                }
-            }
-        }
-
-        private static void DropItem(Item item) {
-            Game1.createItemDebris(item, Game1.player.getStandingPosition(), Game1.player.FacingDirection);
-        }
 
 
         private void OnItemGrab(Item item, Farmer player) {

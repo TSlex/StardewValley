@@ -16,5 +16,20 @@ namespace ItemResearchSpawnerV2.Core.Utils {
                 yield return type.FullName;
             }
         }
+
+        public static void TryReturnItemToInventory(Item item) {
+            if (item != null) {
+                if (Game1.player.isInventoryFull()) {
+                    DropItem(item);
+                }
+                else {
+                    Game1.player.addItemByMenuIfNecessary(item);
+                }
+            }
+        }
+
+        public static void DropItem(Item item) {
+            Game1.createItemDebris(item, Game1.player.getStandingPosition(), Game1.player.FacingDirection);
+        }
     }
 }

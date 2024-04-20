@@ -77,22 +77,10 @@ namespace ItemResearchSpawnerV2.Core {
                 item.SaveData.ResearchCountIridium += progressCount;
             }
 
-            leftAmount -= leftAmount;
+            leftAmount -= needAmount;
 
             ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.SaveData;
-
-
-            switch (ModManager.Instance.ModMode) {
-                case ModMode.BuySell:
-                case ModMode.Combined:
-                    //OnStackChanged?.Invoke(0);
-                    break;
-                case ModMode.Research:
-                    //OnStackChanged?.Invoke(item.Stack - progressCount);
-                    break;
-                default:
-                    break;
-            }
+            ModManager.Instance.UpdateMenu(rebuild: true);
         }
 
         public void FavoriteItem(ProgressionItem item) {
@@ -109,9 +97,11 @@ namespace ItemResearchSpawnerV2.Core {
 
         public ProgressionItem GetProgressionItem(Item item) {
             var key = CommonHelper.GetItemUniqueKey(item);
-            var succ = ModManager.Instance.ItemRegistry.TryGetValue(key, out var spawnableItem);
+            var _ = ModManager.Instance.ItemRegistry.TryGetValue(key, out var spawnableItem);
 
-            spawnableItem.Item = item;
+            spawnableItem = new SpawnableItem(spawnableItem) {
+                Item = item
+            };
 
             return GetProgressionItem(spawnableItem);
         }
