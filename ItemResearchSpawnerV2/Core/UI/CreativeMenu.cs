@@ -220,7 +220,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         return toPlace;
                     }
 
-                    if (ProgressionItems[i] == null || !ProgressionItems[i].ResearchCompleted) {
+                    if (ProgressionItems[i] == null || !ProgressionItems[i].ResearchCompleted || ProgressionItems[i].CannotResearch) {
                         return toPlace;
                     }
 
@@ -258,7 +258,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     continue;
                 }
 
-                if (ProgressionItems[i] == null || !ProgressionItems[i].ResearchCompleted) {
+                if (ProgressionItems[i] == null || !ProgressionItems[i].ResearchCompleted || ProgressionItems[i].CannotResearch) {
                     return toAddTo;
                 }
 

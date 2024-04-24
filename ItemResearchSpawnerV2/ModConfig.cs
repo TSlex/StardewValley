@@ -7,12 +7,20 @@ namespace ItemResearchSpawnerV2 {
     {
         public KeybindList ShowMenuButton { get; set; } = KeybindList.ForSingle(SButton.R);
         public ModMode DefaultMode { get; set; } = ModMode.Research;
+
         public bool UseDefaultBalanceConfig { get; set; } = true;
 
+        public bool ShowMissingItems { get; set; } = false;
+        public bool EnableSounds { get; set; } = true;
+
         public float ResearchAmountMultiplier { get; set; } = 1.5f;
-
         public float SellPriceMultiplier { get; set; } = 0.9f;
-
         public float BuyPriceMultiplier { get; set; } = 1.1f;
+
+        public float ResearchTimeSeconds { get; set; } = 1f;
+
+        public float GetResearchTime() {
+            return ResearchTimeSeconds >= 0f ? ResearchTimeSeconds : 0f;
+        }
     }
 }

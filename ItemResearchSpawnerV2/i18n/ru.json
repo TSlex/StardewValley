@@ -47,10 +47,14 @@
   "category.secret-note": "Таинственные заметки",
   "category.misc": "Разное",
 
+  //missing item
+  "item.missing-item-desc": "Этот предмет не найден,\nможет мод отсутствует,\nили что-то случилось\nс игровыми предметами...",
+
   //ui
   "ui.research-one-left": "всего 1 остался!",
   "ui.research-more-left": "eще {0} надо",
   "ui.research-completed": "исследование завершено",
+  "ui.research-impossible": "запрещенный предмет",
 
   //commands
   "command.unlock-all.desc": "Разблокировать все предметы",

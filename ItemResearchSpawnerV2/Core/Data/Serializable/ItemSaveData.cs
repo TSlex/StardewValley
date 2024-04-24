@@ -1,4 +1,6 @@
-﻿namespace ItemResearchSpawnerV2.Models {
+﻿using Microsoft.Xna.Framework;
+
+namespace ItemResearchSpawnerV2.Models {
     internal class ItemSaveData {
 
         public int ResearchCount = 0;
@@ -8,5 +10,7 @@
 
         public bool Favorite = false;
 
+        public Color ClothesColor = Color.White;
+        public int WaterLevel = 0;
     }
 }

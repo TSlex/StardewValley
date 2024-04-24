@@ -70,7 +70,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public static string GetItemUniqueKey(Item item) {
-            return $"{item.Name}:" + $"{item.ParentSheetIndex} | {item.Category}";
+            return $"{item.Name}:" + $"{item.ParentSheetIndex} | {item.ItemId} | {item.QualifiedItemId} | {item.GetType().Name}";
         }
     }
 }

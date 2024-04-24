@@ -98,7 +98,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public void Clear() {
             SearchBox.Text = "";
-            Game1.playSound("cancel");
+            if (ModManager.Instance.Config.EnableSounds) {
+                Game1.playSound("cancel");
+            }
         }
 
         public void SetText(string text) {

@@ -4,6 +4,7 @@ using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
+using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using SObject = StardewValley.Object;
@@ -11,11 +12,15 @@ using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core {
     internal class ProgressionManager {
+
         public List<ItemCategoryMeta> Categories { get; private set; }
         public ItemCategoryMeta DefaultCategory { get; private set; }
+
         public Dictionary<string, ItemSaveData> ResearchProgressions { get; set; }
 
-        //private readonly IEnumerable<SpawnableItem> Items;
+        private IModHelper Helper => ModManager.Instance.Helper;
+        private IMonitor Monitor => ModManager.Instance.Monitor;
+        private IManifest Manifest => ModManager.Instance.Manifest;
 
         // ========================================================================================================
 
@@ -40,46 +45,30 @@ namespace ItemResearchSpawnerV2.Core {
 
 
             if (item.RequiredResearch < 0) {
+                ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();
+                ModManager.Instance.UpdateMenu(rebuild: true);
                 return;
             }
 
-            //if (itemProgressionRaw.current >= itemProgressionRaw.max) {
-
-            //    switch (ModManager.Instance.ModMode) {
-            //        case ModMode.BuySell:
-            //        case ModMode.Combined:
-            //            //OnStackChanged?.Invoke(0);
-            //            break;
-            //        default:
-            //            break;
-            //    }
-
-            //    return;
-            //}
-
             var needAmount = item.RequiredResearch - item.CurrentResearchAmount;
-
             var progressCount = item.Stack > needAmount ? needAmount : item.Stack;
 
             if (item.Quality >= ItemQuality.Normal) {
                 item.SaveData.ResearchCount += progressCount;
             }
-
             if (item.Quality >= ItemQuality.Silver) {
                 item.SaveData.ResearchCountSilver += progressCount;
             }
-
             if (item.Quality >= ItemQuality.Gold) {
                 item.SaveData.ResearchCountGold += progressCount;
             }
-
             if (item.Quality >= ItemQuality.Iridium) {
                 item.SaveData.ResearchCountIridium += progressCount;
             }
 
             leftAmount -= needAmount;
 
-            ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.SaveData;
+            ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();
             ModManager.Instance.UpdateMenu(rebuild: true);
         }
 
@@ -93,14 +82,31 @@ namespace ItemResearchSpawnerV2.Core {
             foreach (var item in ModManager.Instance.ItemRegistry.Values) {
                 yield return GetProgressionItem(item);
             }
+
+            foreach (var item in GetMissingItems()) {
+                yield return GetProgressionItem(item);
+            }
         }
 
         public ProgressionItem GetProgressionItem(Item item) {
             var key = CommonHelper.GetItemUniqueKey(item);
-            var _ = ModManager.Instance.ItemRegistry.TryGetValue(key, out var spawnableItem);
 
-            spawnableItem = new SpawnableItem(spawnableItem) {
-                Item = item
+            var possibleItem = ModManager.Instance.ItemRegistry
+                .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId)
+                .Select(p => p.Value).FirstOrDefault();
+
+            possibleItem ??= new SpawnableItem("", "", (item) => new MissingItem(key));
+
+            if (possibleItem == null) {
+                return GetProgressionItem(new SpawnableItem("", "", (item) => new MissingItem(key)));
+            }
+
+            // fix pre SDV1.6 items with different unique key...
+            item.Name = possibleItem.Item.Name;
+            item.ParentSheetIndex = possibleItem.Item.ParentSheetIndex;
+
+            var spawnableItem = new SpawnableItem(possibleItem) {
+                Item = item,
             };
 
             return GetProgressionItem(spawnableItem);
@@ -113,7 +119,7 @@ namespace ItemResearchSpawnerV2.Core {
             var itemCategory = new ItemCategory {
                 Label = I18n.GetByKey(category.Label),
                 BasePrice = category.BaseCost,
-                BaseResearchCount = category.ResearchCount
+                BaseResearchCount = item.Forbidden ? -1 : category.ResearchCount
             };
 
             var itemPrice = ModManager.Instance.GetItemBuyPrice(item.Item);
@@ -131,6 +137,12 @@ namespace ItemResearchSpawnerV2.Core {
 
             ItemSaveData progressionItem;
 
+            if (item is MissingItem) {
+                return new ItemSaveData() {
+                    ResearchCount = 999,
+                };
+            }
+
             if (ResearchProgressions.ContainsKey(key)) {
                 progressionItem = ResearchProgressions[key].DeepClone();
             }
@@ -140,6 +152,51 @@ namespace ItemResearchSpawnerV2.Core {
             }
 
             return progressionItem;
+        }
+
+        public IEnumerable<SpawnableItem> GetMissingItems() {
+            var progressionStarted = ResearchProgressions.Where(p => p.Value.ResearchCount > 0).ToList();
+            var existingItems = ModManager.Instance.ItemRegistry.Select(p => p.Key).ToList();
+
+            var missingKeys = progressionStarted.Where(p => !existingItems.Contains(p.Key)).Select(p => p.Key);
+
+            foreach (var key in missingKeys) {
+                yield return new SpawnableItem("", "", (item) => new MissingItem(key));
+            }
+        }
+
+        public void DumpPlayersProgression() {
+            var onlinePlayers = Game1.getOnlineFarmers()
+                .ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
+
+            var offlinePlayers = Game1.getAllFarmers()
+                .Where(farmer => !onlinePlayers.Keys.Contains(farmer.UniqueMultiplayerID.ToString()))
+                .ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
+
+            DumpPlayerProgression(Game1.player, ResearchProgressions);
+
+            //if (Context.IsMultiplayer) {
+            //    Helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_DUMP_REQUIRED,
+            //        new[] { Manifest.UniqueID });
+            //}
+
+            var progressions = ModManager.SaveManagerInstance.GetAllProgressions();
+
+            foreach (var player in offlinePlayers) {
+                DumpPlayerProgression(player.Value,
+                    progressions.ContainsKey(player.Key)
+                        ? progressions[player.Key]
+                        : new Dictionary<string, ItemSaveData>());
+            }
+        }
+
+        private void DumpPlayerProgression(Farmer player, Dictionary<string, ItemSaveData> progression) {
+            Monitor.Log(
+                $"Dumping progression - player: {player.Name}, location: {SaveHelper.ProgressionDumpPath(player.UniqueMultiplayerID.ToString())}",
+                LogLevel.Info);
+
+            Helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(player.UniqueMultiplayerID.ToString()),
+                progression.Where(p => p.Value.ResearchCount > 0).ToList());
         }
     }
 }

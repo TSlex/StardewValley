@@ -1,5 +1,6 @@
 ﻿using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
+using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Core.UI;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
@@ -11,6 +12,7 @@ namespace ItemResearchSpawnerV2.Core {
         public static ModManager Instance;
         public static ProgressionManager ProgressionManagerInstance => Instance.ProgressionManager;
         public static SaveManager SaveManagerInstance => Instance.SaveManager;
+        public static CommandManager CommandManagerInstance => Instance.CommandManager;
 
 
         public readonly IModHelper Helper;
@@ -20,6 +22,7 @@ namespace ItemResearchSpawnerV2.Core {
 
         public readonly ProgressionManager ProgressionManager;
         public readonly SaveManager SaveManager;
+        public readonly CommandManager CommandManager;
 
 
         public readonly Dictionary<string, SpawnableItem> ItemRegistry = new Dictionary<string, SpawnableItem>();
@@ -53,6 +56,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             ProgressionManager = new ProgressionManager();
             SaveManager = new SaveManager();
+            CommandManager = new CommandManager();
         }
 
         // ===========================================================================================
@@ -80,7 +84,7 @@ namespace ItemResearchSpawnerV2.Core {
                 var key = CommonHelper.GetItemUniqueKey(item.Item);
 
                 if (blacklist.Contains(key)) {
-                    continue;
+                    item.Forbidden = true;
                 }
 
                 ItemRegistry[key] = item;
@@ -215,6 +219,28 @@ namespace ItemResearchSpawnerV2.Core {
         #region Save/Load
 
         public void OnSave() {
+
+            var modState = new ModManagerState() {
+                ActiveMode = ModMode,
+                Quality = ItemQuality,
+                ProgressionDisplayMode = ProgressionDisplay,
+                FavoriteDisplayMode = FavoriteDisplay,
+                SearchText = SearchText,
+                Category = SelectedCategory,
+                SortOption = Enum.GetValues(typeof(ItemSortOption)).Cast<ItemSortOption>()
+                    .Where(op => op.GetString() == SortOption).FirstOrDefault()
+            };
+
+            SaveManager.CommitModState(Game1.player.UniqueMultiplayerID.ToString(), modState);
+
+            // -------------------------------------------------------------------------------------
+
+            SaveManager.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(),
+                ProgressionManager.ResearchProgressions.Where(p => p.Value.ResearchCount > 0)
+                .ToDictionary(p => p.Key, p => p.Value));
+
+            // -------------------------------------------------------------------------------------
+
             SaveManager.OnSave();
         }
 

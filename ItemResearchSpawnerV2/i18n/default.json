@@ -47,10 +47,14 @@
   "category.secret-note": "Secret Notes",
   "category.misc": "Misc",
 
+  //missing item
+  "item.missing-item-desc": "This item was not found,\nmaybe a mod is missing,\nor something changed\nwith game items...",
+
   //ui
   "ui.research-one-left": "last item needed!",
   "ui.research-more-left": "{0} items needed",
   "ui.research-completed": "research completed",
+  "ui.research-impossible": "forbidden item",
 
   //commands
   "command.unlock-all.desc": "Research (unlock) all items",

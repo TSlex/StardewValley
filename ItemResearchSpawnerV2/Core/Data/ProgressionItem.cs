@@ -2,7 +2,6 @@
 using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using StardewValley;
-using System.Transactions;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Models {
@@ -35,6 +34,10 @@ namespace ItemResearchSpawnerV2.Models {
         public int ResearchPerc => (int)((CurrentResearchAmount * 1f) / (RequiredResearch * 1f) * 100f);
 
         public bool Favorited => SaveData.Favorite;
+        public bool Forbidden => Item.Forbidden;
+        public bool Missing => GameItem is MissingItem;
+        public bool CannotResearch => Forbidden || Missing;
+
         public int Stack { get => Item.Item.Stack; set => Item.Item.Stack = value; }
 
         public ItemQuality Quality => (ItemQuality)((Item.Item as SObject)?.Quality ?? 0);
@@ -46,6 +49,34 @@ namespace ItemResearchSpawnerV2.Models {
             SaveData = saveData;
             Category = category;
             Price = price;
+        }
+
+        public Item InstanciateItem() {
+            var itemInstrace = Item.CreateItem();
+
+            if (itemInstrace is StardewValley.Objects.Clothing clothingItem) {
+                clothingItem.clothesColor.Value = SaveData.ClothesColor;
+            }
+
+            if (itemInstrace is StardewValley.Tools.WateringCan can) {
+                can.WaterLeft = SaveData.WaterLevel;
+            }
+
+            return itemInstrace;
+        }
+
+        public ItemSaveData GetSaveData() { 
+            var saveData = SaveData;
+
+            if (GameItem is StardewValley.Objects.Clothing clothingItem) {
+                saveData.ClothesColor = clothingItem.clothesColor.Value;
+            }
+
+            if (GameItem is StardewValley.Tools.WateringCan can) {
+                saveData.WaterLevel = can.WaterLeft;
+            }
+
+            return SaveData; 
         }
 
         public int GetResearchProgress(ItemQuality requestedQuality) {

@@ -27,6 +27,9 @@ namespace ItemResearchSpawnerV2.Core.Data {
     **/
 
     internal class SpawnableItem {
+
+        public bool Forbidden = false;
+
         /*********
         ** Accessors
         *********/
@@ -75,6 +78,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
             QualifiedItemId = Type + Id;
             CreateItem = () => createItem(this);
             Item = createItem(this);
+            Forbidden = false;
         }
 
         /// <summary>Construct an instance.</summary>
@@ -85,6 +89,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
             QualifiedItemId = item.QualifiedItemId;
             CreateItem = item.CreateItem;
             Item = item.Item;
+            Forbidden = item.Forbidden;
         }
 
         /// <summary>Get whether the item name contains a case-insensitive substring.</summary>

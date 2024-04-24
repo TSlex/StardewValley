@@ -153,7 +153,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 if (BookSpriteID % 3 == 0) {
-                    Game1.playSound("newRecipe");
+                    if (ModManager.Instance.Config.EnableSounds) {
+                        Game1.playSound("newRecipe");
+                    }
                 }
             }
             else if (ResearchItem != null) {
@@ -275,9 +277,18 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 var progressPositionX = researchItemCellX + 42 -
                                         progressFont.MeasureString(researchProgressString).X / 2f;
 
-                Utility.drawTextWithColoredShadow(b, researchProgressString, progressFont,
-                    new Vector2(progressPositionX, ResearchArea.bounds.Y + 124),
-                    Color.Cyan, Color.Red * (false ? 1f : 0.25f), 0.9f);
+                if (ResearchItem.CannotResearch) {
+                    Utility.drawTextWithColoredShadow(b, researchProgressString, progressFont,
+                        new Vector2(progressPositionX, ResearchArea.bounds.Y + 124),
+                        Color.Red, Color.Black * (false ? 1f : 0.25f), 0.9f);
+                }
+                else
+                {
+                    Utility.drawTextWithColoredShadow(b, researchProgressString, progressFont,
+                        new Vector2(progressPositionX, ResearchArea.bounds.Y + 124),
+                        Color.Cyan, Color.Red * (false ? 1f : 0.25f), 0.9f);
+                }
+
 
             }
 
@@ -321,7 +332,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public void HandleResearch() {
             if (ResearchItem != null) {
-                ResearchProcessTime = Game1.currentGameTime.TotalGameTime.TotalSeconds + 1f;
+
+                if (ResearchItem.CannotResearch) {
+                    OnResearchImpossible();
+                    return;
+                }
+
+                ResearchProcessTime = Game1.currentGameTime.TotalGameTime.TotalSeconds + ModManager.Instance.Config.GetResearchTime();
                 ResearchStarted = true;
                 //if (ModManager.Instance.ModMode == ModMode.Combined) {
                 //    ModManager.Instance.SellItem(_researchItem);
@@ -337,14 +354,28 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public void OnResearchInterrupted() {
             ResearchStarted = false;
-            Game1.playSound("fireball");
+
+            if (ModManager.Instance.Config.EnableSounds) {
+                Game1.playSound("fireball");
+            }
+        }
+
+        public void OnResearchImpossible() {
+            ResearchStarted = false;
+            if (ModManager.Instance.Config.EnableSounds) {
+                Game1.playSound("grunt");
+            }
         }
 
         public void OnResearchCompleted() {
             ModManager.ProgressionManagerInstance.ResearchItem(ResearchItem, out var leftAmount);
 
             ResearchStarted = false;
-            Game1.playSound("reward");
+
+            if (ModManager.Instance.Config.EnableSounds) {
+                Game1.playSound("reward");
+            }
+
             BookTurnLeftRequested = true;
 
             if (leftAmount > 0) {
@@ -362,6 +393,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             var left = ResearchItem.ResearchLeftAmount;
+
+            if (ResearchItem.CannotResearch) {
+                return I18n.Ui_ResearchImpossible();
+            }
 
             if (left > 1) {
                 return string.Format(I18n.Ui_ResearchMoreLeft(), left);

@@ -17,12 +17,16 @@ namespace ItemResearchSpawnerV2.Components.UI {
         public override void HandleLeftClick(int x, int y) {
             ModManager.Instance.ItemQuality = ModManager.Instance.ItemQuality.GetNext();
             //Game1.playSound("axchop");
-            Game1.playSound("money");
+            if (ModManager.Instance.Config.EnableSounds) {
+                Game1.playSound("money");
+            }
         }
 
         public override void HandleRightClick(int x, int y) {
             ModManager.Instance.ItemQuality = ModManager.Instance.ItemQuality.GetPrevious();
-            Game1.playSound("money");
+            if (ModManager.Instance.Config.EnableSounds) {
+                Game1.playSound("money");
+            }
         }
 
         public override void Draw(SpriteBatch b) {

@@ -1,4 +1,5 @@
 ﻿using Force.DeepCloner;
+using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
@@ -49,7 +50,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 LastSearchQuery = SearchBar.Text;
                 ModManager.Instance.SearchText = SearchBar.Text;
 
-                Game1.playSound("drumkit6");
+                if (ModManager.Instance.Config.EnableSounds) {
+                    Game1.playSound("drumkit6");
+                }
+
                 UpdateView(rebuild: false, filter: true, resetScroll: true, reloadCategories: false);
             }
 
@@ -109,7 +113,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                 foreach (var pi in items) {
 
-                    pi.Item.Item = pi.Item.CreateItem();
+                    //pi.Item.Item = pi.Item.CreateItem();
+                    pi.Item.Item = pi.InstanciateItem();
 
                     var availableQuality = pi.GetAvailableQuality(ModManager.Instance.ItemQuality);
 
@@ -128,7 +133,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         // var pi_c = ModManager.ProgressionManagerInstance.GetProgressionItem(pi.GameItem);
                         var pi_c = new ProgressionItem(pi.Item.ShallowClone(), pi.SaveData, pi.Category, pi.Price);
 
-                        pi_c.Item.Item = pi_c.Item.CreateItem();
+                        pi_c.Item.Item = pi_c.InstanciateItem();
                         pi_c.GameItem.Quality = (int)ModManager.Instance.ItemQuality;
                         pi_c.Stack = pi_c.GameItem.maximumStackSize();
 
@@ -181,8 +186,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
             items = activeSortOption switch {
                 ItemSortOption.NameASC => items.OrderBy(p => p.Item.DisplayName),
                 ItemSortOption.NameDESC => items.OrderByDescending(p => p.Item.DisplayName),
-                ItemSortOption.CategoryASC => items.OrderBy(p => p.Item.Item.Category),
-                ItemSortOption.CategoryDESC => items.OrderByDescending(p => p.Item.Item.Category),
+                ItemSortOption.CategoryASC => items.OrderBy(p => p.Category.Label).ThenBy(p => p.Item.Item.Category),
+                ItemSortOption.CategoryDESC => items.OrderByDescending(p => p.Category.Label).ThenByDescending(p => p.Item.Item.Category),
                 ItemSortOption.IDASC => items.OrderBy(p => p.Item.Item.ParentSheetIndex),
                 ItemSortOption.IDDESC => items.OrderByDescending(p => p.Item.Item.ParentSheetIndex),
                 ItemSortOption.PriceASC => items.OrderBy(p => p.Price),
@@ -217,7 +222,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public void UpdateView(bool rebuild = false, bool filter = false, bool resetScroll = false, bool reloadCategories = false) {
 
             if (rebuild) {
-                ProgressionItems = ModManager.Instance.GetProgressionItems();
+                ProgressionItems = ModManager.Instance.GetProgressionItems().Where(i => !i.Forbidden).ToList();
+
+                if (!ModManager.Instance.Config.ShowMissingItems) {
+                    ProgressionItems = ModManager.Instance.GetProgressionItems().Where(i => !i.Missing).ToList();
+                }
+
                 FilterProgressionItems();
                 TopRowIndex = 0;
                 UpdateCategories();
@@ -234,7 +244,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (filter) {
                 FilterProgressionItems();
                 ItemResearchArea.BookTurnRightRequested = true;
-                Game1.playSound("newRecipe");
+                if (ModManager.Instance.Config.EnableSounds) {
+                    Game1.playSound("newRecipe");
+                }
             }
 
             if (resetScroll || TopRowIndex > MaxTopRowIndex) {
@@ -312,7 +324,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         protected override void cleanupBeforeExit() {
             if (ItemResearchArea.ResearchItem != null) {
-                TryReturnItemToInventory(ItemResearchArea.ReturnItem());
+                CommonHelper.TryReturnItemToInventory(ItemResearchArea.ReturnItem());
             }
 
             base.cleanupBeforeExit();
@@ -388,7 +400,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
                 if (itemClicked2) {
                     SetSortOption(SortDropdown.Selected);
-                    Game1.playSound("drumkit6");
+                    if (ModManager.Instance.Config.EnableSounds) {
+                        Game1.playSound("drumkit6");
+                    }
                 }
             }
 
@@ -398,7 +412,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
                 if (itemClicked1) {
                     SetCategory(CategoryDropdown.Selected);
-                    Game1.playSound("drumkit6");
+                    if (ModManager.Instance.Config.EnableSounds) {
+                        Game1.playSound("drumkit6");
+                    }
                 }
             }
 
@@ -460,14 +476,18 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (CategoryDropdown.IsExpanded || CategoryDropdown.containsPoint(x, y)) {
                 if (CategoryDropdown.Selected != I18n.Category_All()) {
                     SetCategory(I18n.Category_All());
-                    Game1.playSound("smallSelect");
+                    if (ModManager.Instance.Config.EnableSounds) {
+                        Game1.playSound("smallSelect");
+                    }
                 }
                 SetCategoryDropdown(false);
             }
             else if (SortDropdown.IsExpanded || SortDropdown.containsPoint(x, y)) {
                 if (SortDropdown.Selected != I18n.Sort_ByCategoryAsc()) {
                     SetSortOption(I18n.Sort_ByCategoryAsc());
-                    Game1.playSound("smallSelect");
+                    if (ModManager.Instance.Config.EnableSounds) {
+                        Game1.playSound("smallSelect");
+                    }
                 }
 
                 SetSortDropdown(false);
@@ -520,7 +540,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private bool OnShiftLeftClickPressed(int x, int y) {
             if (ItemResearchArea.Bounds.Contains(x, y)) {
                 if (ItemResearchArea.ResearchItem != null) {
-                    TryReturnItemToInventory(ItemResearchArea.ReturnItem());
+                    CommonHelper.TryReturnItemToInventory(ItemResearchArea.ReturnItem());
                 }
 
                 return true;
@@ -546,7 +566,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //}
 
             if (hoveredItem != null && Game1.player.Items.Contains(hoveredItem)) {
-                if (ModManager.ProgressionManagerInstance.GetProgressionItem(hoveredItem).ResearchCompleted) {
+                var progressionItem = ModManager.ProgressionManagerInstance.GetProgressionItem(hoveredItem);
+
+                if (progressionItem?.Forbidden ?? true) {
+                    return false;
+                }
+
+                if (progressionItem.ResearchCompleted) {
                     switch (ModManager.Instance.ModMode) {
                         case ModMode.BuySell:
                         case ModMode.Combined:
@@ -559,7 +585,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 else if (ItemResearchArea.ResearchItem != null) {
-                    TryReturnItemToInventory(ItemResearchArea.ReturnItem());
+                    CommonHelper.TryReturnItemToInventory(ItemResearchArea.ReturnItem());
 
                     ItemResearchArea.SetItem(hoveredItem, out var _);
                 }
@@ -592,13 +618,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (direction < 0 && ShowLeftButton) {
                 TopRowIndex -= 1;
                 ItemResearchArea.BookTurnLeftRequested = true;
-                Game1.playSound("newRecipe");
+                if (ModManager.Instance.Config.EnableSounds) {
+                    Game1.playSound("newRecipe");
+                }
                 UpdateView();
             }
             else if (direction > 0 && ShowRightButton) {
                 TopRowIndex += 1;
                 ItemResearchArea.BookTurnRightRequested = true;
-                Game1.playSound("newRecipe");
+                if (ModManager.Instance.Config.EnableSounds) {
+                    Game1.playSound("newRecipe");
+                }
                 UpdateView();
             }
 

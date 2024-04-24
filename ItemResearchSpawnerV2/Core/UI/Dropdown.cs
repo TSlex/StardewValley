@@ -352,7 +352,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             Update();
 
-            Game1.playSound("boulderCrack");
+            if (ModManager.Instance.Config.EnableSounds) {
+                Game1.playSound("boulderCrack");
+            }
         }
 
         private static int GetFirstValidItem(int value, int maxIndex) {
