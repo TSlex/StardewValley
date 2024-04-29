@@ -1,54 +1,117 @@
-﻿using ItemResearchSpawnerV2.Core;
+﻿using ItemResearchSpawnerV2.Api;
+using ItemResearchSpawnerV2.Core;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 
 
 namespace ItemResearchSpawnerV2 {
+
     public class ModEntry : Mod {
 
-        private ModConfig _config;
-        private ModManager _manager;
+        internal static ModEntry Instance;
+
+        internal ModConfig Config;
+        internal ModManager Manager;
+
+        internal bool IsSaveActive = false;
+
+        internal ModConfig ActiveConfig => IsSaveActive ? Manager.Config : Config;
 
         public override void Entry(IModHelper helper) {
+
+            Instance ??= this;
+
+            // -----------------------------------------------
+
             I18n.Init(helper.Translation);
 
             // -----------------------------------------------
 
             try {
-                _config = helper.ReadConfig<ModConfig>();
+                Config = helper.ReadConfig<ModConfig>();
             }
             catch (Exception e) {
-                _config = new ModConfig();
-                helper.WriteConfig(_config);
+                Config = new ModConfig();
+
+                helper.WriteConfig(Config);
                 Monitor.LogOnce("Failed to load config.json, replaced with default one");
             }
 
             // -----------------------------------------------
 
-            _manager = new ModManager(helper, _config, Monitor, ModManifest);
+            Manager = new ModManager(helper, Config, Monitor, ModManifest);
 
             // -----------------------------------------------
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.Saving += OnSave;
             helper.Events.GameLoop.SaveLoaded += OnLoad;
+
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+
+
+            helper.Events.GameLoop.DayStarted += OnDayStarted;
+            helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
         }
 
-        public void OnSave(object sender, SavingEventArgs saveLoadedEventArgs) {
+        // =======================================================================================================
+
+        public void OnConfigChange() {
+
+        }
+
+        public void ResetConfig() {
+
+            if (IsSaveActive) {
+                Manager.Config = new ModConfig();
+            }
+
+            else {
+                Config = new ModConfig();
+            }
+
+            OnConfigChange();
+        }
+
+        public void SaveConfig() {
+            if (!IsSaveActive) {
+                Helper.WriteConfig(Config);
+            }
+
+            OnConfigChange();
+        }
+
+        // =======================================================================================================
+
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
+            InitConfigMenu();
+        }
+
+        private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e) {
+            Manager.Config = Config;
+            IsSaveActive = false;
+        }
+
+        private void OnDayStarted(object sender, DayStartedEventArgs e) {
+            IsSaveActive = true;
+        }
+
+        private void OnSave(object sender, SavingEventArgs saveLoadedEventArgs) {
             if (!Context.IsMainPlayer) {
                 return;
             }
 
-            _manager.OnSave();
+            Manager.OnSave();
         }
 
-        public void OnLoad(object sender, SaveLoadedEventArgs saveLoadedEventArgs) {
+        private void OnLoad(object sender, SaveLoadedEventArgs saveLoadedEventArgs) {
             if (!Context.IsMainPlayer) {
                 return;
             }
 
-            _manager.OnLoad();
+            Manager.OnLoad();
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
@@ -64,13 +127,142 @@ namespace ItemResearchSpawnerV2 {
             // print button presses to the console window
             // this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
 
-            if (_config.ShowMenuButton.JustPressed()) {
-                _manager.OpenMenu();
+            if (Config.GetShowMenuButton().JustPressed()) {
+                Manager.OpenMenu();
             }
         }
 
-        public static string GetItemUniqueKey(Item item) {
+        private static string GetItemUniqueKey(Item item) {
             return $"{item.Name}:" + $"{item.ParentSheetIndex} | {item.ItemId} | {item.QualifiedItemId} | {item.GetType().Name}";
         }
+
+        // ---------------------------------------------------------------------------------------
+
+        private void InitConfigMenu() {
+            var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            if (configMenu is null)
+                return;
+
+            // register mod
+            configMenu.Register(
+                mod: ModManifest,
+                reset: () => ResetConfig(),
+                save: () => SaveConfig()
+            );
+
+            // ------------------------------------------------------------
+
+            configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Main());
+
+            var availableModes = Enum.GetValues(typeof(ModMode)).Cast<ModMode>().Select(m => m.ToString()).ToList();
+
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetDefaultMode().ToString(),
+                setValue: mode => ActiveConfig.SetDefaultMode((ModMode)availableModes.IndexOf(mode)),
+                allowedValues: availableModes.ToArray(),
+                formatAllowedValue: (mode) => ((ModMode)availableModes.IndexOf(mode)).GetString(),
+                name: () => I18n.Config_DefaultModeName(),
+                tooltip: () => I18n.Config_DefaultModeDesc()
+            );
+
+            configMenu.AddParagraph(
+                ModManifest,
+                () => I18n.Config_DefaultModeNote()
+            );
+
+            configMenu.AddKeybindList(
+                mod: ModManifest,
+                getValue: () => Config.GetShowMenuButton(),
+                setValue: keybind => Config.SetShowMenuButton(keybind),
+                name: () => I18n.Config_OpenMenuKeyName(),
+                tooltip: () => I18n.Config_OpenMenuKeyDesc()
+            );
+
+            // ------------------------------------------------------------
+
+            configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Balance());
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetUseDefaultBalanceConfig(),
+                setValue: value => ActiveConfig.SetUseDefaultBalanceConfig(value),
+                name: () => I18n.Config_DefaultBalanceName(),
+                tooltip: () => I18n.Config_DefaultBalanceDesc()
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetResearchAmountMultiplier(),
+                setValue: value => ActiveConfig.SetResearchAmountMultiplier(value),
+                name: () => I18n.Config_ResearchMultName(),
+                tooltip: () => I18n.Config_ResearchMultDesc(),
+                min: 0.1f,
+                max: 10f,
+                interval: 0.1f
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetBuyPriceMultiplier(),
+                setValue: value => ActiveConfig.SetBuyPriceMultiplier(value),
+                name: () => I18n.Config_BuyPriceMultName(),
+                tooltip: () => I18n.Config_BuyPriceMultDesc(),
+                min: 0.0f,
+                max: 10f,
+                interval: 0.1f
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetSellPriceMultiplier(),
+                setValue: value => ActiveConfig.SetSellPriceMultiplier(value),
+                name: () => I18n.Config_SellPriceMultName(),
+                tooltip: () => I18n.Config_SellPriceMultDesc(),
+                min: 0.0f,
+                max: 10f,
+                interval: 0.1f
+            );
+
+            configMenu.AddParagraph(
+                ModManifest,
+                () => I18n.Config_PriceMarginNote()
+            );
+
+            // ------------------------------------------------------------
+
+            configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Misc());
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetEnableSounds(),
+                setValue: value => ActiveConfig.SetEnableSounds(value),
+                name: () => I18n.Config_EnableSoundsName(),
+                tooltip: () => I18n.Config_EnableSoundsDesc()
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetShowMissingItems(),
+                setValue: value => ActiveConfig.SetShowMissingItems(value),
+                name: () => I18n.Config_ShowMissingName(),
+                tooltip: () => I18n.Config_ShowMissingDesc()
+            );
+
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetResearchTimeSeconds(),
+                setValue: value => ActiveConfig.SetResearchTimeSeconds(value),
+                name: () => I18n.Config_ResearchDelayName(),
+                tooltip: () => I18n.Config_ResearchDelayDesc(),
+                min: 0.0f,
+                max: 60f,
+                interval: 0.1f
+            );
+
+            // ------------------------------------------------------------
+        }
+
     }
 }

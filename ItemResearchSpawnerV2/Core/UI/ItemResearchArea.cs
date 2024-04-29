@@ -153,7 +153,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 if (BookSpriteID % 3 == 0) {
-                    if (ModManager.Instance.Config.EnableSounds) {
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("newRecipe");
                     }
                 }
@@ -338,7 +338,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     return;
                 }
 
-                ResearchProcessTime = Game1.currentGameTime.TotalGameTime.TotalSeconds + ModManager.Instance.Config.GetResearchTime();
+                ResearchProcessTime = Game1.currentGameTime.TotalGameTime.TotalSeconds + ModManager.Instance.Config.GetResearchTimeSeconds();
                 ResearchStarted = true;
                 //if (ModManager.Instance.ModMode == ModMode.Combined) {
                 //    ModManager.Instance.SellItem(_researchItem);
@@ -355,14 +355,14 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public void OnResearchInterrupted() {
             ResearchStarted = false;
 
-            if (ModManager.Instance.Config.EnableSounds) {
+            if (ModManager.Instance.Config.GetEnableSounds()) {
                 Game1.playSound("fireball");
             }
         }
 
         public void OnResearchImpossible() {
             ResearchStarted = false;
-            if (ModManager.Instance.Config.EnableSounds) {
+            if (ModManager.Instance.Config.GetEnableSounds()) {
                 Game1.playSound("grunt");
             }
         }
@@ -372,7 +372,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             ResearchStarted = false;
 
-            if (ModManager.Instance.Config.EnableSounds) {
+            if (ModManager.Instance.Config.GetEnableSounds()) {
                 Game1.playSound("reward");
             }
 

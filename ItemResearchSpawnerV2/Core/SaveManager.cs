@@ -64,12 +64,12 @@ namespace ItemResearchSpawnerV2.Core {
         public ModManagerState GetModState(string playerID) {
             if (ModStates.ContainsKey(playerID)) {
                 return ModStates[playerID] ?? new ModManagerState() {
-                    ActiveMode = ModHelper.ReadConfig<ModConfig>().DefaultMode
+                    Config = ModEntry.Instance.Config
                 };
             }
 
             return new ModManagerState() {
-                ActiveMode = ModHelper.ReadConfig<ModConfig>().DefaultMode
+                Config = ModEntry.Instance.Config
             };
         }
 
@@ -146,7 +146,7 @@ namespace ItemResearchSpawnerV2.Core {
 
         private void LoadPricelist() {
 
-            if (!ModHelper.ReadConfig<ModConfig>().UseDefaultBalanceConfig) {
+            if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
 
                 try {
                     PriceList = ModHelper.Data.ReadGlobalData<Dictionary<string, int>>(SaveHelper.PriceConfigKey);
@@ -167,7 +167,7 @@ namespace ItemResearchSpawnerV2.Core {
 
         private void LoadCategories() {
 
-            if (!ModHelper.ReadConfig<ModConfig>().UseDefaultBalanceConfig) {
+            if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
 
                 try {
                     Categories = ModHelper.Data.ReadGlobalData<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigKey);
@@ -222,13 +222,13 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private void SavePricelist() {
-            if (!ModHelper.ReadConfig<ModConfig>().UseDefaultBalanceConfig) {
+            if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
                 ModHelper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, PriceList);
             }
         }
 
         private void SaveCategories() {
-            if (!ModHelper.ReadConfig<ModConfig>().UseDefaultBalanceConfig) {
+            if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
                 ModHelper.Data.WriteGlobalData(SaveHelper.CategoriesConfigKey, Categories);
             }
         }

@@ -209,7 +209,7 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private bool CheckIsForceDefaults() {
-            if (Helper.ReadConfig<ModConfig>().UseDefaultBalanceConfig) {
+            if (Helper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
                 Monitor.Log(
                     $"Currently default config is used for prices and categories! You can turn this off in config, to be able to manually change :)",
                     LogLevel.Warn);

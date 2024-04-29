@@ -56,6 +56,49 @@
   "ui.research-completed": "research completed",
   "ui.research-impossible": "forbidden item",
 
+  //modes
+  "mod-mode.research": "Research (Spawn) mode",
+  "mod-mode.buy-sell": "Buy/Sell mode",
+  "mod-mode.combined": "Combined mode",
+  "mod-mode.research-plus": "Mr.Qi mode",
+  "mod-mode.buy-sell-plus": "JojaMart mode",
+
+  //settings
+  "config.section.main": "Main settings",
+
+  "config.default-mode-name": "Mod mode",
+  "config.default-mode-desc": "This affects some aspects of this mod, such as item research progression...",
+  "config.default-mode-note": "Note: if you change the mode from title it will affect new saves only, to change active mode, load farm save first...",
+
+  "config.open-menu-key-name": "Open key",
+  "config.open-menu-key-desc": "Key needed to press for menu to open",
+
+  "config.section.balance": "Balance settings",
+
+  "config.default-balance-name": "Use default balance config",
+  "config.default-balance-desc": "Whether to use default config for item price list and categories",
+
+  "config.research-mult-name": "Research amount multiplier",
+  "config.research-mult-desc": "Use this to control base amount of items needed to complete the research",
+
+  "config.buy-price-mult-name": "Buy price multiplier",
+  "config.buy-price-mult-desc": "Use this to control item buy price in menu (Only for modes that use item price)",
+
+  "config.sell-price-mult-name": "Sell price multiplier",
+  "config.sell-price-mult-desc": "Use this to control item sell price in menu (Only for modes that use item price)",
+  "config.price-margin-note": "Note: using buy and sell price multipliers you control the money margin, you can make item \"vanish\" or make it too cheaty, up to you :)",
+
+  "config.section.misc": "Misc settings",
+
+  "config.enable-sounds-name": "Enable menu sounds",
+  "config.enable-sounds-desc": "If menu sounds are very annoying, you can turn them off...",
+
+  "config.show-missing-name": "Show missing items",
+  "config.show-missing-desc": "Whether to show items that were previously researched but do not exist anymore. SDV pre 1.6 had different item type handling, some item might get new \"unique key\", use cheat menu to get them...",
+
+  "config.research-delay-name": "Research time (in seconds)",
+  "config.research-delay-desc": "Use this to control how fast item researching is. \"0\" will research item without any delay (just as it was before)",
+
   //commands
   "command.unlock-all.desc": "Research (unlock) all items",
   "command.unlock-all.succ": "All items were researched!",

@@ -370,7 +370,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         heldItem = null;
                         Game1.player.foundArtifact("102", 1);
                         poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
-                        if (ModManager.Instance.Config.EnableSounds) {
+                        if (ModManager.Instance.Config.GetEnableSounds()) {
                             Game1.playSound("fireball");
                         }
                     }
@@ -380,7 +380,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     Game1.player.canUnderstandDwarves = true;
                     poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
 
-                    if (ModManager.Instance.Config.EnableSounds) {
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("fireball");
                     }
                 }
@@ -402,7 +402,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                         poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
 
-                        if (ModManager.Instance.Config.EnableSounds) {
+                        if (ModManager.Instance.Config.GetEnableSounds()) {
                             Game1.playSound("newRecipe");
                         }
                     }
@@ -413,7 +413,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
                 else if (Game1.player.addItemToInventoryBool(heldItem)) {
                     heldItem = null;
-                    if (ModManager.Instance.Config.EnableSounds) {
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("discoverMineral");
                     }
                 }
@@ -469,7 +469,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     Game1.player.canUnderstandDwarves = true;
                     poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
 
-                    if (ModManager.Instance.Config.EnableSounds) {
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("fireball");
                     }
                 }
@@ -492,7 +492,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                         poof = new TemporaryAnimatedSprite("TileSheets\\animations", new Rectangle(0, 320, 64, 64), 50f, 8, 0, new Vector2(x - x % 64 + 16, y - y % 64 + 16), flicker: false, flipped: false);
 
-                        if (ModManager.Instance.Config.EnableSounds) {
+                        if (ModManager.Instance.Config.GetEnableSounds()) {
                             Game1.playSound("newRecipe");
                         }
                     }
@@ -505,7 +505,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 else if (Game1.player.addItemToInventoryBool(heldItem)) {
                     heldItem = null;
 
-                    if (ModManager.Instance.Config.EnableSounds) {
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("discoverMineral");
                     }
                 }

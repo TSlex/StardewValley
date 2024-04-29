@@ -14,11 +14,11 @@ namespace ItemResearchSpawnerV2.Core {
         public static SaveManager SaveManagerInstance => Instance.SaveManager;
         public static CommandManager CommandManagerInstance => Instance.CommandManager;
 
-
         public readonly IModHelper Helper;
         public readonly IMonitor Monitor;
         public readonly IManifest Manifest;
-        public readonly ModConfig Config;
+
+        public ModConfig Config;
 
         public readonly ProgressionManager ProgressionManager;
         public readonly SaveManager SaveManager;
@@ -141,10 +141,10 @@ namespace ItemResearchSpawnerV2.Core {
 
             var price = GetItemPrice(item, false);
 
-            var buyPrice = (int)MathF.Round(price * Config.BuyPriceMultiplier);
+            var buyPrice = (int)MathF.Round(price * Config.GetBuyPriceMultiplier());
             buyPrice = buyPrice >= 0 ? buyPrice : 0;
 
-            var sellPrice = (int)MathF.Round(price * Config.SellPriceMultiplier);
+            var sellPrice = (int)MathF.Round(price * Config.GetSellPriceMultiplier());
             sellPrice = sellPrice >= 0 ? sellPrice : 0;
 
             if (countStack) {
@@ -157,13 +157,13 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         public int GetItemBuyPrice(Item item, bool countStack = false) {
-            var buyPrice = GetItemPrice(item, countStack, Config.BuyPriceMultiplier);
+            var buyPrice = GetItemPrice(item, countStack, Config.GetBuyPriceMultiplier());
 
             return buyPrice >= 0 ? buyPrice : 0;
         }
 
         public int GetItemSellPrice(Item item, bool countStack = false) {
-            var sellPrice = GetItemPrice(item, countStack, Config.SellPriceMultiplier);
+            var sellPrice = GetItemPrice(item, countStack, Config.GetSellPriceMultiplier());
 
             return sellPrice >= 0 ? sellPrice : 0;
         }
@@ -221,7 +221,7 @@ namespace ItemResearchSpawnerV2.Core {
         public void OnSave() {
 
             var modState = new ModManagerState() {
-                ActiveMode = ModMode,
+                Config = Config,
                 Quality = ItemQuality,
                 ProgressionDisplayMode = ProgressionDisplay,
                 FavoriteDisplayMode = FavoriteDisplay,
@@ -252,7 +252,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             var modState = SaveManager.GetModState(Game1.player.UniqueMultiplayerID.ToString());
 
-            ModMode = modState.ActiveMode;
+            Config = modState.Config;
             ItemQuality = modState.Quality;
             ProgressionDisplay = modState.ProgressionDisplayMode;
             FavoriteDisplay = modState.FavoriteDisplayMode;

@@ -352,7 +352,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             Update();
 
-            if (ModManager.Instance.Config.EnableSounds) {
+            if (ModManager.Instance.Config.GetEnableSounds()) {
                 Game1.playSound("boulderCrack");
             }
         }

@@ -10,13 +10,18 @@
     internal static class ModModeExtensions {
 
         public static string GetString(this ModMode current) {
-            return current switch {
-                ModMode.Research => "Research (Spawn) mode",
-                ModMode.BuySell => "Buy/Sell mode",
-                ModMode.Combined => "Combined mode",
-                ModMode.ResearchPlus => "Mr.Qi mode",
-                ModMode.BuySellPlus => "Jojo mode",
-                _ => "???"
+            return GetTranstationFunc(current)();
+        }
+
+        public static Func<string> GetTranstationFunc(ModMode mode) {
+
+            return mode switch {
+                ModMode.Research => I18n.ModMode_Research,
+                ModMode.BuySell => I18n.ModMode_BuySell,
+                ModMode.Combined => I18n.ModMode_Combined,
+                ModMode.ResearchPlus => I18n.ModMode_ResearchPlus,
+                ModMode.BuySellPlus => I18n.ModMode_BuySellPlus,
+                _ => throw new NotImplementedException(),
             };
         }
     }

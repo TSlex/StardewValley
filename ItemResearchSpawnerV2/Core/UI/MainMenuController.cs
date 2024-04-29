@@ -50,7 +50,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 LastSearchQuery = SearchBar.Text;
                 ModManager.Instance.SearchText = SearchBar.Text;
 
-                if (ModManager.Instance.Config.EnableSounds) {
+                if (ModManager.Instance.Config.GetEnableSounds()) {
                     Game1.playSound("drumkit6");
                 }
 
@@ -224,7 +224,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (rebuild) {
                 ProgressionItems = ModManager.Instance.GetProgressionItems().Where(i => !i.Forbidden).ToList();
 
-                if (!ModManager.Instance.Config.ShowMissingItems) {
+                if (!ModManager.Instance.Config.GetShowMissingItems()) {
                     ProgressionItems = ModManager.Instance.GetProgressionItems().Where(i => !i.Missing).ToList();
                 }
 
@@ -244,7 +244,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (filter) {
                 FilterProgressionItems();
                 ItemResearchArea.BookTurnRightRequested = true;
-                if (ModManager.Instance.Config.EnableSounds) {
+                if (ModManager.Instance.Config.GetEnableSounds()) {
                     Game1.playSound("newRecipe");
                 }
             }
@@ -400,7 +400,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
                 if (itemClicked2) {
                     SetSortOption(SortDropdown.Selected);
-                    if (ModManager.Instance.Config.EnableSounds) {
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("drumkit6");
                     }
                 }
@@ -412,7 +412,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
                 if (itemClicked1) {
                     SetCategory(CategoryDropdown.Selected);
-                    if (ModManager.Instance.Config.EnableSounds) {
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("drumkit6");
                     }
                 }
@@ -476,7 +476,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (CategoryDropdown.IsExpanded || CategoryDropdown.containsPoint(x, y)) {
                 if (CategoryDropdown.Selected != I18n.Category_All()) {
                     SetCategory(I18n.Category_All());
-                    if (ModManager.Instance.Config.EnableSounds) {
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("smallSelect");
                     }
                 }
@@ -485,7 +485,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             else if (SortDropdown.IsExpanded || SortDropdown.containsPoint(x, y)) {
                 if (SortDropdown.Selected != I18n.Sort_ByCategoryAsc()) {
                     SetSortOption(I18n.Sort_ByCategoryAsc());
-                    if (ModManager.Instance.Config.EnableSounds) {
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("smallSelect");
                     }
                 }
@@ -618,7 +618,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (direction < 0 && ShowLeftButton) {
                 TopRowIndex -= 1;
                 ItemResearchArea.BookTurnLeftRequested = true;
-                if (ModManager.Instance.Config.EnableSounds) {
+                if (ModManager.Instance.Config.GetEnableSounds()) {
                     Game1.playSound("newRecipe");
                 }
                 UpdateView();
@@ -626,7 +626,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             else if (direction > 0 && ShowRightButton) {
                 TopRowIndex += 1;
                 ItemResearchArea.BookTurnRightRequested = true;
-                if (ModManager.Instance.Config.EnableSounds) {
+                if (ModManager.Instance.Config.GetEnableSounds()) {
                     Game1.playSound("newRecipe");
                 }
                 UpdateView();
