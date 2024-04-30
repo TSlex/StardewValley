@@ -56,6 +56,9 @@
   "ui.research-completed": "research completed",
   "ui.research-impossible": "forbidden item",
 
+  "ui.price-tooltip.buy": "(Buy)",
+  "ui.price-tooltip.sell": "(Sell)",
+
   //modes
   "mod-mode.research": "Research (Spawn) mode",
   "mod-mode.buy-sell": "Buy/Sell mode",

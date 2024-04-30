@@ -56,6 +56,9 @@
   "ui.research-completed": "исследование завершено",
   "ui.research-impossible": "запрещенный предмет",
 
+  "ui.price-tooltip.buy": "(Куплю)",
+  "ui.price-tooltip.sell": "(Продам)",
+
   //modes
   "mod-mode.research": "Режим исследователя",
   "mod-mode.buy-sell": "Режим покупки-прожажи",

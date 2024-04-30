@@ -116,21 +116,35 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     //pi.Item.Item = pi.Item.CreateItem();
                     pi.Item.Item = pi.InstanciateItem();
 
-                    var availableQuality = pi.GetAvailableQuality(ModManager.Instance.ItemQuality);
+
+                    var availableQuality = ItemQuality.Normal;
+                    var availableQuantity = pi.GameItem.maximumStackSize();
+
+                    if (ModManager.Instance.ModMode == ModMode.Research || ModManager.Instance.ModMode == ModMode.ResearchPlus) {
+                        availableQuality = pi.GetAvailableQuality(ModManager.Instance.ItemQuality);
+                        availableQuantity = pi.GameItem.maximumStackSize();
+                    }
+                    else {
+                        availableQuantity = pi.GetAvailableQuantity(Game1.player._money, ModManager.Instance.ItemQuality, out availableQuality);
+                    }
+                    
 
                     pi.GameItem.Quality = (int)availableQuality;
 
                     pi.Stack = ModManager.Instance.ModMode switch {
-                        ModMode.BuySell => pi.GameItem.maximumStackSize(),
-                        ModMode.Combined => pi.GameItem.maximumStackSize(),
-                        ModMode.BuySellPlus => pi.GameItem.maximumStackSize(),
+                        ModMode.BuySell => availableQuantity,
+                        ModMode.Combined => availableQuantity,
+                        ModMode.BuySellPlus => availableQuantity,
                         _ => pi.GameItem.maximumStackSize()
                     };
 
                     yield return pi;
 
-                    if (availableQuality != ModManager.Instance.ItemQuality && ModManager.Instance.ProgressionDisplay != ProgressionDisplayMode.ResearchedOnly) {
-                        // var pi_c = ModManager.ProgressionManagerInstance.GetProgressionItem(pi.GameItem);
+                    if (availableQuality != ModManager.Instance.ItemQuality 
+                        && ModManager.Instance.ProgressionDisplay != ProgressionDisplayMode.ResearchedOnly
+                        && pi.BaseResearchCompleted && !pi.NormalQualityForced
+                        ) {
+
                         var pi_c = new ProgressionItem(pi.Item.ShallowClone(), pi.SaveData, pi.Category, pi.Price);
 
                         pi_c.Item.Item = pi_c.InstanciateItem();
@@ -205,7 +219,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     break;
             }
 
-            items = items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
+            items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
 
             switch (ModManager.Instance.ProgressionDisplay) {
                 case ProgressionDisplayMode.ResearchStarted:
@@ -225,7 +239,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 ProgressionItems = ModManager.Instance.GetProgressionItems().Where(i => !i.Forbidden).ToList();
 
                 if (!ModManager.Instance.Config.GetShowMissingItems()) {
-                    ProgressionItems = ModManager.Instance.GetProgressionItems().Where(i => !i.Missing).ToList();
+                    ProgressionItems = ProgressionItems.Where(i => !i.Missing).ToList();
                 }
 
                 FilterProgressionItems();

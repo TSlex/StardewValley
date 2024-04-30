@@ -30,7 +30,9 @@ namespace ItemResearchSpawnerV2.Core {
         public string SelectedCategory = I18n.Category_All();
         public string SortOption = ItemSortOption.CategoryDESC.GetString();
         public string SearchText = "";
-        public ModMode ModMode = ModMode.Research;
+
+        public ModMode ModMode => Config.DefaultMode;
+
         public ItemQuality ItemQuality = ItemQuality.Normal;
         public FavoriteDisplayMode FavoriteDisplay = FavoriteDisplayMode.All;
         public ProgressionDisplayMode ProgressionDisplay = ProgressionDisplayMode.ResearchedOnly;
@@ -137,32 +139,56 @@ namespace ItemResearchSpawnerV2.Core {
             Game1.player._money += GetItemSellPrice(item, true);
         }
 
+        // -----------------------------------------------------------------
+
         public (int buy, int sell) GetItemPrices(Item item, bool countStack = false) {
 
-            var price = GetItemPrice(item, false);
+            return GetItemPrices(ProgressionManager.GetProgressionItem(item), countStack);
+        }
 
-            var buyPrice = (int)MathF.Round(price * Config.GetBuyPriceMultiplier());
-            buyPrice = buyPrice >= 0 ? buyPrice : 0;
+        public (int buy, int sell) GetItemPrices(ProgressionItem item, bool countStack = false) {
 
-            var sellPrice = (int)MathF.Round(price * Config.GetSellPriceMultiplier());
-            sellPrice = sellPrice >= 0 ? sellPrice : 0;
+            //var price = GetItemPrice(item, false);
 
-            if (countStack) {
-                buyPrice *= item.Stack;
-                sellPrice *= item.Stack;
-            }
+            //var buyPrice = (int)MathF.Round(price * Config.GetBuyPriceMultiplier());
+            //buyPrice = buyPrice >= 0 ? buyPrice : 0;
 
+            //var sellPrice = (int)MathF.Round(price * Config.GetSellPriceMultiplier());
+            //sellPrice = sellPrice >= 0 ? sellPrice : 0;
+
+            //if (countStack) {
+            //    buyPrice *= item.GameItem.Stack;
+            //    sellPrice *= item.GameItem.Stack;
+            //}
+
+            var buyPrice = GetItemBuyPrice(item, countStack);
+            var sellPrice = GetItemSellPrice(item, countStack);
 
             return new(buyPrice, sellPrice);
         }
 
         public int GetItemBuyPrice(Item item, bool countStack = false) {
+
+            return GetItemBuyPrice(ProgressionManager.GetProgressionItem(item), countStack);
+        }
+
+        public int GetItemBuyPrice(ProgressionItem item, bool countStack = false) {
             var buyPrice = GetItemPrice(item, countStack, Config.GetBuyPriceMultiplier());
 
             return buyPrice >= 0 ? buyPrice : 0;
         }
 
         public int GetItemSellPrice(Item item, bool countStack = false) {
+
+            return GetItemSellPrice(ProgressionManager.GetProgressionItem(item), countStack);
+        }
+
+        public int GetItemSellPrice(ProgressionItem item, bool countStack = false) {
+
+            if (ModMode == ModMode.BuySellPlus) {
+                return 1;
+            }
+
             var sellPrice = GetItemPrice(item, countStack, Config.GetSellPriceMultiplier());
 
             return sellPrice >= 0 ? sellPrice : 0;
@@ -170,34 +196,19 @@ namespace ItemResearchSpawnerV2.Core {
 
         public int GetItemPrice(Item item, bool countStack = false, float multiplyBy = 1.0f) {
 
-            item.Stack = item.Stack > 0 ? item.Stack : 1;
+            return GetItemPrice(ProgressionManager.GetProgressionItem(item), countStack, multiplyBy);
+        }
 
-            //var spawnableItem = GetSpawnableItem(item, out var key);
+        public int GetItemPrice(ProgressionItem item, bool countStack = false, float multiplyBy = 1.0f) {
 
-            //if (spawnableItem == null) {
-            //    return 0;
-            //}
-
-            var price = -1;
-
-            //if (_pricelist.ContainsKey(key)) {
-            //    price = _pricelist[key];
-            //}
-
-            if (price < 0) {
-                price = Utility.getSellToStorePriceOfItem(item, false);
-            }
-
-            //if (price <= 0 && !_pricelist.ContainsKey(key)) {
-            //    price = spawnableItem.CategoryPrice;
-            //}
+            var price = item.Price;
 
             if (multiplyBy != 1.0f) {
                 price = (int)MathF.Round(price * multiplyBy);
             }
 
             if (countStack) {
-                price *= item.Stack;
+                price *= item.GameItem.Stack;
             }
 
             return price;

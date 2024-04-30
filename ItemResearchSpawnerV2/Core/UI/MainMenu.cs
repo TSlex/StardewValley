@@ -7,6 +7,8 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 using System;
+using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.UI {
@@ -23,6 +25,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         protected readonly Dropdown SortDropdown;
         protected readonly SearchBar SearchBar;
         protected readonly ItemResearchArea ItemResearchArea;
+        protected readonly ItemMoneyTooltip MoneyTooltip;
 
         protected readonly ClickableTextureComponent LeftArrow;
         protected readonly ClickableTextureComponent RightArrow;
@@ -106,6 +109,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
             RightArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8,
                 yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
                 Game1.mouseCursors, new Rectangle(366, 495, 11, 10), 4f);
+
+            MoneyTooltip = new ItemMoneyTooltip();
         }
 
         public override void draw(SpriteBatch b) {
@@ -180,6 +185,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
             // ----------------------------------------------------
 
             drawMouse(b);
+
+            if (ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus) {
+                MoneyTooltip.Draw(b, hoveredItem);
+            }
         }
 
         protected void DrawCreativeMenu(SpriteBatch b) {
@@ -326,10 +335,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             if (hoveredItem != null) {
+                //drawToolTip(b, CreativeMenu.descriptionText, CreativeMenu.descriptionTitle, hoveredItem, heldItem != null,
+                //    currencySymbol: 0, moneyAmountToShowAtBottom: 100);
+
                 drawToolTip(b, hoveredItem.getDescription(), hoveredItem.DisplayName, hoveredItem, heldItem != null);
-            }
-            else if (hoveredItem != null) {
-                drawToolTip(b, CreativeMenu.descriptionText, CreativeMenu.descriptionTitle, hoveredItem, heldItem != null);
+
+                //drawHoverText(b, "Aboba", Game1.smallFont);
             }
 
             heldItem?.drawInMenu(b, new Vector2(Game1.getOldMouseX() + 8, Game1.getOldMouseY() + 8), 1f);

@@ -88,7 +88,7 @@ namespace ItemResearchSpawnerV2.Core {
             }
         }
 
-        public ProgressionItem GetProgressionItem(Item item) {
+        public SpawnableItem GetSpawnableItem(Item item) {
             var key = CommonHelper.GetItemUniqueKey(item);
 
             var possibleItem = ModManager.Instance.ItemRegistry
@@ -98,19 +98,23 @@ namespace ItemResearchSpawnerV2.Core {
             possibleItem ??= new SpawnableItem("", "", (item) => new MissingItem(key));
 
             if (possibleItem == null) {
-                return GetProgressionItem(new SpawnableItem("", "", (item) => new MissingItem(key)));
+                return new SpawnableItem("", "", (item) => new MissingItem(key));
             }
 
             // fix pre SDV1.6 items with different unique key...
             item.Name = possibleItem.Item.Name;
             item.ParentSheetIndex = possibleItem.Item.ParentSheetIndex;
 
-            var spawnableItem = new SpawnableItem(possibleItem) {
+            return new SpawnableItem(possibleItem) {
                 Item = item,
             };
-
-            return GetProgressionItem(spawnableItem);
         }
+
+        public ProgressionItem GetProgressionItem(Item item) {
+
+            return GetProgressionItem(GetSpawnableItem(item));
+        }
+
         public ProgressionItem GetProgressionItem(SpawnableItem item) {
 
             var category = Categories.FirstOrDefault(rule => rule.IsMatch(item));
@@ -122,8 +126,38 @@ namespace ItemResearchSpawnerV2.Core {
                 BaseResearchCount = item.Forbidden ? -1 : category.ResearchCount
             };
 
-            var itemPrice = ModManager.Instance.GetItemBuyPrice(item.Item);
+            if (ModManager.Instance.ModMode == ModMode.ResearchPlus || ModManager.Instance.ModMode == ModMode.BuySellPlus) {
+                itemCategory.BaseResearchCount = 0;
+            }
+
+            var itemPrice = Utility.getSellToStorePriceOfItem(item.Item, false);
             itemPrice = itemPrice <= 0 ? category.BaseCost : itemPrice;
+
+            if (ModManager.Instance.ModMode == ModMode.BuySellPlus) {
+                itemPrice = itemPrice * 5;
+
+                if (itemPrice <= 1000) {
+                    itemPrice = 1000;
+                }
+                else if (itemPrice <= 2500) {
+                    itemPrice = 2500;
+                }
+                else if (itemPrice <= 5000) {
+                    itemPrice = 5000;
+                }
+                else if (itemPrice <= 10000) {
+                    itemPrice = 10000;
+                }
+                else if (itemPrice <= 25000) {
+                    itemPrice = 25000;
+                }
+                else if (itemPrice <= 50000) {
+                    itemPrice = 50000;
+                }
+                else {
+                    itemPrice = 100000;
+                }
+            }
 
             var progressionData = GetProgressionDataOrDefault(item.Item);
 

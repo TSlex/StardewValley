@@ -38,6 +38,8 @@ namespace ItemResearchSpawnerV2.Models {
         public bool Missing => GameItem is MissingItem;
         public bool CannotResearch => Forbidden || Missing;
 
+        public bool NormalQualityForced => (Item.Item as SObject)?.Quality == null;
+
         public int Stack { get => Item.Item.Stack; set => Item.Item.Stack = value; }
 
         public ItemQuality Quality => (ItemQuality)((Item.Item as SObject)?.Quality ?? 0);
@@ -89,6 +91,10 @@ namespace ItemResearchSpawnerV2.Models {
         }
 
         public ItemQuality GetAvailableQuality(ItemQuality requestedQuality) {
+            if (NormalQualityForced) {
+                return ItemQuality.Normal;
+            }
+
             while (true) {
                 switch (requestedQuality) {
                     case ItemQuality.Silver:

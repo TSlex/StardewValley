@@ -29,6 +29,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
     internal class SpawnableItem {
 
         public bool Forbidden = false;
+        public bool NormalQualityForced = false;
 
         /*********
         ** Accessors
@@ -65,6 +66,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
         public string DisplayName => Item.DisplayName;
 
 
+
         /*********
         ** Public methods
         *********/
@@ -79,6 +81,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
             CreateItem = () => createItem(this);
             Item = createItem(this);
             Forbidden = false;
+            NormalQualityForced = false;
         }
 
         /// <summary>Construct an instance.</summary>
@@ -90,6 +93,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
             CreateItem = item.CreateItem;
             Item = item.Item;
             Forbidden = item.Forbidden;
+            NormalQualityForced = item.NormalQualityForced;
         }
 
         /// <summary>Get whether the item name contains a case-insensitive substring.</summary>
