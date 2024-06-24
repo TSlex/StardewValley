@@ -19,15 +19,21 @@ namespace ItemResearchSpawnerV2.Core {
         public CommandManager() {
             Helper.ConsoleCommands.Add("rns_unlock_all", I18n.Command_UnlockAll_Desc(), UnlockAllProgression);
             Helper.ConsoleCommands.Add("rns_unlock_active", I18n.Command_UnlockActive_Desc(), UnlockActiveProgression);
+
             Helper.ConsoleCommands.Add("rns_set_mode", I18n.Command_SetMode_Desc(), SetMode);
+
             Helper.ConsoleCommands.Add("rns_set_price", I18n.Command_SetPrice_Desc(), SetPrice);
             Helper.ConsoleCommands.Add("rns_reset_price", I18n.Command_ResetPrice_Desc(), ResetPrice);
 
             Helper.ConsoleCommands.Add("rns_get_key", I18n.Command_SetMode_Desc(), GetUniqueKey);
+
             Helper.ConsoleCommands.Add("rns_dump_progression", I18n.Command_SetMode_Desc(), DumpProgression);
             Helper.ConsoleCommands.Add("rns_load_progression", I18n.Command_SetMode_Desc(), LoadProgression);
+
             Helper.ConsoleCommands.Add("rns_dump_pricelist", I18n.Command_SetMode_Desc(), DumpPricelist);
             Helper.ConsoleCommands.Add("rns_load_pricelist", I18n.Command_SetMode_Desc(), LoadPricelist);
+
+
             Helper.ConsoleCommands.Add("rns_dump_categories", I18n.Command_SetMode_Desc(), DumpCategories);
             Helper.ConsoleCommands.Add("rns_load_categories", I18n.Command_SetMode_Desc(), LoadCategories);
         }

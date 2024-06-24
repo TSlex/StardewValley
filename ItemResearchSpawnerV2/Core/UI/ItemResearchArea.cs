@@ -1,4 +1,5 @@
-﻿using ItemResearchSpawnerV2.Core.Utils;
+﻿using ItemResearchSpawnerV2.Core.Data.Enums;
+using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -243,6 +244,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             ResearchArea.bounds.X = GetXPos();
             ResearchArea.bounds.Y = GetYPos();
+
+            if (ModManager.Instance.ModMode == ModMode.Research || ModManager.Instance.ModMode == ModMode.ResearchPlus) {
+                ResearchArea.bounds.Y -= 48;
+                ResearchButton.BaseYOff = -48;
+            }
 
             //var buttonNewLocation = new Rectangle(
             //        DrawHelper.GetChildCenterPosition(GetXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),

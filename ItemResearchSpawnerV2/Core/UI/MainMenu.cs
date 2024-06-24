@@ -131,7 +131,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
             DrawCreativeMenu(b);
             CreativeMenu.RecreateItemSlots();
 
-            CashTab.Draw(b);
+            if (ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus) {
+                CashTab.Draw(b);
+            }
+
             QualityButton.Draw(b);
             FavoriteButton.Draw(b);
             DisplayButton.Draw(b);

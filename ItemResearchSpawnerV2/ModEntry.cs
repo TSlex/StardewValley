@@ -3,7 +3,10 @@ using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Menus;
+using System.Reflection;
 
 
 namespace ItemResearchSpawnerV2 {
@@ -54,9 +57,25 @@ namespace ItemResearchSpawnerV2 {
 
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
+
         }
 
         // =======================================================================================================
+
+        private void HandleChatMessage(TextBox sender) {
+            var messages = (List<ChatMessage>)typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Game1.chatBox);
+
+            if (messages.Count <= 0) {
+                return;
+            }
+
+            var lastMessage = messages.Select((m, i) => (message: m.message.FirstOrDefault()?.message ?? "", index: i)).Last();
+            var formattedMessage = lastMessage.message.Trim().Split(":").Last().Trim();
+
+            if (formattedMessage.StartsWith("!rns")) {
+                Monitor.Log(formattedMessage);
+            }
+        }
 
         public void OnConfigChange() {
 
@@ -92,6 +111,8 @@ namespace ItemResearchSpawnerV2 {
         private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e) {
             Manager.Config = Config;
             IsSaveActive = false;
+
+            Game1.chatBox.chatBox.OnEnterPressed -= HandleChatMessage;
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e) {
@@ -112,6 +133,8 @@ namespace ItemResearchSpawnerV2 {
             }
 
             Manager.OnLoad();
+
+            Game1.chatBox.chatBox.OnEnterPressed += HandleChatMessage;
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
@@ -120,9 +143,16 @@ namespace ItemResearchSpawnerV2 {
             if (!Context.IsWorldReady || !Context.IsPlayerFree || !Context.CanPlayerMove)
                 return;
 
-            if (Game1.player.ActiveItem != null) {
-                Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
-            }
+            //if (Game1.options.chatButton.Any(k => KeybindList.ForSingle(k.ToSButton()).JustPressed())){
+            //}
+
+            //if (KeybindList.ForSingle(SButton.Enter).JustPressed()) {
+            //    Monitor.Log(Game1.chatBox.chatBox.Text);
+            //}
+
+            //if (Game1.player.ActiveItem != null) {
+            //    Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
+            //}
 
             // print button presses to the console window
             // this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);

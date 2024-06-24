@@ -4,6 +4,7 @@ using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Core.UI;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -24,6 +25,8 @@ namespace ItemResearchSpawnerV2.Core {
         public readonly SaveManager SaveManager;
         public readonly CommandManager CommandManager;
 
+        public readonly Texture2D UITexture;
+        public static Texture2D UITextureInstance => Instance.UITexture;
 
         public readonly Dictionary<string, SpawnableItem> ItemRegistry = new Dictionary<string, SpawnableItem>();
 
@@ -55,6 +58,8 @@ namespace ItemResearchSpawnerV2.Core {
             Config = config;
             Monitor = monitor;
             Manifest = manifest;
+
+            UITexture = helper.ModContent.Load<Texture2D>(UIConstants.UISheet);
 
             ProgressionManager = new ProgressionManager();
             SaveManager = new SaveManager();

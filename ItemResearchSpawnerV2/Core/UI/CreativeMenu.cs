@@ -192,8 +192,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         Game1.smallFont, location + new Vector2(Game1.smallFont.MeasureString(progressText).X * 0.01f + 17f, 32 / 2 + 4f),
                         Color.Gold, Color.Red * 0.5f, 0.9f);
                 }
-                else { 
-                    actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw, Color.White * opacity, flag); 
+                else {
+                    actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw, Color.White * opacity, flag);
                 }
 
                 //actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw_OneInclusive, Color.White * opacity, flag);

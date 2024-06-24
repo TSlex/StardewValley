@@ -11,8 +11,10 @@ namespace ItemResearchSpawnerV2.Components.UI {
         private readonly Func<int> GetXPos;
         private readonly Func<int> GetYPos;
 
-        protected int BaseWidth;
-        protected int BaseHeight;
+        public int BaseWidth;
+        public int BaseHeight;
+        public int BaseXOff;
+        public int BaseYOff;
 
         public ClickableComponent Component;
         public Rectangle Bounds => Component.bounds;
@@ -48,8 +50,8 @@ namespace ItemResearchSpawnerV2.Components.UI {
             var offX = (BaseWidth - scaledWidth) / 2;
             var offY = (BaseHeight - scaledHeight) / 2;
 
-            Component.bounds.X = GetXPos() + offX;
-            Component.bounds.Y = GetYPos() + offY;
+            Component.bounds.X = GetXPos() + offX + BaseXOff;
+            Component.bounds.Y = GetYPos() + offY + BaseYOff;
 
             Component.bounds.Width = scaledWidth;
             Component.bounds.Height = scaledHeight;

@@ -219,7 +219,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     break;
             }
 
-            items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
+            items = items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
 
             switch (ModManager.Instance.ProgressionDisplay) {
                 case ProgressionDisplayMode.ResearchStarted:

@@ -24,12 +24,12 @@ namespace ItemResearchSpawnerV2.Models {
         public int CurrentResearchAmount => GetResearchProgress(Quality);
         public int ResearchLeftAmount => RequiredResearch - CurrentResearchAmount;
         public bool ResearchCompleted => ResearchLeftAmount <= 0;
-        public bool ResearchStarted => !ResearchCompleted && ResearchLeftAmount < RequiredResearch;
+        public bool ResearchStarted => ResearchLeftAmount < RequiredResearch && ResearchLeftAmount > 0;
 
         public int BaseResearchAmount => GetResearchProgress(ItemQuality.Normal);
         public int BaseResearchLeftAmount => RequiredResearch - BaseResearchAmount;
         public bool BaseResearchCompleted => BaseResearchLeftAmount <= 0;
-        public bool BaseResearchStarted => !BaseResearchCompleted && BaseResearchLeftAmount < RequiredResearch;
+        public bool BaseResearchStarted => BaseResearchLeftAmount < RequiredResearch && BaseResearchLeftAmount > 0;
 
         public int ResearchPerc => (int)((CurrentResearchAmount * 1f) / (RequiredResearch * 1f) * 100f);
 
