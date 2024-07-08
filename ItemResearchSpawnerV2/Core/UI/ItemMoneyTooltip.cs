@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Monsters;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ItemResearchSpawnerV2.Core.UI {
 
@@ -25,29 +26,40 @@ namespace ItemResearchSpawnerV2.Core.UI {
             string costText;
 
             if (prices.buy == prices.sell) {
-                costText = hoveredItem.Stack > 1 ? $"{prices.buy * hoveredItem.Stack}({prices.buy})" : $"{prices.buy}";
+                costText = hoveredItem.Stack > 1 ? $"{prices.buy * hoveredItem.Stack} ({prices.buy})" : $"{prices.buy}";
             }
             else {
                 costText = hoveredItem.Stack > 1 ?
-                    $"{I18n.Ui_PriceTooltip_Buy()} {prices.buy * hoveredItem.Stack}({prices.buy}) \n{I18n.Ui_PriceTooltip_Sell()} {prices.sell * hoveredItem.Stack}({prices.sell})" :
+                    $"{I18n.Ui_PriceTooltip_Buy()} {prices.buy * hoveredItem.Stack} ({prices.buy}) \n{I18n.Ui_PriceTooltip_Sell()} {prices.sell * hoveredItem.Stack} ({prices.sell})" :
                     $"{I18n.Ui_PriceTooltip_Buy()} {prices.buy} \n{I18n.Ui_PriceTooltip_Sell()} {prices.sell}";
             }
 
             //var costText = "0";
 
             var mousePos = Game1.getMousePosition();
-            var basePosition = new Vector2(mousePos.X, mousePos.Y) + new Vector2(-38, 0);
 
-            var textOffsetX = CoinTexture.Width * Game1.pixelZoom + 5;
+            var textOffsetX = UIConstants.CoinIcon.Width + 4 * 1;
             var textWidth = Game1.smallFont.MeasureString(costText).X;
+            var boxWidth = textWidth + CoinTexture.Width;
 
-            var boxWidth = textWidth + UIConstants.BorderWidth * 2 + CoinTexture.Width;
+            //var boxPosX = mousePos.X - boxWidth / 2 + 4 * 12;
+            var boxPosX = mousePos.X - 4 * 16;
+            var boxPosY = mousePos.Y - 4 * 1;
+
+            //boxPosX = boxPosX < 250 ? 250 : boxPosX;
+
+            var basePosition = new Vector2(boxPosX, boxPosY);
+            var bounds = Game1.smallFont.MeasureString(costText);
 
             DrawHelper.DrawTextMenuBox((int)(basePosition.X - boxWidth), (int)(basePosition.Y - 40),
-                Game1.smallFont, costText, textOffsetX);
+                Game1.smallFont, costText, textOffsetX, paddingY: 4 * 2 + 1, paddingX: 4 * 2);
 
-            Utility.drawWithShadow(b, CoinTexture, basePosition + new Vector2(-boxWidth + 16, -24),
-                CoinTexture.Bounds, Color.White, 0f, Vector2.Zero, shadowIntensity: 0f);
+            b.Draw(ModManager.UITextureInstance, basePosition + new Vector2(-boxWidth + 4 * 2, -4 * 10 - 1 + bounds.Y / 4),
+                UIConstants.CoinIcon, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
+
+
+            //Utility.drawWithShadow(b, CoinTexture, basePosition + new Vector2(-boxWidth + 16, -24),
+            //    CoinTexture.Bounds, Color.White, 0f, Vector2.Zero, shadowIntensity: 0f);
         }
     }
 }

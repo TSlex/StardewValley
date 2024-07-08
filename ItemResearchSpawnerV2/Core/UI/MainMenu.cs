@@ -17,10 +17,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
         protected readonly CreativeMenu CreativeMenu;
 
         protected readonly CashTab CashTab;
-        protected readonly QualityButton QualityButton;
-        protected readonly FavoriteButton FavoriteButton;
-        protected readonly DisplayButton DisplayButton;
-        protected readonly SettingsButton SettingsButton;
+
+        protected readonly QualityBookmarkButton QualityButton;
+        protected readonly FavoriteBookmarkButton FavoriteButton;
+        protected readonly ProgressBookmarkButton ProgressButton;
+        //protected readonly SettingsButton SettingsButton;
+
         protected readonly Dropdown CategoryDropdown;
         protected readonly Dropdown SortDropdown;
         protected readonly SearchBar SearchBar;
@@ -66,8 +68,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             xPositionOnScreen -= 32;
             inventory.xPositionOnScreen -= 32;
+            //inventory.yPositionOnScreen += 32;
+
             foreach (var item in inventory.inventory) {
                 item.bounds.X -= 32;
+                //item.bounds.Y += 32;
             }
 
 
@@ -76,7 +81,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
 
             CreativeMenu = new(ItemsToGrabMenu) {
-                rows = 4
+                rows = 4,
             };
             CreativeMenu.capacity = CreativeMenu.rows * 4;
             CreativeMenu.verticalGap += 40;
@@ -85,29 +90,39 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // ----------------------------------------------------
 
-            CashTab = new CashTab(() => xPositionOnScreen + width - borderWidth + 10, () => yPositionOnScreen - borderWidth + 16, 180);
+            CashTab = new CashTab(() => xPositionOnScreen + width - borderWidth + 12,
+                () => yPositionOnScreen - borderWidth + 16 - 24,
+                192);
 
-            QualityButton = new QualityButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4);
-            FavoriteButton = new FavoriteButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72);
-            DisplayButton = new DisplayButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 2);
-            SettingsButton = new SettingsButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3);
+            QualityButton = new QualityBookmarkButton(() => xPositionOnScreen - borderWidth - 4 * 14, () => yPositionOnScreen - borderWidth / 2 + 4 * 6);
+            FavoriteButton = new FavoriteBookmarkButton(() => xPositionOnScreen - borderWidth - 4 * 14, () => yPositionOnScreen - borderWidth / 2 + 4 * 23);
+            ProgressButton = new ProgressBookmarkButton(() => xPositionOnScreen - borderWidth - 4 * 14, () => yPositionOnScreen - borderWidth / 2 + 4 * 40);
 
-            SortDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
+            //QualityButton = new QualityButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4);
+            //FavoriteButton = new FavoriteButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72);
+            //DisplayButton = new DisplayButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 2);
+            //SettingsButton = new SettingsButton(() => xPositionOnScreen - borderWidth - 40, () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3);
+
+            SortDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40,
+                () => yPositionOnScreen - borderWidth / 2 - 4 - 64 - 24,
                 Game1.smallFont, ItemSortOption.CategoryASC.GetString(),
                 Enum.GetValues(typeof(ItemSortOption)).Cast<ItemSortOption>().Select(option => option.GetString()).ToArray(),
                 p => p, tabWidth: 236);
 
-            CategoryDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40 + 236 + 36, () => yPositionOnScreen - borderWidth / 2 - 4 - 64,
+            CategoryDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40 + 236 + 36,
+                () => yPositionOnScreen - borderWidth / 2 - 4 - 64 - 24,
                 Game1.smallFont, I18n.Category_All(), new[] { I18n.Category_All() }, p => p, tabWidth: 336);
 
-            SearchBar = new SearchBar(() => xPositionOnScreen - borderWidth - 40 + 500 + 72 * 2, () => yPositionOnScreen - borderWidth / 2 - 4 - 64, 464);
+            SearchBar = new SearchBar(() => xPositionOnScreen - borderWidth - 40 + 500 + 72 * 2,
+                () => yPositionOnScreen - borderWidth / 2 - 4 - 64 - 24, 464);
+
             ItemResearchArea = new ItemResearchArea(() => xPositionOnScreen + width - borderWidth + 10, () => yPositionOnScreen - borderWidth + 88, 180);
 
-            LeftArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + 20,
-                yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
+            LeftArrow = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + 20, yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
                 Game1.mouseCursors, new Rectangle(353, 495, 11, 10), 4f);
-            RightArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8,
-                yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
+            RightArrow = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8, yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
                 Game1.mouseCursors, new Rectangle(366, 495, 11, 10), 4f);
 
             MoneyTooltip = new ItemMoneyTooltip();
@@ -137,7 +152,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             QualityButton.Draw(b);
             FavoriteButton.Draw(b);
-            DisplayButton.Draw(b);
+            ProgressButton.Draw(b);
             //SettingsButton.Draw(b);
 
             SearchBar.Draw(b);
@@ -145,10 +160,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // ----------------------------------------------------
 
-            LeftArrow.bounds.Width = (int)(11 * 4f * (LeftButtonHovered ? 1.1f : 1f));
-            RightArrow.bounds.Width = (int)(11 * 4f * (RightButtonHovered ? 1.1f : 1f));
-            LeftArrow.bounds.Height = (int)(10 * 4f * (LeftButtonHovered ? 1.1f : 1f));
-            RightArrow.bounds.Height = (int)(10 * 4f * (RightButtonHovered ? 1.1f : 1f));
+            LeftArrow.bounds.Width = (int) (11 * 4f * (LeftButtonHovered ? 1.1f : 1f));
+            RightArrow.bounds.Width = (int) (11 * 4f * (RightButtonHovered ? 1.1f : 1f));
+            LeftArrow.bounds.Height = (int) (10 * 4f * (LeftButtonHovered ? 1.1f : 1f));
+            RightArrow.bounds.Height = (int) (10 * 4f * (RightButtonHovered ? 1.1f : 1f));
 
             LeftArrow.bounds.X = xPositionOnScreen + 20 - (LeftButtonHovered ? 4 : 0);
             LeftArrow.bounds.Y = yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4 - (LeftButtonHovered ? 4 : 0);
@@ -166,14 +181,14 @@ namespace ItemResearchSpawnerV2.Core.UI {
             var page_right = (TopRowIndex + 2).ToString();
             var font = Game1.smallFont;
 
-            Utility.drawTextWithColoredShadow(b, page_left, font,
-                new Vector2(LeftArrow.bounds.X + LeftArrow.bounds.Width + 170 - font.MeasureString(page_left).X / 2, LeftArrow.bounds.Y + 16),
-                Color.Black, Color.White * 1f, 0.7f);
+            Utility.drawTextWithShadow(b, page_left, font,
+                new Vector2(LeftArrow.bounds.X + LeftArrow.bounds.Width + 170 - font.MeasureString(page_left).X / 2 - 4 * 1 + 2, LeftArrow.bounds.Y - 4 * 2),
+                Color.Black);
 
 
-            Utility.drawTextWithColoredShadow(b, page_right.ToString(), font,
-                new Vector2(RightArrow.bounds.X - 160 - font.MeasureString(page_right).X / 2, RightArrow.bounds.Y + 16),
-                Color.Black, Color.White * 1f, 0.7f);
+            Utility.drawTextWithShadow(b, page_right.ToString(), font,
+                new Vector2(RightArrow.bounds.X - 160 - font.MeasureString(page_right).X / 2 - 4 * 2, RightArrow.bounds.Y - 4 * 2),
+                Color.Black);
 
 
             // ----------------------------------------------------
@@ -207,87 +222,29 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         protected void DrawCreativeMenuBackground(SpriteBatch b) {
-            DrawHelper.drawDialogueBox(
-            CreativeMenu.xPositionOnScreen - borderWidth - spaceToClearSideBorder,
-            CreativeMenu.yPositionOnScreen - borderWidth - spaceToClearTopBorder + storageSpaceTopBorderOffset,
-            CreativeMenu.width + borderWidth * 2 + spaceToClearSideBorder * 2,
-            CreativeMenu.height + spaceToClearTopBorder + borderWidth * 2 - storageSpaceTopBorderOffset,
-            speaker: false, drawOnlyBox: true, r: 255, b: 255, g: 255);
 
-
-            //Rectangle titleSafeArea = Game1.graphics.GraphicsDevice.Viewport.GetTitleSafeArea();
-
-            //int num = 0;
-            //int num2 = 0;
-            //int num3 = 0;
-            //int num4 = -1;
-
-            //width = Math.Min(titleSafeArea.Width, width);
-
-            //Rectangle value = new Rectangle(0, 0, 64, 64);
-
-            //int r = -1;
-            //int g = -1;
-            //int b = -1;
-
-            //int x = xPositionOnScreen;
-            //int y = yPositionOnScreen;
-
-            //value.X = 64;
-            //value.Y = 128;
-
-            //Color color = r == -1 ? Color.White : new Color(-1, -1, -1);
-
-            //var borderColor = r == -1 ? color : new Color((int)Utility.Lerp(r, Math.Min(255, r + 150), 0.65f), (int)Utility.Lerp(g, Math.Min(255, g + 150), 0.65f), (int)Utility.Lerp(b, Math.Min(255, b + 150), 0.65f));
-
-            //Texture2D texture = r == -1 ? Game1.menuTexture : Game1.uncoloredMenuTexture;
-
-            //Game1.spriteBatch.Draw(texture, new Rectangle(x + borderWidth - 28, y - 64, width - 64, height - 128 * 3), value, borderColor);
-
-            //value.Y = 0;
-            //value.X = 0;
-
-            //Game1.spriteBatch.Draw(texture, new Vector2(x + num, y - 64 * num4 + num2 + num3), value, color);
-
-            //value.X = 192;
-
-            //Game1.spriteBatch.Draw(texture, new Vector2(x + width + num - 64, y - 64 * num4 + num2 + num3), value, color);
-            //value.Y = 192;
-
-            //Game1.spriteBatch.Draw(texture, new Vector2(x + width + num - 64, y + height + num2 - 64 + num3), value, color);
-            //value.X = 0;
-
-            //Game1.spriteBatch.Draw(texture, new Vector2(x + num, y + height + num2 - 64 + num3), value, color);
-
-            //value.X = 128;
-            //value.Y = 0;
-            //Game1.spriteBatch.Draw(texture, new Rectangle(64 + x + num, y - 64 * num4 + num2 + num3, width - 128, 64), value, color);
-
-            //value.Y = 192;
-            //Game1.spriteBatch.Draw(texture, new Rectangle(64 + x + num, y + height + num2 - 64 + num3, width - 128, 64), value, color);
-
-            //value.Y = 128;
-            //value.X = 0;
-            //Game1.spriteBatch.Draw(texture, new Rectangle(x + num, y - 64 * num4 + num2 + 64 + num3, 64, height - 128 + num4 * 64), value, color);
-
-            //value.X = 192;
-            //Game1.spriteBatch.Draw(texture, new Rectangle(x + width + num - 64, y - 64 * num4 + num2 + 64 + num3, 64, height - 128 + num4 * 64), value, color);
-
-
-            //Game1.spriteBatch.Draw(Game1.uncoloredMenuTexture, 
-            //    new Vector2(CreativeMenu.xPositionOnScreen + CreativeMenu.width / 2 - 32, yPositionOnScreen + 64 + 16), 
-            //    new Rectangle(128, 384, 64, 64), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            var bookBaseRect = UIConstants.CreativeMenuBase;
+            var bookBaseFrame = UIConstants.CreativeMenuFrame;
 
             b.Draw(
-                    Game1.uncoloredMenuTexture,
-                    new Rectangle(CreativeMenu.xPositionOnScreen + CreativeMenu.width / 2 - 24, yPositionOnScreen - 12, 48, 256 + 8),
-                    new Rectangle(128, 384, 64, 64), Color.White
+                    ModManager.UITextureInstance,
+                    new Rectangle(
+                        CreativeMenu.xPositionOnScreen - 8 * 4,
+                        yPositionOnScreen - 18 * 4,
+                        bookBaseRect.Width, bookBaseRect.Height),
+                    bookBaseRect,
+                    Color.White
                 );
 
-
-            //b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 100, yPositionOnScreen + 64 + 16), new Rectangle(16, 368, 12, 16), Color.White, 4.712389f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
-            //b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 100, yPositionOnScreen + 64 - 16), new Rectangle(21, 368, 11, 16), Color.White, 4.712389f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
-            //b.Draw(Game1.mouseCursors, new Vector2(CreativeMenu.xPositionOnScreen - 84, yPositionOnScreen + 64 - 44), new Rectangle(146, 447, 11, 10), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
+            b.Draw(
+                    ModManager.UITextureInstance,
+                    new Rectangle(
+                        CreativeMenu.xPositionOnScreen - 24 * 4,
+                        yPositionOnScreen - 18 * 4,
+                        bookBaseFrame.Width, bookBaseFrame.Height),
+                    bookBaseFrame,
+                    ModManager.Instance.ModMode.GetColor()
+                );
         }
 
         protected void DrawInventoryMenu(SpriteBatch b) {

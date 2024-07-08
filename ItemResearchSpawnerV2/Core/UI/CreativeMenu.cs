@@ -74,6 +74,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public void RecreateItemSlots() {
             inventory.Clear();
 
+            yPositionOnScreen -= 10 * 4;
+
             var middleID = capacity / 2;
 
             for (int j = 0; j < capacity; j++) {
@@ -148,20 +150,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             var color = ((red == -1) ? Color.White : new Color(
-                    (int)Utility.Lerp(red, Math.Min(255, red + 150), 0.65f),
-                    (int)Utility.Lerp(green, Math.Min(255, green + 150), 0.65f),
-                    (int)Utility.Lerp(blue, Math.Min(255, blue + 150), 0.65f)));
+                    (int) Utility.Lerp(red, Math.Min(255, red + 150), 0.65f),
+                    (int) Utility.Lerp(green, Math.Min(255, green + 150), 0.65f),
+                    (int) Utility.Lerp(blue, Math.Min(255, blue + 150), 0.65f)));
 
-            var texture = Game1.mouseCursors;
+            var texture = ModManager.UITextureInstance;
 
             for (int j = 0; j < capacity; j++) {
 
                 var slot = inventory[j];
                 var location = new Vector2(slot.bounds.X, slot.bounds.Y);
 
-                var c = (ProgressionItems.ElementAtOrDefault(j)?.Favorited ?? false) ? Color.Red : Color.White;
+                var c = (ProgressionItems.ElementAtOrDefault(j)?.Favorited ?? false) ? Color.Gold * 0.5f : Color.White;
 
-                b.Draw(texture, location - new Vector2(12, 12), new Rectangle(648, 841, 30, 30), c, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0.5f);
+                //b.Draw(texture, location - new Vector2(12, 12), new Rectangle(648, 841, 30, 30), c, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0.5f);
+                b.Draw(texture, location - new Vector2(8, 8), UIConstants.ItemCell, c, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
 
                 if (actualInventory.Count <= j || actualInventory[j] == null) {
                     continue;
@@ -194,6 +197,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
                 else {
                     actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw, Color.White * opacity, flag);
+                }
+
+                if (ProgressionItems.ElementAtOrDefault(j)?.Favorited ?? false) {
+                    b.Draw(texture, location + new Vector2(4 * 12, 4 * -1), UIConstants.FavoriteItemIcon, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
                 }
 
                 //actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw_OneInclusive, Color.White * opacity, flag);
@@ -262,8 +269,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     return toAddTo;
                 }
 
-                if (actualInventory[num] is Tool tool && (toAddTo == null || toAddTo is SObject) && tool.canThisBeAttached((SObject)toAddTo)) {
-                    return tool.attach((SObject)toAddTo);
+                if (actualInventory[num] is Tool tool && (toAddTo == null || toAddTo is SObject) && tool.canThisBeAttached((SObject) toAddTo)) {
+                    return tool.attach((SObject) toAddTo);
                 }
 
                 if (onlyCheckToolAttachments) {
@@ -281,7 +288,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         {
                         new InputButton(Keys.LeftShift)
                         })) {
-                            one.Stack = (int)Math.Ceiling((double)actualInventory[num].Stack / 2.0);
+                            one.Stack = (int) Math.Ceiling((double) actualInventory[num].Stack / 2.0);
                             actualInventory[num].Stack = actualInventory[num].Stack / 2;
                         }
                         else if (actualInventory[num].Stack == 1) {
@@ -311,7 +318,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     {
                     new InputButton(Keys.LeftShift)
                     })) {
-                        int val = (int)Math.Ceiling((double)actualInventory[num].Stack / 2.0);
+                        int val = (int) Math.Ceiling((double) actualInventory[num].Stack / 2.0);
                         val = Math.Min(toAddTo.maximumStackSize() - toAddTo.Stack, val);
                         toAddTo.Stack += val;
                         actualInventory[num].Stack -= val;

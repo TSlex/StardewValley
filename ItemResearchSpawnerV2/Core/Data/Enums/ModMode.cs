@@ -1,4 +1,7 @@
-﻿namespace ItemResearchSpawnerV2.Core.Data.Enums {
+﻿using ItemResearchSpawnerV2.Core.UI;
+using Microsoft.Xna.Framework;
+
+namespace ItemResearchSpawnerV2.Core.Data.Enums {
     internal enum ModMode {
         Research,
         BuySell,
@@ -21,6 +24,19 @@
                 ModMode.Combined => I18n.ModMode_Combined,
                 ModMode.ResearchPlus => I18n.ModMode_ResearchPlus,
                 ModMode.BuySellPlus => I18n.ModMode_BuySellPlus,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        public static Color GetColor(this ModMode current)
+        {
+            return current switch
+            {
+                ModMode.Research => UIConstants.ResearchModeColor,
+                ModMode.BuySell => UIConstants.BuySellModeColor,
+                ModMode.Combined => UIConstants.CombinedModeColor,
+                ModMode.ResearchPlus => UIConstants.ResearchPlusModeColor,
+                ModMode.BuySellPlus => UIConstants.BuySellPlusModeColor,
                 _ => throw new NotImplementedException(),
             };
         }

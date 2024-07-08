@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using System.Text;
 using StardewValley.Menus;
 using ItemResearchSpawnerV2.Core.UI;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 
 namespace ItemResearchSpawnerV2.Core.Utils {
     internal static class DrawHelper {
@@ -26,8 +27,8 @@ namespace ItemResearchSpawnerV2.Core.Utils {
             int num3 = 0;
             width = Math.Min(titleSafeArea.Width, width);
             if (!Game1.isQuestion && Game1.currentSpeaker == null && Game1.currentObjectDialogue.Count > 0 && !drawOnlyBox) {
-                width = (int)Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).X + 128;
-                height = (int)Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y + 64;
+                width = (int) Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).X + 128;
+                height = (int) Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y + 64;
                 x = width2 / 2 - width / 2;
                 num3 = height > 256 ? -(height - 256) : 0;
             }
@@ -40,12 +41,12 @@ namespace ItemResearchSpawnerV2.Core.Utils {
 
             if (!drawOnlyBox && Game1.currentObjectDialogue.Count > 0) {
                 if (Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y >= height - 128) {
-                    num4 -= (int)((height - 128 - Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y) / 64f) - 1;
+                    num4 -= (int) ((height - 128 - Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y) / 64f) - 1;
                 }
                 else {
-                    height += (int)Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y / 2;
-                    num3 -= (int)Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y / 2;
-                    if ((int)Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y / 2 > 64) {
+                    height += (int) Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y / 2;
+                    num3 -= (int) Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y / 2;
+                    if ((int) Game1.dialogueFont.MeasureString(Game1.currentObjectDialogue.Peek()).Y / 2 > 64) {
                         num4 = 0;
                     }
                 }
@@ -62,7 +63,7 @@ namespace ItemResearchSpawnerV2.Core.Utils {
             value.Y = 128;
             Color color = r == -1 ? Color.White : new Color(r, g, b);
             Texture2D texture = r == -1 ? Game1.menuTexture : Game1.uncoloredMenuTexture;
-            Game1.spriteBatch.Draw(texture, new Rectangle(28 + x + num, 28 + y - 64 * num4 + num2 + num3, width - 64, height - 64 + num4 * 64), value, r == -1 ? color : new Color((int)Utility.Lerp(r, Math.Min(255, r + 150), 0.65f), (int)Utility.Lerp(g, Math.Min(255, g + 150), 0.65f), (int)Utility.Lerp(b, Math.Min(255, b + 150), 0.65f)));
+            Game1.spriteBatch.Draw(texture, new Rectangle(28 + x + num, 28 + y - 64 * num4 + num2 + num3, width - 64, height - 64 + num4 * 64), value, r == -1 ? color : new Color((int) Utility.Lerp(r, Math.Min(255, r + 150), 0.65f), (int) Utility.Lerp(g, Math.Min(255, g + 150), 0.65f), (int) Utility.Lerp(b, Math.Min(255, b + 150), 0.65f)));
             value.Y = 0;
             value.X = 0;
             Game1.spriteBatch.Draw(texture, new Vector2(x + num, y - 64 * num4 + num2 + num3), value, color);
@@ -166,7 +167,7 @@ namespace ItemResearchSpawnerV2.Core.Utils {
                         vector.Y = height2 - (5 + num4 + 1) * 64 + (text.Trim().Length > 0 ? Game1.dialogueFont.MeasureString(text).Y : 0f) + 128f + 48 * i - (16 + (Game1.questionChoices.Count - 2) * 64) + num2 + num3;
                         Game1.spriteBatch.End();
                         Game1.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp);
-                        Game1.spriteBatch.Draw(Game1.objectSpriteSheet, vector + new Vector2((float)Math.Cos(Game1.currentGameTime.TotalGameTime.Milliseconds * Math.PI / 512.0) * 3f, 0f), GameLocation.getSourceRectForObject(26), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
+                        Game1.spriteBatch.Draw(Game1.objectSpriteSheet, vector + new Vector2((float) Math.Cos(Game1.currentGameTime.TotalGameTime.Milliseconds * Math.PI / 512.0) * 3f, 0f), GameLocation.getSourceRectForObject(26), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
                         Game1.spriteBatch.End();
                         Game1.spriteBatch.Begin();
                         vector.X = 160 + num + x;
@@ -194,7 +195,7 @@ namespace ItemResearchSpawnerV2.Core.Utils {
             var stringWidth = font.MeasureString(truncatedString).X;
 
             var charWidth = font.MeasureString(fillWith).X;
-            var charCount = (int)(maxWidth - stringWidth) / charWidth;
+            var charCount = (int) (maxWidth - stringWidth) / charWidth;
 
             var newString = new StringBuilder();
 
@@ -227,11 +228,11 @@ namespace ItemResearchSpawnerV2.Core.Utils {
         }
 
         public static int GetLabelWidth(SpriteFont font) {
-            return (int)font.MeasureString("THISISLABELWIDTHYEAH").X;
+            return (int) font.MeasureString("THISISLABELWIDTHYEAH").X;
         }
 
         public static int GetChildCenterPosition(int pos, int parentLenght, int childLenght) {
-            return (int)(pos + parentLenght / 2f - childLenght / 2f);
+            return (int) (pos + parentLenght / 2f - childLenght / 2f);
         }
 
         public static void DrawItemBox(int x, int y, int innerWidth, int innerHeight, out Vector2 innerDrawPosition) {
@@ -252,51 +253,131 @@ namespace ItemResearchSpawnerV2.Core.Utils {
             innerDrawPosition = new Vector2(x, y);
         }
 
-        public static void DrawTextMenuBox(int x, int y, SpriteFont font, string text, int offsetX = 0, int offsetY = 0) {
+        public static void DrawTextMenuBox(int x, int y, SpriteFont font, string text, int offsetX = 0, int offsetY = 0, int paddingX = 0, int paddingY = 0) {
             var spriteBatch = Game1.spriteBatch;
             var bounds = font.MeasureString(text);
 
             var additionalBounds = new Vector2(offsetX > 0 ? offsetX : 0, offsetY > 0 ? offsetY : 0);
 
-            DrawMenuBox(x, y, (int)((int)bounds.X + additionalBounds.X), (int)((int)bounds.Y + additionalBounds.Y),
+            DrawMenuBox(
+                x - paddingX, 
+                y - paddingY, 
+                (int) ((int) bounds.X + additionalBounds.X + paddingX * 2), 
+                (int) ((int) bounds.Y + additionalBounds.Y + paddingY * 2),
                 out var textPosition);
 
             Utility.drawTextWithShadow(spriteBatch, text, font,
-                new Vector2(textPosition.X + offsetX, textPosition.Y + offsetY), Game1.textColor);
+                new Vector2(textPosition.X + offsetX + paddingX, textPosition.Y + offsetY + paddingY), Game1.textColor);
         }
 
-        public static void DrawTextMenuBox(int x, int y, int width, SpriteFont font, string text, int offsetX = 0, int offsetY = 0) {
+        public static void DrawTextMenuBox(int x, int y, int width, SpriteFont font, string text, int offsetX = 0, int offsetY = 0, bool bypassDraw = false) {
             var spriteBatch = Game1.spriteBatch;
             var bounds = font.MeasureString(text);
 
             var additionalBounds = new Vector2(offsetX > 0 ? offsetX : 0, offsetY > 0 ? offsetY : 0);
 
-            DrawMenuBox(x, y, width, (int)((int)bounds.Y + additionalBounds.Y),
-                out var textPosition);
+            DrawMenuBox(x, y, width, (int) ((int) bounds.Y + additionalBounds.Y),
+                out var textPosition, bypassDraw);
 
             Utility.drawTextWithShadow(spriteBatch, text, font,
                 new Vector2(textPosition.X + offsetX, textPosition.Y + offsetY), Game1.textColor);
         }
 
-        public static void DrawMenuBox(int x, int y, int innerWidth, int innerHeight, out Vector2 innerDrawPosition) {
-            var spriteBatch = Game1.spriteBatch;
+        public static void DrawMenuBox(int x, int y, int innerWidth, int innerHeight, out Vector2 innerDrawPosition, bool bypassDraw = false) {
+            var b = Game1.spriteBatch;
 
-            var outerWidth = innerWidth + UIConstants.BorderWidth * 2;
-            var outerHeight = innerHeight + UIConstants.BorderWidth * 2;
+            //var outerWidth = innerWidth + UIConstants.BorderWidth * 2;
+            //var outerHeight = innerHeight + UIConstants.BorderWidth * 2;
 
-            IClickableMenu.drawTextureBox(
-                spriteBatch,
-                Game1.uncoloredMenuTexture,
-                new Rectangle(0, 256, 60, 60),
-                x,
-                y,
-                outerWidth,
-                outerHeight,
-                Color.White,
-                1,
-                false);
+            if (!bypassDraw) {
+                //IClickableMenu.drawTextureBox(
+                //    spriteBatch,
+                //    Game1.uncoloredMenuTexture,
+                //    new Rectangle(0, 256, 60, 60),
+                //    x,
+                //    y,
+                //    outerWidth,
+                //    outerHeight,
+                //    Color.White,
+                //    1,
+                //    false);
 
-            innerDrawPosition = new Vector2(x + UIConstants.BorderWidth, y + UIConstants.BorderWidth);
+                DrawTileableTexture(b, ModManager.UITextureInstance, UIConstants.BarBase,
+                    new Rectangle(x + 8, y + 8, innerWidth, innerHeight), cornerSize: 8, colorize: false);
+
+                DrawTileableTexture(b, ModManager.UITextureInstance, UIConstants.BarFrame,
+                    new Rectangle(x , y, innerWidth + 16, innerHeight + 16), cornerSize: 16, colorize: true);
+
+            }
+
+            innerDrawPosition = new Vector2(x + 8, y + 8);
+        }
+
+        public static void DrawTileableTexture(SpriteBatch b, Texture2D texture, Rectangle sourceRect, Rectangle destRect, int cornerSize = 8, bool colorize = false) {
+
+            var sX = sourceRect.X;
+            var sY = sourceRect.Y;  
+            var sW = sourceRect.Width;
+            var sH = sourceRect.Height;
+
+            var dX = destRect.X;
+            var dY = destRect.Y;
+            var dW = destRect.Width > cornerSize * 2 ? destRect.Width : cornerSize * 2 + 1;
+            var dH = destRect.Height > cornerSize * 2 ? destRect.Height : cornerSize * 2 + 1;
+
+            var color = colorize ? ModManager.Instance.ModMode.GetColor() : Color.White;
+
+            // scaled base
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(dX + cornerSize, dY + cornerSize, dW - cornerSize * 2, dH - cornerSize * 2),
+                new Rectangle(sX + cornerSize, sY + cornerSize, sW - cornerSize * 2, sH - cornerSize * 2),
+                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+
+            // corners
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(dX, dY, cornerSize, cornerSize),
+                new Rectangle(sX, sY, cornerSize, cornerSize),
+                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(dX, dY + dH - cornerSize, cornerSize, cornerSize),
+                new Rectangle(sX, sY + sH - cornerSize, cornerSize, cornerSize),
+                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(dX + dW - cornerSize, dY, cornerSize, cornerSize),
+                new Rectangle(sX + sW - cornerSize, sY, cornerSize, cornerSize),
+                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(dX + dW - cornerSize, dY + dH - cornerSize, cornerSize, cornerSize),
+                new Rectangle(sX + sW - cornerSize, sY + sH - cornerSize, cornerSize, cornerSize),
+                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+
+            // scaled borders
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(dX + cornerSize, dY, dW - cornerSize * 2, cornerSize),
+                new Rectangle(sX + cornerSize, sY, sW - cornerSize * 2, cornerSize),
+                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(dX + cornerSize, dY + dH - cornerSize, dW - cornerSize * 2, cornerSize),
+                new Rectangle(sX + cornerSize, sY + sH - cornerSize, sW - cornerSize * 2, cornerSize),
+                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(dX, dY + cornerSize, cornerSize, dH - cornerSize * 2),
+                new Rectangle(sX, sY + cornerSize, cornerSize, sH - cornerSize * 2),
+                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(dX + dW - cornerSize, dY + cornerSize, cornerSize, dH - cornerSize * 2),
+                new Rectangle(sX + sW - cornerSize, sY + cornerSize, cornerSize, sH - cornerSize * 2),
+                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+
         }
 
         #endregion
@@ -305,7 +386,7 @@ namespace ItemResearchSpawnerV2.Core.Utils {
             SpriteBatch spriteBatch = Game1.spriteBatch;
             Vector2 bounds = font.MeasureString(text);
 
-            DrawTab(x, y, (int)bounds.X, (int)bounds.Y, out Vector2 drawPos, align, alpha, drawShadow: drawShadow);
+            DrawTab(x, y, (int) bounds.X, (int) bounds.Y, out Vector2 drawPos, align, alpha, drawShadow: drawShadow);
             Utility.drawTextWithShadow(spriteBatch, text, font, drawPos, Game1.textColor);
         }
 

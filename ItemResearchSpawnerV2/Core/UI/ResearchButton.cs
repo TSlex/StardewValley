@@ -41,9 +41,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //    Component.bounds.Width - UIConstants.BorderWidth,
             //    Component.bounds.Height - UIConstants.BorderWidth, out var buttonInnerLocation);
 
-            var buttonBounds = new Rectangle(Component.bounds.X, Component.bounds.Y,
-                Component.bounds.Width,
-                Component.bounds.Height);
+            var buttonBounds = new Rectangle(
+                Component.bounds.X + 4 * 4, 
+                Component.bounds.Y + 4 * 4,
+                Component.bounds.Width - 4 * 8,
+                Component.bounds.Height - 4 * 8
+                );
 
             if (shake) {
                 var buttonOff = 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
@@ -51,7 +54,38 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 buttonBounds.Y += (int)buttonOff.Y;
             }
 
-            b.Draw(buttonTexture, buttonBounds, buttonTexture.Bounds, Color.White);
+            //b.Draw(buttonTexture, buttonBounds, buttonTexture.Bounds, Color.White);
+
+            DrawHelper.DrawMenuBox(Component.bounds.X, Component.bounds.Y,
+                Component.bounds.Width - UIConstants.BorderWidth,
+                Component.bounds.Height - UIConstants.BorderWidth, out var buttonInnerLocation);
+
+            switch (ModManager.Instance.ModMode) {
+                case ModMode.Research:
+                    b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.RNSButtonResearchIcon, Color.White);
+                    break;
+                case ModMode.BuySell:
+                    b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.CoinIcon, Color.White);
+                    break;
+                case ModMode.ResearchPlus:
+                    b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.RNSQiButtonIcon, Color.White);
+                    break;
+                case ModMode.BuySellPlus:
+                    b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.RNSJojaButtonIcon, Color.White);
+                    break;
+                case ModMode.Combined:
+                    if (researchArea.ResearchItem?.ResearchCompleted ?? false) {
+                        b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.CoinIcon, Color.White);
+                    }
+                    else {
+                        b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.RNSButtonResearchIcon, Color.White);
+                    }
+
+                    break;
+            }
+
+            //b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.RNSButtonResearchIcon, Color.White);
+            //b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.CoinIcon, Color.White);
         }
 
         public override void HandleLeftClick(int x, int y) {

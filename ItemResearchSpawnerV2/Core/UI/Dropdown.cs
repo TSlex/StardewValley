@@ -4,6 +4,9 @@ using StardewValley.Menus;
 using StardewValley;
 using ItemResearchSpawnerV2.Core.Utils;
 using StardewModdingAPI;
+using Microsoft.CodeAnalysis.Text;
+using StardewValley.Network;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     internal class Dropdown : ClickableComponent {
@@ -123,16 +126,24 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // -------------------------------------------------------------------------------------
 
-            DrawHelper.DrawTab(bounds.X, bounds.Y, TabWidth, List.MaxLabelHeight, out Vector2 textPos, drawShadow: IsAndroid);
+            //DrawHelper.DrawTab(bounds.X, bounds.Y, TabWidth, List.MaxLabelHeight, out Vector2 textPos, drawShadow: IsAndroid);
+            DrawHelper.DrawMenuBox(bounds.X, bounds.Y, TabWidth + 4 * 4, List.MaxLabelHeight + 4 * 2, out Vector2 textPos);
 
             //b.DrawString(Font, List.SelectedLabel, textPos, Color.Black * opacity);
-            b.DrawString(Font, DrawHelper.TruncateString(List.SelectedLabel, Font, TabWidth), textPos,
-                Color.Black * opacity);
+            //b.DrawString(Font, DrawHelper.TruncateString(List.SelectedLabel, Font, TabWidth), textPos + new Vector2(4 * 2, 4 * 2 - 3),
+            //    Color.Black * opacity);
 
-            var sourceRect = new Rectangle(439, 453, 5, 5);
-            var position = new Vector2(bounds.X + TabWidth - sourceRect.Width, bounds.Y + 20);
+            Utility.drawTextWithShadow(b, List.SelectedLabel, Font, textPos + new Vector2(4 * 2, 4 * 2 - 3), Color.Black * opacity);
 
-            b.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
+            //var sourceRect = new Rectangle(439, 453, 5, 5);
+            //var position = new Vector2(bounds.X + TabWidth - sourceRect.Width, bounds.Y + 20);
+
+            //b.Draw(Game1.mouseCursors, position, sourceRect, Color.White, 0, Vector2.Zero, Game1.pixelZoom,
+            //    IsExpanded ? SpriteEffects.FlipVertically : SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance, 
+                new Vector2(bounds.X + TabWidth - UIConstants.DropdownIcon.Width + 4 * 3, bounds.Y + 4 * 5), UIConstants.DropdownIcon, 
+                Color.White, 0, Vector2.Zero, 1f,
                 IsExpanded ? SpriteEffects.FlipVertically : SpriteEffects.None, 1f);
 
             if (IsExpanded) {

@@ -16,12 +16,15 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private readonly Texture2D CombinedTexture;
         private readonly Texture2D ResearchItemLightTexture;
 
-        private readonly Texture2D BookAnimations;
-        private readonly int BookTextureSize = 20;
+        //private readonly Texture2D BookAnimations;
+        //private readonly int BookTextureSize = 20;
+
+        private int BookAnimOpenLoopId = 0;
         private int BookSpriteID = 0;
         private int TimeCounter = 0;
-        private int AnimWait = 10;
+        private int AnimWait = 60;
         private bool BookOpenAnimComplete = false;
+        private bool BookOpenAnimActive => !BookOpenAnimComplete || BookTurnLeftPending || BookTurnLeftPendingC || BookTurnRightPending || BookTurnRightPendingC;
 
         public bool BookTurnLeftRequested = false;
         private bool BookTurnLeftPending = false;
@@ -33,6 +36,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         private double ResearchProcessTime = 0;
         private bool ResearchStarted = false;
+
+        private float SpinAnimationCounter = 0f;
+        private float AppearAnimationCounter = 0f;
+        private float PingPongAnimationCounter = 0f;
+        private int PingPongAnimationPointer = 1;
 
         public ProgressionItem ResearchItem;
         //private Item LastItem;
@@ -50,7 +58,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         private Rectangle GetButtonPosition => new Rectangle(
                     DrawHelper.GetChildCenterPosition(GetXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),
-                    ResearchArea.bounds.Height + 4 * 10 + GetYPos(), ResearchTexture.Width, ResearchTexture.Height);
+                    ResearchArea.bounds.Height + 4 * 10 + 2 + GetYPos(), ResearchTexture.Width, ResearchTexture.Height);
 
         // ===================================================================================================
 
@@ -66,10 +74,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             ResearchArea = new ClickableComponent(new Rectangle(getXPos(), getYPos(), width, Game1.tileSize + 50), "");
 
-            ResearchButton = new ResearchButton(this, () => GetButtonPosition.X + 3, () => GetButtonPosition.Y);
+            ResearchButton = new ResearchButton(this, () => GetButtonPosition.X, () => GetButtonPosition.Y);
 
             //BookAnimations = ModManager.Instance.Helper.GameContent.Load<Texture2D>("LooseSprites\\Book_Animation");
-            BookAnimations = ModManager.Instance.Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "images", "Book_Animation"));
+            //BookAnimations = ModManager.Instance.Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "images", "Book_Animation"));
             ResearchItemLightTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "pinpointLight"));
 
             //ResearchButton = new ClickableTextureComponent(
@@ -98,7 +106,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                 if (moveAmount > 0) {
                     ResearchItem.GameItem.Stack += moveAmount;
-                    
+
                     if (retIStack == moveAmount) {
                         returnItem = null;
                     }
@@ -125,6 +133,26 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 OnResearchInterrupted();
             }
 
+
+            // ------------------------------------------------------------------
+
+            var spinSpeed = ResearchStarted ? -4f : 1f;
+            SpinAnimationCounter += time.ElapsedGameTime.Milliseconds / 1000f * spinSpeed;
+            SpinAnimationCounter = SpinAnimationCounter >= 6.28319f ? 0 : SpinAnimationCounter;
+            SpinAnimationCounter = SpinAnimationCounter < 0 ? 6.28318f : SpinAnimationCounter;
+
+            var appearSpeed = (!BookOpenAnimComplete || BookOpenAnimActive) ? -100f : 1f * 3;
+
+            AppearAnimationCounter += time.ElapsedGameTime.Milliseconds / 1000f * appearSpeed;
+            AppearAnimationCounter = AppearAnimationCounter > 1 ? 1 : AppearAnimationCounter;
+            AppearAnimationCounter = AppearAnimationCounter < 0 ? 0 : AppearAnimationCounter;
+
+            PingPongAnimationCounter += time.ElapsedGameTime.Milliseconds / 1000f * PingPongAnimationPointer * 1f;
+            PingPongAnimationCounter = PingPongAnimationCounter > 1 ? 1 : PingPongAnimationCounter;
+            PingPongAnimationCounter = PingPongAnimationCounter < 0 ? 0 : PingPongAnimationCounter;
+            PingPongAnimationPointer = PingPongAnimationCounter >= 1 ? -1 : (PingPongAnimationCounter <= 0 ? 1 : PingPongAnimationPointer);
+            //ModManager.Instance.Monitor.Log($"{PingPongAnimationCounter}");
+
             // ------------------------------------------------------------------
 
             TimeCounter += time.ElapsedGameTime.Milliseconds;
@@ -134,23 +162,30 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             if (!BookOpenAnimComplete) {
-                if (BookSpriteID < 2) {
-                    AnimWait = 80;
+
+                if (BookSpriteID < 4) {
+                    AnimWait = 40;
                 }
-                else if (BookSpriteID > 8) {
-                    AnimWait = 30;
+                else if (BookSpriteID > 4 && BookAnimOpenLoopId == 0) {
+                    AnimWait = 25;
                 }
-                else if (BookSpriteID > 14) {
-                    AnimWait = 50;
+                else if (BookSpriteID > 10 && BookAnimOpenLoopId == 0) {
+                    AnimWait = 20;
                 }
                 else {
                     AnimWait = 15;
                 }
                 BookSpriteID++;
 
-                if (BookSpriteID > 20) {
-                    BookSpriteID--;
-                    BookOpenAnimComplete = true;
+                if (BookSpriteID > 10) {
+                    BookAnimOpenLoopId++;
+
+                    if (BookAnimOpenLoopId > 1) {
+                        BookSpriteID--;
+                        BookOpenAnimComplete = true;
+                    }
+
+                    BookSpriteID = 4;
                 }
 
                 if (BookSpriteID % 3 == 0) {
@@ -160,7 +195,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
             }
             else if (ResearchItem != null) {
-                BookSpriteID = 8;
+                BookSpriteID = 4;
                 BookTurnRightPending = false;
                 BookTurnLeftPending = false;
                 BookTurnLeftRequested = false;
@@ -173,7 +208,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                     if (!BookTurnLeftPending) {
                         AnimWait = 10;
-                        BookSpriteID = 14;
+                        BookSpriteID = 10;
                         BookTurnLeftPendingC = false;
                     }
                     else {
@@ -189,7 +224,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                     if (!BookTurnRightPending) {
                         AnimWait = 10;
-                        BookSpriteID = 8;
+                        BookSpriteID = 4;
                         BookTurnRightPendingC = false;
                     }
                     else {
@@ -203,14 +238,14 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     AnimWait = 10;
                     BookSpriteID++;
 
-                    if (BookSpriteID > 14) {
+                    if (BookSpriteID > 10) {
                         if (!BookTurnRightPendingC) {
                             BookSpriteID--;
                             BookTurnRightPending = false;
                         }
                         else {
                             BookTurnRightPendingC = false;
-                            BookSpriteID = 8;
+                            BookSpriteID = 4;
                         }
                     }
                 }
@@ -218,14 +253,14 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     AnimWait = 10;
                     BookSpriteID--;
 
-                    if (BookSpriteID < 8) {
+                    if (BookSpriteID < 4) {
                         if (!BookTurnLeftPendingC) {
                             BookSpriteID++;
                             BookTurnLeftPending = false;
                         }
                         else {
                             BookTurnLeftPendingC = false;
-                            BookSpriteID = 14;
+                            BookSpriteID = 10;
                         }
                     }
                 }
@@ -264,9 +299,48 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //DrawHelper.DrawMenuBox(ResearchArea.bounds.X, ResearchArea.bounds.Y,
             //    ResearchArea.bounds.Width, ResearchArea.bounds.Height, out var areaInnerAnchors);
 
-            b.Draw(BookAnimations,
-                new Vector2(ResearchArea.bounds.X + 4 * 6 - 1, ResearchArea.bounds.Y - 4 * 6),
-                new Rectangle(BookTextureSize * BookSpriteID, 0, BookTextureSize, BookTextureSize), Color.White, 0f, Vector2.Zero, 8f, SpriteEffects.None, 1f);
+            //b.Draw(BookAnimations,
+            //    new Vector2(ResearchArea.bounds.X + 4 * 6 - 1, ResearchArea.bounds.Y - 4 * 6),
+            //    new Rectangle(BookTextureSize * BookSpriteID, 0, BookTextureSize, BookTextureSize), Color.White, 0f, Vector2.Zero, 8f, SpriteEffects.None, 1f);
+
+            var bookAnimBase = UIConstants.BookAnimBase;
+            var bookAnimFrame = UIConstants.BookAnimFrame;
+
+            b.Draw(ModManager.UITextureInstance,
+                new Vector2(ResearchArea.bounds.X + 4 * (2), ResearchArea.bounds.Y - 4 * 9),
+                new Rectangle(bookAnimBase.X + 192 * BookSpriteID, bookAnimBase.Y, bookAnimBase.Width, bookAnimBase.Height),
+                Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Vector2(ResearchArea.bounds.X + 4 * (2), ResearchArea.bounds.Y - 4 * 5),
+                new Rectangle(bookAnimFrame.X + 192 * BookSpriteID, bookAnimFrame.Y, bookAnimFrame.Width, bookAnimFrame.Height),
+                ModManager.Instance.ModMode.GetColor(), 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+
+            //b.Draw(ModManager.UITextureInstance,
+            //    new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
+            //    UIConstants.RNSPentagramEffect,
+            //    ModManager.Instance.ModMode.GetColor() * 0.6f * AppearAnimationCounter, 
+            //    SpinAnimationCounter, new Vector2(4 * 14 + 1.5f, 4 * 14 + 1.5f), 1f, SpriteEffects.None, 1f);
+
+            //b.Draw(ModManager.UITextureInstance,
+            //    new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
+            //    UIConstants.RNSPentagramEffect,
+            //    ModManager.Instance.ModMode.GetColor() * (0.2f * PingPongAnimationCounter + 0.3f) * AppearAnimationCounter,
+            //    SpinAnimationCounter, new Vector2(4 * 14 + 2f, 4 * 14 + 2f), 1f, SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
+                UIConstants.RNSPentagramEffect2,
+                ModManager.Instance.ModMode.GetColor() * (0.2f * PingPongAnimationCounter + 0.3f) * AppearAnimationCounter,
+                SpinAnimationCounter, new Vector2(4 * 16 + 2f, 4 * 16 + 2f), 1.2f, SpriteEffects.None, 1f);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Vector2(ResearchArea.bounds.X + 4 * 12, ResearchArea.bounds.Y - 4 * 4),
+                UIConstants.RNSOutlineEffect,
+                ModManager.Instance.ModMode.GetColor() * 0.9f * AppearAnimationCounter,
+                0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+
+
 
             var researchItemCellX = areaInnerAnchors.X + ResearchArea.bounds.Width / 2f - Game1.tileSize / 2f;
 
@@ -288,8 +362,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         new Vector2(progressPositionX, ResearchArea.bounds.Y + 124),
                         Color.Red, Color.Black * (false ? 1f : 0.25f), 0.9f);
                 }
-                else
-                {
+                else {
                     Utility.drawTextWithColoredShadow(b, researchProgressString, progressFont,
                         new Vector2(progressPositionX, ResearchArea.bounds.Y + 124),
                         Color.Cyan, Color.Red * (false ? 1f : 0.25f), 0.9f);
@@ -308,17 +381,29 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             ResearchButton.Draw(b, shake: ResearchStarted);
 
+
+
             if (ResearchStarted && ResearchItem != null) {
-                float deltatime = ((float)(ResearchProcessTime - Game1.currentGameTime.TotalGameTime.TotalSeconds)) / 2f;
+                float deltatime = ((float) (ResearchProcessTime - Game1.currentGameTime.TotalGameTime.TotalSeconds)) / 2f;
 
                 for (int i = 0; i < 5; i++) {
-                    b.Draw(ResearchItemLightTexture,
-                        new Rectangle((int)researchItemCellX, (int)(areaInnerAnchors.Y - 10), 64, 64),
-                        ResearchItemLightTexture.Bounds, Color.White * (1f - deltatime));
+                    //b.Draw(ResearchItemLightTexture,
+                    //    new Rectangle((int) researchItemCellX, (int) (areaInnerAnchors.Y - 10), 64, 64),
+                    //    ResearchItemLightTexture.Bounds, Color.White * (1f - deltatime));
                 }
 
+                b.Draw(ModManager.UITextureInstance,
+                    new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
+                    UIConstants.RNSSplashEffect,
+                    Color.White * (1f - EasingFunctions.InOutQuad(MathF.Sqrt(deltatime))), MathF.PI / 2,
+                    new Vector2(UIConstants.RNSSplashEffect.Width / 2, UIConstants.RNSSplashEffect.Height / 2),
+                    1f, SpriteEffects.None, 1f);
+
+                // 1f * (1f - deltatime) / 2 + 0.5f
+                // * (1.2f - EasingFunctions.OutQuad(MathF.Sqrt(deltatime))) / 2 + 0.5f
+
                 ResearchItem?.GameItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f,
-                    1f, 0.9f, StackDrawType.Draw, Color.White * deltatime, drawShadow: true);
+                    1f, 0.9f, StackDrawType.Draw, Color.White * (EasingFunctions.InOutQuad(MathF.Sqrt(deltatime))), drawShadow: true);
 
                 //var itemData = ItemRegistry.GetDataOrErrorItem(ResearchItem.QualifiedItemId);
                 //var location = new Vector2(researchItemCellX, areaInnerAnchors.Y - 10);
@@ -407,7 +492,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (left > 1) {
                 return string.Format(I18n.Ui_ResearchMoreLeft(), left);
             }
-            else if (left == 1){
+            else if (left == 1) {
                 return I18n.Ui_ResearchOneLeft();
             }
             else {

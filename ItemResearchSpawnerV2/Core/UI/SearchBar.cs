@@ -125,7 +125,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             SearchBoxArea.bounds.Y = GetYPos();
 
             SearchBox.X = SearchBoxArea.bounds.X;
-            SearchBox.Y = SearchBoxArea.bounds.Y;
+            SearchBox.Y = SearchBoxArea.bounds.Y + 4 * 1 - 2;
 
             var iconNewLocation = new Rectangle((int)(SearchBoxArea.bounds.Right - SearchTexture.Width * 2f), SearchBoxArea.bounds.Y + 16, 0, 0);
 
@@ -135,16 +135,18 @@ namespace ItemResearchSpawnerV2.Core.UI {
             // --------------------------------------------------------------------------------------------
 
             DrawHelper.DrawMenuBox(SearchBoxArea.bounds.X, SearchBoxArea.bounds.Y,
-                SearchBoxArea.bounds.Width - UIConstants.BorderWidth,
-                SearchBoxArea.bounds.Height - UIConstants.BorderWidth - 8, out _);
+                SearchBoxArea.bounds.Width,
+                SearchBoxArea.bounds.Height - 8, out _);
 
             SearchBox.Draw(b);
 
             if (SearchBox.Text != "") {
-                b.Draw(Game1.mouseCursors, SearchBarButton.bounds, ClearTexture, Color.White);
+                //b.Draw(Game1.mouseCursors, SearchBarButton.bounds, ClearTexture, Color.White);
+                b.Draw(ModManager.UITextureInstance, SearchBarButton.bounds, UIConstants.SearchbarClearIcon, Color.White);
             }
             else {
-                b.Draw(SearchBarButton.texture, SearchBarButton.bounds, SearchBarButton.sourceRect, Color.White * IconOpacity);
+                //b.Draw(SearchBarButton.texture, SearchBarButton.bounds, SearchBarButton.sourceRect, Color.White * IconOpacity);
+                b.Draw(ModManager.UITextureInstance, SearchBarButton.bounds, UIConstants.SearchbarIcon, Color.White * IconOpacity);
             }
         }
 

@@ -459,8 +459,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 UpdateView(filter: true, resetScroll: true, reloadCategories: true);
             }
 
-            else if (DisplayButton.HoveredOver) {
-                DisplayButton.HandleLeftClick(x, y);
+            else if (ProgressButton.HoveredOver) {
+                ProgressButton.HandleLeftClick(x, y);
                 UpdateView(filter: true, resetScroll: true, reloadCategories: true);
             }
 
@@ -517,8 +517,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 UpdateView(filter: true, resetScroll: true, reloadCategories: true);
             }
 
-            else if (DisplayButton.HoveredOver) {
-                DisplayButton.HandleRightClick(x, y);
+            else if (ProgressButton.HoveredOver) {
+                ProgressButton.HandleRightClick(x, y);
                 UpdateView(filter: true, resetScroll: true, reloadCategories: true);
             }
 
@@ -544,8 +544,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             QualityButton.HandleHover(x, y);
             FavoriteButton.HandleHover(x, y);
-            DisplayButton.HandleHover(x, y);
-            SettingsButton.HandleHover(x, y);
+            ProgressButton.HandleHover(x, y);
+            //SettingsButton.HandleHover(x, y);
             ItemResearchArea.ResearchButton.HandleHover(x, y);
 
             base.performHoverAction(x, y);
