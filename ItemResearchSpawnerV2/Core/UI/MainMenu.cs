@@ -29,8 +29,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
         protected readonly ItemResearchArea ItemResearchArea;
         protected readonly ItemMoneyTooltip MoneyTooltip;
 
-        protected readonly ClickableTextureComponent LeftArrow;
-        protected readonly ClickableTextureComponent RightArrow;
+        //protected readonly ClickableTextureComponent LeftArrow;
+        //protected readonly ClickableTextureComponent RightArrow;
+
+        protected readonly ArrowButton LeftArrow;
+        protected readonly ArrowButton RightArrow;
 
         protected int TopRowIndex;
         protected int MaxTopRowIndex;
@@ -84,8 +87,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 rows = 4,
             };
             CreativeMenu.capacity = CreativeMenu.rows * 4;
-            CreativeMenu.verticalGap += 40;
-            CreativeMenu.horizontalGap += 20;
+            CreativeMenu.verticalGap += 4 * 8;
+            CreativeMenu.horizontalGap += 4 * 5;
             CreativeMenu.drawSlots = false;
 
             // ----------------------------------------------------
@@ -118,12 +121,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             ItemResearchArea = new ItemResearchArea(() => xPositionOnScreen + width - borderWidth + 10, () => yPositionOnScreen - borderWidth + 88, 180);
 
-            LeftArrow = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + 20, yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
-                Game1.mouseCursors, new Rectangle(353, 495, 11, 10), 4f);
-            RightArrow = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8, yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
-                Game1.mouseCursors, new Rectangle(366, 495, 11, 10), 4f);
+            //LeftArrow = new ClickableTextureComponent(
+            //    new Rectangle(xPositionOnScreen + 20, yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
+            //    Game1.mouseCursors, new Rectangle(353, 495, 11, 10), 4f);
+            //RightArrow = new ClickableTextureComponent(
+            //    new Rectangle(xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8, yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4, 11 * 4, 10 * 4),
+            //    Game1.mouseCursors, new Rectangle(366, 495, 11, 10), 4f);
+
+            LeftArrow = new ArrowButton(
+                () => xPositionOnScreen + 4 * 17, 
+                () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 - 4 * 2, 
+                ArrowButtonType.Left);
+            RightArrow = new ArrowButton(
+                () => xPositionOnScreen + width - borderWidth - 120 + 4 * 4, 
+                () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 - 4 * 2, 
+                ArrowButtonType.Right);
 
             MoneyTooltip = new ItemMoneyTooltip();
         }
@@ -160,21 +172,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // ----------------------------------------------------
 
-            LeftArrow.bounds.Width = (int) (11 * 4f * (LeftButtonHovered ? 1.1f : 1f));
-            RightArrow.bounds.Width = (int) (11 * 4f * (RightButtonHovered ? 1.1f : 1f));
-            LeftArrow.bounds.Height = (int) (10 * 4f * (LeftButtonHovered ? 1.1f : 1f));
-            RightArrow.bounds.Height = (int) (10 * 4f * (RightButtonHovered ? 1.1f : 1f));
+            //LeftArrow.bounds.Width = (int) (11 * 4f * (LeftButtonHovered ? 1.1f : 1f));
+            //RightArrow.bounds.Width = (int) (11 * 4f * (RightButtonHovered ? 1.1f : 1f));
+            //LeftArrow.bounds.Height = (int) (10 * 4f * (LeftButtonHovered ? 1.1f : 1f));
+            //RightArrow.bounds.Height = (int) (10 * 4f * (RightButtonHovered ? 1.1f : 1f));
 
-            LeftArrow.bounds.X = xPositionOnScreen + 20 - (LeftButtonHovered ? 4 : 0);
-            LeftArrow.bounds.Y = yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4 - (LeftButtonHovered ? 4 : 0);
-            RightArrow.bounds.X = xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8 - (RightButtonHovered ? 4 : 0);
-            RightArrow.bounds.Y = LeftArrow.bounds.Y - (RightButtonHovered ? 4 : 0);
+            //LeftArrow.bounds.X = xPositionOnScreen + 20 - (LeftButtonHovered ? 4 : 0);
+            //LeftArrow.bounds.Y = yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 + 2 * 4 - (LeftButtonHovered ? 4 : 0);
+            //RightArrow.bounds.X = xPositionOnScreen + width - borderWidth - 120 + 12 * 4 + 8 - (RightButtonHovered ? 4 : 0);
+            //RightArrow.bounds.Y = LeftArrow.bounds.Y - (RightButtonHovered ? 4 : 0);
 
             if (ShowLeftButton) {
-                LeftArrow.draw(b);
+                LeftArrow.Draw(b);
             }
             if (ShowRightButton) {
-                RightArrow.draw(b);
+                RightArrow.Draw(b);
             }
 
             var page_left = (TopRowIndex + 1).ToString();
@@ -182,12 +194,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
             var font = Game1.smallFont;
 
             Utility.drawTextWithShadow(b, page_left, font,
-                new Vector2(LeftArrow.bounds.X + LeftArrow.bounds.Width + 170 - font.MeasureString(page_left).X / 2 - 4 * 1 + 2, LeftArrow.bounds.Y - 4 * 2),
+                new Vector2(xPositionOnScreen - font.MeasureString(page_left).X / 2 + 4 * 58,
+                yPositionOnScreen + 4 * 47),
                 Color.Black);
 
-
             Utility.drawTextWithShadow(b, page_right.ToString(), font,
-                new Vector2(RightArrow.bounds.X - 160 - font.MeasureString(page_right).X / 2 - 4 * 2, RightArrow.bounds.Y - 4 * 2),
+                new Vector2(xPositionOnScreen - font.MeasureString(page_right).X / 2 + 4 * 152, 
+                yPositionOnScreen + 4 * 47),
                 Color.Black);
 
 

@@ -437,11 +437,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 heldItem = returnItem;
             }
 
-            else if (LeftArrow.bounds.Contains(x, y)) {
+            else if (LeftArrow.Bounds.Contains(x, y)) {
                 receiveScrollWheelAction(1);
             }
 
-            else if (RightArrow.bounds.Contains(x, y)) {
+            else if (RightArrow.Bounds.Contains(x, y)) {
                 receiveScrollWheelAction(-1);
             }
 
@@ -541,6 +541,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             //    }
             //}
+
+            LeftArrow.HandleHover(x, y);
+            RightArrow.HandleHover(x, y);
 
             QualityButton.HandleHover(x, y);
             FavoriteButton.HandleHover(x, y);

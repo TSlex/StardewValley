@@ -7,6 +7,7 @@ using StardewModdingAPI;
 using Microsoft.CodeAnalysis.Text;
 using StardewValley.Network;
 using static System.Net.Mime.MediaTypeNames;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     internal class Dropdown : ClickableComponent {
@@ -179,8 +180,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private int MaxItems;
         private readonly Func<string, string> GetLabel;
         private readonly SpriteFont Font;
-        private ClickableTextureComponent UpArrow;
-        private ClickableTextureComponent DownArrow;
+
+        //private ClickableTextureComponent UpArrow;
+        //private ClickableTextureComponent DownArrow;
+
+        private ArrowButton UpArrow;
+        private ArrowButton DownArrow;
 
         public int MaxLabelHeight;
         public int BaseWidth;
@@ -211,6 +216,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             bounds.X = x;
             bounds.Y = y;
+
+            UpArrow = new ArrowButton(
+                () => x - 4 * 9,
+                () => y + 4 * 20,
+                ArrowButtonType.Up);
+
+            DownArrow = new ArrowButton(
+                () => x - 4 * 9,
+                () => y + bounds.Height - 4 * 4,
+                ArrowButtonType.Down);
+
+            //UpArrow = new ClickableTextureComponent("up-arrow",
+            //    new Rectangle(x - upSource.Width - 4 * 3, y + 4 * 8, upSource.Width, upSource.Height), "", "", Game1.mouseCursors, upSource, 1);
+            //DownArrow = new ClickableTextureComponent("down-arrow",
+            //    new Rectangle(x - downSource.Width - 4 * 3, y + bounds.Height - downSource.Height - 4 * 8, downSource.Width, downSource.Height), "", "", Game1.mouseCursors, downSource, 1);
 
             Update();
         }
@@ -249,11 +269,20 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             itemClicked = false;
 
-            if (UpArrow.containsPoint(x, y)) {
+            //if (UpArrow.containsPoint(x, y)) {
+            //    Scroll(-1);
+            //    return true;
+            //}
+            //if (DownArrow.containsPoint(x, y)) {
+            //    Scroll(1);
+            //    return true;
+            //}
+
+            if (UpArrow.Bounds.Contains(x, y)) {
                 Scroll(-1);
                 return true;
             }
-            if (DownArrow.containsPoint(x, y)) {
+            if (DownArrow.Bounds.Contains(x, y)) {
                 Scroll(1);
                 return true;
             }
@@ -281,7 +310,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public override bool containsPoint(int x, int y) {
-            return base.containsPoint(x, y) || UpArrow.containsPoint(x, y) || DownArrow.containsPoint(x, y);
+            return base.containsPoint(x, y) || UpArrow.Bounds.Contains(x, y) || DownArrow.Bounds.Contains(x, y);
         }
 
         public void Draw(SpriteBatch b, float opacity = 1) {
@@ -291,36 +320,74 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 if (option.containsPoint(Game1.getMouseX(), Game1.getMouseY())) {
-                    b.Draw(Game1.mouseCursors, option.bounds, new Rectangle(161, 340, 4, 4), Color.White * opacity);
+                    //b.Draw(Game1.mouseCursors, option.bounds, new Rectangle(161, 340, 4, 4), Color.White * opacity);
+                    b.Draw(ModManager.UITextureInstance, option.bounds, UIConstants.DropdownHover, Color.White * opacity);
                 }
                 else if (option.Index == SelectedOption.Index) {
-                    b.Draw(Game1.mouseCursors, option.bounds, new Rectangle(258, 258, 4, 4), Color.White * opacity);
+                    //b.Draw(Game1.mouseCursors, option.bounds, new Rectangle(258, 258, 4, 4), Color.White * opacity);
+                    b.Draw(ModManager.UITextureInstance, option.bounds, UIConstants.DropdownSelected, Color.White * opacity);
                 }
                 else {
-                    b.Draw(Game1.mouseCursors, option.bounds, new Rectangle(269, 258, 4, 4), Color.White * opacity);
+                    //b.Draw(Game1.mouseCursors, option.bounds, new Rectangle(269, 258, 4, 4), Color.White * opacity);
+                    b.Draw(ModManager.UITextureInstance, option.bounds, UIConstants.DropdownBase, Color.White * opacity);
+                }
+
+                //Vector2 position = new(option.bounds.X + 10, option.bounds.Y + Game1.tileSize / 16);
+
+                //b.DrawString(Font, option.label, position, Color.Black * opacity);
+                //b.DrawString(Font, DrawHelper.TruncateString(option.label, Font, option.bounds.Width), position,
+                //    Color.Black * opacity);
+            }
+
+            UpArrow.HandleHover(Game1.getMouseX(), Game1.getMouseY());
+            DownArrow.HandleHover(Game1.getMouseX(), Game1.getMouseY());
+
+            if (CanScrollUp) {
+                UpArrow.Draw(b, opacity);
+            }
+            if (CanScrollDown) {
+                DownArrow.Draw(b, opacity);
+            }
+
+            // --------------------------------------------------------------------------------------
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(bounds.X + 4 * 2, bounds.Y + bounds.Height - 4 * 2 - 2 - UIConstants.DropdownGradient.Height, 
+                bounds.Width + 4 * 2, UIConstants.DropdownGradient.Height),
+                UIConstants.DropdownGradient, Color.White * opacity);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(bounds.X + 4 * 2, bounds.Y - 4 * 2 - 2, 4, bounds.Height + 4),
+                UIConstants.DropdownBorderH, ModManager.Instance.ModMode.GetColor() * opacity);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(bounds.X + 4 * 3 + bounds.Width, bounds.Y - 4 * 2 - 2, 4, bounds.Height + 4),
+                UIConstants.DropdownBorderH, ModManager.Instance.ModMode.GetColor() * opacity);
+
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(bounds.X + 4 * 2, bounds.Y + bounds.Height - 4 * 2 - 2, bounds.Width + 4 * 2, 4),
+                UIConstants.DropdownBorderV, ModManager.Instance.ModMode.GetColor() * opacity);
+
+            // --------------------------------------------------------------------------------------
+
+            foreach (DropListOption option in Options) {
+                if (!option.visible) {
+                    continue;
                 }
 
                 Vector2 position = new(option.bounds.X + 10, option.bounds.Y + Game1.tileSize / 16);
 
-                //b.DrawString(Font, option.label, position, Color.Black * opacity);
                 b.DrawString(Font, DrawHelper.TruncateString(option.label, Font, option.bounds.Width), position,
                     Color.Black * opacity);
-            }
-
-            if (CanScrollUp) {
-                UpArrow.draw(b, Color.White * opacity, 1);
-            }
-            if (CanScrollDown) {
-                DownArrow.draw(b, Color.White * opacity, 1);
             }
         }
 
         public void Update() {
             var x = bounds.X + 4 * 3;
-            var y = bounds.Y + 4 * -3;
+            var y = bounds.Y + 4 * -3 + 2;
 
             var itemWidth = Math.Max(Options.Max(p => p.LabelWidth) - 80, BaseWidth) + 20;
-            var itemHeight = MaxLabelHeight;
+            var itemHeight = MaxLabelHeight + 4 * 2;
 
             MaxItems = Math.Min(10, Options.Count);
 
@@ -343,10 +410,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
             var upSource = new Rectangle(76, 72, 40, 44);
             var downSource = new Rectangle(12, 76, 40, 44);
 
-            UpArrow = new ClickableTextureComponent("up-arrow",
-                new Rectangle(x - upSource.Width - 4 * 3, y + 4 * 8, upSource.Width, upSource.Height), "", "", Game1.mouseCursors, upSource, 1);
-            DownArrow = new ClickableTextureComponent("down-arrow",
-                new Rectangle(x - downSource.Width - 4 * 3, y + bounds.Height - downSource.Height - 4 * 8, downSource.Width, downSource.Height), "", "", Game1.mouseCursors, downSource, 1);
+            //UpArrow = new ClickableTextureComponent("up-arrow",
+            //    new Rectangle(x - upSource.Width - 4 * 3, y + 4 * 8, upSource.Width, upSource.Height), "", "", Game1.mouseCursors, upSource, 1);
+            //DownArrow = new ClickableTextureComponent("down-arrow",
+            //    new Rectangle(x - downSource.Width - 4 * 3, y + bounds.Height - downSource.Height - 4 * 8, downSource.Width, downSource.Height), "", "", Game1.mouseCursors, downSource, 1);
         }
 
         // -------------------------------------------------------------------------------------

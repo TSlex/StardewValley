@@ -52,5 +52,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public static Rectangle RNSPentagramEffect => new Rectangle(1928, 40, 116, 116);
         public static Rectangle RNSPentagramEffect2 => new Rectangle(2060, 44, 132, 132);
         public static Rectangle RNSSplashEffect => new Rectangle(1696, 32, 92, 164);
+
+        public static Rectangle DropdownBorderH => new Rectangle(2016, 584, 32, 4);
+        public static Rectangle DropdownBorderV => new Rectangle(1992, 256, 4, 32);
+        public static Rectangle DropdownGradient => new Rectangle(1920, 256, 32, 320);
+        public static Rectangle DropdownBase => new Rectangle(1412, 80, 4, 4);
+        public static Rectangle DropdownSelected => new Rectangle(1412, 100, 4, 4);
+        public static Rectangle DropdownHover => new Rectangle(1412, 96, 4, 4);
+
+        public static Rectangle LeftArrow => new Rectangle(648, 136, 44, 40);
+        public static Rectangle RightArrow => new Rectangle(588, 136, 44, 40);
+        public static Rectangle UpArrow => new Rectangle(524, 72, 40, 44);
+        public static Rectangle DownArrow => new Rectangle(524, 140, 40, 44);
     }
 }

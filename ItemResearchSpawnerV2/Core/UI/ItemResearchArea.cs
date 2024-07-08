@@ -392,6 +392,14 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     //    ResearchItemLightTexture.Bounds, Color.White * (1f - deltatime));
                 }
 
+                //b.Draw(ModManager.UITextureInstance,
+                //    new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
+                //    UIConstants.RNSSplashEffect,
+                //    ModManager.Instance.ModMode.GetColor() * (1f - EasingFunctions.InOutQuad(MathF.Sqrt(deltatime)) + 0.2f), 
+                //    MathF.PI / 2,
+                //    new Vector2(UIConstants.RNSSplashEffect.Width / 2, UIConstants.RNSSplashEffect.Height / 2),
+                //    1f, SpriteEffects.None, 1f);
+
                 b.Draw(ModManager.UITextureInstance,
                     new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
                     UIConstants.RNSSplashEffect,
@@ -402,7 +410,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 // 1f * (1f - deltatime) / 2 + 0.5f
                 // * (1.2f - EasingFunctions.OutQuad(MathF.Sqrt(deltatime))) / 2 + 0.5f
 
-                ResearchItem?.GameItem?.drawInMenu(b, new Vector2(researchItemCellX, areaInnerAnchors.Y - 10), 1f,
+                var shakeOff = 4f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2)) * (EasingFunctions.InOutQuad(MathF.Sqrt(deltatime)));
+
+                ResearchItem?.GameItem?.drawInMenu(b, new Vector2(researchItemCellX + shakeOff.X, areaInnerAnchors.Y - 10 + shakeOff.Y), 1f,
                     1f, 0.9f, StackDrawType.Draw, Color.White * (EasingFunctions.InOutQuad(MathF.Sqrt(deltatime))), drawShadow: true);
 
                 //var itemData = ItemRegistry.GetDataOrErrorItem(ResearchItem.QualifiedItemId);
@@ -472,6 +482,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (leftAmount > 0) {
                 ResearchItem.Stack = leftAmount;
                 CommonHelper.TryReturnItemToInventory(ResearchItem.GameItem);
+            }
+
+            if (ModManager.Instance.Config.GetEnableSounds()) {
+                Game1.playSound("newRecipe");
             }
 
             ResearchItem = null;
