@@ -1,4 +1,5 @@
 ﻿using Force.DeepCloner;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
+using System;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.UI {
@@ -30,17 +32,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 menu.highlightMethod, menu.capacity, menu.rows, menu.horizontalGap, menu.verticalGap, menu.drawSlots) {
 
             ItemOpacity = new float[capacity];
-            Array.Fill(ItemOpacity, InitialOpacity);
+            Array.Fill(ItemOpacity, 1f);
         }
 
         public void Update(GameTime time) {
-            float availableValue = 1.5f;
+            float availableValue = 0.2f;
             float availablePerItem = 0f;
             float valueToAdd = 0;
 
             if (!AppearAnimComplete) {
                 for (int i = 0; i < capacity; i++) {
-                    availablePerItem = availableValue * 0.2f;
+                    availablePerItem = availableValue * 0.1f;
 
                     valueToAdd = ItemOpacity[i] + availablePerItem;
                     valueToAdd = valueToAdd >= 1f ? 1f - ItemOpacity[i] : availablePerItem;
@@ -69,6 +71,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public void OnInventoryChange() {
             AppearAnimComplete = false;
             Array.Fill(ItemOpacity, 1f);
+
+            if (ModManager.Instance.RecentlyUnlockedItemIndex >= 0 && ModManager.Instance.RecentlyUnlockedItemIndex < capacity) {
+                ItemOpacity[ModManager.Instance.RecentlyUnlockedItemIndex] = 0f;
+
+                ModManager.Instance.RecentlyUnlockedItemIndex = -1;
+                ModManager.Instance.RecentlyUnlockedItem = null;
+            }
         }
 
         public void RecreateItemSlots() {
@@ -181,10 +190,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 opacity = MathF.Min(opacity, flag ? 1f : 0.25f);
 
                 if (!(ProgressionItems.ElementAtOrDefault(j)?.ResearchCompleted ?? false)) {
-                    actualInventory[j].drawInMenu(b, 
-                        location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, 
-                        StackDrawType.HideButShowQuality, 
-                        Color.Black * 0.25f, 
+                    actualInventory[j].drawInMenu(b,
+                        location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f,
+                        StackDrawType.HideButShowQuality,
+                        Color.Black * 0.25f,
                         flag);
 
                     var progressText = $"{ProgressionItems[j].ResearchPerc}%";
@@ -198,6 +207,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         progressText,
                         Game1.smallFont, location + new Vector2(Game1.smallFont.MeasureString(progressText).X * 0.01f + 17f, 32 / 2 + 4f),
                         Color.Gold, Color.Red * 0.5f, 0.9f);
+                }
+                else if (ModManager.Instance.ShouldDisableItemByPrice(actualInventory[j])) {
+                    actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw, Color.White * 0.25f, flag);
                 }
                 else {
                     actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw, Color.White * opacity, flag);
@@ -221,7 +233,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 int num = Convert.ToInt32(item.name);
+
                 if (num >= actualInventory.Count || (actualInventory[num] != null && !highlightMethod(actualInventory[num]) && !actualInventory[num].canStackWith(toPlace))) {
+                    continue;
+                }
+
+                if (actualInventory[num] != null && ModManager.Instance.ShouldDisableItemByPrice(actualInventory[num])) {
                     continue;
                 }
 
@@ -266,6 +283,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
             foreach (var (item, i) in inventory.Select((value, i) => (value, i))) {
                 int num = Convert.ToInt32(item.name);
                 if (!item.containsPoint(x, y) || num >= actualInventory.Count || (actualInventory[num] != null && !highlightMethod(actualInventory[num])) || num >= actualInventory.Count || actualInventory[num] == null) {
+                    continue;
+                }
+
+                if (actualInventory[num] != null && ModManager.Instance.ShouldDisableItemByPrice(actualInventory[num])) {
                     continue;
                 }
 

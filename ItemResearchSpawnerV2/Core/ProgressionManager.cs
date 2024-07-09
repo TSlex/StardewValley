@@ -69,7 +69,6 @@ namespace ItemResearchSpawnerV2.Core {
             leftAmount -= needAmount;
 
             ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();
-            ModManager.Instance.UpdateMenu(rebuild: true);
         }
 
         public void FavoriteItem(ProgressionItem item) {

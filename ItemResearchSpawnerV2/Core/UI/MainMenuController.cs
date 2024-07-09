@@ -14,6 +14,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private List<ProgressionItem> ProgressionItems;
         private List<ProgressionItem> FilteredProgressionItems;
 
+        private static bool ControlPressed => ModManager.Instance.Helper.Input.IsDown(SButton.LeftControl);
         private static bool ShiftPressed => ModManager.Instance.Helper.Input.IsDown(SButton.LeftShift);
 
         private string LastSearchQuery;
@@ -22,6 +23,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public MainMenuController() : base() {
             behaviorOnItemGrab = OnItemGrab;
+            CreativeMenu.highlightMethod = GetDefaultHighlightMethod();
 
             // -----------------------------------------------------------------
 
@@ -107,9 +109,39 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //}
 
             IEnumerable<ProgressionItem> GetMenuItems() {
+                var recentlyUnlockedItem = ModManager.Instance.RecentlyUnlockedItem;
+
+                if (recentlyUnlockedItem != null &&
+                    FilteredProgressionItems
+                    .Select(item => CommonHelper.GetItemUniqueKey(item.GameItem))
+                    .Contains(CommonHelper.GetItemUniqueKey(recentlyUnlockedItem.GameItem))) {
+
+                    var unlockedItemIndex = FilteredProgressionItems.FindIndex(
+                        item => CommonHelper.GetItemUniqueKey(item.GameItem) == CommonHelper.GetItemUniqueKey(recentlyUnlockedItem.GameItem));
+
+                    ModManager.Instance.Monitor.Log($"found index is {unlockedItemIndex}");
+                    ModManager.Instance.Monitor.Log($"found item is {CommonHelper.GetItemUniqueKey(FilteredProgressionItems[unlockedItemIndex].GameItem)}");
+                    ModManager.Instance.Monitor.Log($"must be  {CommonHelper.GetItemUniqueKey(recentlyUnlockedItem.GameItem)}");
+
+                    PageIndex = unlockedItemIndex / (CreativeMenu.ItemsPerRow * 2) - 1;
+                    PageIndex = PageIndex < 0 ? 0 : PageIndex;
+
+                    ModManager.Instance.RecentlyUnlockedItemIndex = unlockedItemIndex - PageIndex * CreativeMenu.ItemsPerRow * 2;
+
+                    ModManager.Instance.Monitor.Log($"index on page {ModManager.Instance.RecentlyUnlockedItemIndex}");
+                }
+                else {
+                    recentlyUnlockedItem = null;
+                }
+
+                //ModManager.Instance.RecentlyUnlockedItem = null;
+
+                ModManager.Instance.Monitor.Log($"number of filtered items {FilteredProgressionItems.Count()}");
+
                 var items = FilteredProgressionItems
-                    .Skip(TopRowIndex * CreativeMenu.ItemsPerRow * 2)
+                    .Skip(PageIndex * CreativeMenu.ItemsPerRow * 2)
                     .Take(CreativeMenu.ItemsPerView).ToList();
+
 
                 foreach (var pi in items) {
 
@@ -127,9 +159,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     else {
                         availableQuantity = pi.GetAvailableQuantity(Game1.player._money, ModManager.Instance.ItemQuality, out availableQuality);
                     }
-                    
 
-                    pi.GameItem.Quality = (int)availableQuality;
+
+                    pi.GameItem.Quality = (int) availableQuality;
 
                     pi.Stack = ModManager.Instance.ModMode switch {
                         ModMode.BuySell => availableQuantity,
@@ -138,11 +170,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         _ => pi.GameItem.maximumStackSize()
                     };
 
-                    if (!(ModManager.Instance.ProgressionDisplay == ProgressionDisplayMode.ResearchStarted && pi.ResearchCompleted)) {
-                        yield return pi;
-                    }
+                    //if (!(ModManager.Instance.ProgressionDisplay == ProgressionDisplayMode.ResearchStarted && pi.ResearchCompleted)) {
+                    //    yield return pi;
+                    //}
 
-                    ModManager.Instance.Monitor.Log($"{ModManager.Instance.ProgressionDisplay}");
+                    yield return pi;
+
+                    //ModManager.Instance.Monitor.Log($"{ModManager.Instance.ProgressionDisplay}");
 
                     if (availableQuality != ModManager.Instance.ItemQuality
                         && ModManager.Instance.ProgressionDisplay != ProgressionDisplayMode.ResearchedOnly
@@ -229,8 +263,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             switch (ModManager.Instance.ProgressionDisplay) {
                 case ProgressionDisplayMode.ResearchStarted:
-                    //items = items.Where(item => item.BaseResearchStarted);
-                    items = items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
+                    items = items.Where(item => item.BaseResearchStarted || (item.BaseResearchCompleted && item.RequestedResearchStarted));
+                    //items = items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
                     break;
                 case ProgressionDisplayMode.ResearchedOnly:
                     items = items.Where(item => item.BaseResearchCompleted);
@@ -256,10 +290,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 FilterProgressionItems();
-                TopRowIndex = 0;
+                PageIndex = 0;
                 UpdateCategories();
                 UpdateCreativeMenu();
-                MaxTopRowIndex = Math.Max(0, (int)Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 2m) - 2));
+                MaxTopRowIndex = Math.Max(0, (int) Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 2m) - 2));
                 ItemResearchArea.BookTurnRightRequested = true;
                 return;
             }
@@ -276,8 +310,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
             }
 
-            if (resetScroll || TopRowIndex > MaxTopRowIndex) {
-                TopRowIndex = 0;
+            if (resetScroll || PageIndex > MaxTopRowIndex) {
+                PageIndex = 0;
             }
 
             //if (reloadCategories) {
@@ -286,7 +320,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             UpdateCreativeMenu();
 
-            MaxTopRowIndex = Math.Max(0, (int)Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 2m) - 2));
+            MaxTopRowIndex = Math.Max(0, (int) Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 2m) - 2));
         }
 
         // ------------------------------------------------------------------------------------------------
@@ -298,7 +332,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             CategoryDropdown.IsExpanded = expanded;
             inventory.highlightMethod = _ => !expanded;
-            CreativeMenu.highlightMethod = _ => !expanded;
+            CreativeMenu.highlightMethod = expanded ? _ => false : GetDefaultHighlightMethod();
 
             if (!expanded && !Game1.lastCursorMotionWasMouse) {
                 setCurrentlySnappedComponentTo(CategoryDropdown.myID);
@@ -313,7 +347,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             SortDropdown.IsExpanded = expanded;
             inventory.highlightMethod = _ => !expanded;
-            CreativeMenu.highlightMethod = _ => !expanded;
+            CreativeMenu.highlightMethod = expanded ? _ => false : GetDefaultHighlightMethod();
 
             if (!expanded && !Game1.lastCursorMotionWasMouse) {
                 setCurrentlySnappedComponentTo(SortDropdown.myID);
@@ -421,6 +455,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 TrashHeldItem();
             }
 
+            else if (ControlPressed) {
+                OnControlLeftClickPressed(x, y);
+            }
+
             else if (SortDropdown.TryLeftClick(x, y, out bool itemClicked2, out bool dropdownToggled2)) {
                 if (dropdownToggled2) {
                     SetSortDropdown(SortDropdown.IsExpanded);
@@ -490,11 +528,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     SearchBar.Blur();
                 }
 
-                if (ShiftPressed && OnShiftLeftClickPressed(x, y)) {
-                }
-
                 else {
                     base.receiveLeftClick(x, y, playSound);
+                }
+
+                if (ShiftPressed && heldItem != null && !CreativeMenu.isWithinBounds(x, y)) {
+                    CommonHelper.TryReturnItemToInventory(heldItem);
+                    heldItem = null;
                 }
             }
         }
@@ -567,7 +607,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             base.performHoverAction(x, y);
         }
 
-        private bool OnShiftLeftClickPressed(int x, int y) {
+        private bool OnControlLeftClickPressed(int x, int y) {
             if (ItemResearchArea.Bounds.Contains(x, y)) {
                 if (ItemResearchArea.ResearchItem != null) {
                     CommonHelper.TryReturnItemToInventory(ItemResearchArea.ReturnItem());
@@ -576,24 +616,37 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 return true;
             }
 
-            //if (trashCan.containsPoint(x, y)) {
-            //    foreach (var item in Game1.player.items.Where(item => item != null)) {
-            //        if (ProgressionManager.Instance.ItemResearched(item)) {
-            //            switch (ModManager.Instance.ModMode) {
-            //                case ModMode.BuySell:
-            //                case ModMode.Combined:
-            //                    ModManager.Instance.SellItem(item);
-            //                    Game1.player.removeItemFromInventory(item);
-            //                    break;
-            //                default:
-            //                    Game1.player.removeItemFromInventory(item);
-            //                    break;
-            //            }
-            //        }
-            //    }
+            if (trashCan.containsPoint(x, y)) {
+                var removedAny = false;
+                var removeSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
+                    "purchase" : "fireball";
 
-            //    return true;
-            //}
+                foreach (var item in Game1.player.Items.Where(item => item != null)) {
+                    var progressionItem = ModManager.ProgressionManagerInstance.GetProgressionItem(item);
+
+                    if (progressionItem.ResearchCompleted) {
+                        switch (ModManager.Instance.ModMode) {
+                            case ModMode.Research:
+                            case ModMode.ResearchPlus:
+                                Game1.player.removeItemFromInventory(item);
+                                removedAny = true;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                if (removedAny) {
+                    ItemResearchArea.BookTurnLeftRequested = true;
+
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
+                        Game1.playSound(removeSound);
+                    }
+                }
+
+                return true;
+            }
 
             if (hoveredItem != null && Game1.player.Items.Contains(hoveredItem)) {
                 var progressionItem = ModManager.ProgressionManagerInstance.GetProgressionItem(hoveredItem);
@@ -603,6 +656,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 if (progressionItem.ResearchCompleted) {
+                    var removeSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
+                        "purchase" : "fireball";
+
                     switch (ModManager.Instance.ModMode) {
                         case ModMode.BuySell:
                         case ModMode.Combined:
@@ -612,6 +668,16 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         default:
                             break;
                     }
+
+                    Game1.player.removeItemFromInventory(hoveredItem);
+
+                    ItemResearchArea.BookTurnLeftRequested = true;
+
+                    if (ModManager.Instance.Config.GetEnableSounds()) {
+                        Game1.playSound(removeSound);
+                    }
+
+                    return true;
                 }
 
                 else if (ItemResearchArea.ResearchItem != null) {
@@ -646,7 +712,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public void ScrollView(int direction) {
             if (direction < 0 && ShowLeftButton) {
-                TopRowIndex -= 1;
+                PageIndex -= 1;
                 ItemResearchArea.BookTurnLeftRequested = true;
                 if (ModManager.Instance.Config.GetEnableSounds()) {
                     Game1.playSound("newRecipe");
@@ -654,7 +720,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 UpdateView();
             }
             else if (direction > 0 && ShowRightButton) {
-                TopRowIndex += 1;
+                PageIndex += 1;
                 ItemResearchArea.BookTurnRightRequested = true;
                 if (ModManager.Instance.Config.GetEnableSounds()) {
                     Game1.playSound("newRecipe");
@@ -662,16 +728,25 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 UpdateView();
             }
 
-            TopRowIndex = MathHelper.Clamp(TopRowIndex, 0, MaxTopRowIndex);
+            PageIndex = MathHelper.Clamp(PageIndex, 0, MaxTopRowIndex);
         }
 
         // --------------------------------------------------------------------------------------
 
+        private StardewValley.Menus.InventoryMenu.highlightThisItem GetDefaultHighlightMethod() {
+            return ModManager.Instance.ModMode switch {
+                //ModMode.Research or ModMode.ResearchPlus => (item) => true,
+                //ModMode.BuySell or ModMode.Combined or ModMode.BuySellPlus => (item) => ModManager.Instance.CanBuyItem(item) && item.Stack > 0,
+                _ => (item) => true,
+            };
+        }
+
 
         private void OnItemGrab(Item item, Farmer player) {
-            //if (ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.GetItemBuyPrice(item, true) <= Game1.player._money) {
-            //    ModManager.Instance.BuyItem(item);
-            //}
+            if ((ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus)
+                && ModManager.Instance.CanBuyItem(item)) {
+                ModManager.Instance.BuyItem(item);
+            }
 
             UpdateView();
         }

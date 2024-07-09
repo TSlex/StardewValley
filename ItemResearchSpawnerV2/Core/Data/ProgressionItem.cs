@@ -26,6 +26,11 @@ namespace ItemResearchSpawnerV2.Models {
         public bool ResearchCompleted => ResearchLeftAmount <= 0;
         public bool ResearchStarted => ResearchLeftAmount < RequiredResearch && ResearchLeftAmount > 0;
 
+        public int RequestedResearchAmount => GetResearchProgress(ModManager.Instance?.ItemQuality ?? ItemQuality.Normal);
+        public int RequestedResearchLeftAmount => RequiredResearch - RequestedResearchAmount;
+        public bool RequestedResearchCompleted => RequestedResearchLeftAmount <= 0;
+        public bool RequestedResearchStarted => RequestedResearchLeftAmount < RequiredResearch && RequestedResearchLeftAmount > 0;
+
         public int BaseResearchAmount => GetResearchProgress(ItemQuality.Normal);
         public int BaseResearchLeftAmount => RequiredResearch - BaseResearchAmount;
         public bool BaseResearchCompleted => BaseResearchLeftAmount <= 0;

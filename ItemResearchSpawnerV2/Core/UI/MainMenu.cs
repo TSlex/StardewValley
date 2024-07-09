@@ -35,11 +35,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
         protected readonly ArrowButton LeftArrow;
         protected readonly ArrowButton RightArrow;
 
-        protected int TopRowIndex;
+        protected int PageIndex;
         protected int MaxTopRowIndex;
 
-        protected bool ShowRightButton => TopRowIndex < MaxTopRowIndex;
-        protected bool ShowLeftButton => TopRowIndex > 0;
+        protected bool ShowRightButton => PageIndex < MaxTopRowIndex;
+        protected bool ShowLeftButton => PageIndex > 0;
 
         protected bool LeftButtonHovered = false;
         protected bool RightButtonHovered = false;
@@ -129,12 +129,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //    Game1.mouseCursors, new Rectangle(366, 495, 11, 10), 4f);
 
             LeftArrow = new ArrowButton(
-                () => xPositionOnScreen + 4 * 17, 
-                () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 - 4 * 2, 
+                () => xPositionOnScreen + 4 * 17,
+                () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 - 4 * 2,
                 ArrowButtonType.Left);
             RightArrow = new ArrowButton(
-                () => xPositionOnScreen + width - borderWidth - 120 + 4 * 4, 
-                () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 - 4 * 2, 
+                () => xPositionOnScreen + width - borderWidth - 120 + 4 * 4,
+                () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 - 4 * 2,
                 ArrowButtonType.Right);
 
             MoneyTooltip = new ItemMoneyTooltip();
@@ -189,8 +189,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 RightArrow.Draw(b);
             }
 
-            var page_left = (TopRowIndex + 1).ToString();
-            var page_right = (TopRowIndex + 2).ToString();
+            var page_left = (PageIndex + 1).ToString();
+            var page_right = (PageIndex + 2).ToString();
             var font = Game1.smallFont;
 
             Utility.drawTextWithShadow(b, page_left, font,
@@ -199,7 +199,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 Color.Black);
 
             Utility.drawTextWithShadow(b, page_right.ToString(), font,
-                new Vector2(xPositionOnScreen - font.MeasureString(page_right).X / 2 + 4 * 152, 
+                new Vector2(xPositionOnScreen - font.MeasureString(page_right).X / 2 + 4 * 152,
                 yPositionOnScreen + 4 * 47),
                 Color.Black);
 
@@ -397,8 +397,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
                 else if (Game1.player.addItemToInventoryBool(heldItem)) {
                     heldItem = null;
+
+                    var addSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
+                        "purchase" : "discoverMineral";
+
                     if (ModManager.Instance.Config.GetEnableSounds()) {
-                        Game1.playSound("discoverMineral");
+                        Game1.playSound(addSound);
                     }
                 }
             }
@@ -489,8 +493,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 else if (Game1.player.addItemToInventoryBool(heldItem)) {
                     heldItem = null;
 
+                    var addSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
+                        "purchase" : "discoverMineral";
+
                     if (ModManager.Instance.Config.GetEnableSounds()) {
-                        Game1.playSound("discoverMineral");
+                        Game1.playSound(addSound);
                     }
                 }
             }

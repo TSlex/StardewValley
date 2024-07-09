@@ -328,11 +328,33 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //    ModManager.Instance.ModMode.GetColor() * (0.2f * PingPongAnimationCounter + 0.3f) * AppearAnimationCounter,
             //    SpinAnimationCounter, new Vector2(4 * 14 + 2f, 4 * 14 + 2f), 1f, SpriteEffects.None, 1f);
 
-            b.Draw(ModManager.UITextureInstance,
-                new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
-                UIConstants.RNSPentagramEffect2,
-                ModManager.Instance.ModMode.GetColor() * (0.2f * PingPongAnimationCounter + 0.3f) * AppearAnimationCounter,
-                SpinAnimationCounter, new Vector2(4 * 16 + 2f, 4 * 16 + 2f), 1.2f, SpriteEffects.None, 1f);
+            if (ResearchItem != null && !ResearchItem.Forbidden) {
+                b.Draw(ModManager.UITextureInstance,
+                    new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
+                    UIConstants.RNSPentagramEffect2,
+                    ModManager.Instance.ModMode.GetColor() * (0.5f * PingPongAnimationCounter + 0.3f) * AppearAnimationCounter,
+                    SpinAnimationCounter, new Vector2(4 * 16 + 2f, 4 * 16 + 2f), 1.2f, SpriteEffects.None, 1f);
+            }
+            else if (ResearchItem != null && ResearchItem.Forbidden) {
+                b.Draw(ModManager.UITextureInstance,
+                    new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
+                    UIConstants.RNSPentagramEffect2,
+                    Color.Black * (1f * PingPongAnimationCounter) * AppearAnimationCounter * 0.8f,
+                    SpinAnimationCounter, new Vector2(4 * 16 + 2f, 4 * 16 + 2f), 1.2f, SpriteEffects.None, 1f);
+                b.Draw(ModManager.UITextureInstance,
+                    new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
+                    UIConstants.RNSPentagramEffect2,
+                    Color.Red * (1f - (1f * PingPongAnimationCounter)) * AppearAnimationCounter * 0.8f,
+                    SpinAnimationCounter, new Vector2(4 * 16 + 2f, 4 * 16 + 2f), 1.2f, SpriteEffects.None, 1f);
+            }
+            else {
+                b.Draw(ModManager.UITextureInstance,
+                    new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
+                    UIConstants.RNSPentagramEffect,
+                    ModManager.Instance.ModMode.GetColor() * (0.2f * PingPongAnimationCounter + 0.3f) * AppearAnimationCounter,
+                    SpinAnimationCounter, new Vector2(4 * 14 + 2f, 4 * 14 + 2f), 1f, SpriteEffects.None, 1f);
+            }
+
 
             b.Draw(ModManager.UITextureInstance,
                 new Vector2(ResearchArea.bounds.X + 4 * 12, ResearchArea.bounds.Y - 4 * 4),
@@ -469,15 +491,31 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public void OnResearchCompleted() {
+            var itemAlreadyResearched = ResearchItem.ResearchCompleted;
+
             ModManager.ProgressionManagerInstance.ResearchItem(ResearchItem, out var leftAmount);
 
             ResearchStarted = false;
 
+            var pI = ModManager.ProgressionManagerInstance.GetProgressionItem(ResearchItem.Item);
+
+            var itemUnlocked = !itemAlreadyResearched && pI.ResearchCompleted;
+
             if (ModManager.Instance.Config.GetEnableSounds()) {
-                Game1.playSound("reward");
+                if (itemUnlocked) {
+                    Game1.playSound("stardrop");
+                    ModManager.Instance.RecentlyUnlockedItem = pI;
+                    //Game1.playSound("getNewSpecialItem");
+                    //Game1.playSound("newRecord");
+                    //Game1.playSound("secret1");
+                }
+                else {
+                    Game1.playSound("reward");
+                }
             }
 
-            BookTurnLeftRequested = true;
+            //BookTurnLeftRequested = true;
+            ModManager.Instance.UpdateMenu(rebuild: true);
 
             if (leftAmount > 0) {
                 ResearchItem.Stack = leftAmount;

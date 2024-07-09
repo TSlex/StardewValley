@@ -25,6 +25,9 @@ namespace ItemResearchSpawnerV2.Core {
         public readonly SaveManager SaveManager;
         public readonly CommandManager CommandManager;
 
+        public ProgressionItem RecentlyUnlockedItem = null;
+        public int RecentlyUnlockedItemIndex = -1;
+
         public readonly Texture2D UITexture;
         public static Texture2D UITextureInstance => Instance.UITexture;
 
@@ -128,6 +131,14 @@ namespace ItemResearchSpawnerV2.Core {
         #endregion
 
         #region Price/Money
+
+        public bool ShouldDisableItemByPrice(Item item) {
+            return ModMode != ModMode.Research && ModMode != ModMode.ResearchPlus && !(CanBuyItem(item) && item.Stack > 0);
+        }
+
+        public bool CanBuyItem(Item item) {
+            return GetItemBuyPrice(item, true) <= Game1.player._money;
+        }
 
         public void BuyItem(Item item) {
             var price = GetItemBuyPrice(item, true);
