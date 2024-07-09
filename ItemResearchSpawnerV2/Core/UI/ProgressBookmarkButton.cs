@@ -40,7 +40,14 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 baseRect, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
 
             if (!Inactive) {
-                var c = ModManager.Instance.ProgressionDisplay == ProgressionDisplayMode.ResearchStarted ? Color.Gray * 0.7f : Color.White;
+                //var c = ModManager.Instance.ProgressionDisplay == ProgressionDisplayMode.ResearchStarted ? Color.Gray * 0.7f : Color.White;
+                var c = ModManager.Instance.ProgressionDisplay switch {
+                    ProgressionDisplayMode.ResearchedOnly => Color.White,
+                    ProgressionDisplayMode.ResearchStarted => Color.Gray * 0.7f,
+                    ProgressionDisplayMode.Combined => Color.White,
+                    ProgressionDisplayMode.NotResearched => Color.Red * 0.7f,
+                    _ => Color.White,
+                };
 
                 b.Draw(ModManager.UITextureInstance, new Vector2(Component.bounds.X + 4 * 6 - XOffcet, Component.bounds.Y + 4 * 3),
                     UIConstants.ProgressButtonIconBase, c, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);

@@ -181,7 +181,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 opacity = MathF.Min(opacity, flag ? 1f : 0.25f);
 
                 if (!(ProgressionItems.ElementAtOrDefault(j)?.ResearchCompleted ?? false)) {
-                    actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Hide, Color.Black * 0.25f, flag);
+                    actualInventory[j].drawInMenu(b, 
+                        location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, 
+                        StackDrawType.HideButShowQuality, 
+                        Color.Black * 0.25f, 
+                        flag);
 
                     var progressText = $"{ProgressionItems[j].ResearchPerc}%";
 

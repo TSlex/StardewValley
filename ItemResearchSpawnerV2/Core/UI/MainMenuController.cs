@@ -138,9 +138,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         _ => pi.GameItem.maximumStackSize()
                     };
 
-                    yield return pi;
+                    if (!(ModManager.Instance.ProgressionDisplay == ProgressionDisplayMode.ResearchStarted && pi.ResearchCompleted)) {
+                        yield return pi;
+                    }
 
-                    if (availableQuality != ModManager.Instance.ItemQuality 
+                    ModManager.Instance.Monitor.Log($"{ModManager.Instance.ProgressionDisplay}");
+
+                    if (availableQuality != ModManager.Instance.ItemQuality
                         && ModManager.Instance.ProgressionDisplay != ProgressionDisplayMode.ResearchedOnly
                         && pi.BaseResearchCompleted && !pi.NormalQualityForced
                         ) {
@@ -148,10 +152,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         var pi_c = new ProgressionItem(pi.Item.ShallowClone(), pi.SaveData, pi.Category, pi.Price);
 
                         pi_c.Item.Item = pi_c.InstanciateItem();
-                        pi_c.GameItem.Quality = (int)ModManager.Instance.ItemQuality;
+                        pi_c.GameItem.Quality = (int) ModManager.Instance.ItemQuality;
                         pi_c.Stack = pi_c.GameItem.maximumStackSize();
 
-                        yield return pi_c;
+                        if (pi_c.ResearchStarted) {
+                            yield return pi_c;
+                        }
                     }
                 }
             }
@@ -219,14 +225,21 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     break;
             }
 
-            items = items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
+            //items = items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
 
             switch (ModManager.Instance.ProgressionDisplay) {
                 case ProgressionDisplayMode.ResearchStarted:
-                    items = items.Where(item => item.BaseResearchStarted);
+                    //items = items.Where(item => item.BaseResearchStarted);
+                    items = items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
                     break;
                 case ProgressionDisplayMode.ResearchedOnly:
                     items = items.Where(item => item.BaseResearchCompleted);
+                    break;
+                case ProgressionDisplayMode.Combined:
+                    items = items.Where(item => item.BaseResearchStarted || item.BaseResearchCompleted);
+                    break;
+                case ProgressionDisplayMode.NotResearched:
+                    items = items.Where(item => !(item.BaseResearchStarted || item.BaseResearchCompleted));
                     break;
             }
 

@@ -291,6 +291,47 @@ namespace ItemResearchSpawnerV2 {
                 interval: 0.1f
             );
 
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetUseCustomUIColor(),
+                setValue: value => ActiveConfig.SetUseCustomUIColor(value),
+                name: () => I18n.Config_UiUseCustomColorName(),
+                tooltip: () => I18n.Config_UiUseCustomColorDesc()
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetCustomUIColor().R,
+                setValue: value => ActiveConfig.SetCustomUIColor(R: value),
+                name: () => I18n.Config_UiCustomColorRName(),
+                tooltip: () => I18n.Config_UiCustomColorRDesc(),
+                min: 0,
+                max: 255,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetCustomUIColor().G,
+                setValue: value => ActiveConfig.SetCustomUIColor(G: value),
+                name: () => I18n.Config_UiCustomColorGName(),
+                tooltip: () => I18n.Config_UiCustomColorGDesc(),
+                min: 0,
+                max: 255,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetCustomUIColor().B,
+                setValue: value => ActiveConfig.SetCustomUIColor(B: value),
+                name: () => I18n.Config_UiCustomColorBName(),
+                tooltip: () => I18n.Config_UiCustomColorBDesc(),
+                min: 0,
+                max: 255,
+                interval: 1
+            );
+
             // ------------------------------------------------------------
         }
 

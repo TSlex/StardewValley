@@ -29,7 +29,7 @@ namespace ItemResearchSpawnerV2.Models {
         public int BaseResearchAmount => GetResearchProgress(ItemQuality.Normal);
         public int BaseResearchLeftAmount => RequiredResearch - BaseResearchAmount;
         public bool BaseResearchCompleted => BaseResearchLeftAmount <= 0;
-        public bool BaseResearchStarted => BaseResearchLeftAmount < RequiredResearch && BaseResearchLeftAmount > 0;
+        public bool BaseResearchStarted => BaseResearchLeftAmount < RequiredResearch && (BaseResearchLeftAmount > 0 || RequiredResearch == 1) && !BaseResearchCompleted;
 
         public int ResearchPerc => (int)((CurrentResearchAmount * 1f) / (RequiredResearch * 1f) * 100f);
 

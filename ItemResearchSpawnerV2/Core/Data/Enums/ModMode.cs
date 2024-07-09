@@ -30,6 +30,10 @@ namespace ItemResearchSpawnerV2.Core.Data.Enums {
 
         public static Color GetColor(this ModMode current)
         {
+            if (ModManager.Instance.Config.UseCustomUIColor) {
+                return ModManager.Instance.Config.CustomUIColor;
+            }
+
             return current switch
             {
                 ModMode.Research => UIConstants.ResearchModeColor,

@@ -1,10 +1,10 @@
 ﻿using StardewModdingAPI.Utilities;
 using StardewModdingAPI;
 using ItemResearchSpawnerV2.Core.Data.Enums;
+using Microsoft.Xna.Framework;
 
 namespace ItemResearchSpawnerV2 {
-    internal class ModConfig
-    {
+    internal class ModConfig {
         public KeybindList ShowMenuButton = KeybindList.ForSingle(SButton.R);
 
         public ModMode DefaultMode = ModMode.Research;
@@ -17,6 +17,9 @@ namespace ItemResearchSpawnerV2 {
         public float SellPriceMultiplier = 0.9f;
         public float BuyPriceMultiplier = 1.1f;
         public float ResearchTimeSeconds = 1f;
+
+        public bool UseCustomUIColor = false;
+        public Color CustomUIColor = Color.Gold;
 
         // ===============================================================================
 
@@ -54,6 +57,14 @@ namespace ItemResearchSpawnerV2 {
 
         public float GetResearchTimeSeconds() {
             return ResearchTimeSeconds >= 0f ? ResearchTimeSeconds : 0f;
+        }
+
+        public bool GetUseCustomUIColor() {
+            return UseCustomUIColor;
+        }
+
+        public Color GetCustomUIColor() {
+            return CustomUIColor;
         }
 
         // ===============================================================================
@@ -100,6 +111,27 @@ namespace ItemResearchSpawnerV2 {
 
         public void SetResearchTimeSeconds(float value) {
             ResearchTimeSeconds = value;
+            ModEntry.Instance.OnConfigChange();
+        }
+
+        public void SetUseCustomUIColor(bool value) {
+            UseCustomUIColor = value;
+            ModEntry.Instance.OnConfigChange();
+        }
+
+        public void SetCustomUIColor(Color value) {
+            CustomUIColor = value;
+            ModEntry.Instance.OnConfigChange();
+        }
+
+        public void SetCustomUIColor(int R = -1, int G = -1, int B = -1) {
+            var currentColor = CustomUIColor;
+
+            var newR = R >= 0 ? R : currentColor.R;
+            var newG = G >= 0 ? G : currentColor.G;
+            var newB = B >= 0 ? B : currentColor.B;
+
+            CustomUIColor = new Color(newR, newG, newB);
             ModEntry.Instance.OnConfigChange();
         }
     }

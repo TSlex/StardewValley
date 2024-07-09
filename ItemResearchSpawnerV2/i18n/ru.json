@@ -102,6 +102,15 @@
   "config.research-delay-name": "Время для исследования (в секундах)",
   "config.research-delay-desc": "Влияет на задержку, прежде чем предмет будет исследован. 0 секунд уберёт эту задержку (как это было раньше)",
 
+  "config.ui-use-custom-color-name": "Переопределить цвета интерфейса",
+  "config.ui-custom-color-R-name": "Красное значение",
+  "config.ui-custom-color-G-name": "Зеленое значение",
+  "config.ui-custom-color-B-name": "Синее значение",
+  "config.ui-use-custom-color-desc": "Влияет на контрастные элементы интерфейса (бортики, эффекты и т.д.)",
+  "config.ui-custom-color-R-desc": "Красное значение (0-255)",
+  "config.ui-custom-color-G-desc": "Зеленое значение (0-255)",
+  "config.ui-custom-color-B-desc": "Синее значение (0-255)",
+
   //commands
   "command.unlock-all.desc": "Разблокировать все предметы",
   "command.unlock-all.succ": "Все исследования завершены! :D",

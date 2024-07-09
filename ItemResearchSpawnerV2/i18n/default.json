@@ -102,6 +102,15 @@
   "config.research-delay-name": "Research time (in seconds)",
   "config.research-delay-desc": "Use this to control how fast item researching is. \"0\" will research item without any delay (just as it was before)",
 
+  "config.ui-use-custom-color-name": "Override UI color",
+  "config.ui-custom-color-R-name": "UI color red value",
+  "config.ui-custom-color-G-name": "UI color green value",
+  "config.ui-custom-color-B-name": "UI color blue value",
+  "config.ui-use-custom-color-desc": "Enable to set custom color for menu (borders, effects, etc.)",
+  "config.ui-custom-color-R-desc": "Red color value (0-255)",
+  "config.ui-custom-color-G-desc": "Green color value (0-255)",
+  "config.ui-custom-color-B-desc": "Blue color value (0-255)",
+
   //commands
   "command.unlock-all.desc": "Research (unlock) all items",
   "command.unlock-all.succ": "All items were researched!",
