@@ -16,7 +16,18 @@ namespace ItemResearchSpawnerV2.Core.Data.Enums {
             return GetTranstationFunc(current)();
         }
 
-        public static Func<string> GetTranstationFunc(ModMode mode) {
+        public static bool HasPriceBehaviour(this ModMode mode) {
+            return mode switch {
+                ModMode.Research => false,
+                ModMode.BuySell => true,
+                ModMode.Combined => true,
+                ModMode.ResearchPlus => false,
+                ModMode.BuySellPlus => true,
+                _ => false,
+            };
+        }
+
+        public static Func<string> GetTranstationFunc(this ModMode mode) {
 
             return mode switch {
                 ModMode.Research => I18n.ModMode_Research,

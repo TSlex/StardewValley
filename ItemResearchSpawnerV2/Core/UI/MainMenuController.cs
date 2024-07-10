@@ -48,7 +48,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public override void update(GameTime time) {
             SearchBar.Update(time);
 
-            if (SearchBar.Text != LastSearchQuery) {
+            if (SearchBar.Text != LastSearchQuery && MenuWasBuild) {
                 LastSearchQuery = SearchBar.Text;
                 ModManager.Instance.SearchText = SearchBar.Text;
 
@@ -119,16 +119,16 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     var unlockedItemIndex = FilteredProgressionItems.FindIndex(
                         item => CommonHelper.GetItemUniqueKey(item.GameItem) == CommonHelper.GetItemUniqueKey(recentlyUnlockedItem.GameItem));
 
-                    ModManager.Instance.Monitor.Log($"found index is {unlockedItemIndex}");
-                    ModManager.Instance.Monitor.Log($"found item is {CommonHelper.GetItemUniqueKey(FilteredProgressionItems[unlockedItemIndex].GameItem)}");
-                    ModManager.Instance.Monitor.Log($"must be  {CommonHelper.GetItemUniqueKey(recentlyUnlockedItem.GameItem)}");
+                    //ModManager.Instance.Monitor.Log($"found index is {unlockedItemIndex}");
+                    //ModManager.Instance.Monitor.Log($"found item is {CommonHelper.GetItemUniqueKey(FilteredProgressionItems[unlockedItemIndex].GameItem)}");
+                    //ModManager.Instance.Monitor.Log($"must be  {CommonHelper.GetItemUniqueKey(recentlyUnlockedItem.GameItem)}");
 
                     PageIndex = unlockedItemIndex / (CreativeMenu.ItemsPerRow * 2) - 1;
                     PageIndex = PageIndex < 0 ? 0 : PageIndex;
 
                     ModManager.Instance.RecentlyUnlockedItemIndex = unlockedItemIndex - PageIndex * CreativeMenu.ItemsPerRow * 2;
 
-                    ModManager.Instance.Monitor.Log($"index on page {ModManager.Instance.RecentlyUnlockedItemIndex}");
+                    //ModManager.Instance.Monitor.Log($"index on page {ModManager.Instance.RecentlyUnlockedItemIndex}");
                 }
                 else {
                     recentlyUnlockedItem = null;
@@ -136,7 +136,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                 //ModManager.Instance.RecentlyUnlockedItem = null;
 
-                ModManager.Instance.Monitor.Log($"number of filtered items {FilteredProgressionItems.Count()}");
+                //ModManager.Instance.Monitor.Log($"number of filtered items {FilteredProgressionItems.Count()}");
 
                 var items = FilteredProgressionItems
                     .Skip(PageIndex * CreativeMenu.ItemsPerRow * 2)
@@ -280,7 +280,19 @@ namespace ItemResearchSpawnerV2.Core.UI {
             FilteredProgressionItems = items.ToList();
         }
 
-        public void UpdateView(bool rebuild = false, bool filter = false, bool resetScroll = false, bool reloadCategories = false) {
+        public void UpdateView(bool rebuild = false, bool filter = false, bool resetScroll = false, bool reloadCategories = false, bool clearFiltering = false) {
+
+            //ModManager.Instance.Monitor.Log($"Menu was updated");
+
+            if (clearFiltering) {
+                MenuWasBuild = false;
+                LastSearchQuery = "";
+                SearchBar.SetText("");
+                ModManager.Instance.SearchText = "";
+                SetCategory(I18n.Category_All());
+                SetSortOption(I18n.Sort_ByCategoryAsc());
+                MenuWasBuild = true;
+            }
 
             if (rebuild) {
                 ProgressionItems = ModManager.Instance.GetProgressionItems().Where(i => !i.Forbidden).ToList();
@@ -527,10 +539,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 if (SearchBar.Selected) {
                     SearchBar.Blur();
                 }
-
-                else {
-                    base.receiveLeftClick(x, y, playSound);
-                }
+                
+                base.receiveLeftClick(x, y, playSound);
 
                 if (ShiftPressed && heldItem != null && !CreativeMenu.isWithinBounds(x, y)) {
                     CommonHelper.TryReturnItemToInventory(heldItem);
@@ -662,6 +672,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     switch (ModManager.Instance.ModMode) {
                         case ModMode.BuySell:
                         case ModMode.Combined:
+                        case ModMode.BuySellPlus:
                             ModManager.Instance.SellItem(hoveredItem);
                             UpdateView();
                             break;

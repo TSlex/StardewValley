@@ -76,9 +76,9 @@ namespace ItemResearchSpawnerV2.Core {
             Game1.activeClickableMenu = new MainMenuController();
         }
 
-        public void UpdateMenu(bool rebuild = false, bool filter = false, bool resetScroll = false, bool reloadCategories = false) {
+        public void UpdateMenu(bool rebuild = false, bool filter = false, bool resetScroll = false, bool reloadCategories = false, bool clearFiltering = false) {
             if (Game1.activeClickableMenu != null && Game1.activeClickableMenu is MainMenuController menu) {
-                menu.UpdateView(rebuild, filter, resetScroll, reloadCategories);
+                menu.UpdateView(rebuild, filter, resetScroll, reloadCategories, clearFiltering: clearFiltering);
             }
         }
 

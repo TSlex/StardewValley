@@ -92,6 +92,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
         // ===================================================================================================
 
         public void SetItem(Item item, out Item returnItem) {
+            if (item != null) {
+                PingPongAnimationCounter = 0;
+                PingPongAnimationPointer = 1;
+            }
+
             returnItem = ResearchItem?.GameItem ?? null;
             ResearchItem = item != null ? ModManager.ProgressionManagerInstance.GetProgressionItem(item) : null;
 
@@ -501,21 +506,44 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             var itemUnlocked = !itemAlreadyResearched && pI.ResearchCompleted;
 
-            if (ModManager.Instance.Config.GetEnableSounds()) {
-                if (itemUnlocked) {
+            if (itemUnlocked) {
+                ModManager.Instance.FavoriteDisplay = FavoriteDisplayMode.All;
+                ModManager.Instance.ItemQuality = ItemQuality.Normal;
+                ModManager.Instance.ProgressionDisplay = ProgressionDisplayMode.ResearchedOnly;
+                ModManager.Instance.UpdateMenu(clearFiltering: true);
+                //ModManager.Instance.SearchText = "";
+                //ModManager.Instance.SelectedCategory = I18n.Category_All();
+                //ModManager.Instance.SortOption = I18n.Sort_ByCategoryAsc();
+
+                ModManager.Instance.RecentlyUnlockedItem = pI;
+
+                if (ModManager.Instance.Config.GetEnableSounds()) {
                     Game1.playSound("stardrop");
-                    ModManager.Instance.RecentlyUnlockedItem = pI;
                     //Game1.playSound("getNewSpecialItem");
                     //Game1.playSound("newRecord");
                     //Game1.playSound("secret1");
                 }
-                else {
+            }
+            else {
+                if (ModManager.Instance.Config.GetEnableSounds()) {
                     Game1.playSound("reward");
                 }
             }
 
             //BookTurnLeftRequested = true;
             ModManager.Instance.UpdateMenu(rebuild: true);
+
+            if (itemAlreadyResearched && ModManager.Instance.ModMode.HasPriceBehaviour() && leftAmount > 0) {
+                var itemToSell = ResearchItem.GameItem;
+                itemToSell.Stack = leftAmount;
+
+                ModManager.Instance.SellItem(itemToSell);
+                leftAmount = 0;
+
+                if (ModManager.Instance.Config.GetEnableSounds()) {
+                    Game1.playSound("purchase");
+                }
+            }
 
             if (leftAmount > 0) {
                 ResearchItem.Stack = leftAmount;

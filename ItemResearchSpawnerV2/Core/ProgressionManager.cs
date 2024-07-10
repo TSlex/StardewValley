@@ -43,7 +43,6 @@ namespace ItemResearchSpawnerV2.Core {
         public void ResearchItem(ProgressionItem item, out int leftAmount) {
             leftAmount = item.Stack;
 
-
             if (item.RequiredResearch < 0) {
                 ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();
                 ModManager.Instance.UpdateMenu(rebuild: true);
@@ -64,6 +63,17 @@ namespace ItemResearchSpawnerV2.Core {
             }
             if (item.Quality >= ItemQuality.Iridium) {
                 item.SaveData.ResearchCountIridium += progressCount;
+            }
+
+            if (ModManager.Instance.ModMode.HasPriceBehaviour() && needAmount > 0) {
+                var itemToSell = item.GameItem;
+                itemToSell.Stack = needAmount;
+
+                ModManager.Instance.SellItem(itemToSell);
+
+                if (ModManager.Instance.Config.GetEnableSounds()) {
+                    Game1.playSound("purchase");
+                }
             }
 
             leftAmount -= needAmount;
@@ -125,37 +135,65 @@ namespace ItemResearchSpawnerV2.Core {
                 BaseResearchCount = item.Forbidden ? -1 : category.ResearchCount
             };
 
-            if (ModManager.Instance.ModMode == ModMode.ResearchPlus || ModManager.Instance.ModMode == ModMode.BuySellPlus) {
-                itemCategory.BaseResearchCount = 0;
-            }
+            itemCategory.BaseResearchCount = ModManager.Instance.ModMode switch {
+                ModMode.Research => itemCategory.BaseResearchCount,
+                ModMode.BuySell => 1,
+                ModMode.Combined => itemCategory.BaseResearchCount,
+                ModMode.ResearchPlus => 0,
+                ModMode.BuySellPlus => 0,
+                _ => itemCategory.BaseResearchCount,
+            };
+
+            //if (ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.Combined) {
+            //    itemCategory.BaseResearchCount = 0;
+            //}
 
             var itemPrice = Utility.getSellToStorePriceOfItem(item.Item, false);
             itemPrice = itemPrice <= 0 ? category.BaseCost : itemPrice;
 
             if (ModManager.Instance.ModMode == ModMode.BuySellPlus) {
-                itemPrice = itemPrice * 5;
+                itemPrice = itemPrice * 2;
 
-                if (itemPrice <= 1000) {
-                    itemPrice = 1000;
+                if (itemPrice <= 100) {
+                    itemPrice *= 50;
                 }
-                else if (itemPrice <= 2500) {
-                    itemPrice = 2500;
+                else if (itemPrice <= 500) {
+                    itemPrice *= 15;
+                }
+                else if (itemPrice <= 1000) {
+                    itemPrice *= 10;
                 }
                 else if (itemPrice <= 5000) {
-                    itemPrice = 5000;
-                }
-                else if (itemPrice <= 10000) {
-                    itemPrice = 10000;
-                }
-                else if (itemPrice <= 25000) {
-                    itemPrice = 25000;
-                }
-                else if (itemPrice <= 50000) {
-                    itemPrice = 50000;
+                    itemPrice *= 5;
                 }
                 else {
+                    itemPrice *= 2;
+                }
+                if (itemPrice > 100000) {
                     itemPrice = 100000;
                 }
+
+                //if (itemPrice <= 1000) {
+                //    itemPrice = 1000;
+                //}
+                //else if (itemPrice <= 2500) {
+                //    itemPrice = 2500;
+                //}
+                //else if (itemPrice <= 5000) {
+                //    itemPrice = 5000;
+                //}
+                //else if (itemPrice <= 10000) {
+                //    itemPrice = 10000;
+                //}
+                //else if (itemPrice <= 25000) {
+                //    itemPrice = 25000;
+                //}
+                //else if (itemPrice <= 50000) {
+                //    itemPrice = 50000;
+                //}
+                //else {
+                //    itemPrice = 100000;
+                //}
             }
 
             var progressionData = GetProgressionDataOrDefault(item.Item);

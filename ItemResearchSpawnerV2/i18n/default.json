@@ -71,7 +71,7 @@
 
   "config.default-mode-name": "Mod mode",
   "config.default-mode-desc": "This affects some aspects of this mod, such as item research progression...",
-  "config.default-mode-note": "Note: if you change the mode from title it will affect new saves only, to change active mode, load farm save first...",
+  "config.default-mode-note": "Note: if you change the mode from title it will affect new saves only, to change an active mode, load the save first...",
 
   "config.open-menu-key-name": "Open key",
   "config.open-menu-key-desc": "Key needed to press for menu to open",
