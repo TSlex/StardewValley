@@ -1,6 +1,7 @@
 ﻿using ItemResearchSpawnerV2.Api;
 using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data.Enums;
+using ItemResearchSpawnerV2.Core.Utils;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -150,9 +151,9 @@ namespace ItemResearchSpawnerV2 {
             //    Monitor.Log(Game1.chatBox.chatBox.Text);
             //}
 
-            //if (Game1.player.ActiveItem != null) {
-            //    Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
-            //}
+            if (Game1.player.ActiveItem != null) {
+                Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
+            }
 
             // print button presses to the console window
             // this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
@@ -163,7 +164,8 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private static string GetItemUniqueKey(Item item) {
-            return $"{item.Name}:" + $"{item.ParentSheetIndex} | {item.ItemId} | {item.QualifiedItemId} | {item.GetType().Name}";
+            //return $"{item.Name}:" + $"{item.ParentSheetIndex} | {item.ItemId} | {item.QualifiedItemId} | {item.GetType().Name}";
+            return $"{CommonHelper.GetItemUniqueKey(item)}";
         }
 
         // ---------------------------------------------------------------------------------------
@@ -213,13 +215,13 @@ namespace ItemResearchSpawnerV2 {
 
             configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Balance());
 
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                getValue: () => ActiveConfig.GetUseDefaultBalanceConfig(),
-                setValue: value => ActiveConfig.SetUseDefaultBalanceConfig(value),
-                name: () => I18n.Config_DefaultBalanceName(),
-                tooltip: () => I18n.Config_DefaultBalanceDesc()
-            );
+            //configMenu.AddBoolOption(
+            //    mod: ModManifest,
+            //    getValue: () => ActiveConfig.GetUseDefaultBalanceConfig(),
+            //    setValue: value => ActiveConfig.SetUseDefaultBalanceConfig(value),
+            //    name: () => I18n.Config_DefaultBalanceName(),
+            //    tooltip: () => I18n.Config_DefaultBalanceDesc()
+            //);
 
             configMenu.AddNumberOption(
                 mod: ModManifest,

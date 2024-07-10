@@ -1,4 +1,5 @@
-﻿using StardewValley;
+﻿using ItemResearchSpawnerV2.Core.Utils;
+using StardewValley;
 
 namespace ItemResearchSpawnerV2.Core.Data {
 
@@ -30,6 +31,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
 
         public bool Forbidden = false;
         public bool NormalQualityForced = false;
+        public string UniqueKey = "";
 
         /*********
         ** Accessors
@@ -82,6 +84,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
             Item = createItem(this);
             Forbidden = false;
             NormalQualityForced = false;
+            UniqueKey = CommonHelper.GetItemUniqueKey(Item);
         }
 
         /// <summary>Construct an instance.</summary>
@@ -94,6 +97,7 @@ namespace ItemResearchSpawnerV2.Core.Data {
             Item = item.Item;
             Forbidden = item.Forbidden;
             NormalQualityForced = item.NormalQualityForced;
+            UniqueKey = item.UniqueKey;
         }
 
         /// <summary>Get whether the item name contains a case-insensitive substring.</summary>

@@ -13,8 +13,8 @@ using SObject = StardewValley.Object;
 namespace ItemResearchSpawnerV2.Core {
     internal class ProgressionManager {
 
-        public List<ItemCategoryMeta> Categories { get; private set; }
-        public ItemCategoryMeta DefaultCategory { get; private set; }
+        //public List<ItemCategoryMeta> Categories { get; private set; }
+        //public ItemCategoryMeta DefaultCategory { get; private set; }
 
         public Dictionary<string, ItemSaveData> ResearchProgressions { get; set; }
 
@@ -22,21 +22,34 @@ namespace ItemResearchSpawnerV2.Core {
         private IMonitor Monitor => ModManager.Instance.Monitor;
         private IManifest Manifest => ModManager.Instance.Manifest;
 
+        //public Dictionary<string, int> Pricelist { get; internal set; }
+
         // ========================================================================================================
 
         public ProgressionManager() {
         }
 
-        public void LoadCategories() {
-            var categories = ModManager.Instance.Helper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath);
-            if (categories == null) {
-                ModManager.Instance.Monitor.LogOnce("One of the mod files (assets/categories.json) is missing or invalid. Some features may not work correctly; consider reinstalling the mod.", LogLevel.Warn);
-            }
+        //public void LoadCategories() {
+        //    var categories = ModManager.Instance.Helper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath);
+        //    if (categories == null) {
+        //        ModManager.Instance.Monitor.LogOnce("One of the mod files (assets/categories.json) is missing or invalid. Some features may not work correctly; consider reinstalling the mod.", LogLevel.Warn);
+        //    }
 
-            Categories = categories ?? new List<ItemCategoryMeta>();
-            DefaultCategory = new ItemCategoryMeta("category.misc", 1, 1, null, null);
-            Categories.Add(DefaultCategory);
-        }
+        //    Categories = categories ?? new List<ItemCategoryMeta>();
+        //    DefaultCategory = new ItemCategoryMeta("category.misc", 1, 1, null, null);
+        //    Categories.Add(DefaultCategory);
+        //}
+
+        //public void LoadPricelist() {
+        //    var categories = ModManager.Instance.Helper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.PricelistConfigPath);
+        //    if (categories == null) {
+        //        ModManager.Instance.Monitor.LogOnce("One of the mod files (assets/pricelist.json) is missing or invalid. Some features may not work correctly; consider reinstalling the mod.", LogLevel.Warn);
+        //    }
+
+        //    Categories = categories ?? new List<ItemCategoryMeta>();
+        //    DefaultCategory = new ItemCategoryMeta("category.misc", 1, 1, null, null);
+        //    Categories.Add(DefaultCategory);
+        //}
 
         // ========================================================================================================
 
@@ -104,7 +117,7 @@ namespace ItemResearchSpawnerV2.Core {
                 .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId)
                 .Select(p => p.Value).FirstOrDefault();
 
-            possibleItem ??= new SpawnableItem("", "", (item) => new MissingItem(key));
+            //possibleItem ??= new SpawnableItem("", "", (item) => new MissingItem(key));
 
             if (possibleItem == null) {
                 return new SpawnableItem("", "", (item) => new MissingItem(key));
@@ -116,6 +129,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             return new SpawnableItem(possibleItem) {
                 Item = item,
+                UniqueKey = possibleItem.UniqueKey
             };
         }
 
@@ -126,8 +140,17 @@ namespace ItemResearchSpawnerV2.Core {
 
         public ProgressionItem GetProgressionItem(SpawnableItem item) {
 
-            var category = Categories.FirstOrDefault(rule => rule.IsMatch(item));
-            category ??= DefaultCategory;
+            //var category = Categories.FirstOrDefault(rule => rule.IsMatch(item));
+            //category ??= DefaultCategory;
+
+            var category = ModManager.SaveManagerInstance.GetCategories().FirstOrDefault(rule => rule.IsMatch(item));
+            category ??= ModManager.SaveManagerInstance.GetDefaultCategory();
+
+            //var pricelistItem = ModManager.SaveManagerInstance.GetPricelist().FirstOrDefault(p => p.Key == item.UniqueKey);
+            var pricelistItem = ModManager.SaveManagerInstance.GetPricelist()
+                .Where(p => p.Key == item.UniqueKey)
+                .Select(e => (KeyValuePair<string, int>?) e)
+                .FirstOrDefault();
 
             var itemCategory = new ItemCategory {
                 Label = I18n.GetByKey(category.Label),
@@ -150,6 +173,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             var itemPrice = Utility.getSellToStorePriceOfItem(item.Item, false);
             itemPrice = itemPrice <= 0 ? category.BaseCost : itemPrice;
+            itemPrice = pricelistItem != null ? pricelistItem.Value.Value : itemPrice;
 
             if (ModManager.Instance.ModMode == ModMode.BuySellPlus) {
                 itemPrice = itemPrice * 2;

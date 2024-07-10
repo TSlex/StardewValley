@@ -72,7 +72,7 @@ namespace ItemResearchSpawnerV2.Core {
         // ===========================================================================================
 
         public void OpenMenu() {
-            ProgressionManager.LoadCategories();
+            //ProgressionManager.LoadCategories();
             Game1.activeClickableMenu = new MainMenuController();
         }
 
@@ -290,6 +290,7 @@ namespace ItemResearchSpawnerV2.Core {
             // -------------------------------------------------------------------------------------
 
             ProgressionManager.ResearchProgressions = SaveManager.GetProgression(Game1.player.UniqueMultiplayerID.ToString());
+            //ProgressionManager.Pricelist = SaveManager.GetPricelist();
         }
 
 

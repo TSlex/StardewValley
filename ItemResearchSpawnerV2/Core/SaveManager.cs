@@ -10,18 +10,18 @@ namespace ItemResearchSpawnerV2.Core {
 
         private Dictionary<string, Dictionary<string, ItemSaveData>> Progressions;
         private Dictionary<string, ModManagerState> ModStates;
-        private Dictionary<string, int> PriceList;
+        private Dictionary<string, int> Pricelist;
         private List<string> ItemBlacklist;
 
         private ICollection<ItemCategoryMeta> Categories;
+        private ItemCategoryMeta DefaultCategory;
 
         private IModHelper ModHelper => ModManager.Instance.Helper;
-
 
         public SaveManager() {
             Progressions = new Dictionary<string, Dictionary<string, ItemSaveData>>();
             ModStates = new Dictionary<string, ModManagerState>();
-            PriceList = new Dictionary<string, int>();
+            Pricelist = new Dictionary<string, int>();
             Categories = new List<ItemCategoryMeta>();
         }
 
@@ -80,17 +80,21 @@ namespace ItemResearchSpawnerV2.Core {
         // ----------------------------------------------------------------------------------------------------------------
 
         public Dictionary<string, int> GetPricelist() {
-            return PriceList.DeepClone();
+            return Pricelist.DeepClone();
         }
 
         public void CommitPricelist(Dictionary<string, int> pricelist) {
-            PriceList = new Dictionary<string, int>(pricelist);
+            Pricelist = new Dictionary<string, int>(pricelist);
         }
 
         // ----------------------------------------------------------------------------------------------------------------
 
         public List<ItemCategoryMeta> GetCategories() {
             return Categories.ToList();
+        }
+
+        public ItemCategoryMeta GetDefaultCategory() {
+            return DefaultCategory;
         }
 
         public void CommitCategories(List<ItemCategoryMeta> categories) {
@@ -146,57 +150,102 @@ namespace ItemResearchSpawnerV2.Core {
 
         private void LoadPricelist() {
 
-            if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
+            //if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
 
-                try {
-                    PriceList = ModHelper.Data.ReadGlobalData<Dictionary<string, int>>(SaveHelper.PriceConfigKey);
-                }
-                catch (Exception _) {
-                    PriceList = null;
-                }
+            //    try {
+            //        PriceList = ModHelper.Data.ReadGlobalData<Dictionary<string, int>>(SaveHelper.PriceConfigKey);
+            //    }
+            //    catch (Exception _) {
+            //        PriceList = null;
+            //    }
 
-                PriceList ??= ModHelper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
-                               new Dictionary<string, int>();
+            //    PriceList ??= ModHelper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
+            //                   new Dictionary<string, int>();
+            //}
+
+            //else {
+            //    PriceList = ModHelper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
+            //                 new Dictionary<string, int>();
+            //}
+
+            Dictionary<string, int> pricelist = null;
+
+            try {
+                pricelist = ModHelper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath);
+
+                if (pricelist == null) {
+                    throw new Exception();
+                }
+            }
+            catch (Exception _) {
+                ModManager.Instance.Monitor.LogOnce("One of the mod files (assets/pricelist.json) is missing or invalid. Some features may not work correctly; consider reinstalling the mod.", LogLevel.Error);
             }
 
-            else {
-                PriceList = ModHelper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
-                             new Dictionary<string, int>();
-            }
+            Pricelist = pricelist ?? new Dictionary<string, int>();
         }
 
         private void LoadCategories() {
 
-            if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
+            //if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
 
-                try {
-                    Categories = ModHelper.Data.ReadGlobalData<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigKey);
-                }
-                catch (Exception _) {
-                    Categories = null;
-                }
+            //    try {
+            //        Categories = ModHelper.Data.ReadGlobalData<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigKey);
+            //    }
+            //    catch (Exception _) {
+            //        Categories = null;
+            //    }
 
-                Categories ??= ModHelper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath) ??
-                                new List<ItemCategoryMeta>();
+            //    Categories ??= ModHelper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath) ??
+            //                    new List<ItemCategoryMeta>();
+            //}
+
+            //else {
+            //    Categories = ModHelper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath) ??
+            //                  new List<ItemCategoryMeta>();
+            //}
+
+            List<ItemCategoryMeta> categories = null;
+
+            try {
+                categories = ModManager.Instance.Helper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath);
+
+                if (categories == null) {
+                    throw new Exception();
+                }
+            }
+            catch (Exception _) {
+                ModManager.Instance.Monitor.LogOnce("One of the mod files (assets/categories.json) is missing or invalid. Some features may not work correctly; consider reinstalling the mod.", LogLevel.Error);
             }
 
-            else {
-                Categories = ModHelper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath) ??
-                              new List<ItemCategoryMeta>();
-            }
-
+            Categories = categories ?? new List<ItemCategoryMeta>();
+            DefaultCategory = new ItemCategoryMeta("category.misc", 1, 1, null, null);
+            Categories.Add(DefaultCategory);
         }
 
         private void LoadItemBlacklist() {
 
+            //try {
+            //    ItemBlacklist = ModHelper.Data.ReadJsonFile<List<string>>(SaveHelper.BannedItemsConfigPath) ??
+            //                 new List<string>();
+            //}
+            //catch (Exception _) {
+            //    ItemBlacklist = new List<string>();
+            //}
+
+            List<string> blacklist = null;
+
             try {
-                ItemBlacklist = ModHelper.Data.ReadJsonFile<List<string>>(SaveHelper.BannedItemsConfigPath) ??
-                             new List<string>();
+                blacklist = ModHelper.Data.ReadJsonFile<List<string>>(SaveHelper.BannedItemsConfigPath);
+
+                if (blacklist == null) {
+                    throw new Exception();
+                }
             }
             catch (Exception _) {
-                ItemBlacklist = new List<string>();
+                ModManager.Instance.Monitor.LogOnce("One of the mod files (assets/banlist.json) is missing or invalid. Some features may not work correctly; consider reinstalling the mod.", LogLevel.Error);
             }
 
+            ItemBlacklist = blacklist ?? new List<string>();
         }
 
         #endregion
@@ -223,7 +272,7 @@ namespace ItemResearchSpawnerV2.Core {
 
         private void SavePricelist() {
             if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
-                ModHelper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, PriceList);
+                ModHelper.Data.WriteGlobalData(SaveHelper.PriceConfigKey, Pricelist);
             }
         }
 
