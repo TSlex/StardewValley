@@ -1,137 +1,161 @@
 ﻿using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using static StardewValley.BellsAndWhistles.PlayerStatusList;
 
 namespace ItemResearchSpawnerV2.Core {
+
+    internal class ModCommand {
+        public readonly string command;
+        public readonly Func<string> description;
+        public readonly Action<string, string[]> action;
+
+        public ModCommand(string command, Func<string> description, Action<string, string[]> action) {
+            this.command = command;
+            this.description = description;
+            this.action = action;
+        }
+    }
+
     internal class CommandManager {
 
         private IModHelper Helper => ModManager.Instance.Helper;
         private IMonitor Monitor => ModManager.Instance.Monitor;
 
+        private Dictionary<string, ModCommand> Commands;
+
         public CommandManager() {
-            Helper.ConsoleCommands.Add("rns_unlock_all", I18n.Command_UnlockAll_Desc(), UnlockAllProgression);
-            Helper.ConsoleCommands.Add("rns_unlock_active", I18n.Command_UnlockActive_Desc(), UnlockActiveProgression);
+            Commands = new Dictionary<string, ModCommand> {
+                { "rns_get_key", new ModCommand("rns_get_key", () => I18n.Command_UniqueKey_Desc(), GetUniqueKey) },
+                { "rns_unlock_all", new ModCommand("rns_unlock_all", () => I18n.Command_UnlockAll_Desc(), UnlockAllProgression) },
+                { "rns_unlock_active", new ModCommand("rns_unlock_active", () => I18n.Command_UnlockActive_Desc(), UnlockActiveProgression) },
+                { "rns_dump_progression", new ModCommand("rns_dump_progression", () => I18n.Command_DumpProgressions_Desc(), DumpProgression) },
+                { "rns_load_progression", new ModCommand("rns_load_progression", () => I18n.Command_LoadProgressions_Desc(), LoadProgression) }
+            };
+        }
 
-            Helper.ConsoleCommands.Add("rns_set_mode", I18n.Command_SetMode_Desc(), SetMode);
+        // =====================================================================================
 
-            Helper.ConsoleCommands.Add("rns_set_price", I18n.Command_SetPrice_Desc(), SetPrice);
-            Helper.ConsoleCommands.Add("rns_reset_price", I18n.Command_ResetPrice_Desc(), ResetPrice);
+        public void HandleChatCommand(string message) {
+            //ReplyToChat($"Got command: {message}");
 
-            Helper.ConsoleCommands.Add("rns_get_key", I18n.Command_SetMode_Desc(), GetUniqueKey);
+            var splitted = message.Split(" ");
+            string command = splitted[0];
+            string[] args = splitted.Skip(1).ToArray();
 
-            Helper.ConsoleCommands.Add("rns_dump_progression", I18n.Command_SetMode_Desc(), DumpProgression);
-            Helper.ConsoleCommands.Add("rns_load_progression", I18n.Command_SetMode_Desc(), LoadProgression);
+            if (command == "rns_help") {
+                var targetCommand = args.Length > 0 ? args[0] : "";
 
-            Helper.ConsoleCommands.Add("rns_dump_pricelist", I18n.Command_SetMode_Desc(), DumpPricelist);
-            Helper.ConsoleCommands.Add("rns_load_pricelist", I18n.Command_SetMode_Desc(), LoadPricelist);
+                if (targetCommand == "") {
+                    foreach (var item in Commands)
+                    {
+                        GiveCommandDescription(item.Value);
+                    }
+                }
+                else if (Commands.TryGetValue(targetCommand, out var modCommand)) {
+                    GiveCommandDescription(modCommand);
+                }
+                else {
+                    ReplyToChat(string.Format(I18n.Command_GetHelpFail(), targetCommand));
+                }
+            }
 
+            else if (Commands.TryGetValue(command, out var modCommand)) {
 
-            Helper.ConsoleCommands.Add("rns_dump_categories", I18n.Command_SetMode_Desc(), DumpCategories);
-            Helper.ConsoleCommands.Add("rns_load_categories", I18n.Command_SetMode_Desc(), LoadCategories);
+                //ReplyToChat($"Got command -> {command} \nParameters were:");
+
+                //foreach (var arg in args) {
+                //    ReplyToChat($"{arg}");
+                //}
+
+                modCommand.action(command, args);
+            }
+        }
+
+        public void GiveCommandDescription(ModCommand command) {
+            ReplyToChat(string.Format(I18n.Command_GetHelp(), command.command, command.description()));
+        }
+
+        public void ReplyToChat(string message) {
+            Game1.Multiplayer.sendChatMessage(LocalizedContentManager.CurrentLanguageCode, message, Game1.player.UniqueMultiplayerID);
+            ReceiveModMessage(Game1.chatBox, 0, 2, LocalizedContentManager.CurrentLanguageCode, message);
+        }
+
+        private void ReceiveModMessage(ChatBox chatBox, long sourceFarmer, int chatKind, LocalizedContentManager.LanguageCode language, string message) {
+            string text = message;
+            ChatMessage chatMessage = new();
+
+            List<ChatMessage> messages = (List<ChatMessage>) typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(chatBox);
+            MethodInfo messageColor = typeof(ChatBox).GetMethod("messageColor", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            string text2 = Game1.parseText(text, chatBox.chatBox.Font, chatBox.chatBox.Width - 16);
+
+            chatMessage.timeLeftToDisplay = 600;
+            chatMessage.verticalSize = (int) chatBox.chatBox.Font.MeasureString(text2).Y + 4;
+            chatMessage.color = (Color) messageColor.Invoke(chatBox, new object[] { chatKind });
+            chatMessage.language = language;
+
+            chatMessage.message = new List<ChatSnippet>() {
+                new("[RNS", language),
+                new("", language) {
+                    emojiIndex = 106,
+                    myLength = 4 * 9
+                },
+                new("]: ", language),
+                new(text2, language)
+            };
+
+            messages.Add(chatMessage);
+            if (messages.Count > chatBox.maxMessages) {
+                messages.RemoveAt(0);
+            }
+        }
+
+        // =====================================================================================
+
+        private void GetUniqueKey(string command, string[] args) {
+            var activeItem = Game1.player.CurrentItem;
+
+            if (activeItem == null) {
+                ReplyToChat(I18n.Command_UnlockActive_ErrNoItem());
+            }
+            else {
+                //Monitor.Log($"{CommonHelper.GetItemUniqueKey(activeItem)}", LogLevel.Info);
+                ReplyToChat(CommonHelper.GetItemUniqueKey(activeItem));
+            }
         }
 
         private void UnlockAllProgression(string command, string[] args) {
-            if (!CheckCommandInGame())
-                return;
 
-            //ProgressionManager.Instance.UnlockAllProgression();
+            ModManager.ProgressionManagerInstance.UnlockAllProgression();
 
-            Monitor.Log($"All items were researched!", LogLevel.Info);
+            //Monitor.Log($"All items were researched!", LogLevel.Info);
+            ReplyToChat(I18n.Command_UnlockAll_Succ());
         }
 
         private void UnlockActiveProgression(string command, string[] args) {
-            if (!CheckCommandInGame())
-                return;
-
             var activeItem = Game1.player.CurrentItem;
 
             if (activeItem == null) {
-                Monitor.Log($"Select an item first", LogLevel.Info);
+                //Monitor.Log($"Select an item first", LogLevel.Info);
+                ReplyToChat(I18n.Command_UnlockActive_ErrNoItem());
             }
             else {
                 //_progressionManager.UnlockProgression(activeItem);
-                Monitor.Log($"Item - {activeItem.DisplayName}, was unlocked! ;)", LogLevel.Info);
-            }
-        }
+                ModManager.ProgressionManagerInstance.UnlockProgression(activeItem);
 
-        private void SetMode(string command, string[] args) {
-            if (!CheckIsHostPlayer())
-                return;
-
-            try {
-                //_modManager.ModMode = (ModMode)int.Parse(args[0]);
-                Monitor.Log($"Mode was changed to: {ModManager.Instance.ModMode.GetString()}", LogLevel.Info);
-            }
-            catch (Exception) {
-                Monitor.Log($"Available modes: \n 0 - Research (Spawn) mode \n 1 - Buy/Sell mode \n 2 - Combined (Research->Sell/Buy) mode", LogLevel.Info);
-            }
-        }
-
-        private void SetPrice(string command, string[] args) {
-            if (!CheckIsHostPlayer())
-                return;
-            if (!CheckIsForceDefaults())
-                return;
-
-            var activeItem = Game1.player.CurrentItem;
-
-            if (activeItem == null) {
-                Monitor.Log($"Select an item first", LogLevel.Info);
-            }
-            else {
-                try {
-                    var price = int.Parse(args[0]);
-
-                    if (price < 0) {
-                        Monitor.Log($"Price must be a non-negative number", LogLevel.Info);
-                    }
-                    else {
-                        //_modManager.SetItemPrice(activeItem, price);
-                        Monitor.Log($"Price for {activeItem.DisplayName}, was changed to: {price}! ;)", LogLevel.Info);
-                    }
-                }
-                catch (Exception) {
-                    Monitor.Log($"Price must be a correct non-negative number", LogLevel.Info);
-                }
-            }
-        }
-
-        private void ResetPrice(string command, string[] args) {
-            if (!CheckIsHostPlayer())
-                return;
-            if (!CheckIsForceDefaults())
-                return;
-
-            var activeItem = Game1.player.CurrentItem;
-
-            if (activeItem == null) {
-                Monitor.Log($"Select an item first", LogLevel.Info);
-            }
-            else {
-                //_modManager.SetItemPrice(activeItem, -1);
-                Monitor.Log($"Price for {activeItem.DisplayName}, was reset! ;)", LogLevel.Info);
-            }
-        }
-
-        private void GetUniqueKey(string command, string[] args) {
-            if (!CheckCommandInGame())
-                return;
-
-            var activeItem = Game1.player.CurrentItem;
-
-            if (activeItem == null) {
-                Monitor.Log($"Select an item first", LogLevel.Info);
-            }
-            else {
-                Monitor.Log($"{CommonHelper.GetItemUniqueKey(activeItem)}", LogLevel.Info);
+                //Monitor.Log($"Item - {activeItem.DisplayName}, was unlocked! ;)", LogLevel.Info);
+                ReplyToChat(string.Format(I18n.Command_UnlockActive_Succ(), activeItem.DisplayName));
             }
         }
 
@@ -139,87 +163,36 @@ namespace ItemResearchSpawnerV2.Core {
             if (!CheckIsHostPlayer())
                 return;
 
-            if (Context.IsMultiplayer) {
-                Monitor.Log($"Waiting until all clients response", LogLevel.Info);
-            }
+            //if (Context.IsMultiplayer) {
+            //    Monitor.Log($"Waiting until all clients response", LogLevel.Info);
+            //}
 
             ModManager.ProgressionManagerInstance.DumpPlayersProgression();
 
-            if (!Context.IsMultiplayer) {
-                Monitor.Log($"Player(s) progressions were dumped", LogLevel.Info);
-            }
+            //if (!Context.IsMultiplayer) {
+            //    Monitor.Log($"Player(s) progressions were dumped", LogLevel.Info);
+            //}
+
+            //SaveHelper.ProgressionDumpPath(player.UniqueMultiplayerID.ToString())
+
+            //ReplyToChat(I18n.Command_DumpProgressions_Succ());
+            ReplyToChat(string.Format(I18n.Command_DumpProgressions_Succ(), $"...mods/ItemResearchSpawner/{SaveHelper.DumpBasePath}/{Game1.player.Name}_{Game1.getFarm().NameOrUniqueName}"));
         }
 
         private void LoadProgression(string command, string[] args) {
             if (!CheckIsHostPlayer())
                 return;
 
-            //ProgressionManager.Instance.LoadPlayersProgression();
+            ModManager.ProgressionManagerInstance.LoadPlayersProgression();
 
-            Monitor.Log($"Player(s) progressions was loaded", LogLevel.Info);
-        }
-
-        private void DumpPricelist(string command, string[] args) {
-            if (!CheckIsHostPlayer())
-                return;
-            //ModManager.Instance.DumpPricelist();
-
-            Monitor.Log($"Pricelist was dumped to {SaveHelper.PricelistDumpPath}", LogLevel.Info);
-        }
-
-        private void LoadPricelist(string command, string[] args) {
-            if (!CheckIsHostPlayer())
-                return;
-            if (!CheckIsForceDefaults())
-                return;
-            //ModManager.Instance.LoadPricelist();
-
-            Monitor.Log($"Pricelist was loaded", LogLevel.Info);
-        }
-
-        private void DumpCategories(string command, string[] args) {
-            if (!CheckIsHostPlayer())
-                return;
-            //ModManager.Instance.DumpCategories();
-
-            Monitor.Log($"Categories were dumped to {SaveHelper.CategoriesDumpPath}", LogLevel.Info);
-        }
-
-        private void LoadCategories(string command, string[] args) {
-            if (!CheckIsHostPlayer())
-                return;
-            if (!CheckIsForceDefaults())
-                return;
-
-            //ModManager.Instance.LoadCategories();
-
-            Monitor.Log($"Categories were loaded", LogLevel.Info);
-        }
-
-        private bool CheckCommandInGame() {
-            if (!Game1.hasLoadedGame) {
-                Monitor.Log($"Use this command in-game only!", LogLevel.Info);
-                return false;
-            }
-
-            return true;
+            //Monitor.Log($"Player(s) progressions was loaded", LogLevel.Info);
+            ReplyToChat(I18n.Command_LoadProgressions_Succ());
         }
 
         private bool CheckIsHostPlayer() {
-            if (CheckCommandInGame() && !Context.IsMainPlayer) {
-                Monitor.Log($"This command is for host player only!", LogLevel.Info);
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool CheckIsForceDefaults() {
-            if (Helper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
-                Monitor.Log(
-                    $"Currently default config is used for prices and categories! You can turn this off in config, to be able to manually change :)",
-                    LogLevel.Warn);
-                return false;
+            if (!Context.IsMainPlayer) {
+                //Monitor.Log($"This command is for host player only!", LogLevel.Info);
+                ReplyToChat(I18n.Command_Multiplayer_HostOnly());
             }
 
             return true;

@@ -49,14 +49,19 @@ namespace ItemResearchSpawnerV2.Core {
             Progressions[playerID] = progression;
         }
 
-        public void CommitProgression(string playerID, Dictionary<string, ItemSaveData> commitProgression) {
-            var progression = GetProgression(playerID);
+        public void CommitProgression(string playerID, Dictionary<string, ItemSaveData> commitProgression, bool replace = false) {
+            if (!replace) {
+                var progression = GetProgression(playerID);
 
-            foreach (var key in commitProgression.Keys.ToArray()) {
-                progression[key] = commitProgression[key];
+                foreach (var key in commitProgression.Keys.ToArray()) {
+                    progression[key] = commitProgression[key];
+                }
+
+                Progressions[playerID] = progression;
             }
-
-            Progressions[playerID] = progression;
+            else {
+                Progressions[playerID] = commitProgression;
+            }
         }
 
         // ----------------------------------------------------------------------------------------------------------------

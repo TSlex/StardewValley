@@ -112,26 +112,23 @@
   "config.ui-custom-color-B-desc": "Синее значение (0-255)",
 
   //commands
-  "command.unlock-all.desc": "Разблокировать все предметы",
-  "command.unlock-all.succ": "Все исследования завершены! :D",
+  "command.get-help": "Описание для комманды \"{0}\":\n{1}",
+  "command.get-help-fail": "Не могу найти комманду \"{0}\"!",
 
-  "command.unlock-active.desc": "Разблокировать активный предмет в руках",
-  "command.unlock-active.err-no-item": "Сначала возьмите предмет!",
-  "command.unlock-active.succ": "Исследование для предмета - {0}, завершено! ;)",
+  "command.unlock-all.desc": "Исследовать (открыть) все предметы",
+  "command.unlock-all.succ": "Все исследования завершены!",
 
-  "command.set-mode.desc": "Изменить режим:\\n[0] - Режим дублирования\\n[1] - Режим покупки/продажи",
-  "command.set-mode.err": "Доступные режимы:\\n[0] - Режим дублирования\\n[1] - Режим покупки/продажи",
-  "command.set-mode.succ": "Режим был изменен на: {0}",
+  "command.unique-key.desc": "Показать уникальный айди текущего предмета в руках",
 
-  "command.set-price.desc": "Изменить цену для предмета в руках (глобально и только для меню) \\nТолько 0+ значения!",
-  "command.set-price.err-no-item": "Сначала возьмите предмет!",
-  "command.set-price.err-incorrect-price": "Цена должа быть неотрицателньым целочисленным числом (как например 120, 999 и 0)",
-  "command.set-price.succ": "Цена для {0}, была изменена на: {1}! ;)",
+  "command.unlock-active.desc": "Исследовать (открыть) текущий предмет в руках",
+  "command.unlock-active.err-no-item": "Для начала возьмите предмет",
+  "command.unlock-active.succ": "Предмет - {0}, исследован!",
 
-  "command.reset-price.desc": "Сбросить цену для предмета в руках (глобально и только для меню)",
-  "command.reset-price.err-no-item": "Сначала возьмите предмет!",
-  "command.reset-price.succ": "Цена для {0}, была сброшена! ;)",
+  "command.dump-progressions.desc": "Извлечь прогресс в .json файл",
+  "command.dump-progressions.succ": "Прогресс был извлечен в {0}",
+  "command.load-progressions.desc": "Загрузить прогресс из .json файла",
+  "command.load-progressions.succ": "Прогресс был загружен!",
 
-  "command.reload_prices.desc": "Загрузить прайслист из файла",
-  "command.reload_prices.succ": "Прайслист успешно загружен :)"
+  "command.multiplayer.wait": "Ожидаю отклика всех клиентов...",
+  "command.multiplayer.host-only": "Эта комманда только для хост-игрока!"
 }

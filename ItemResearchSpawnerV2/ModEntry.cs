@@ -2,6 +2,8 @@
 using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -63,6 +65,7 @@ namespace ItemResearchSpawnerV2 {
 
         // =======================================================================================================
 
+
         private void HandleChatMessage(TextBox sender) {
             var messages = (List<ChatMessage>)typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Game1.chatBox);
 
@@ -74,8 +77,9 @@ namespace ItemResearchSpawnerV2 {
             var formattedMessage = lastMessage.message.Trim().Split(":").Last().Trim();
 
             if (formattedMessage.StartsWith("!rns")) {
-                Monitor.Log(formattedMessage);
+                ModManager.CommandManagerInstance.HandleChatCommand(formattedMessage.Replace("!rns", "rns"));
             }
+
         }
 
         public void OnConfigChange() {

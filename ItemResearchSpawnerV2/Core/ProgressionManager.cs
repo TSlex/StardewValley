@@ -58,6 +58,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             if (item.RequiredResearch < 0) {
                 ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();
+                ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
                 ModManager.Instance.UpdateMenu(rebuild: true);
                 return;
             }
@@ -92,6 +93,7 @@ namespace ItemResearchSpawnerV2.Core {
             leftAmount -= needAmount;
 
             ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();
+            ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
         }
 
         public void FavoriteItem(ProgressionItem item) {
@@ -286,12 +288,74 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private void DumpPlayerProgression(Farmer player, Dictionary<string, ItemSaveData> progression) {
-            Monitor.Log(
-                $"Dumping progression - player: {player.Name}, location: {SaveHelper.ProgressionDumpPath(player.UniqueMultiplayerID.ToString())}",
-                LogLevel.Info);
+            //Monitor.Log(
+            //    $"Dumping progression - player: {player.Name}, location: {SaveHelper.ProgressionDumpPath(player.UniqueMultiplayerID.ToString())}",
+            //    LogLevel.Info);
 
             Helper.Data.WriteJsonFile(SaveHelper.ProgressionDumpPath(player.UniqueMultiplayerID.ToString()),
                 progression.Where(p => p.Value.ResearchCount > 0).ToList());
+        }
+
+        public void LoadPlayersProgression() {
+            var players = Game1.getAllFarmers().ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
+
+            var progressions = ModManager.SaveManagerInstance.GetAllProgressions();
+
+            foreach (var player in players) {
+                if (!progressions.ContainsKey(player.Key)) {
+                    progressions[player.Key] = new Dictionary<string, ItemSaveData>();
+                }
+            }
+
+            foreach (var playerID in progressions.Keys) {
+                var playerData = (Helper.Data.ReadJsonFile<List<KeyValuePair<string, ItemSaveData>>>(SaveHelper.ProgressionDumpPath(playerID)) ?? new List<KeyValuePair<string, ItemSaveData>>()).ToDictionary(p => p.Key, p => p.Value);
+
+                foreach (var item in ModManager.Instance.ItemRegistry.Values) {
+                    if (item.UniqueKey == ":0") {
+                        var a = 0;
+                    }
+
+                    if (!playerData.ContainsKey(item.UniqueKey)) {
+                        playerData[item.UniqueKey] = new ItemSaveData();
+                    }
+                }
+
+                ModManager.SaveManagerInstance.CommitProgression(playerID, playerData, replace: true);
+            }
+
+            Game1.activeClickableMenu = null;
+            ResearchProgressions = ModManager.SaveManagerInstance.GetProgression(Game1.player.UniqueMultiplayerID.ToString());
+        }
+
+        public void UnlockAllProgression() {
+            foreach (var item in ModManager.Instance.ItemRegistry.Values) {
+                UnlockProgression(item.Item, false);
+            }
+            if (ModManager.Instance.Config.GetEnableSounds()) {
+                Game1.playSound("stardrop");
+            }
+
+            Game1.activeClickableMenu = null;
+            ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
+        }
+
+        public void UnlockProgression(Item item, bool playSound = true) {
+            var pI = GetProgressionItem(item);
+            var saveData = pI.SaveData;
+
+            saveData.ResearchCount = (int) MathF.Max(saveData.ResearchCount, pI.RequiredResearch);
+            saveData.ResearchCountSilver = (int) MathF.Max(saveData.ResearchCountSilver, pI.RequiredResearch);
+            saveData.ResearchCountGold = (int) MathF.Max(saveData.ResearchCountGold, pI.RequiredResearch);
+            saveData.ResearchCountIridium = (int) MathF.Max(saveData.ResearchCountIridium, pI.RequiredResearch);
+
+            ResearchProgressions[CommonHelper.GetItemUniqueKey(item)] = saveData;
+
+            if (playSound && ModManager.Instance.Config.GetEnableSounds()) {
+                Game1.playSound("stardrop");
+            }
+
+            Game1.activeClickableMenu = null;
+            ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
         }
     }
 }
