@@ -203,6 +203,8 @@ namespace ItemResearchSpawnerV2.Core {
             playerModState.Config.SellPriceMultiplier = hostModState.Config.SellPriceMultiplier;
             playerModState.Config.BuyPriceMultiplier = hostModState.Config.BuyPriceMultiplier;
             playerModState.Config.ResearchTimeSeconds = hostModState.Config.ResearchTimeSeconds;
+
+            ModManager.SaveManagerInstance.CommitModState(fromPlayerID.ToString(), playerModState);
         }
 
         private static void OnCommitProgression(long fromPlayerID, OnCommitProgressionMessage onCommitProgressionMessage) {
