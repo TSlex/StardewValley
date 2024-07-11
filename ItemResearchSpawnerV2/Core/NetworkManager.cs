@@ -33,7 +33,7 @@ namespace ItemResearchSpawnerV2.Core {
             public ICollection<ItemCategoryMeta> Categories;
             public ItemCategoryMeta DefaultCategory;
 
-            public string ShowMenuButton;
+            //public string ShowMenuButton;
         }
 
         public class OnCommitProgressionMessage : IModMessage {
@@ -51,7 +51,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             public ModManagerState ModState;
 
-            public string ShowMenuButton;
+            //public string ShowMenuButton;
         }
 
         public class OnHostConfigChangedMessage : IModMessage {
@@ -65,7 +65,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             public ModConfig Config;
 
-            public string ShowMenuButton;
+            //public string ShowMenuButton;
         }
 
         //public class SerializableModState {
@@ -196,7 +196,7 @@ namespace ItemResearchSpawnerV2.Core {
             var hostModState = ModManager.SaveManagerInstance.GetModState(Game1.player.UniqueMultiplayerID.ToString());
 
             playerModState.Config = onNonHostConfigChangedMessage.Config;
-            playerModState.Config.ShowMenuButton = KeybindList.Parse(onNonHostConfigChangedMessage.ShowMenuButton);
+            //playerModState.Config.ShowMenuButton = KeybindList.Parse(onNonHostConfigChangedMessage.ShowMenuButton);
 
             playerModState.Config.DefaultMode = hostModState.Config.DefaultMode;
             playerModState.Config.ResearchAmountMultiplier = hostModState.Config.ResearchAmountMultiplier;
@@ -223,7 +223,7 @@ namespace ItemResearchSpawnerV2.Core {
             var playerModState = onCommitModStateMessage.ModState;
             var hostModState = ModManager.SaveManagerInstance.GetModState(Game1.player.UniqueMultiplayerID.ToString());
 
-            playerModState.Config.ShowMenuButton = KeybindList.Parse(onCommitModStateMessage.ShowMenuButton);
+            //playerModState.Config.ShowMenuButton = KeybindList.Parse(onCommitModStateMessage.ShowMenuButton);
 
             playerModState.Config.DefaultMode = hostModState.Config.DefaultMode;
             playerModState.Config.ResearchAmountMultiplier = hostModState.Config.ResearchAmountMultiplier;
@@ -242,8 +242,8 @@ namespace ItemResearchSpawnerV2.Core {
             var playerModState = ModManager.SaveManagerInstance.GetModState(fromPlayerID.ToString());
             var hostModState = ModManager.SaveManagerInstance.GetModState(Game1.player.UniqueMultiplayerID.ToString());
 
-            var showMenuKey = playerModState.Config.ShowMenuButton.ToString();
-            playerModState.Config.ShowMenuButton = null;
+            //var showMenuKey = playerModState.Config.ShowMenuButton.ToString();
+            //playerModState.Config.ShowMenuButton = null;
 
             playerModState.Config.DefaultMode = hostModState.Config.DefaultMode;
             playerModState.Config.ResearchAmountMultiplier = hostModState.Config.ResearchAmountMultiplier;
@@ -263,7 +263,7 @@ namespace ItemResearchSpawnerV2.Core {
                 Progressions = new Dictionary<string, Dictionary<string, ItemSaveData>> {
                     {fromPlayerID.ToString() , ModManager.SaveManagerInstance.GetProgression(fromPlayerID.ToString()) }
                 },
-                ShowMenuButton = showMenuKey
+                //ShowMenuButton = showMenuKey
             };
 
             SendNetworkModMessage(reply, fromPlayerID);

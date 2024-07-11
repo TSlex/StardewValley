@@ -92,18 +92,18 @@ namespace ItemResearchSpawnerV2 {
         public void OnConfigChange() {
             if (IsSaveActive) {
                 // Parcing fix
-                var c = Manager.Config.DeepClone();
-                c.ShowMenuButton = null;
+                //var c = Manager.Config.DeepClone();
+                //c.ShowMenuButton = null;
 
                 if (Context.IsMainPlayer) {
                     NetworkManager.SendNetworkModMessage(new OnHostConfigChangedMessage() {
-                        Config = c,
+                        Config = Manager.Config,
                     });
                 }
                 else {
                     NetworkManager.SendNetworkModMessage(new OnNonHostConfigChangedMessage() {
-                        Config = c,
-                        ShowMenuButton = Manager.Config.ShowMenuButton.ToString()
+                        Config = Manager.Config,
+                        //ShowMenuButton = Manager.Config.ShowMenuButton.ToString()
                     });
                 }
             }

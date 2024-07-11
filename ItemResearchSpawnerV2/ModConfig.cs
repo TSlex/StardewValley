@@ -9,8 +9,8 @@ namespace ItemResearchSpawnerV2 {
 
     internal class ModConfig {
 
-        [JsonIgnore]
-        public KeybindList ShowMenuButton = KeybindList.ForSingle(SButton.R);
+        //public KeybindList ShowMenuButton = KeybindList.ForSingle(SButton.R);
+        public string ShowMenuButton = "R";
 
         public ModMode DefaultMode = ModMode.Research;
 
@@ -29,7 +29,8 @@ namespace ItemResearchSpawnerV2 {
         // ===============================================================================
 
         public KeybindList GetShowMenuButton() {
-            return ShowMenuButton;
+            //return ShowMenuButton;
+            return KeybindList.Parse(ShowMenuButton);
         }
 
         public ModMode GetDefaultMode() {
@@ -75,7 +76,8 @@ namespace ItemResearchSpawnerV2 {
         // ===============================================================================
 
         public void SetShowMenuButton(KeybindList value) {
-            ShowMenuButton = value;
+            ShowMenuButton = value.ToString();
+            //ShowMenuButton = value;
             //ModEntry.Instance.OnConfigChange();
         }
 
