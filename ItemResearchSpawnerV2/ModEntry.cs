@@ -90,7 +90,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void OnConfigChange() {
-            if (IsSaveActive) {
+            if (Manager.SaveDataLoaded) {
                 // Parcing fix
                 //var c = Manager.Config.DeepClone();
                 //c.ShowMenuButton = null;
@@ -112,6 +112,9 @@ namespace ItemResearchSpawnerV2 {
         public void ResetConfig() {
 
             if (IsSaveActive) {
+                if (!Manager.SaveDataLoaded) {
+                    return;
+                }
                 Manager.Config = new ModConfig();
             }
 
@@ -144,7 +147,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e) {
-            IsSaveActive = true;
+            //IsSaveActive = true;
         }
 
         private void OnSave(object sender, SavingEventArgs saveLoadedEventArgs) {
@@ -159,6 +162,8 @@ namespace ItemResearchSpawnerV2 {
             //if (!Context.IsMainPlayer) {
             //    return;
             //}
+
+            IsSaveActive = true;
 
             Manager.OnLoad();
 

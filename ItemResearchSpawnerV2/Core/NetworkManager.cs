@@ -42,8 +42,10 @@ namespace ItemResearchSpawnerV2.Core {
             internal Dictionary<string, ItemSaveData> CommitProgression;
         }
 
-        public class OnReplaceProgressionMessage : OnCommitProgressionMessage {
+        public class OnReplaceProgressionMessage : IModMessage {
             public string Type => "RNS_OnReplaceProgression";
+
+            internal Dictionary<string, ItemSaveData> CommitProgression;
         }
 
         public class OnCommitModStateMessage : IModMessage {
