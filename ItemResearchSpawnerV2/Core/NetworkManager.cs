@@ -39,13 +39,13 @@ namespace ItemResearchSpawnerV2.Core {
         public class OnCommitProgressionMessage : IModMessage {
             public string Type => "RNS_OnCommitProgression";
 
-            internal Dictionary<string, ItemSaveData> CommitProgression;
+            public Dictionary<string, ItemSaveData> CommitProgression;
         }
 
         public class OnReplaceProgressionMessage : IModMessage {
             public string Type => "RNS_OnReplaceProgression";
 
-            internal Dictionary<string, ItemSaveData> CommitProgression;
+            public Dictionary<string, ItemSaveData> CommitProgression;
         }
 
         public class OnCommitModStateMessage : IModMessage {

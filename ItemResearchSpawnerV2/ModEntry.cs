@@ -147,7 +147,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e) {
-            //IsSaveActive = true;
+            IsSaveActive = true;
         }
 
         private void OnSave(object sender, SavingEventArgs saveLoadedEventArgs) {
@@ -159,10 +159,6 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void OnLoad(object sender, SaveLoadedEventArgs saveLoadedEventArgs) {
-            //if (!Context.IsMainPlayer) {
-            //    return;
-            //}
-
             IsSaveActive = true;
 
             Manager.OnLoad();

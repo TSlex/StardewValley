@@ -82,7 +82,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetDefaultMode(ModMode value) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsMainPlayer) {
                 return;
             }
 
@@ -91,7 +91,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetUseDefaultBalanceConfig(bool value) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsMainPlayer) {
                 return;
             }
 
@@ -110,7 +110,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetResearchAmountMultiplier(float value) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsMainPlayer) {
                 return;
             }
 
@@ -119,7 +119,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetSellPriceMultiplier(float value) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsMainPlayer) {
                 return;
             }
 
@@ -128,7 +128,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetBuyPriceMultiplier(float value) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsMainPlayer) {
                 return;
             }
 
@@ -137,7 +137,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetResearchTimeSeconds(float value) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsMainPlayer) {
                 return;
             }
 
