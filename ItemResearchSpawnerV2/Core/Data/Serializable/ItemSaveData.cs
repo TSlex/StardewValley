@@ -12,5 +12,20 @@ namespace ItemResearchSpawnerV2.Models {
 
         public Color ClothesColor = Color.White;
         public int WaterLevel = 0;
+
+        public override bool Equals(object obj) {
+            if (obj == null || obj is not ItemSaveData data) {
+                return false;
+            }
+            else {
+                return ResearchCount == data.ResearchCount &&
+                    ResearchCountGold == data.ResearchCountGold &&
+                    ResearchCountSilver == data.ResearchCountSilver &&
+                    ResearchCountIridium == data.ResearchCountIridium &&
+                    Favorite == data.Favorite &&
+                    ClothesColor == data.ClothesColor &&
+                    WaterLevel == data.WaterLevel;
+            }
+        }
     }
 }

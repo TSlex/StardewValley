@@ -88,10 +88,10 @@ namespace ItemResearchSpawnerV2.Core {
 
         public void ReplyToChat(string message) {
             Game1.Multiplayer.sendChatMessage(LocalizedContentManager.CurrentLanguageCode, message, Game1.player.UniqueMultiplayerID);
-            ReceiveModMessage(Game1.chatBox, 0, 2, LocalizedContentManager.CurrentLanguageCode, message);
+            ReceiveСhatModMessage(Game1.chatBox, 0, 2, LocalizedContentManager.CurrentLanguageCode, message);
         }
 
-        private void ReceiveModMessage(ChatBox chatBox, long sourceFarmer, int chatKind, LocalizedContentManager.LanguageCode language, string message) {
+        private void ReceiveСhatModMessage(ChatBox chatBox, long sourceFarmer, int chatKind, LocalizedContentManager.LanguageCode language, string message) {
             string text = message;
             ChatMessage chatMessage = new();
 
@@ -193,6 +193,7 @@ namespace ItemResearchSpawnerV2.Core {
             if (!Context.IsMainPlayer) {
                 //Monitor.Log($"This command is for host player only!", LogLevel.Info);
                 ReplyToChat(I18n.Command_Multiplayer_HostOnly());
+                return false;
             }
 
             return true;

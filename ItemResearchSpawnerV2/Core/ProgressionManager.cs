@@ -7,6 +7,7 @@ using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
+using static ItemResearchSpawnerV2.Core.NetworkManager;
 using SObject = StardewValley.Object;
 
 
@@ -263,14 +264,14 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         public void DumpPlayersProgression() {
-            var onlinePlayers = Game1.getOnlineFarmers()
-                .ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
+            //var onlinePlayers = Game1.getOnlineFarmers()
+            //    .ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
 
-            var offlinePlayers = Game1.getAllFarmers()
-                .Where(farmer => !onlinePlayers.Keys.Contains(farmer.UniqueMultiplayerID.ToString()))
-                .ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
+            //var offlinePlayers = Game1.getAllFarmers()
+            //    .Where(farmer => !onlinePlayers.Keys.Contains(farmer.UniqueMultiplayerID.ToString()))
+            //    .ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
 
-            DumpPlayerProgression(Game1.player, ResearchProgressions);
+            //DumpPlayerProgression(Game1.player, ResearchProgressions);
 
             //if (Context.IsMultiplayer) {
             //    Helper.Multiplayer.SendMessage("", MessageKeys.PROGRESSION_DUMP_REQUIRED,
@@ -278,8 +279,9 @@ namespace ItemResearchSpawnerV2.Core {
             //}
 
             var progressions = ModManager.SaveManagerInstance.GetAllProgressions();
+            var players = Game1.getAllFarmers().ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
 
-            foreach (var player in offlinePlayers) {
+            foreach (var player in players) {
                 DumpPlayerProgression(player.Value,
                     progressions.ContainsKey(player.Key)
                         ? progressions[player.Key]
@@ -298,30 +300,40 @@ namespace ItemResearchSpawnerV2.Core {
 
         public void LoadPlayersProgression() {
             var players = Game1.getAllFarmers().ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
+            //var progressions = ModManager.SaveManagerInstance.GetAllProgressions();
 
-            var progressions = ModManager.SaveManagerInstance.GetAllProgressions();
+            foreach (var player in players) { 
+                var playerProgression = (Helper.Data.ReadJsonFile<List<KeyValuePair<string, ItemSaveData>>>(SaveHelper.ProgressionDumpPath(player.Key)) ?? 
+                    new List<KeyValuePair<string, ItemSaveData>>()).ToDictionary(p => p.Key, p => p.Value);
 
-            foreach (var player in players) {
-                if (!progressions.ContainsKey(player.Key)) {
-                    progressions[player.Key] = new Dictionary<string, ItemSaveData>();
+                ModManager.SaveManagerInstance.CommitProgression(player.Key, playerProgression, replace: true);
+
+                if (player.Key != Game1.player.UniqueMultiplayerID.ToString()) {
+                    NetworkManager.SendNetworkModMessage(new OnReplaceProgressionMessage() {
+                        CommitProgression = playerProgression
+                    }, playerID: player.Value.UniqueMultiplayerID);
                 }
             }
 
-            foreach (var playerID in progressions.Keys) {
-                var playerData = (Helper.Data.ReadJsonFile<List<KeyValuePair<string, ItemSaveData>>>(SaveHelper.ProgressionDumpPath(playerID)) ?? new List<KeyValuePair<string, ItemSaveData>>()).ToDictionary(p => p.Key, p => p.Value);
+            //foreach (var player in players) {
+            //    if (!progressions.ContainsKey(player.Key)) {
+            //        progressions[player.Key] = new Dictionary<string, ItemSaveData>();
+            //    }
+            //}
 
-                foreach (var item in ModManager.Instance.ItemRegistry.Values) {
-                    if (item.UniqueKey == ":0") {
-                        var a = 0;
-                    }
+            //foreach (var playerID in progressions.Keys) {
+            //    var playerData = (Helper.Data.ReadJsonFile<List<KeyValuePair<string, ItemSaveData>>>(SaveHelper.ProgressionDumpPath(playerID)) ?? new List<KeyValuePair<string, ItemSaveData>>()).ToDictionary(p => p.Key, p => p.Value);
 
-                    if (!playerData.ContainsKey(item.UniqueKey)) {
-                        playerData[item.UniqueKey] = new ItemSaveData();
-                    }
-                }
+            //    //foreach (var item in ModManager.Instance.ItemRegistry.Values) {
+            //    //    if (!playerData.ContainsKey(item.UniqueKey)) {
+            //    //        playerData[item.UniqueKey] = new ItemSaveData();
+            //    //    }
+            //    //}
 
-                ModManager.SaveManagerInstance.CommitProgression(playerID, playerData, replace: true);
-            }
+            //    ModManager.SaveManagerInstance.CommitProgression(playerID, playerData, replace: true);
+
+            //    if (playerID != Game1.player.UniqueMultiplayerID.ToString())
+            //}
 
             Game1.activeClickableMenu = null;
             ResearchProgressions = ModManager.SaveManagerInstance.GetProgression(Game1.player.UniqueMultiplayerID.ToString());

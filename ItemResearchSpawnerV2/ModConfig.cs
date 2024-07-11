@@ -2,6 +2,7 @@
 using StardewModdingAPI;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using Microsoft.Xna.Framework;
+using ItemResearchSpawnerV2.Core;
 
 namespace ItemResearchSpawnerV2 {
     internal class ModConfig {
@@ -75,11 +76,19 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetDefaultMode(ModMode value) {
+            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+                return;
+            }
+
             DefaultMode = value;
             ModEntry.Instance.OnConfigChange();
         }
 
         public void SetUseDefaultBalanceConfig(bool value) {
+            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+                return;
+            }
+
             UseDefaultBalanceConfig = value;
             ModEntry.Instance.OnConfigChange();
         }
@@ -95,21 +104,37 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetResearchAmountMultiplier(float value) {
+            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+                return;
+            }
+
             ResearchAmountMultiplier = value;
             ModEntry.Instance.OnConfigChange();
         }
 
         public void SetSellPriceMultiplier(float value) {
+            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+                return;
+            }
+
             SellPriceMultiplier = value;
             ModEntry.Instance.OnConfigChange();
         }
 
         public void SetBuyPriceMultiplier(float value) {
+            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+                return;
+            }
+
             BuyPriceMultiplier = value;
             ModEntry.Instance.OnConfigChange();
         }
 
         public void SetResearchTimeSeconds(float value) {
+            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+                return;
+            }
+
             ResearchTimeSeconds = value;
             ModEntry.Instance.OnConfigChange();
         }

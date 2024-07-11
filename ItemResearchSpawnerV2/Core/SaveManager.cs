@@ -4,6 +4,8 @@ using ItemResearchSpawnerV2.Models;
 using StardewModdingAPI;
 using Force.DeepCloner;
 using StardewModdingAPI.Events;
+using StardewValley;
+using static ItemResearchSpawnerV2.Core.NetworkManager;
 
 namespace ItemResearchSpawnerV2.Core {
     internal class SaveManager {
@@ -30,6 +32,10 @@ namespace ItemResearchSpawnerV2.Core {
         // ----------------------------------------------------------------------------------------------------------------
 
         public Dictionary<string, Dictionary<string, ItemSaveData>> GetAllProgressions() {
+            if (!Context.IsMainPlayer) {
+                throw new NotImplementedException();
+            }
+
             return Progressions.DeepClone();
         }
 
@@ -52,12 +58,26 @@ namespace ItemResearchSpawnerV2.Core {
         public void CommitProgression(string playerID, Dictionary<string, ItemSaveData> commitProgression, bool replace = false) {
             if (!replace) {
                 var progression = GetProgression(playerID);
+                var changedProgression = new Dictionary<string, ItemSaveData>();
 
                 foreach (var key in commitProgression.Keys.ToArray()) {
-                    progression[key] = commitProgression[key];
+                    var prevState = progression.ContainsKey(key) ? progression[key] : new ItemSaveData();
+                    var newState = commitProgression[key];
+
+                    if (!newState.Equals(prevState)) {
+                        changedProgression[key] = newState;
+                    }
+
+                    progression[key] = newState;
                 }
 
                 Progressions[playerID] = progression;
+
+                if (!Context.IsMainPlayer && !Context.IsSplitScreen) {
+                    NetworkManager.SendNetworkModMessage(new OnCommitProgressionMessage() {
+                        CommitProgression = changedProgression
+                    });
+                }
             }
             else {
                 Progressions[playerID] = commitProgression;
@@ -79,6 +99,12 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         public void CommitModState(string playerID, ModManagerState modState) {
+            if (!Context.IsMainPlayer && !Context.IsSplitScreen) {
+                NetworkManager.SendNetworkModMessage(new OnCommitModStateMessage() { 
+                    ModState = modState
+                });
+            }
+
             ModStates[playerID] = modState;
         }
 
@@ -119,14 +145,29 @@ namespace ItemResearchSpawnerV2.Core {
         #region Load
 
         public void OnLoad() {
-            if (!Context.IsMainPlayer)
-                return;
+            if (!Context.IsMainPlayer && !Context.IsSplitScreen)
+                throw new NotImplementedException();
 
             LoadProgression();
             LoadModState();
             LoadPricelist();
             LoadCategories();
             LoadItemBlacklist();
+        }
+
+        public void OnRemoteLoadRequested() {
+            NetworkManager.SendNetworkModMessage(new NetworkManager.OnLoadRequestedMessage());
+        }
+
+        public void OnRemoteLoadSucceed(ICollection<ItemCategoryMeta> categories, ItemCategoryMeta defaultCategory, List<string> itemBlacklist, Dictionary<string, int> pricelist, Dictionary<string, ModManagerState> modStates, Dictionary<string, Dictionary<string, ItemSaveData>> progressions) {
+            Categories = categories;
+            DefaultCategory = defaultCategory;
+            ItemBlacklist = itemBlacklist;
+            Pricelist = pricelist;
+            ModStates = modStates;
+            Progressions = progressions;
+
+            ModManager.Instance.OnLoadReady();
         }
 
         private void LoadProgression() {

@@ -10,6 +10,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using System.Reflection;
+using static ItemResearchSpawnerV2.Core.NetworkManager;
 
 
 namespace ItemResearchSpawnerV2 {
@@ -51,16 +52,16 @@ namespace ItemResearchSpawnerV2 {
 
             // -----------------------------------------------
 
+            helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
+
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.Saving += OnSave;
             helper.Events.GameLoop.SaveLoaded += OnLoad;
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
-
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
-
         }
 
         // =======================================================================================================
@@ -82,8 +83,24 @@ namespace ItemResearchSpawnerV2 {
 
         }
 
-        public void OnConfigChange() {
 
+        private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e) {
+            NetworkManager.RecieveNetworkModMessage(e);
+        }
+
+        public void OnConfigChange() {
+            if (IsSaveActive) {
+                if (Context.IsMainPlayer) {
+                    NetworkManager.SendNetworkModMessage(new OnHostConfigChangedMessage() {
+                        Config = Manager.Config
+                    });
+                }
+                else {
+                    NetworkManager.SendNetworkModMessage(new OnNonHostConfigChangedMessage() {
+                        Config = Manager.Config
+                    });
+                }
+            }
         }
 
         public void ResetConfig() {
@@ -125,17 +142,17 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void OnSave(object sender, SavingEventArgs saveLoadedEventArgs) {
-            if (!Context.IsMainPlayer) {
-                return;
-            }
+            //if (!Context.IsMainPlayer) {
+            //    return;
+            //}
 
             Manager.OnSave();
         }
 
         private void OnLoad(object sender, SaveLoadedEventArgs saveLoadedEventArgs) {
-            if (!Context.IsMainPlayer) {
-                return;
-            }
+            //if (!Context.IsMainPlayer) {
+            //    return;
+            //}
 
             Manager.OnLoad();
 

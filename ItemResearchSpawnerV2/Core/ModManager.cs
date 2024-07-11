@@ -43,6 +43,8 @@ namespace ItemResearchSpawnerV2.Core {
         public FavoriteDisplayMode FavoriteDisplay = FavoriteDisplayMode.All;
         public ProgressionDisplayMode ProgressionDisplay = ProgressionDisplayMode.ResearchedOnly;
 
+        public bool SaveDataLoaded = false;
+
         // ===========================================================================================
 
         public ModManager(IModHelper helper, ModConfig config, IMonitor monitor, IManifest manifest) {
@@ -73,7 +75,9 @@ namespace ItemResearchSpawnerV2.Core {
 
         public void OpenMenu() {
             //ProgressionManager.LoadCategories();
-            Game1.activeClickableMenu = new MainMenuController();
+            if (SaveDataLoaded) {
+                Game1.activeClickableMenu = new MainMenuController();
+            }
         }
 
         public void UpdateMenu(bool rebuild = false, bool filter = false, bool resetScroll = false, bool reloadCategories = false, bool clearFiltering = false) {
@@ -272,7 +276,19 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         public void OnLoad() {
-            SaveManager.OnLoad();
+            SaveDataLoaded = false;
+
+            if (!Context.IsSplitScreen && !Context.IsMainPlayer) {
+                SaveManager.OnRemoteLoadRequested();
+                return;
+            }
+            else {
+                SaveManager.OnLoad();
+                OnLoadReady();
+            }
+        }
+
+        public void OnLoadReady() {
             InitRegistry();
 
             // -------------------------------------------------------------------------------------
@@ -290,10 +306,10 @@ namespace ItemResearchSpawnerV2.Core {
             // -------------------------------------------------------------------------------------
 
             ProgressionManager.ResearchProgressions = SaveManager.GetProgression(Game1.player.UniqueMultiplayerID.ToString());
-            //ProgressionManager.Pricelist = SaveManager.GetPricelist();
+
+            SaveDataLoaded = true;
         }
 
-
-        #endregion`
+        #endregion
     }
 }
