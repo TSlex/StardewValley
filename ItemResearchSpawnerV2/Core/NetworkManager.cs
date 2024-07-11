@@ -1,9 +1,12 @@
 ﻿
 
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Models;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using static ItemResearchSpawnerV2.Core.NetworkManager;
 
@@ -29,6 +32,8 @@ namespace ItemResearchSpawnerV2.Core {
 
             public ICollection<ItemCategoryMeta> Categories;
             public ItemCategoryMeta DefaultCategory;
+
+            public string ShowMenuButton;
         }
 
         public class OnCommitProgressionMessage : IModMessage {
@@ -45,6 +50,8 @@ namespace ItemResearchSpawnerV2.Core {
             public string Type => "RNS_OnCommitModState";
 
             public ModManagerState ModState;
+
+            public string ShowMenuButton;
         }
 
         public class OnHostConfigChangedMessage : IModMessage {
@@ -57,7 +64,78 @@ namespace ItemResearchSpawnerV2.Core {
             public string Type => "RNS_OnNonHostConfigChanged";
 
             public ModConfig Config;
+
+            public string ShowMenuButton;
         }
+
+        //public class SerializableModState {
+        //    public ModMode ActiveMode;
+        //    public ItemQuality Quality;
+        //    public string SearchText;
+        //    public ItemSortOption SortOption;
+        //    public string Category;
+        //    public FavoriteDisplayMode FavoriteDisplayMode;
+        //    public ProgressionDisplayMode ProgressionDisplayMode;
+        //    public SerializableModConfig Config;
+
+        //    public static SerializableModState FromModConfig(ModManagerState config) {
+        //        return new SerializableModState {
+        //            UseDefaultBalanceConfig = config.UseDefaultBalanceConfig,
+        //            ShowMissingItems = config.ShowMissingItems,
+        //            EnableSounds = config.EnableSounds,
+        //            ResearchAmountMultiplier = config.ResearchAmountMultiplier,
+        //            SellPriceMultiplier = config.SellPriceMultiplier,
+        //            BuyPriceMultiplier = config.BuyPriceMultiplier,
+        //            ResearchTimeSeconds = config.ResearchTimeSeconds,
+        //            UseCustomUIColor = config.UseCustomUIColor,
+        //            CustomUIColor = config.CustomUIColor,
+        //            ShowMenuButton = config.ShowMenuButton.ToString()
+        //        };
+        //    }
+        //}
+
+        //public class SerializableModConfig {
+        //    public bool UseDefaultBalanceConfig;
+        //    public bool ShowMissingItems;
+        //    public bool EnableSounds;
+        //    public float ResearchAmountMultiplier;
+        //    public float SellPriceMultiplier;
+        //    public float BuyPriceMultiplier;
+        //    public float ResearchTimeSeconds;
+        //    public bool UseCustomUIColor;
+        //    public Color CustomUIColor;
+        //    public string ShowMenuButton;
+
+        //    public static SerializableModConfig FromModConfig(ModConfig config) {
+        //        return new SerializableModConfig {
+        //            UseDefaultBalanceConfig = config.UseDefaultBalanceConfig,
+        //            ShowMissingItems = config.ShowMissingItems,
+        //            EnableSounds = config.EnableSounds,
+        //            ResearchAmountMultiplier = config.ResearchAmountMultiplier,
+        //            SellPriceMultiplier = config.SellPriceMultiplier,
+        //            BuyPriceMultiplier = config.BuyPriceMultiplier,
+        //            ResearchTimeSeconds = config.ResearchTimeSeconds,
+        //            UseCustomUIColor = config.UseCustomUIColor,
+        //            CustomUIColor = config.CustomUIColor,
+        //            ShowMenuButton = config.ShowMenuButton.ToString()
+        //        };
+        //    }
+
+        //    public ModConfig ToModConfig() {
+        //        return new ModConfig {
+        //            UseDefaultBalanceConfig = UseDefaultBalanceConfig,
+        //            ShowMissingItems = ShowMissingItems,
+        //            EnableSounds = EnableSounds,
+        //            ResearchAmountMultiplier = ResearchAmountMultiplier,
+        //            SellPriceMultiplier = SellPriceMultiplier,
+        //            BuyPriceMultiplier = BuyPriceMultiplier,
+        //            ResearchTimeSeconds = ResearchTimeSeconds,
+        //            UseCustomUIColor = UseCustomUIColor,
+        //            CustomUIColor = CustomUIColor,
+        //            ShowMenuButton = KeybindList.Parse(ShowMenuButton)
+        //        };
+        //    }
+        //}
 
 
         // ======================================================================
@@ -118,6 +196,7 @@ namespace ItemResearchSpawnerV2.Core {
             var hostModState = ModManager.SaveManagerInstance.GetModState(Game1.player.UniqueMultiplayerID.ToString());
 
             playerModState.Config = onNonHostConfigChangedMessage.Config;
+            playerModState.Config.ShowMenuButton = KeybindList.Parse(onNonHostConfigChangedMessage.ShowMenuButton);
 
             playerModState.Config.DefaultMode = hostModState.Config.DefaultMode;
             playerModState.Config.ResearchAmountMultiplier = hostModState.Config.ResearchAmountMultiplier;
@@ -142,6 +221,8 @@ namespace ItemResearchSpawnerV2.Core {
             var playerModState = onCommitModStateMessage.ModState;
             var hostModState = ModManager.SaveManagerInstance.GetModState(Game1.player.UniqueMultiplayerID.ToString());
 
+            playerModState.Config.ShowMenuButton = KeybindList.Parse(onCommitModStateMessage.ShowMenuButton);
+
             playerModState.Config.DefaultMode = hostModState.Config.DefaultMode;
             playerModState.Config.ResearchAmountMultiplier = hostModState.Config.ResearchAmountMultiplier;
             playerModState.Config.SellPriceMultiplier = hostModState.Config.SellPriceMultiplier;
@@ -158,6 +239,9 @@ namespace ItemResearchSpawnerV2.Core {
 
             var playerModState = ModManager.SaveManagerInstance.GetModState(fromPlayerID.ToString());
             var hostModState = ModManager.SaveManagerInstance.GetModState(Game1.player.UniqueMultiplayerID.ToString());
+
+            var showMenuKey = playerModState.Config.ShowMenuButton.ToString();
+            playerModState.Config.ShowMenuButton = null;
 
             playerModState.Config.DefaultMode = hostModState.Config.DefaultMode;
             playerModState.Config.ResearchAmountMultiplier = hostModState.Config.ResearchAmountMultiplier;
@@ -176,7 +260,8 @@ namespace ItemResearchSpawnerV2.Core {
                 },
                 Progressions = new Dictionary<string, Dictionary<string, ItemSaveData>> {
                     {fromPlayerID.ToString() , ModManager.SaveManagerInstance.GetProgression(fromPlayerID.ToString()) }
-                }
+                },
+                ShowMenuButton = showMenuKey
             };
 
             SendNetworkModMessage(reply, fromPlayerID);

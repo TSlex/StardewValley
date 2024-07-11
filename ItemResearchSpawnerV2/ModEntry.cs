@@ -1,4 +1,5 @@
-﻿using ItemResearchSpawnerV2.Api;
+﻿using Force.DeepCloner;
+using ItemResearchSpawnerV2.Api;
 using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
@@ -90,14 +91,19 @@ namespace ItemResearchSpawnerV2 {
 
         public void OnConfigChange() {
             if (IsSaveActive) {
+                // Parcing fix
+                var c = Manager.Config.DeepClone();
+                c.ShowMenuButton = null;
+
                 if (Context.IsMainPlayer) {
                     NetworkManager.SendNetworkModMessage(new OnHostConfigChangedMessage() {
-                        Config = Manager.Config
+                        Config = c,
                     });
                 }
                 else {
                     NetworkManager.SendNetworkModMessage(new OnNonHostConfigChangedMessage() {
-                        Config = Manager.Config
+                        Config = c,
+                        ShowMenuButton = Manager.Config.ShowMenuButton.ToString()
                     });
                 }
             }

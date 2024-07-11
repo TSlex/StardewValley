@@ -100,8 +100,13 @@ namespace ItemResearchSpawnerV2.Core {
 
         public void CommitModState(string playerID, ModManagerState modState) {
             if (!Context.IsMainPlayer && !Context.IsSplitScreen) {
+                var modStateC = modState.DeepClone();
+                var showMenuButton = modState.Config.ShowMenuButton.ToString();
+                modState.Config.ShowMenuButton = null;
+
                 NetworkManager.SendNetworkModMessage(new OnCommitModStateMessage() { 
-                    ModState = modState
+                    ModState = modStateC,
+                    ShowMenuButton = showMenuButton
                 });
             }
 

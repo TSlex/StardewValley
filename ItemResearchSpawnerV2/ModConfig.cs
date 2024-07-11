@@ -3,9 +3,13 @@ using StardewModdingAPI;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using Microsoft.Xna.Framework;
 using ItemResearchSpawnerV2.Core;
+using System.Text.Json.Serialization;
 
 namespace ItemResearchSpawnerV2 {
+
     internal class ModConfig {
+
+        [JsonIgnore]
         public KeybindList ShowMenuButton = KeybindList.ForSingle(SButton.R);
 
         public ModMode DefaultMode = ModMode.Research;
@@ -72,7 +76,7 @@ namespace ItemResearchSpawnerV2 {
 
         public void SetShowMenuButton(KeybindList value) {
             ShowMenuButton = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetDefaultMode(ModMode value) {
@@ -81,7 +85,7 @@ namespace ItemResearchSpawnerV2 {
             }
 
             DefaultMode = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetUseDefaultBalanceConfig(bool value) {
@@ -90,17 +94,17 @@ namespace ItemResearchSpawnerV2 {
             }
 
             UseDefaultBalanceConfig = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetShowMissingItems(bool value) {
             ShowMissingItems = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetEnableSounds(bool value) {
             EnableSounds = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetResearchAmountMultiplier(float value) {
@@ -109,7 +113,7 @@ namespace ItemResearchSpawnerV2 {
             }
 
             ResearchAmountMultiplier = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetSellPriceMultiplier(float value) {
@@ -118,7 +122,7 @@ namespace ItemResearchSpawnerV2 {
             }
 
             SellPriceMultiplier = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetBuyPriceMultiplier(float value) {
@@ -127,7 +131,7 @@ namespace ItemResearchSpawnerV2 {
             }
 
             BuyPriceMultiplier = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetResearchTimeSeconds(float value) {
@@ -136,17 +140,17 @@ namespace ItemResearchSpawnerV2 {
             }
 
             ResearchTimeSeconds = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetUseCustomUIColor(bool value) {
             UseCustomUIColor = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetCustomUIColor(Color value) {
             CustomUIColor = value;
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetCustomUIColor(int R = -1, int G = -1, int B = -1) {
@@ -157,7 +161,7 @@ namespace ItemResearchSpawnerV2 {
             var newB = B >= 0 ? B : currentColor.B;
 
             CustomUIColor = new Color(newR, newG, newB);
-            ModEntry.Instance.OnConfigChange();
+            //ModEntry.Instance.OnConfigChange();
         }
     }
 }
