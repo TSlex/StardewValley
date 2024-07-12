@@ -90,7 +90,7 @@ namespace ItemResearchSpawnerV2.Core {
 
 
             Game1.Multiplayer.sendChatMessage(LocalizedContentManager.CurrentLanguageCode, message, Game1.player.UniqueMultiplayerID);
-            ReceiveСhatModMessage(Game1.chatBox, 0, chatKind, LocalizedContentManager.CurrentLanguageCode, message);
+            ReceiveСhatModMessage(Game1.chatBox, 0, chatKind, LocalizedContentManager.CurrentLanguageCode, message, color: color);
         }
 
         private void ReceiveСhatModMessage(ChatBox chatBox, long sourceFarmer, int chatKind, LocalizedContentManager.LanguageCode language, string message, Color? color = null) {

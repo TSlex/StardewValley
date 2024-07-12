@@ -222,7 +222,7 @@ namespace ItemResearchSpawnerV2.Core {
             ModManager.Instance.Config.ResearchTimeSeconds = onHostConfigChangedMessage.Config.ResearchTimeSeconds;
 
             Game1.activeClickableMenu = null;
-            ModManager.CommandManagerInstance.ReplyToChat(I18n.Command_Multiplayer_HostConfigChanged(), color: new Color(Color.Cyan, 1));
+            ModManager.CommandManagerInstance.ReplyToChat(I18n.Command_Multiplayer_HostConfigChanged(), color: Color.Cyan);
         }
 
         private static void OnReplaceProgression(OnReplaceProgressionMessage onCommitProgressionMessage) {
@@ -234,7 +234,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             Game1.activeClickableMenu = null;
             ModManager.ProgressionManagerInstance.ResearchProgressions = ModManager.SaveManagerInstance.GetProgression(Game1.player.UniqueMultiplayerID.ToString());
-            ModManager.CommandManagerInstance.ReplyToChat(I18n.Command_Multiplayer_HostProgressionLoaded(), color: new Color(Color.Cyan, 1));
+            ModManager.CommandManagerInstance.ReplyToChat(I18n.Command_Multiplayer_HostProgressionLoaded(), color: Color.Cyan);
         }
 
         private static void OnLoadSucceed(OnLoadSucceedMessage onLoadSucceedMessage) {
