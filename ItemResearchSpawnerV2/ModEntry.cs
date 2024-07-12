@@ -240,8 +240,8 @@ namespace ItemResearchSpawnerV2 {
 
             configMenu.AddKeybindList(
                 mod: ModManifest,
-                getValue: () => Config.GetShowMenuButton(),
-                setValue: keybind => Config.SetShowMenuButton(keybind),
+                getValue: () => ActiveConfig.GetShowMenuButton(),
+                setValue: keybind => ActiveConfig.SetShowMenuButton(keybind),
                 name: () => I18n.Config_OpenMenuKeyName(),
                 tooltip: () => I18n.Config_OpenMenuKeyDesc()
             );

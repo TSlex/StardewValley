@@ -86,12 +86,14 @@ namespace ItemResearchSpawnerV2.Core {
             ReplyToChat(string.Format(I18n.Command_GetHelp(), command.command, command.description()));
         }
 
-        public void ReplyToChat(string message, int chatKind = 2) {
+        public void ReplyToChat(string message, int chatKind = 2, Color? color = null) {
+
+
             Game1.Multiplayer.sendChatMessage(LocalizedContentManager.CurrentLanguageCode, message, Game1.player.UniqueMultiplayerID);
             ReceiveСhatModMessage(Game1.chatBox, 0, chatKind, LocalizedContentManager.CurrentLanguageCode, message);
         }
 
-        private void ReceiveСhatModMessage(ChatBox chatBox, long sourceFarmer, int chatKind, LocalizedContentManager.LanguageCode language, string message) {
+        private void ReceiveСhatModMessage(ChatBox chatBox, long sourceFarmer, int chatKind, LocalizedContentManager.LanguageCode language, string message, Color? color = null) {
             string text = message;
             ChatMessage chatMessage = new();
 
@@ -99,10 +101,11 @@ namespace ItemResearchSpawnerV2.Core {
             MethodInfo messageColor = typeof(ChatBox).GetMethod("messageColor", BindingFlags.NonPublic | BindingFlags.Instance);
 
             string text2 = Game1.parseText(text, chatBox.chatBox.Font, chatBox.chatBox.Width - 16);
+            var c = (Color) (color != null ? color : (Color) messageColor.Invoke(chatBox, new object[] { chatKind }));
 
             chatMessage.timeLeftToDisplay = 600;
             chatMessage.verticalSize = (int) chatBox.chatBox.Font.MeasureString(text2).Y + 4;
-            chatMessage.color = (Color) messageColor.Invoke(chatBox, new object[] { chatKind });
+            chatMessage.color = c;
             chatMessage.language = language;
 
             chatMessage.message = new List<ChatSnippet>() {
