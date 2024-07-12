@@ -150,7 +150,9 @@ namespace ItemResearchSpawnerV2 {
             Manager.Config = Config;
             IsSaveActive = false;
 
-            Game1.chatBox.chatBox.OnEnterPressed -= HandleChatMessage;
+            if (Game1.chatBox != null) {
+                Game1.chatBox.chatBox.OnEnterPressed -= HandleChatMessage;
+            }
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e) {
@@ -170,7 +172,9 @@ namespace ItemResearchSpawnerV2 {
 
             Manager.OnLoad();
 
-            Game1.chatBox.chatBox.OnEnterPressed += HandleChatMessage;
+            if (Game1.chatBox != null) {
+                Game1.chatBox.chatBox.OnEnterPressed += HandleChatMessage;
+            }
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {

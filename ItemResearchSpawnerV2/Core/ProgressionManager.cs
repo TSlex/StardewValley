@@ -341,7 +341,7 @@ namespace ItemResearchSpawnerV2.Core {
 
         public void UnlockAllProgression() {
             foreach (var item in ModManager.Instance.ItemRegistry.Values) {
-                UnlockProgression(item.Item, false);
+                UnlockProgression(item.Item, false, doCommit: false);
             }
             if (ModManager.Instance.Config.GetEnableSounds()) {
                 Game1.playSound("stardrop");
@@ -351,7 +351,7 @@ namespace ItemResearchSpawnerV2.Core {
             ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
         }
 
-        public void UnlockProgression(Item item, bool playSound = true) {
+        public void UnlockProgression(Item item, bool playSound = true, bool doCommit = true) {
             var pI = GetProgressionItem(item);
             var saveData = pI.SaveData;
 
@@ -366,8 +366,10 @@ namespace ItemResearchSpawnerV2.Core {
                 Game1.playSound("stardrop");
             }
 
-            Game1.activeClickableMenu = null;
-            ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
+            if (doCommit) {
+                Game1.activeClickableMenu = null;
+                ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
+            }
         }
     }
 }
