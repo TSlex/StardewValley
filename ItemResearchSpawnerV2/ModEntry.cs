@@ -193,7 +193,7 @@ namespace ItemResearchSpawnerV2 {
             // print button presses to the console window
             // this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
 
-            if (Config.GetShowMenuButton().JustPressed()) {
+            if (ActiveConfig.GetShowMenuButton().JustPressed()) {
                 Manager.OpenMenu();
             }
         }
