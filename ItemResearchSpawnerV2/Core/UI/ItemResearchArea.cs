@@ -11,10 +11,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
     internal class ItemResearchArea {
         private readonly ClickableComponent ResearchArea;
         public readonly ResearchButton ResearchButton;
-        private readonly Texture2D ResearchTexture;
-        private readonly Texture2D SellTexture;
-        private readonly Texture2D CombinedTexture;
-        private readonly Texture2D ResearchItemLightTexture;
+        //private readonly Texture2D ResearchTexture;
+        //private readonly Texture2D SellTexture;
+        //private readonly Texture2D CombinedTexture;
+        //private readonly Texture2D ResearchItemLightTexture;
 
         //private readonly Texture2D BookAnimations;
         //private readonly int BookTextureSize = 20;
@@ -57,8 +57,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public Rectangle ButtonBounds => ResearchButton.Bounds;
 
         private Rectangle GetButtonPosition => new Rectangle(
-                    DrawHelper.GetChildCenterPosition(GetXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, ResearchTexture.Width),
-                    ResearchArea.bounds.Height + 4 * 10 + 2 + GetYPos(), ResearchTexture.Width, ResearchTexture.Height);
+                    DrawHelper.GetChildCenterPosition(GetXPos(), ResearchArea.bounds.Width + 2 * UIConstants.BorderWidth, 4 * 17),
+                    ResearchArea.bounds.Height + 4 * 10 + 2 + GetYPos(), 4 * 13, 4 * 14);
 
         // ===================================================================================================
 
@@ -68,9 +68,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
             GetYPos = getYPos;
             Width = width;
 
-            ResearchTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "search-button"));
-            SellTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "sell-button.png"));
-            CombinedTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "combined-button.png"));
+            //ResearchTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "search-button"));
+            //SellTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "sell-button.png"));
+            //CombinedTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "combined-button.png"));
 
             ResearchArea = new ClickableComponent(new Rectangle(getXPos(), getYPos(), width, Game1.tileSize + 50), "");
 
@@ -78,7 +78,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             //BookAnimations = ModManager.Instance.Helper.GameContent.Load<Texture2D>("LooseSprites\\Book_Animation");
             //BookAnimations = ModManager.Instance.Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "images", "Book_Animation"));
-            ResearchItemLightTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "pinpointLight"));
+            //ResearchItemLightTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "pinpointLight"));
 
             //ResearchButton = new ClickableTextureComponent(
             //    new Rectangle(

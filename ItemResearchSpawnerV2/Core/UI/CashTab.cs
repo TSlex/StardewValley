@@ -13,7 +13,7 @@ namespace ItemResearchSpawnerV2.Components.UI
     public class CashTab
     {
 
-        private readonly Texture2D _coinTexture;
+        //private readonly Texture2D _coinTexture;
 
         private readonly ClickableComponent BalanceArea;
         //private readonly ClickableTextureComponent Coin;
@@ -30,7 +30,7 @@ namespace ItemResearchSpawnerV2.Components.UI
             GetYPos = getYPos;
             Width = width;
 
-            _coinTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "coin-icon.png"));
+            //_coinTexture = Content.Load<Texture2D>(Path.Combine("assets", "images", "coin-icon.png"));
 
             BalanceArea = new ClickableComponent(
                 new Rectangle(getXPos(), getYPos(), width, Game1.tileSize), "");

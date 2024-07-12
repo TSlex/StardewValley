@@ -10,10 +10,10 @@ using static System.Net.Mime.MediaTypeNames;
 namespace ItemResearchSpawnerV2.Core.UI {
 
     public class ItemMoneyTooltip {
-        private readonly Texture2D CoinTexture;
+        //private readonly Texture2D CoinTexture;
 
         public ItemMoneyTooltip() {
-            CoinTexture = ModManager.Instance.Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "images", "coin-icon.png"));
+            //CoinTexture = ModManager.Instance.Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "images", "coin-icon.png"));
         }
 
         public void Draw(SpriteBatch b, Item hoveredItem) {
@@ -40,7 +40,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             var textOffsetX = UIConstants.CoinIcon.Width + 4 * 1;
             var textWidth = Game1.smallFont.MeasureString(costText).X;
-            var boxWidth = textWidth + CoinTexture.Width;
+            var boxWidth = textWidth + UIConstants.CoinIcon.Width;
 
             //var boxPosX = mousePos.X - boxWidth / 2 + 4 * 12;
             var boxPosX = mousePos.X - 4 * 16;
