@@ -130,5 +130,8 @@
   "command.load-progressions.succ": "Прогресс был загружен!",
 
   "command.multiplayer.wait": "Ожидаю отклика всех клиентов...",
-  "command.multiplayer.host-only": "Эта комманда только для хост-игрока!"
+  "command.multiplayer.host-only": "Эта комманда только для хост-игрока!",
+
+  "command.multiplayer.host-config-changed": "Хост изменил настройки мода",
+  "command.multiplayer.host-progression-loaded": "Хост заменил ваш прогресс"
 }

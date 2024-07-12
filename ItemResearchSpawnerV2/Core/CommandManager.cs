@@ -86,9 +86,9 @@ namespace ItemResearchSpawnerV2.Core {
             ReplyToChat(string.Format(I18n.Command_GetHelp(), command.command, command.description()));
         }
 
-        public void ReplyToChat(string message) {
+        public void ReplyToChat(string message, int chatKind = 2) {
             Game1.Multiplayer.sendChatMessage(LocalizedContentManager.CurrentLanguageCode, message, Game1.player.UniqueMultiplayerID);
-            ReceiveСhatModMessage(Game1.chatBox, 0, 2, LocalizedContentManager.CurrentLanguageCode, message);
+            ReceiveСhatModMessage(Game1.chatBox, 0, chatKind, LocalizedContentManager.CurrentLanguageCode, message);
         }
 
         private void ReceiveСhatModMessage(ChatBox chatBox, long sourceFarmer, int chatKind, LocalizedContentManager.LanguageCode language, string message) {

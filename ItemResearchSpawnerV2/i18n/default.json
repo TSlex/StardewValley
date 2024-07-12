@@ -130,5 +130,8 @@
   "command.load-progressions.succ": "Player(s) progressions were loaded!",
 
   "command.multiplayer.wait": "Waiting for all clients to respond...",
-  "command.multiplayer.host-only": "This command is for a host player only!"
+  "command.multiplayer.host-only": "This command is for a host player only!",
+
+  "command.multiplayer.host-config-changed": "Host has changed the mod settings",
+  "command.multiplayer.host-progression-loaded": "Host has replaced your progression"
 }
