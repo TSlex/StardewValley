@@ -497,6 +497,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public void OnResearchCompleted() {
             var itemAlreadyResearched = ResearchItem.ResearchCompleted;
+            var itemAlreadyResearchedNormal = ResearchItem.BaseResearchCompleted;
 
             ModManager.ProgressionManagerInstance.ResearchItem(ResearchItem, out var leftAmount);
 
@@ -504,7 +505,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             var pI = ModManager.ProgressionManagerInstance.GetProgressionItem(ResearchItem.Item);
 
-            var itemUnlocked = !itemAlreadyResearched && pI.ResearchCompleted;
+            var itemUnlocked = !itemAlreadyResearchedNormal && pI.BaseResearchCompleted;
 
             if (itemUnlocked) {
                 ModManager.Instance.FavoriteDisplay = FavoriteDisplayMode.All;

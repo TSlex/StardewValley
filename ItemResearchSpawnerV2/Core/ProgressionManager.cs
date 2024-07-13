@@ -82,7 +82,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             if (ModManager.Instance.ModMode.HasPriceBehaviour() && needAmount > 0) {
                 var itemToSell = item.GameItem;
-                itemToSell.Stack = needAmount;
+                itemToSell.Stack = progressCount;
 
                 ModManager.Instance.SellItem(itemToSell);
 
@@ -91,7 +91,7 @@ namespace ItemResearchSpawnerV2.Core {
                 }
             }
 
-            leftAmount -= needAmount;
+            leftAmount -= progressCount;
 
             ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();
             ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
@@ -158,7 +158,7 @@ namespace ItemResearchSpawnerV2.Core {
             var itemCategory = new ItemCategory {
                 Label = I18n.GetByKey(category.Label),
                 BasePrice = category.BaseCost,
-                BaseResearchCount = item.Forbidden ? -1 : category.ResearchCount
+                BaseResearchCount = item.Forbidden ? -1 : (int) (category.ResearchCount * ModManager.Instance.Config.GetResearchAmountMultiplier()),
             };
 
             itemCategory.BaseResearchCount = ModManager.Instance.ModMode switch {
