@@ -51,12 +51,22 @@ namespace ItemResearchSpawnerV2.Components.UI
             b.Draw(ModManager.UITextureInstance, new Vector2(BalanceArea.bounds.X + 4 * 4, BalanceArea.bounds.Y + 4 * 4), 
                 UIConstants.CoinIcon, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
 
-            var textOffsetX = UIConstants.CoinIcon.Width + 24;
+            var textOffsetX = UIConstants.CoinIcon.Width + 4 * 8;
 
-            Utility.drawTextWithShadow(b, 
-                DrawHelper.FillString(Game1.player._money.ToString(), "0", Game1.smallFont, Width - textOffsetX, "+"), 
+            var playerMoney = Game1.player._money + 10000000000;
+            playerMoney = playerMoney >= 20000000000 ? 19999999999 : playerMoney;
+            var playerMoneyStr = new string(playerMoney.ToString().Skip(1).ToArray());
+
+            //Utility.drawTextWithShadow(b, 
+            //    DrawHelper.FillString(Game1.player._money.ToString(), "0", Game1.smallFont, Width - textOffsetX, "+"), 
+            //    Game1.smallFont,
+            //    new Vector2(textPosition.X + textOffsetX - 12, textPosition.Y + 8), 
+            //    Game1.textColor);
+
+            Utility.drawTextWithShadow(b,
+                playerMoneyStr,
                 Game1.smallFont,
-                new Vector2(textPosition.X + textOffsetX - 12, textPosition.Y + 8), 
+                new Vector2(textPosition.X + textOffsetX - 12, textPosition.Y + 8),
                 Game1.textColor);
 
 
