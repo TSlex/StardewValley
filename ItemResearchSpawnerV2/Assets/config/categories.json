@@ -297,7 +297,8 @@
       ],
       "UniqueKey": [
         "Artifact Trove:275",
-        "Mystery Box"
+        "Mystery Box",
+        "Prize Ticket:69"
       ]
     },
     "ResearchCount": 5,
@@ -341,7 +342,8 @@
         -16
       ],
       "UniqueKey": [
-        "Dragon Tooth:852"
+        "Dragon Tooth:852",
+        "Sap:92"
       ]
     },
     "ResearchCount": 45,
