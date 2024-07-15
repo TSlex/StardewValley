@@ -251,6 +251,10 @@ namespace ItemResearchSpawnerV2.Core {
 
         public void OnSave() {
 
+            if (!SaveDataLoaded) {
+                return;
+            }
+
             var modState = new ModManagerState() {
                 Config = Config,
                 Quality = ItemQuality,
