@@ -19,8 +19,8 @@ namespace ItemResearchSpawnerV2 {
         public bool EnableSounds = true;
 
         public float ResearchAmountMultiplier = 1.5f;
-        public float SellPriceMultiplier = 0.9f;
-        public float BuyPriceMultiplier = 1.1f;
+        public float SellPriceMultiplier = 0.8f;
+        public float BuyPriceMultiplier = 1.2f;
         public float ResearchTimeSeconds = 1f;
 
         public bool UseCustomUIColor = false;
