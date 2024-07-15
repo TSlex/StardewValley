@@ -1,3 +1,5 @@
+![](title.png)
+
 SDV 1.6 Status: Version 2.0 is finally completed, thank you for waiting <3
 
 Secret Note #1: some items (especially new) might be imbalanced by price or have the wrong category, and it needs a lot more time to figure it all out (and I don't want to delay release anymore). If you want to help, please submit your suggestions in the forum :)
@@ -7,6 +9,8 @@ Secret Note #2: due to new ID and naming mechanics introduced by SDV 1.6 already
 ## Description
 
 This mod introduces mechanics similar to Terraria's Journey Mode and Minecraft's ProjectE mod, where you can "research" an item and create much more of it (for free or by spending some currency). There are different modes and settings available, allowing you to play the mod the way you like, more game-progression friendly or straight-up cheaty.
+
+![preview](preview.gif)
 
 ## How to use
 
