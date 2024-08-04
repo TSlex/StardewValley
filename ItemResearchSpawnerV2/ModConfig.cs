@@ -7,9 +7,22 @@ using System.Text.Json.Serialization;
 
 namespace ItemResearchSpawnerV2 {
 
+    internal static class ModConfigConstraints {
+        public static float ResearchAmountMultipliterMin => 0.0f;
+        public static float ResearchAmountMultipliterMax => 10f;
+
+        public static float SellPriceMultiplierMin => 0.0f;
+        public static float SellPriceMultiplierMax => 10f;
+
+        public static float BuyPriceMultiplierMin => 0.0f;
+        public static float BuyPriceMultiplierMax => 10f;
+
+        public static float ResearchTimeSecondsMin => 0.0f;
+        public static float ResearchTimeSecondsMax => 60f;
+    }
+
     internal class ModConfig {
 
-        //public KeybindList ShowMenuButton = KeybindList.ForSingle(SButton.R);
         public string ShowMenuButton = "R";
 
         public ModMode DefaultMode = ModMode.Research;
@@ -29,7 +42,6 @@ namespace ItemResearchSpawnerV2 {
         // ===============================================================================
 
         public KeybindList GetShowMenuButton() {
-            //return ShowMenuButton;
             return KeybindList.Parse(ShowMenuButton);
         }
 
@@ -77,8 +89,6 @@ namespace ItemResearchSpawnerV2 {
 
         public void SetShowMenuButton(KeybindList value) {
             ShowMenuButton = value.ToString();
-            //ShowMenuButton = value;
-            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetDefaultMode(ModMode value) {
@@ -87,7 +97,6 @@ namespace ItemResearchSpawnerV2 {
             }
 
             DefaultMode = value;
-            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetUseDefaultBalanceConfig(bool value) {
@@ -96,17 +105,14 @@ namespace ItemResearchSpawnerV2 {
             }
 
             UseDefaultBalanceConfig = value;
-            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetShowMissingItems(bool value) {
             ShowMissingItems = value;
-            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetEnableSounds(bool value) {
             EnableSounds = value;
-            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetResearchAmountMultiplier(float value) {
@@ -114,8 +120,10 @@ namespace ItemResearchSpawnerV2 {
                 return;
             }
 
-            ResearchAmountMultiplier = value;
-            //ModEntry.Instance.OnConfigChange();
+            var checkedValue = value >= ModConfigConstraints.ResearchAmountMultipliterMin ? value : ModConfigConstraints.ResearchAmountMultipliterMin;
+            checkedValue = checkedValue <= ModConfigConstraints.ResearchAmountMultipliterMax ? checkedValue : ModConfigConstraints.ResearchAmountMultipliterMax;
+
+            ResearchAmountMultiplier = checkedValue;
         }
 
         public void SetSellPriceMultiplier(float value) {
@@ -123,8 +131,10 @@ namespace ItemResearchSpawnerV2 {
                 return;
             }
 
-            SellPriceMultiplier = value;
-            //ModEntry.Instance.OnConfigChange();
+            var checkedValue = value >= ModConfigConstraints.SellPriceMultiplierMin ? value : ModConfigConstraints.SellPriceMultiplierMin;
+            checkedValue = checkedValue <= ModConfigConstraints.SellPriceMultiplierMax ? checkedValue : ModConfigConstraints.SellPriceMultiplierMax;
+
+            SellPriceMultiplier = checkedValue;
         }
 
         public void SetBuyPriceMultiplier(float value) {
@@ -132,8 +142,10 @@ namespace ItemResearchSpawnerV2 {
                 return;
             }
 
-            BuyPriceMultiplier = value;
-            //ModEntry.Instance.OnConfigChange();
+            var checkedValue = value >= ModConfigConstraints.BuyPriceMultiplierMin ? value : ModConfigConstraints.BuyPriceMultiplierMin;
+            checkedValue = checkedValue <= ModConfigConstraints.BuyPriceMultiplierMax ? checkedValue : ModConfigConstraints.BuyPriceMultiplierMax;
+
+            BuyPriceMultiplier = checkedValue;
         }
 
         public void SetResearchTimeSeconds(float value) {
@@ -141,18 +153,18 @@ namespace ItemResearchSpawnerV2 {
                 return;
             }
 
-            ResearchTimeSeconds = value;
-            //ModEntry.Instance.OnConfigChange();
+            var checkedValue = value >= ModConfigConstraints.ResearchTimeSecondsMin ? value : ModConfigConstraints.ResearchTimeSecondsMin;
+            checkedValue = checkedValue <= ModConfigConstraints.ResearchTimeSecondsMax ? checkedValue : ModConfigConstraints.ResearchTimeSecondsMax;
+
+            ResearchTimeSeconds = checkedValue;
         }
 
         public void SetUseCustomUIColor(bool value) {
             UseCustomUIColor = value;
-            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetCustomUIColor(Color value) {
             CustomUIColor = value;
-            //ModEntry.Instance.OnConfigChange();
         }
 
         public void SetCustomUIColor(int R = -1, int G = -1, int B = -1) {
@@ -163,7 +175,6 @@ namespace ItemResearchSpawnerV2 {
             var newB = B >= 0 ? B : currentColor.B;
 
             CustomUIColor = new Color(newR, newG, newB);
-            //ModEntry.Instance.OnConfigChange();
         }
     }
 }

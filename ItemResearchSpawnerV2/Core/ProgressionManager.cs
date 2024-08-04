@@ -155,10 +155,13 @@ namespace ItemResearchSpawnerV2.Core {
                 .Select(e => (KeyValuePair<string, int>?) e)
                 .FirstOrDefault();
 
+            var itemBaseResearchCount = (int) (category.ResearchCount * ModManager.Instance.Config.GetResearchAmountMultiplier());
+            itemBaseResearchCount = itemBaseResearchCount >= 1 ? itemBaseResearchCount : 1;
+
             var itemCategory = new ItemCategory {
                 Label = I18n.GetByKey(category.Label),
                 BasePrice = category.BaseCost,
-                BaseResearchCount = item.Forbidden ? -1 : (int) (category.ResearchCount * ModManager.Instance.Config.GetResearchAmountMultiplier()),
+                BaseResearchCount = item.Forbidden ? -1 : itemBaseResearchCount,
             };
 
             itemCategory.BaseResearchCount = ModManager.Instance.ModMode switch {

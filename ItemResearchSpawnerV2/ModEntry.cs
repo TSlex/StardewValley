@@ -64,6 +64,12 @@ namespace ItemResearchSpawnerV2 {
         private void ReadConfig() {
             try {
                 Config = Helper.ReadConfig<ModConfig>();
+
+                // fixing whatever values come from .json
+                Config.SetResearchAmountMultiplier(Config.ResearchAmountMultiplier);
+                Config.SetSellPriceMultiplier(Config.SellPriceMultiplier);
+                Config.SetBuyPriceMultiplier(Config.BuyPriceMultiplier);
+                Config.SetResearchTimeSeconds(Config.ResearchTimeSeconds);
             }
             catch (Exception e) {
                 Config = new ModConfig();
@@ -268,8 +274,8 @@ namespace ItemResearchSpawnerV2 {
                 setValue: value => ActiveConfig.SetResearchAmountMultiplier(value),
                 name: () => I18n.Config_ResearchMultName(),
                 tooltip: () => I18n.Config_ResearchMultDesc(),
-                min: 0.1f,
-                max: 10f,
+                min: ModConfigConstraints.ResearchAmountMultipliterMin,
+                max: ModConfigConstraints.ResearchAmountMultipliterMax,
                 interval: 0.1f
             );
 
@@ -279,8 +285,8 @@ namespace ItemResearchSpawnerV2 {
                 setValue: value => ActiveConfig.SetBuyPriceMultiplier(value),
                 name: () => I18n.Config_BuyPriceMultName(),
                 tooltip: () => I18n.Config_BuyPriceMultDesc(),
-                min: 0.0f,
-                max: 10f,
+                min: ModConfigConstraints.BuyPriceMultiplierMin,
+                max: ModConfigConstraints.BuyPriceMultiplierMax,
                 interval: 0.1f
             );
 
@@ -290,8 +296,8 @@ namespace ItemResearchSpawnerV2 {
                 setValue: value => ActiveConfig.SetSellPriceMultiplier(value),
                 name: () => I18n.Config_SellPriceMultName(),
                 tooltip: () => I18n.Config_SellPriceMultDesc(),
-                min: 0.0f,
-                max: 10f,
+                min: ModConfigConstraints.SellPriceMultiplierMin,
+                max: ModConfigConstraints.SellPriceMultiplierMax,
                 interval: 0.1f
             );
 
@@ -327,8 +333,8 @@ namespace ItemResearchSpawnerV2 {
                 setValue: value => ActiveConfig.SetResearchTimeSeconds(value),
                 name: () => I18n.Config_ResearchDelayName(),
                 tooltip: () => I18n.Config_ResearchDelayDesc(),
-                min: 0.0f,
-                max: 60f,
+                min: ModConfigConstraints.ResearchTimeSecondsMin,
+                max: ModConfigConstraints.ResearchTimeSecondsMax,
                 interval: 0.1f
             );
 
