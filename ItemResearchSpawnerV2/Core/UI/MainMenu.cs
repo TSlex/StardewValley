@@ -229,7 +229,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
             // ---- ItemsToGrabMenu drawing (receiving menu) --------------------------
 
             CreativeMenu.xPositionOnScreen = xPositionOnScreen + 36;
-            CreativeMenu.yPositionOnScreen = inventory.yPositionOnScreen - inventory.height - borderWidth - spaceToClearTopBorder + 64;
+            //CreativeMenu.yPositionOnScreen = inventory.yPositionOnScreen - inventory.height - borderWidth - spaceToClearTopBorder + 64;
+            CreativeMenu.yPositionOnScreen = yPositionOnScreen + 4 * 8;
 
             DrawCreativeMenuBackground(b);
 
