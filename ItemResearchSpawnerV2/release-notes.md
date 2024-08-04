@@ -1,5 +1,14 @@
 ﻿[(← Back to readme)](README.md)
 
+## 2.0.1
+Released 4th August 2024 for SMAPI 4.0.8 or later.
+
+Fixes:
+- ResearchAmountMultiplier will reduce the required research amount not lower than 1
+- Added check from incorrect values from config.json
+- Fix for "Auto Loot Treasures" feature of the Joys of Efficiency (now menu content will not be looted)
+- Fix for incorrect menu position caused by the change of player inventory position, ex: Bigger Backpack mod
+
 ## 2.0.0
 Released 15th July 2024 for SMAPI 4.0.8 or later.
 
