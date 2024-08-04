@@ -65,9 +65,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 context: null,
                 heldItemExitBehavior: ItemExitBehavior.ReturnToPlayer,
                 allowExitWithHeldItem: true,
-                source: IsAndroid ? source_chest : source_none) {
+                source: source_chest) {
 
             // =========================================================================
+
+            source = ItemGrabMenu.source_chest;
 
             xPositionOnScreen -= 32;
             inventory.xPositionOnScreen -= 32;
