@@ -80,7 +80,8 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void HandleChatMessage(TextBox sender) {
-            var messages = (List<ChatMessage>)typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Game1.chatBox);
+            //var messages = (List<ChatMessage>)typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Game1.chatBox);
+            var messages = Game1.chatBox.messages;
 
             if (messages.Count <= 0) {
                 return;

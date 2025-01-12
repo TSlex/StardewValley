@@ -97,11 +97,15 @@ namespace ItemResearchSpawnerV2.Core {
             string text = message;
             ChatMessage chatMessage = new();
 
-            List<ChatMessage> messages = (List<ChatMessage>) typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(chatBox);
-            MethodInfo messageColor = typeof(ChatBox).GetMethod("messageColor", BindingFlags.NonPublic | BindingFlags.Instance);
+            //List<ChatMessage> messages = (List<ChatMessage>) typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(chatBox);
+            var messages = Game1.chatBox.messages;
+
+            //MethodInfo messageColor = typeof(ChatBox).GetMethod("messageColor", BindingFlags.NonPublic | BindingFlags.Instance);
 
             string text2 = Game1.parseText(text, chatBox.chatBox.Font, chatBox.chatBox.Width - 16);
-            var c = (Color) (color != null ? color : (Color) messageColor.Invoke(chatBox, new object[] { chatKind }));
+            //var c = (Color) (color != null ? color : (Color) messageColor.Invoke(chatBox, new object[] { chatKind }));
+
+            var c = (Color) (color != null ? color : chatBox.messageColor(chatKind));
 
             chatMessage.timeLeftToDisplay = 600;
             chatMessage.verticalSize = (int) chatBox.chatBox.Font.MeasureString(text2).Y + 4;
