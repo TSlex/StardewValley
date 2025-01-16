@@ -116,8 +116,17 @@ namespace ItemResearchSpawnerV2.Core {
         public SpawnableItem GetSpawnableItem(Item item) {
             var key = CommonHelper.GetItemUniqueKey(item);
 
+            //var possibleItem = ModManager.Instance.ItemRegistry
+            //    .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId)
+            //    .Select(p => p.Value).FirstOrDefault();
+
             var possibleItem = ModManager.Instance.ItemRegistry
-                .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId)
+                .Where(p => p.Key == key)
+                .Select(p => p.Value).FirstOrDefault();
+
+            // in case unique key matching failed, use QualifiedItemId
+            possibleItem ??= ModManager.Instance.ItemRegistry
+                .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId || p.Key == key)
                 .Select(p => p.Value).FirstOrDefault();
 
             //possibleItem ??= new SpawnableItem("", "", (item) => new MissingItem(key));
@@ -305,8 +314,8 @@ namespace ItemResearchSpawnerV2.Core {
             var players = Game1.getAllFarmers().ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
             //var progressions = ModManager.SaveManagerInstance.GetAllProgressions();
 
-            foreach (var player in players) { 
-                var playerProgression = (Helper.Data.ReadJsonFile<List<KeyValuePair<string, ItemSaveData>>>(SaveHelper.ProgressionDumpPath(player.Key)) ?? 
+            foreach (var player in players) {
+                var playerProgression = (Helper.Data.ReadJsonFile<List<KeyValuePair<string, ItemSaveData>>>(SaveHelper.ProgressionDumpPath(player.Key)) ??
                     new List<KeyValuePair<string, ItemSaveData>>()).ToDictionary(p => p.Key, p => p.Value);
 
                 ModManager.SaveManagerInstance.CommitProgression(player.Key, playerProgression, replace: true);

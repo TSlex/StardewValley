@@ -197,9 +197,9 @@ namespace ItemResearchSpawnerV2 {
             //    Monitor.Log(Game1.chatBox.chatBox.Text);
             //}
 
-            //if (Game1.player.ActiveItem != null) {
-            //    Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
-            //}
+            if (Game1.player.ActiveItem != null) {
+                Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
+            }
 
             // print button presses to the console window
             // this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
