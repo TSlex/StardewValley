@@ -5,8 +5,10 @@ using ItemResearchSpawnerV2.Core.UI;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
+using System.Linq;
 
 namespace ItemResearchSpawnerV2.Core {
     internal class ModManager {

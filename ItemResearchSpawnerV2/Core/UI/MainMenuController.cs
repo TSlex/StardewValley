@@ -142,7 +142,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     .Skip(PageIndex * CreativeMenu.ItemsPerRow * 2)
                     .Take(CreativeMenu.ItemsPerView).ToList();
 
-
                 foreach (var pi in items) {
 
                     //pi.Item.Item = pi.Item.CreateItem();
