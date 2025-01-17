@@ -120,14 +120,34 @@ namespace ItemResearchSpawnerV2.Core {
             //    .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId)
             //    .Select(p => p.Value).FirstOrDefault();
 
-            var possibleItem = ModManager.Instance.ItemRegistry
+            SpawnableItem possibleItem = null;
+
+            var possibleItems = ModManager.Instance.ItemRegistry
                 .Where(p => p.Key == key)
-                .Select(p => p.Value).FirstOrDefault();
+                .Select(p => p.Value).ToList();
+
+            if (possibleItems.Count == 1) {
+                possibleItem = possibleItems[0];
+            }
+            else {
+                possibleItem = possibleItems
+                    .Where(p => p.QualifiedItemId == item.QualifiedItemId)
+                    .Select(p => p).FirstOrDefault();
+            }
 
             // in case unique key matching failed, use QualifiedItemId
             possibleItem ??= ModManager.Instance.ItemRegistry
-                .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId || p.Key == key)
+                .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId)
                 .Select(p => p.Value).FirstOrDefault();
+
+            //var possibleItem = ModManager.Instance.ItemRegistry
+            //    .Where(p => p.Key == key)
+            //    .Select(p => p.Value).FirstOrDefault();
+
+            //// in case unique key matching failed, use QualifiedItemId
+            //possibleItem ??= ModManager.Instance.ItemRegistry
+            //    .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId || p.Key == key)
+            //    .Select(p => p.Value).FirstOrDefault();
 
             //possibleItem ??= new SpawnableItem("", "", (item) => new MissingItem(key));
 

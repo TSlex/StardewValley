@@ -539,7 +539,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 if (SearchBar.Selected) {
                     SearchBar.Blur();
                 }
-                
+
                 base.receiveLeftClick(x, y, playSound);
 
                 if (ShiftPressed && heldItem != null && !CreativeMenu.isWithinBounds(x, y)) {
