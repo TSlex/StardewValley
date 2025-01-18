@@ -1,5 +1,4 @@
 ﻿using Force.DeepCloner;
-using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
@@ -7,7 +6,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
-using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     internal class MainMenuController : MainMenu {
@@ -158,7 +156,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     else {
                         availableQuantity = pi.GetAvailableQuantity(Game1.player._money, ModManager.Instance.ItemQuality, out availableQuality);
                     }
-
 
                     pi.GameItem.Quality = (int) availableQuality;
 

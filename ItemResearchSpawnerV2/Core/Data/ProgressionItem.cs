@@ -9,6 +9,7 @@ namespace ItemResearchSpawnerV2.Models {
         public string Label;
         public int BasePrice;
         public int BaseResearchCount;
+        public bool CannotBeSold;
     }
 
     internal class ProgressionItem {
@@ -36,7 +37,7 @@ namespace ItemResearchSpawnerV2.Models {
         public bool BaseResearchCompleted => BaseResearchLeftAmount <= 0;
         public bool BaseResearchStarted => BaseResearchLeftAmount < RequiredResearch && (BaseResearchLeftAmount > 0 || RequiredResearch == 1) && !BaseResearchCompleted;
 
-        public int ResearchPerc => (int)((CurrentResearchAmount * 1f) / (RequiredResearch * 1f) * 100f);
+        public int ResearchPerc => (int) ((CurrentResearchAmount * 1f) / (RequiredResearch * 1f) * 100f);
 
         public bool Favorited => SaveData.Favorite;
         public bool Forbidden => Item.Forbidden;
@@ -47,7 +48,7 @@ namespace ItemResearchSpawnerV2.Models {
 
         public int Stack { get => Item.Item.Stack; set => Item.Item.Stack = value; }
 
-        public ItemQuality Quality => (ItemQuality)((Item.Item as SObject)?.Quality ?? 0);
+        public ItemQuality Quality => (ItemQuality) ((Item.Item as SObject)?.Quality ?? 0);
 
         public Item GameItem => Item.Item;
 
@@ -72,7 +73,7 @@ namespace ItemResearchSpawnerV2.Models {
             return itemInstrace;
         }
 
-        public ItemSaveData GetSaveData() { 
+        public ItemSaveData GetSaveData() {
             var saveData = SaveData;
 
             if (GameItem is StardewValley.Objects.Clothing clothingItem) {
@@ -83,7 +84,7 @@ namespace ItemResearchSpawnerV2.Models {
                 saveData.WaterLevel = can.WaterLeft;
             }
 
-            return SaveData; 
+            return SaveData;
         }
 
         public int GetResearchProgress(ItemQuality requestedQuality) {
@@ -180,7 +181,13 @@ namespace ItemResearchSpawnerV2.Models {
             var item = Item.CreateItem();
 
             if (item is SObject obj) {
-                obj.Quality = (int)requestedQuality;
+                obj.Quality = (int) requestedQuality;
+            }
+
+            var itemBuyPrice = ModManager.Instance.GetItemBuyPrice(item);
+
+            if (itemBuyPrice <= 0) {
+                return item.maximumStackSize();
             }
 
             try {

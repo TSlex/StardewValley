@@ -21,6 +21,7 @@
   "category.craftable": "Ремесло",
   "category.crops": "Урожай",
   "category.decor": "Декор",
+  "category.house_decor": "Домашний декор",
   "category.fish": "Рыба",
   "category.flowers": "Цветы",
   "category.forage": "Дикие растения",
@@ -63,7 +64,7 @@
 
   //modes
   "mod-mode.research": "Режим исследователя",
-  "mod-mode.buy-sell": "Режим покупки-прожажи",
+  "mod-mode.buy-sell": "Режим покупки-продажи",
   "mod-mode.combined": "Режим \"Исследуй->Продавай\"",
   "mod-mode.research-plus": "Режим Мистера Ки",
   "mod-mode.buy-sell-plus": "Режим ДжоджаМарт",

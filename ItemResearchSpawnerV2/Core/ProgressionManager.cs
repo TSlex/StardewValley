@@ -1,14 +1,11 @@
 ﻿using Force.DeepCloner;
 using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
-using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
-using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using static ItemResearchSpawnerV2.Core.NetworkManager;
-using SObject = StardewValley.Object;
 
 
 namespace ItemResearchSpawnerV2.Core {
@@ -187,10 +184,18 @@ namespace ItemResearchSpawnerV2.Core {
             var itemBaseResearchCount = (int) (category.ResearchCount * ModManager.Instance.Config.GetResearchAmountMultiplier());
             itemBaseResearchCount = itemBaseResearchCount >= 1 ? itemBaseResearchCount : 1;
 
+            // prevents items from catalogues (free infinite items) to be used as money generator :)
+            var cannotSold = category.Label switch {
+                "category.house_decor" => true,
+                "category.furniture" => true,
+                _ => false,
+            };
+
             var itemCategory = new ItemCategory {
                 Label = I18n.GetByKey(category.Label),
                 BasePrice = category.BaseCost,
                 BaseResearchCount = item.Forbidden ? -1 : itemBaseResearchCount,
+                CannotBeSold = cannotSold
             };
 
             itemCategory.BaseResearchCount = ModManager.Instance.ModMode switch {
@@ -231,28 +236,10 @@ namespace ItemResearchSpawnerV2.Core {
                 if (itemPrice > 100000) {
                     itemPrice = 100000;
                 }
+            }
 
-                //if (itemPrice <= 1000) {
-                //    itemPrice = 1000;
-                //}
-                //else if (itemPrice <= 2500) {
-                //    itemPrice = 2500;
-                //}
-                //else if (itemPrice <= 5000) {
-                //    itemPrice = 5000;
-                //}
-                //else if (itemPrice <= 10000) {
-                //    itemPrice = 10000;
-                //}
-                //else if (itemPrice <= 25000) {
-                //    itemPrice = 25000;
-                //}
-                //else if (itemPrice <= 50000) {
-                //    itemPrice = 50000;
-                //}
-                //else {
-                //    itemPrice = 100000;
-                //}
+            if (ModManager.Instance.ModMode != ModMode.BuySellPlus && itemCategory.CannotBeSold) {
+                itemPrice = 0;
             }
 
             var progressionData = GetProgressionDataOrDefault(item.Item);

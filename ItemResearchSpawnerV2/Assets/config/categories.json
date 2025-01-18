@@ -48,7 +48,14 @@
         "Pet License:138",
         "Tent Kit:59",
         "Enricher:913",
-        "Pressure Nozzle:915"
+        "Pressure Nozzle:915",
+        "JunimoCatalogue:96",
+        "TrashCatalogue:122",
+        "RetroCatalogue:97",
+        "WizardCatalogue:168",
+        "JojaCatalogue:97",
+        "Catalogue:1308",
+        "Furniture Catalogue:1226"
       ]
     },
     "Except": {
@@ -575,17 +582,24 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 50
+    "BaseCost": 0
+  },
+  {
+    "Label": "category.house_decor",
+    "When": {
+      "UniqueKey": [
+        "Flooring",
+        "Wallpaper"
+      ]
+    },
+    "ResearchCount": 1,
+    "BaseCost": 0
   },
   {
     "Label": "category.decor",
     "When": {
       "ObjCategory": [
         -24
-      ],
-      "UniqueKey": [
-        "Flooring",
-        "Wallpaper"
       ]
     },
     "ResearchCount": 1,

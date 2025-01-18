@@ -1,17 +1,8 @@
-﻿using ItemResearchSpawnerV2.Core.Data.Enums;
-using ItemResearchSpawnerV2.Core.Utils;
+﻿using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static StardewValley.BellsAndWhistles.PlayerStatusList;
 
 namespace ItemResearchSpawnerV2.Core {
 
