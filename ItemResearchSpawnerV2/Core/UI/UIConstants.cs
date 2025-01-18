@@ -11,9 +11,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
         //public static Color ResearchModeColor => new Color(160, 80, 0);
         public static Color ResearchModeColor => new Color(240, 60, 60);
         public static Color BuySellModeColor => new Color(255, 200, 20);
-        public static Color CombinedModeColor => new Color(80, 220, 0);
+        public static Color CombinedModeColor => new Color(200, 160, 0);
         public static Color ResearchPlusModeColor => new Color(120, 50, 255);
         public static Color BuySellPlusModeColor => new Color(0, 150, 255);
+        public static Color JunimoMagicTradeColor => new Color(80, 220, 0);
+        public static Color JunimoMagicTradePlusColor => new Color(70, 180, 0);
 
         public static Rectangle CreativeMenuBase => new Rectangle(64, 256, 832, 384);
         public static Rectangle CreativeMenuFrame => new Rectangle(896, 256, 960, 384);
@@ -35,6 +37,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public static Rectangle RNSButtonResearchIcon => new Rectangle(524, 200, 32, 32);
         public static Rectangle RNSJojaButtonIcon => new Rectangle(588, 200, 32, 32);
         public static Rectangle RNSQiButtonIcon => new Rectangle(652, 200, 32, 32);
+
+        public static Rectangle JMTResearchButtonIcon => new Rectangle(716, 200, 32, 32);
+        public static Rectangle JMTCoinIcon => new Rectangle(780, 200, 32, 32);
+        public static Rectangle JMTCoinButtonIcon => new Rectangle(844, 200, 32, 32);
 
         public static Rectangle QualitySilverIcon => new Rectangle(200, 208, 32, 32);
         public static Rectangle QualityGoldIcon => new Rectangle(136, 208, 32, 32);

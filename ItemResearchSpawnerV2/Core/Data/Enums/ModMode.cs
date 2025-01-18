@@ -7,7 +7,9 @@ namespace ItemResearchSpawnerV2.Core.Data.Enums {
         BuySell,
         Combined,
         ResearchPlus,
-        BuySellPlus
+        BuySellPlus,
+        JunimoMagicTrade,
+        JunimoMagicTradePlus,
     }
 
     internal static class ModModeExtensions {
@@ -23,6 +25,8 @@ namespace ItemResearchSpawnerV2.Core.Data.Enums {
                 ModMode.Combined => true,
                 ModMode.ResearchPlus => false,
                 ModMode.BuySellPlus => true,
+                ModMode.JunimoMagicTrade => true,
+                ModMode.JunimoMagicTradePlus => true,
                 _ => false,
             };
         }
@@ -35,6 +39,8 @@ namespace ItemResearchSpawnerV2.Core.Data.Enums {
                 ModMode.Combined => I18n.ModMode_Combined,
                 ModMode.ResearchPlus => I18n.ModMode_ResearchPlus,
                 ModMode.BuySellPlus => I18n.ModMode_BuySellPlus,
+                ModMode.JunimoMagicTrade => I18n.ModMode_JunimoMagicTrade,
+                ModMode.JunimoMagicTradePlus => I18n.ModMode_JunimoMagicTradePlus,
                 _ => throw new NotImplementedException(),
             };
         }
@@ -52,6 +58,8 @@ namespace ItemResearchSpawnerV2.Core.Data.Enums {
                 ModMode.Combined => UIConstants.CombinedModeColor,
                 ModMode.ResearchPlus => UIConstants.ResearchPlusModeColor,
                 ModMode.BuySellPlus => UIConstants.BuySellPlusModeColor,
+                ModMode.JunimoMagicTrade => UIConstants.JunimoMagicTradeColor,
+                ModMode.JunimoMagicTradePlus => UIConstants.JunimoMagicTradePlusColor,
                 _ => throw new NotImplementedException(),
             };
         }

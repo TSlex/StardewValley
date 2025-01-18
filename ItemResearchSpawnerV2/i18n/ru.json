@@ -68,6 +68,8 @@
   "mod-mode.combined": "Режим \"Исследуй->Продавай\"",
   "mod-mode.research-plus": "Режим Мистера Ки",
   "mod-mode.buy-sell-plus": "Режим ДжоджаМарт",
+  "mod-mode.junimo-magic-trade": "Режим Волшебной Торговли Джунимо",
+  "mod-mode.junimo-magic-trade-plus": "Режим Волшебной Торговли Джунимо+",
 
   //settings
   "config.section.main": "Основные настройки",
@@ -104,6 +106,9 @@
 
   "config.research-delay-name": "Время для исследования (в секундах)",
   "config.research-delay-desc": "Влияет на задержку, прежде чем предмет будет исследован. 0 секунд уберёт эту задержку (как это было раньше)",
+
+  "config.auto-research-enabled-name": "Автоматическое исследование",
+  "config.auto-research-enabled-desc": "Позволяет автоматически исследовать предмет сразу после его помещения в область исследования",
 
   "config.ui-use-custom-color-name": "Переопределить цвета интерфейса",
   "config.ui-custom-color-R-name": "  Красное значение",

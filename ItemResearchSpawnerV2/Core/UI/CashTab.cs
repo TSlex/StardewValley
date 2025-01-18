@@ -1,4 +1,5 @@
 ﻿using ItemResearchSpawnerV2.Core;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.UI;
 using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
@@ -6,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ItemResearchSpawnerV2.Components.UI
 {
@@ -48,8 +48,14 @@ namespace ItemResearchSpawnerV2.Components.UI
 
             DrawHelper.DrawMenuBox(BalanceArea.bounds.X, BalanceArea.bounds.Y, Width, 48, out var textPosition);
 
-            b.Draw(ModManager.UITextureInstance, new Vector2(BalanceArea.bounds.X + 4 * 4, BalanceArea.bounds.Y + 4 * 4), 
-                UIConstants.CoinIcon, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
+            var coinIcon = ModManager.Instance.ModMode switch {
+                ModMode.JunimoMagicTrade => UIConstants.JMTCoinIcon,
+                ModMode.JunimoMagicTradePlus => UIConstants.JMTCoinIcon,
+                _ => UIConstants.CoinIcon,
+            };
+
+            b.Draw(ModManager.UITextureInstance, new Vector2(BalanceArea.bounds.X + 4 * 4, BalanceArea.bounds.Y + 4 * 4),
+                coinIcon, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
 
             var textOffsetX = UIConstants.CoinIcon.Width + 4 * 8;
 

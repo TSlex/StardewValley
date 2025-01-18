@@ -120,6 +120,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     }
                 }
             }
+
+            if (ResearchItem != null && ModManager.Instance.Config.AutoResearch) {
+                HandleResearch();
+            }
         }
 
         public Item ReturnItem() {
@@ -481,6 +485,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public void OnResearchInterrupted() {
+            if (ModManager.Instance.Config.AutoResearch && ResearchItem != null) {
+                return;
+            }
+
             ResearchStarted = false;
 
             if (ModManager.Instance.Config.GetEnableSounds()) {

@@ -68,6 +68,8 @@
   "mod-mode.combined": "Combined mode",
   "mod-mode.research-plus": "Mr.Qi mode",
   "mod-mode.buy-sell-plus": "JojaMart mode",
+  "mod-mode.junimo-magic-trade": "Junimo's Magic Trade mode",
+  "mod-mode.junimo-magic-trade-plus": "JMT Combined mode",
 
   //settings
   "config.section.main": "Main settings",
@@ -104,6 +106,9 @@
 
   "config.research-delay-name": "Research time (in seconds)",
   "config.research-delay-desc": "Use this to control how fast item researching is. \"0\" will research item without any delay (just as it was before)",
+
+  "config.auto-research-enabled-name": "Automatic research",
+  "config.auto-research-enabled-desc": "Enable to research item automatically once it is placed in the research area",
 
   "config.ui-use-custom-color-name": "Override UI color",
   "config.ui-custom-color-R-name": "  UI color red value",

@@ -168,19 +168,6 @@ namespace ItemResearchSpawnerV2.Core {
 
         public (int buy, int sell) GetItemPrices(ProgressionItem item, bool countStack = false) {
 
-            //var price = GetItemPrice(item, false);
-
-            //var buyPrice = (int)MathF.Round(price * Config.GetBuyPriceMultiplier());
-            //buyPrice = buyPrice >= 0 ? buyPrice : 0;
-
-            //var sellPrice = (int)MathF.Round(price * Config.GetSellPriceMultiplier());
-            //sellPrice = sellPrice >= 0 ? sellPrice : 0;
-
-            //if (countStack) {
-            //    buyPrice *= item.GameItem.Stack;
-            //    sellPrice *= item.GameItem.Stack;
-            //}
-
             var buyPrice = GetItemBuyPrice(item, countStack);
             var sellPrice = GetItemSellPrice(item, countStack);
 
@@ -228,7 +215,7 @@ namespace ItemResearchSpawnerV2.Core {
             var price = item.Price;
 
             if (multiplyBy != 1.0f) {
-                price = (int)MathF.Round(price * multiplyBy);
+                price = (int) MathF.Round(price * multiplyBy);
             }
 
             if (countStack) {
@@ -237,17 +224,6 @@ namespace ItemResearchSpawnerV2.Core {
 
             return price;
         }
-
-        //public void SetItemPrice(Item activeItem, int price) {
-        //    var key = Helpers.GetItemUniqueKey(activeItem);
-
-        //    if (price < 0 && _pricelist.ContainsKey(key)) {
-        //        _pricelist.Remove(key);
-        //    }
-        //    else {
-        //        _pricelist[key] = price;
-        //    }
-        //}
 
         #endregion
 

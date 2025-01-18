@@ -163,6 +163,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         ModMode.BuySell => availableQuantity,
                         ModMode.Combined => availableQuantity,
                         ModMode.BuySellPlus => availableQuantity,
+                        ModMode.JunimoMagicTrade => availableQuantity,
+                        ModMode.JunimoMagicTradePlus => availableQuantity,
                         _ => pi.GameItem.maximumStackSize()
                     };
 
@@ -669,6 +671,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         case ModMode.BuySell:
                         case ModMode.Combined:
                         case ModMode.BuySellPlus:
+                        case ModMode.JunimoMagicTrade:
+                        case ModMode.JunimoMagicTradePlus:
                             ModManager.Instance.SellItem(hoveredItem);
                             UpdateView();
                             break;

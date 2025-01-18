@@ -1,13 +1,10 @@
-﻿using Force.DeepCloner;
-using ItemResearchSpawnerV2.Core.Data.Enums;
-using ItemResearchSpawnerV2.Models;
+﻿using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
-using System;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.UI {
@@ -309,12 +306,18 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         }
 
                         Item one = actualInventory[num].getOne();
-                        if (actualInventory[num].Stack > 1 && Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1]
-                        {
-                        new InputButton(Keys.LeftShift)
-                        })) {
-                            one.Stack = (int) Math.Ceiling((double) actualInventory[num].Stack / 2.0);
-                            actualInventory[num].Stack = actualInventory[num].Stack / 2;
+
+                        if (actualInventory[num].Stack > 1) {
+                            if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1] { new InputButton(Keys.LeftShift) })) {
+                                int val = (int) Math.Ceiling((double) actualInventory[num].Stack / 2.0);
+                                one.Stack = val;
+                                actualInventory[num].Stack -= val;
+                            }
+                            else if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1] { new InputButton(Keys.LeftControl) })) {
+                                int val = Math.Min(10, actualInventory[num].Stack);
+                                one.Stack = val;
+                                actualInventory[num].Stack -= val;
+                            }
                         }
                         else if (actualInventory[num].Stack == 1) {
                             actualInventory[num] = null;
@@ -339,11 +342,14 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         continue;
                     }
 
-                    if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1]
-                    {
-                    new InputButton(Keys.LeftShift)
-                    })) {
+                    if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1] { new InputButton(Keys.LeftShift) })) {
                         int val = (int) Math.Ceiling((double) actualInventory[num].Stack / 2.0);
+                        val = Math.Min(toAddTo.maximumStackSize() - toAddTo.Stack, val);
+                        toAddTo.Stack += val;
+                        actualInventory[num].Stack -= val;
+                    }
+                    else if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1] { new InputButton(Keys.LeftControl) })) {
+                        int val = Math.Min(10, actualInventory[num].Stack);
                         val = Math.Min(toAddTo.maximumStackSize() - toAddTo.Stack, val);
                         toAddTo.Stack += val;
                         actualInventory[num].Stack -= val;

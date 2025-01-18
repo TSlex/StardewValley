@@ -341,6 +341,14 @@ namespace ItemResearchSpawnerV2 {
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
+                getValue: () => ActiveConfig.GetAutoResearch(),
+                setValue: value => ActiveConfig.SetAutoResearch(value),
+                name: () => I18n.Config_AutoResearchEnabledName(),
+                tooltip: () => I18n.Config_AutoResearchEnabledDesc()
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
                 getValue: () => ActiveConfig.GetUseCustomUIColor(),
                 setValue: value => ActiveConfig.SetUseCustomUIColor(value),
                 name: () => I18n.Config_UiUseCustomColorName(),

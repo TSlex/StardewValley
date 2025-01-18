@@ -82,6 +82,18 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     }
 
                     break;
+                case ModMode.JunimoMagicTrade:
+                    b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.JMTCoinButtonIcon, Color.White);
+                    break;
+                case ModMode.JunimoMagicTradePlus:
+                    if (researchArea.ResearchItem?.ResearchCompleted ?? false) {
+                        b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.JMTCoinButtonIcon, Color.White);
+                    }
+                    else {
+                        b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.JMTResearchButtonIcon, Color.White);
+                    }
+
+                    break;
             }
 
             //b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.RNSButtonResearchIcon, Color.White);

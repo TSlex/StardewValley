@@ -204,6 +204,8 @@ namespace ItemResearchSpawnerV2.Core {
                 ModMode.Combined => itemCategory.BaseResearchCount,
                 ModMode.ResearchPlus => 0,
                 ModMode.BuySellPlus => 0,
+                ModMode.JunimoMagicTrade => 1,
+                ModMode.JunimoMagicTradePlus => itemCategory.BaseResearchCount,
                 _ => itemCategory.BaseResearchCount,
             };
 
