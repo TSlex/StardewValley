@@ -5,7 +5,6 @@ using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
 using StardewModdingAPI;
 using StardewValley;
-using static ItemResearchSpawnerV2.Core.NetworkManager;
 
 
 namespace ItemResearchSpawnerV2.Core {
@@ -84,7 +83,13 @@ namespace ItemResearchSpawnerV2.Core {
                 ModManager.Instance.SellItem(itemToSell);
 
                 if (ModManager.Instance.Config.GetEnableSounds()) {
-                    Game1.playSound("purchase");
+                    var purchaseSound = ModManager.Instance.ModMode switch {
+                        ModMode.JunimoMagicTrade => "junimoMeep1",
+                        ModMode.JunimoMagicTradePlus => "junimoMeep1",
+                        _ => "purchase",
+                    };
+
+                    Game1.playSound(purchaseSound);
                 }
             }
 
@@ -330,7 +335,7 @@ namespace ItemResearchSpawnerV2.Core {
                 ModManager.SaveManagerInstance.CommitProgression(player.Key, playerProgression, replace: true);
 
                 if (player.Key != Game1.player.UniqueMultiplayerID.ToString()) {
-                    NetworkManager.SendNetworkModMessage(new OnReplaceProgressionMessage() {
+                    NetworkManager.SendNetworkModMessage(new NetworkManager.OnReplaceProgressionMessage() {
                         CommitProgression = playerProgression
                     }, playerID: player.Value.UniqueMultiplayerID);
                 }

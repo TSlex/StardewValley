@@ -34,6 +34,8 @@ namespace ItemResearchSpawnerV2.Core {
                 { "rns_unlock_active", new ModCommand("rns_unlock_active", () => I18n.Command_UnlockActive_Desc(), UnlockActiveProgression) },
                 { "rns_dump_progression", new ModCommand("rns_dump_progression", () => I18n.Command_DumpProgressions_Desc(), DumpProgression) },
                 { "rns_load_progression", new ModCommand("rns_load_progression", () => I18n.Command_LoadProgressions_Desc(), LoadProgression) },
+                { "rns_jmt_rich", new ModCommand("rns_jmt_rich", () => I18n.Command_JMTRich_Desc(), JMTAdd100k) },
+                { "rns_jmt_broke", new ModCommand("rns_jmt_broke", () => I18n.Command_JMTBroke_Desc(), JMTVoid) },
                 { "rns_check_recipes", new ModCommand("rns_check_recipes", () => "", CheckRecipes, true) }
             };
         }
@@ -198,6 +200,18 @@ namespace ItemResearchSpawnerV2.Core {
             }
 
             return true;
+        }
+
+        private void JMTAdd100k(string command, string[] args) {
+            ModManager.Instance.JMTMoney += 100000;
+
+            ReplyToChat(I18n.Command_JMTRich_Succ());
+        }
+
+        private void JMTVoid(string command, string[] args) {
+            ModManager.Instance.JMTMoney = 0;
+
+            ReplyToChat(I18n.Command_JMTBroke_Succ());
         }
 
         private void CheckRecipes(string command, string[] args) {

@@ -550,7 +550,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 leftAmount = 0;
 
                 if (ModManager.Instance.Config.GetEnableSounds()) {
-                    Game1.playSound("purchase");
+                    var purchaseSound = ModManager.Instance.ModMode switch {
+                        ModMode.JunimoMagicTrade => "junimoMeep1",
+                        ModMode.JunimoMagicTradePlus => "junimoMeep1",
+                        _ => "purchase",
+                    };
+
+                    Game1.playSound(purchaseSound);
                 }
             }
 

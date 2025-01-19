@@ -1,7 +1,15 @@
 ﻿using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
+using ItemResearchSpawnerV2.Core.Data.Serializable;
+using ItemResearchSpawnerV2.Core.Utils;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 using StardewValley;
+using StardewValley.Enchantments;
+using StardewValley.Objects;
+using StardewValley.Objects.Trinkets;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Models {
@@ -62,12 +70,65 @@ namespace ItemResearchSpawnerV2.Models {
         public Item InstanciateItem() {
             var itemInstrace = Item.CreateItem();
 
+            // leave for now for backwards compatibility
             if (itemInstrace is StardewValley.Objects.Clothing clothingItem) {
                 clothingItem.clothesColor.Value = SaveData.ClothesColor;
             }
 
+            // leave for now for backwards compatibility
             if (itemInstrace is StardewValley.Tools.WateringCan can) {
                 can.WaterLeft = SaveData.WaterLevel;
+            }
+
+            //if (itemInstrace is StardewValley.Objects.ColoredObject coloredObject) {
+
+            //    coloredObject.color.Value = SaveData.TryGetMetaPropery("Color", coloredObject.color.Value);
+            //}
+
+            if (SaveData.Meta.ContainsKey("Color")) {
+                if (StardewValley.Objects.ColoredObject.TrySetColor(itemInstrace, SaveData.TryGetMetaPropery("Color", Color.White), out var coloredItemInstance)){
+                    itemInstrace = coloredItemInstance;
+                }
+            }
+
+            if (itemInstrace is Tool tool) {
+                var loadedEnchantments = SaveData.TryGetMetaPropery("Enchantments", new List<ToolEnchantment>());
+                //var availableEnchantments = BaseEnchantment.GetAvailableEnchantmentsForItem(tool).Select(ne => (Base: ne, Name: ne.GetType().Name)).ToList();
+                var availableEnchantments = CommonHelper.GetAllEnchantments()
+                    .Where(ne => ne.CanApplyTo(GameItem))
+                    .Select(ne => (Base: ne, Name: ne.GetType().Name))
+                    .ToList();
+
+
+                var join = availableEnchantments.Join(loadedEnchantments, a => a.Name, b => b.Name, (a, b) => (a.Base, a.Name, b.Level)).ToList();
+
+                foreach (var enchantment in join) {
+                    var enchInstance = enchantment.Base;
+                    enchInstance.Level = enchantment.Level;
+
+                    tool.AddEnchantment(enchInstance);
+                }
+            }
+
+            if (itemInstrace is CombinedRing cRing) {
+                var ringsKeys = SaveData.TryGetMetaPropery("CombinedRings", new List<string>());
+
+                try {
+                    var ringsItems = ringsKeys.Select(rk => ModManager.Instance.ItemRegistry[rk].Item).ToList();
+
+                    foreach(var ringsItem in ringsItems) {
+                        if (ringsItem is Ring ring) {
+                            cRing.combinedRings.Add(ring);
+                        }
+                    }
+
+                }
+                catch { }
+
+            }
+
+            if (itemInstrace is Trinket trinket) {
+                trinket.RerollStats(SaveData.TryGetMetaPropery("TrinketSeed", trinket.generationSeed.Value));
             }
 
             return itemInstrace;
@@ -77,11 +138,37 @@ namespace ItemResearchSpawnerV2.Models {
             var saveData = SaveData;
 
             if (GameItem is StardewValley.Objects.Clothing clothingItem) {
+
+                // leave for now for backwards compatibility
                 saveData.ClothesColor = clothingItem.clothesColor.Value;
+                saveData.Meta["ClothesColor"] = JsonConvert.SerializeObject(clothingItem.clothesColor.Value); // new way of storing item's meta
             }
 
             if (GameItem is StardewValley.Tools.WateringCan can) {
+
+                // leave for now for backwards compatibility
                 saveData.WaterLevel = can.WaterLeft;
+                saveData.Meta["WaterLevel"] = JsonConvert.SerializeObject(can.WaterLeft); // new way of storing item's meta
+            }
+
+            if (GameItem is StardewValley.Objects.ColoredObject coloredObject) {
+                saveData.Meta["Color"] = JsonConvert.SerializeObject(coloredObject.color.Value);
+            }
+
+            if (GameItem is Tool tool) {
+                var enchantments = tool.enchantments.Select(ne => new ToolEnchantment(Level: ne.Level, Name: ne.GetType().Name)).ToList();
+
+                saveData.Meta["Enchantments"] = JsonConvert.SerializeObject(enchantments);
+            }
+
+            if (GameItem is CombinedRing cRing) {
+                var rings = cRing.combinedRings.Select(cr => ModManager.ProgressionManagerInstance.GetSpawnableItem(cr).UniqueKey).ToList();
+
+                saveData.Meta["CombinedRings"] = JsonConvert.SerializeObject(rings);
+            }
+
+            if (GameItem is Trinket trinket) {
+                saveData.Meta["TrinketSeed"] = JsonConvert.SerializeObject(trinket.generationSeed.Value);
             }
 
             return SaveData;

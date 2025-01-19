@@ -128,6 +128,11 @@
 
   "command.unique-key.desc": "Print hotbar active item unique key",
 
+  "command.j-m-t-rich.desc": "Add 100k to your Junimo's Magic Trade balance",
+  "command.j-m-t-rich.succ": "The magic of the forest has added 100k to your Junimo's Magic Trade balance!",
+  "command.j-m-t-broke.desc": "Void your Junimo's' Magic Trade balance",
+  "command.j-m-t-broke.succ": "You've donated all your JMT for the Forest Conservation fund!",
+
   "command.unlock-active.desc": "Research (unlock) hotbar active item",
   "command.unlock-active.err-no-item": "Select an item first",
   "command.unlock-active.succ": "Item - {0}, was researched!",

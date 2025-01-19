@@ -20,6 +20,8 @@ namespace ItemResearchSpawnerV2.Core.Data.Serializable {
 
         public ModConfig Config { get; set; } = new ModConfig();
 
+        public int JMTMoney { get; set; } = 0;
+
         public override bool Equals(object obj) {
             if (obj is ModManagerState CModState) {
 

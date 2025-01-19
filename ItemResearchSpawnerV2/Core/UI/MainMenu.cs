@@ -397,8 +397,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 else if (Game1.player.addItemToInventoryBool(heldItem)) {
                     heldItem = null;
 
-                    var addSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
-                        "purchase" : "discoverMineral";
+                    //var addSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
+                    //    "purchase" : "discoverMineral";
+
+                    var addSound = ModManager.Instance.ModMode switch {
+                        ModMode.BuySell => "purchase",
+                        ModMode.Combined => "purchase",
+                        ModMode.BuySellPlus => "purchase",
+                        ModMode.JunimoMagicTrade => "junimoMeep1",
+                        ModMode.JunimoMagicTradePlus => "junimoMeep1",
+                        _ => "discoverMineral",
+                    };
 
                     if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound(addSound);
@@ -492,8 +501,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 else if (Game1.player.addItemToInventoryBool(heldItem)) {
                     heldItem = null;
 
-                    var addSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
-                        "purchase" : "discoverMineral";
+                    //var addSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
+                    //    "purchase" : "discoverMineral";
+
+                    var addSound = ModManager.Instance.ModMode switch {
+                        ModMode.BuySell => "purchase",
+                        ModMode.Combined => "purchase",
+                        ModMode.BuySellPlus => "purchase",
+                        ModMode.JunimoMagicTrade => "junimoMeep1",
+                        ModMode.JunimoMagicTradePlus => "junimoMeep1",
+                        _ => "discoverMineral",
+                    };
 
                     if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound(addSound);

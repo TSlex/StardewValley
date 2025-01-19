@@ -154,7 +154,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         availableQuantity = pi.GameItem.maximumStackSize();
                     }
                     else {
-                        availableQuantity = pi.GetAvailableQuantity(Game1.player._money, ModManager.Instance.ItemQuality, out availableQuality);
+                        //availableQuantity = pi.GetAvailableQuantity(Game1.player._money, ModManager.Instance.ItemQuality, out availableQuality);
+                        availableQuantity = pi.GetAvailableQuantity(ModManager.Instance.PlayerMoney, ModManager.Instance.ItemQuality, out availableQuality);
                     }
 
                     pi.GameItem.Quality = (int) availableQuality;
@@ -664,8 +665,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 if (progressionItem.ResearchCompleted) {
-                    var removeSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
-                        "purchase" : "fireball";
+                    //var removeSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
+                    //    "purchase" : "fireball";
+
+                    var removeSound = ModManager.Instance.ModMode switch {
+                        ModMode.BuySell => "purchase",
+                        ModMode.Combined => "purchase",
+                        ModMode.BuySellPlus => "purchase",
+                        ModMode.JunimoMagicTrade => "junimoMeep1",
+                        ModMode.JunimoMagicTradePlus => "junimoMeep1",
+                        _ => "fireball",
+                    };
 
                     switch (ModManager.Instance.ModMode) {
                         case ModMode.BuySell:

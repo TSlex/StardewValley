@@ -43,6 +43,8 @@ namespace ItemResearchSpawnerV2.Core {
         public FavoriteDisplayMode FavoriteDisplay = FavoriteDisplayMode.All;
         public ProgressionDisplayMode ProgressionDisplay = ProgressionDisplayMode.ResearchedOnly;
 
+        public int JMTMoney = 0;
+
         public bool SaveDataLoaded = false;
 
         // ===========================================================================================
@@ -136,27 +138,59 @@ namespace ItemResearchSpawnerV2.Core {
 
         #region Price/Money
 
+        public int PlayerMoney {
+            get {
+                return ModMode switch {
+                    ModMode.JunimoMagicTrade => JMTMoney,
+                    ModMode.JunimoMagicTradePlus => JMTMoney,
+                    _ => Game1.player._money,
+                };
+            }
+        }
+
+        private void AddPlayerMoney(int byAmount) {
+            SetPlayerMoney(PlayerMoney + byAmount);
+        }
+
+        private void WithdrawPlayerMoney(int byAmount) {
+            SetPlayerMoney(PlayerMoney - byAmount);
+        }
+
+        private void SetPlayerMoney(int value) {
+            if (ModMode == ModMode.JunimoMagicTrade || ModMode == ModMode.JunimoMagicTradePlus) {
+                JMTMoney = value;
+            }
+            else {
+                Game1.player._money = value;
+            }
+        }
+
+        // -----------------------------------------------------------------
+
         public bool ShouldDisableItemByPrice(Item item) {
             return ModMode != ModMode.Research && ModMode != ModMode.ResearchPlus && !(CanBuyItem(item) && item.Stack > 0);
         }
 
         public bool CanBuyItem(Item item) {
-            return GetItemBuyPrice(item, true) <= Game1.player._money;
+            return GetItemBuyPrice(item, true) <= PlayerMoney;
         }
 
         public void BuyItem(Item item) {
             var price = GetItemBuyPrice(item, true);
 
-            if (price > Game1.player._money) {
-                Game1.player._money = 0;
+            if (price > PlayerMoney) {
+                //Game1.player._money = 0;
+                SetPlayerMoney(0);
             }
             else {
-                Game1.player._money -= price;
+                //Game1.player._money -= price;
+                WithdrawPlayerMoney(price);
             }
         }
 
         public void SellItem(Item item) {
-            Game1.player._money += GetItemSellPrice(item, true);
+            //Game1.player._money += GetItemSellPrice(item, true);
+            AddPlayerMoney(GetItemSellPrice(item, true));
         }
 
         // -----------------------------------------------------------------
@@ -237,6 +271,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             var modState = new ModManagerState() {
                 Config = Config,
+                JMTMoney = JMTMoney,
                 Quality = ItemQuality,
                 ProgressionDisplayMode = ProgressionDisplay,
                 FavoriteDisplayMode = FavoriteDisplay,
@@ -280,6 +315,7 @@ namespace ItemResearchSpawnerV2.Core {
             var modState = SaveManager.GetModState(Game1.player.UniqueMultiplayerID.ToString());
 
             Config = modState.Config;
+            JMTMoney = modState.JMTMoney;
             ItemQuality = modState.Quality;
             ProgressionDisplay = modState.ProgressionDisplayMode;
             FavoriteDisplay = modState.FavoriteDisplayMode;

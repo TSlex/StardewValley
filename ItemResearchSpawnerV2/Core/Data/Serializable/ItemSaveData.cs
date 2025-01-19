@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 
 namespace ItemResearchSpawnerV2.Models {
     internal class ItemSaveData {
@@ -13,6 +14,8 @@ namespace ItemResearchSpawnerV2.Models {
         public Color ClothesColor = Color.White;
         public int WaterLevel = 0;
 
+        public Dictionary<string, string> Meta = new();
+
         public override bool Equals(object obj) {
             if (obj == null || obj is not ItemSaveData data) {
                 return false;
@@ -23,8 +26,25 @@ namespace ItemResearchSpawnerV2.Models {
                     ResearchCountSilver == data.ResearchCountSilver &&
                     ResearchCountIridium == data.ResearchCountIridium &&
                     Favorite == data.Favorite &&
+                    Meta.Count == data.Meta.Count && !Meta.Except(data.Meta).Any() &&
                     ClothesColor == data.ClothesColor &&
                     WaterLevel == data.WaterLevel;
+            }
+        }
+
+        public T TryGetMetaPropery<T>(string Key, T fallback) { 
+            if (Meta.ContainsKey(Key)) {
+                try {
+                    T property = JsonConvert.DeserializeObject<T>(Meta[Key]);
+                    return property;
+                }
+                catch {
+                    Meta.Remove(Key);
+                    return fallback;
+                }
+            }
+            else {
+                return fallback;
             }
         }
     }

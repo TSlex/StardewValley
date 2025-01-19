@@ -24,6 +24,7 @@ namespace ItemResearchSpawnerV2.Components.UI
 
         private static IModContentHelper Content => ModManager.Instance.Helper.ModContent;
 
+
         public CashTab(Func<int> getXPos, Func<int> getYPos, int width)
         {
             GetXPos = getXPos;
@@ -59,7 +60,9 @@ namespace ItemResearchSpawnerV2.Components.UI
 
             var textOffsetX = UIConstants.CoinIcon.Width + 4 * 8;
 
-            var playerMoney = Game1.player._money + 10000000000;
+            //var playerMoney = Game1.player._money + 10000000000;
+            var playerMoney = ModManager.Instance.PlayerMoney + 10000000000;
+
             playerMoney = playerMoney >= 20000000000 ? 19999999999 : playerMoney;
             var playerMoneyStr = new string(playerMoney.ToString().Skip(1).ToArray());
 
