@@ -276,6 +276,14 @@ namespace ItemResearchSpawnerV2 {
                 tooltip: () => I18n.Config_ShareProgressionEnabledDesc()
             );
 
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetDisableNonHostCommands(),
+                setValue: value => ActiveConfig.SetDisableNonHostCommands(value),
+                name: () => I18n.Config_DissableNonHostCommandsName(),
+                tooltip: () => I18n.Config_DissableNonHostCommandsDesc()
+            );
+
             // ------------------------------------------------------------
 
             configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Balance());

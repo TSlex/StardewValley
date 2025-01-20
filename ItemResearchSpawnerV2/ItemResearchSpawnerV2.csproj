@@ -21,6 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="DebounceThrottle" Version="3.0.1" />
 		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
 		<PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
 	</ItemGroup>

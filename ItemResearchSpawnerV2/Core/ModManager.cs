@@ -1,4 +1,5 @@
-﻿using ItemResearchSpawnerV2.Core.Data;
+﻿using DebounceThrottle;
+using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Core.UI;
@@ -44,6 +45,7 @@ namespace ItemResearchSpawnerV2.Core {
         public ProgressionDisplayMode ProgressionDisplay = ProgressionDisplayMode.ResearchedOnly;
 
         public int JMTMoney = 0;
+        private DebounceDispatcher jmtSyncDebounce = new(TimeSpan.FromMilliseconds(500));
 
         public bool SaveDataLoaded = false;
 
@@ -159,6 +161,14 @@ namespace ItemResearchSpawnerV2.Core {
         private void SetPlayerMoney(int value) {
             if (ModMode == ModMode.JunimoMagicTrade || ModMode == ModMode.JunimoMagicTradePlus) {
                 JMTMoney = value;
+
+                if (!Context.IsMainPlayer && SaveDataLoaded) {
+                    jmtSyncDebounce.Debounce(() => {
+                        NetworkManager.SendNetworkModMessage(new NetworkManager.OnCommitJMTMoneyMessage() {
+                            JMTMoney = value,
+                        });
+                    });
+                }
             }
             else {
                 Game1.player._money = value;

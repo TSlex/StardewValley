@@ -39,6 +39,7 @@ namespace ItemResearchSpawnerV2 {
         public bool AutoResearch = false;
 
         public bool ShareProgression = false;
+        public bool DisableNonHostCommands = false;
 
         public bool UseCustomUIColor = false;
         public Color CustomUIColor = Color.Gold;
@@ -87,6 +88,10 @@ namespace ItemResearchSpawnerV2 {
 
         public bool GetShareProgression() {
             return ShareProgression;
+        }
+
+        public bool GetDisableNonHostCommands() {
+            return DisableNonHostCommands;
         }
 
         public bool GetUseCustomUIColor() {
@@ -181,6 +186,14 @@ namespace ItemResearchSpawnerV2 {
             }
 
             ShareProgression = value;
+        }
+
+        public void SetDisableNonHostCommands(bool value) {
+            if (!Context.IsMainPlayer) {
+                return;
+            }
+
+            DisableNonHostCommands = value;
         }
 
         public void SetUseCustomUIColor(bool value) {

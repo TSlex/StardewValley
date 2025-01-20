@@ -127,6 +127,9 @@
   "config.share-progression-enabled-name": "Share progression",
   "config.share-progression-enabled-desc": "Enable to share progression between host and non-host players (host file will be used)",
 
+  "config.dissable_non-host-commands-name": "Commands for host only",
+  "config.dissable_non-host-commands-desc": "Enable to allow command usage only for the host player",
+
   //commands
   "command.get-help": "Description for command \"{0}\":\n{1}",
   "command.get-help-fail": "Cannot find command \"{0}\"!",

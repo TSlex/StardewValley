@@ -76,7 +76,12 @@ namespace ItemResearchSpawnerV2.Core {
                 //    ReplyToChat($"{arg}");
                 //}
 
-                modCommand.action(command, args);
+                if (!Context.IsMainPlayer && ModManager.Instance.Config.DisableNonHostCommands) {
+                    CheckIsHostPlayer();
+                }
+                else {
+                    modCommand.action(command, args);
+                }
             }
         }
 

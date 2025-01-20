@@ -127,6 +127,9 @@
   "config.share-progression-enabled-name": "Синхронизация исследований",
   "config.share-progression-enabled-desc": "Синхронизирует исследования между хостом и другими игроками (используется файл хоста)",
 
+  "config.dissable_non-host-commands-name": "Комманды только для хоста",
+  "config.dissable_non-host-commands-desc": "Разрешает использование комманд только хосту",
+
   //commands
   "command.get-help": "Описание для комманды \"{0}\":\n{1}",
   "command.get-help-fail": "Не могу найти комманду \"{0}\"!",
