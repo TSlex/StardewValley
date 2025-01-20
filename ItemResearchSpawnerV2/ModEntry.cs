@@ -42,6 +42,7 @@ namespace ItemResearchSpawnerV2 {
             // -----------------------------------------------
 
             helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
+            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.Saving += OnSave;
@@ -93,6 +94,12 @@ namespace ItemResearchSpawnerV2 {
 
         private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e) {
             NetworkManager.RecieveNetworkModMessage(e);
+        }
+
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e) {
+            if (e.IsMultipleOf(30)) {
+                Manager.SyncJTMMoney();
+            }
         }
 
         public void OnConfigChange() {
