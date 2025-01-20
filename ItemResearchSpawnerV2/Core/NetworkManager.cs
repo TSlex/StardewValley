@@ -1,14 +1,9 @@
-﻿
-
-using ItemResearchSpawnerV2.Core.Data.Enums;
-using ItemResearchSpawnerV2.Core.Data.Serializable;
+﻿using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewModdingAPI.Utilities;
 using StardewValley;
-using static ItemResearchSpawnerV2.Core.NetworkManager;
 
 namespace ItemResearchSpawnerV2.Core {
 
@@ -142,6 +137,7 @@ namespace ItemResearchSpawnerV2.Core {
             playerModState.Config.SellPriceMultiplier = hostModState.Config.SellPriceMultiplier;
             playerModState.Config.BuyPriceMultiplier = hostModState.Config.BuyPriceMultiplier;
             playerModState.Config.ResearchTimeSeconds = hostModState.Config.ResearchTimeSeconds;
+            playerModState.Config.ShareProgression = hostModState.Config.ShareProgression;
 
             ModManager.SaveManagerInstance.CommitModState(fromPlayerID.ToString(), playerModState);
         }
@@ -169,6 +165,7 @@ namespace ItemResearchSpawnerV2.Core {
             playerModState.Config.SellPriceMultiplier = hostModState.Config.SellPriceMultiplier;
             playerModState.Config.BuyPriceMultiplier = hostModState.Config.BuyPriceMultiplier;
             playerModState.Config.ResearchTimeSeconds = hostModState.Config.ResearchTimeSeconds;
+            playerModState.Config.ShareProgression = hostModState.Config.ShareProgression;
 
             ModManager.SaveManagerInstance.CommitModState(fromPlayerID.ToString(), playerModState);
         }
@@ -220,6 +217,7 @@ namespace ItemResearchSpawnerV2.Core {
             ModManager.Instance.Config.SellPriceMultiplier = onHostConfigChangedMessage.Config.SellPriceMultiplier;
             ModManager.Instance.Config.BuyPriceMultiplier = onHostConfigChangedMessage.Config.BuyPriceMultiplier;
             ModManager.Instance.Config.ResearchTimeSeconds = onHostConfigChangedMessage.Config.ResearchTimeSeconds;
+            ModManager.Instance.Config.ShareProgression = onHostConfigChangedMessage.Config.ShareProgression;
 
             Game1.activeClickableMenu = null;
             ModManager.CommandManagerInstance.ReplyToChat(I18n.Command_Multiplayer_HostConfigChanged(), color: Color.Cyan);

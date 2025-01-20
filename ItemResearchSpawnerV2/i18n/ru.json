@@ -21,7 +21,7 @@
   "category.craftable": "Ремесло",
   "category.crops": "Урожай",
   "category.decor": "Декор",
-  "category.house_decor": "Домашний декор",
+  "category.house-decor": "Домашний декор",
   "category.fish": "Рыба",
   "category.flowers": "Цветы",
   "category.forage": "Дикие растения",
@@ -72,6 +72,9 @@
   "mod-mode.junimo-magic-trade-plus": "Режим Волшебной Торговли Джунимо+",
 
   //settings
+  "config.section.attention": "Внимание!",
+  "config.attention-note": "Изменение настроек на титульном экране влияет только на новые сохранения. Чтобы изменить уже существующие, сначала загрузите файл сохранения!",
+
   "config.section.main": "Основные настройки",
 
   "config.default-mode-name": "Режим мода",
@@ -118,6 +121,11 @@
   "config.ui-custom-color-R-desc": "Красное значение (0-255)",
   "config.ui-custom-color-G-desc": "Зеленое значение (0-255)",
   "config.ui-custom-color-B-desc": "Синее значение (0-255)",
+
+  "config.section.multiplayer": "Настройки совместной игры",
+
+  "config.share-progression-enabled-name": "Синхронизация исследований",
+  "config.share-progression-enabled-desc": "Синхронизирует исследования между хостом и другими игроками (используется файл хоста)",
 
   //commands
   "command.get-help": "Описание для комманды \"{0}\":\n{1}",

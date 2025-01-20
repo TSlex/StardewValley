@@ -1,5 +1,4 @@
-﻿using Force.DeepCloner;
-using ItemResearchSpawnerV2.Models;
+﻿using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;

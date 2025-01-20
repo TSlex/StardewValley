@@ -1,5 +1,4 @@
-﻿using System;
-using StardewValley;
+﻿using StardewValley;
 using StardewValley.Enchantments;
 
 namespace ItemResearchSpawnerV2.Core.Utils {

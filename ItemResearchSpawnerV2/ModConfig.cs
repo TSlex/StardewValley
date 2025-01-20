@@ -38,6 +38,8 @@ namespace ItemResearchSpawnerV2 {
 
         public bool AutoResearch = false;
 
+        public bool ShareProgression = false;
+
         public bool UseCustomUIColor = false;
         public Color CustomUIColor = Color.Gold;
 
@@ -81,6 +83,10 @@ namespace ItemResearchSpawnerV2 {
 
         public bool GetAutoResearch() {
             return AutoResearch;
+        }
+
+        public bool GetShareProgression() {
+            return ShareProgression;
         }
 
         public bool GetUseCustomUIColor() {
@@ -167,6 +173,14 @@ namespace ItemResearchSpawnerV2 {
 
         public void SetAutoResearch(bool value) {
             AutoResearch = value;
+        }
+
+        public void SetShareProgression(bool value) {
+            if (!Context.IsMainPlayer) {
+                return;
+            }
+
+            ShareProgression = value;
         }
 
         public void SetUseCustomUIColor(bool value) {

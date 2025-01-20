@@ -21,7 +21,7 @@
   "category.craftable": "Craftable",
   "category.crops": "Crops",
   "category.decor": "Decoration",
-  "category.house_decor": "House decoration",
+  "category.house-decor": "House decoration",
   "category.fish": "Fish",
   "category.flowers": "Flowers",
   "category.forage": "Forage plants",
@@ -72,6 +72,9 @@
   "mod-mode.junimo-magic-trade-plus": "JMT Combined mode",
 
   //settings
+  "config.section.attention": "Attention!",
+  "config.attention-note": "Changing settings from the title screen only affects new saves, to change existing ones, load the save file first!",
+
   "config.section.main": "Main settings",
 
   "config.default-mode-name": "Mod mode",
@@ -118,6 +121,11 @@
   "config.ui-custom-color-R-desc": "Red color value (0-255)",
   "config.ui-custom-color-G-desc": "Green color value (0-255)",
   "config.ui-custom-color-B-desc": "Blue color value (0-255)",
+
+  "config.section.multiplayer": "Multiplayer settings",
+
+  "config.share-progression-enabled-name": "Share progression",
+  "config.share-progression-enabled-desc": "Enable to share progression between host and non-host players (host file will be used)",
 
   //commands
   "command.get-help": "Description for command \"{0}\":\n{1}",

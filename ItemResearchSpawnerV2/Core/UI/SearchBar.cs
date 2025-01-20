@@ -1,11 +1,8 @@
-﻿using System;
-using ItemResearchSpawnerV2.Core.Utils;
+﻿using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     /**

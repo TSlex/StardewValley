@@ -191,7 +191,7 @@ namespace ItemResearchSpawnerV2.Core {
 
             // prevents items from catalogues (free infinite items) to be used as money generator :)
             var cannotSold = category.Label switch {
-                "category.house_decor" => true,
+                "category.house-decor" => true,
                 "category.furniture" => true,
                 _ => false,
             };

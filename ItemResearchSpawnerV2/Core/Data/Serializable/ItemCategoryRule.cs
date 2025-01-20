@@ -1,5 +1,4 @@
 ﻿using ItemResearchSpawnerV2.Core.Utils;
-using StardewValley;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.Data.Serializable {
