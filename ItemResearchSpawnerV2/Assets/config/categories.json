@@ -585,7 +585,7 @@
     "BaseCost": 0
   },
   {
-    "Label": "category.house_decor",
+    "Label": "category.house-decor",
     "When": {
       "UniqueKey": [
         "Flooring",
