@@ -209,12 +209,14 @@ namespace ItemResearchSpawnerV2.Core {
 
         private void JMTAdd100k(string command, string[] args) {
             ModManager.Instance.JMTMoney += 100000;
+            ModManager.Instance.JMTMoneySyncRequired = true;
 
             ReplyToChat(I18n.Command_JMTRich_Succ());
         }
 
         private void JMTVoid(string command, string[] args) {
             ModManager.Instance.JMTMoney = 0;
+            ModManager.Instance.JMTMoneySyncRequired = true;
 
             ReplyToChat(I18n.Command_JMTBroke_Succ());
         }

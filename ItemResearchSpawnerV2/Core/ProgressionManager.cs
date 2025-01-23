@@ -3,8 +3,10 @@ using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Tools;
 
 
 namespace ItemResearchSpawnerV2.Core {
@@ -52,6 +54,21 @@ namespace ItemResearchSpawnerV2.Core {
 
         public void ResearchItem(ProgressionItem item, out int leftAmount) {
             leftAmount = item.Stack;
+
+            if (item.GameItem is FishingRod fishingRod) {
+                foreach(var attachement in fishingRod.attachments.ToList()) {
+                    if (attachement != null) {
+                        CommonHelper.TryReturnItemToInventory(attachement);
+                    }
+                }
+            }
+            if (item.GameItem is Slingshot slingshot) {
+                foreach (var attachement in slingshot.attachments.ToList()) {
+                    if (attachement != null) {
+                        CommonHelper.TryReturnItemToInventory(attachement);
+                    }
+                }
+            }
 
             if (item.RequiredResearch < 0) {
                 ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();

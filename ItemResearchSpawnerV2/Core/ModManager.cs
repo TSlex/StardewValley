@@ -175,6 +175,9 @@ namespace ItemResearchSpawnerV2.Core {
                     JMTMoney = JMTMoney,
                 });
             }
+            else {
+                JMTMoneySyncRequired = false;
+            }
         }
 
         // -----------------------------------------------------------------

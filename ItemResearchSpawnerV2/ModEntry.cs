@@ -97,7 +97,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void OnUpdateTicked(object sender, UpdateTickedEventArgs e) {
-            if (e.IsMultipleOf(30)) {
+            if (e.IsMultipleOf(15)) { // ~every 1/4 of a second
                 Manager.SyncJTMMoney();
             }
         }

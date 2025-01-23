@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using StardewValley;
 using StardewValley.Objects;
 using StardewValley.Objects.Trinkets;
+using StardewValley.Tools;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Models {
@@ -69,12 +70,12 @@ namespace ItemResearchSpawnerV2.Models {
             var itemInstrace = Item.CreateItem();
 
             // leave for now for backwards compatibility
-            if (itemInstrace is StardewValley.Objects.Clothing clothingItem) {
+            if (itemInstrace is Clothing clothingItem) {
                 clothingItem.clothesColor.Value = SaveData.ClothesColor;
             }
 
             // leave for now for backwards compatibility
-            if (itemInstrace is StardewValley.Tools.WateringCan can) {
+            if (itemInstrace is WateringCan can) {
                 can.WaterLeft = SaveData.WaterLevel;
             }
 
@@ -84,7 +85,7 @@ namespace ItemResearchSpawnerV2.Models {
             //}
 
             if (SaveData.Meta.ContainsKey("Color")) {
-                if (StardewValley.Objects.ColoredObject.TrySetColor(itemInstrace, SaveData.TryGetMetaPropery("Color", Color.White), out var coloredItemInstance)){
+                if (ColoredObject.TrySetColor(itemInstrace, SaveData.TryGetMetaPropery("Color", Color.White), out var coloredItemInstance)) {
                     itemInstrace = coloredItemInstance;
                 }
             }
@@ -114,9 +115,9 @@ namespace ItemResearchSpawnerV2.Models {
                 try {
                     var ringsItems = ringsKeys.Select(rk => ModManager.Instance.ItemRegistry[rk].Item).ToList();
 
-                    foreach(var ringsItem in ringsItems) {
+                    foreach (var ringsItem in ringsItems) {
                         if (ringsItem is Ring ring) {
-                            cRing.combinedRings.Add(ring);
+                            cRing.combinedRings.Add((Ring) ring.getOne());
                         }
                     }
 
@@ -128,6 +129,27 @@ namespace ItemResearchSpawnerV2.Models {
             if (itemInstrace is Trinket trinket) {
                 trinket.RerollStats(SaveData.TryGetMetaPropery("TrinketSeed", trinket.generationSeed.Value));
             }
+
+            //if (itemInstrace is FishingRod fishingRod) {
+            //    var attachments = SaveData.TryGetMetaPropery("FishRodAttachment", new List<FishRodAttachment>())
+            //        .Take(fishingRod.AttachmentSlotsCount)
+            //        .ToList();
+
+            //    foreach (var attachment in attachments) {
+            //        if (attachment.IsEmpty) {
+            //            continue;
+            //        }
+            //        try {
+            //            var attachmentItem = (SObject) ModManager.Instance.ItemRegistry[attachment.UniqueKey].Item.getOne();
+
+            //            attachmentItem.Stack = attachment.Stack;
+            //            attachmentItem.uses.Value = attachment.Uses;
+
+            //            fishingRod.attachments[attachment.Index] = attachmentItem;
+            //        }
+            //        catch { }
+            //    }
+            //}
 
             return itemInstrace;
         }
@@ -168,6 +190,20 @@ namespace ItemResearchSpawnerV2.Models {
             if (GameItem is Trinket trinket) {
                 saveData.Meta["TrinketSeed"] = JsonConvert.SerializeObject(trinket.generationSeed.Value);
             }
+
+            //if (GameItem is FishingRod fishingRod) {
+            //    var attachments = fishingRod.attachments
+            //        .Select((at, i) => new FishRodAttachment(
+            //            UniqueKey: at != null ? ModManager.ProgressionManagerInstance.GetSpawnableItem(at).UniqueKey : null,
+            //            Uses: at?.uses.Value ?? 0,
+            //            Index: i,
+            //            Stack: at?.Stack ?? 0,
+            //            IsEmpty: at == null
+            //            ))
+            //        .ToList();
+
+            //    saveData.Meta["FishRodAttachment"] = JsonConvert.SerializeObject(attachments);
+            //}
 
             return SaveData;
         }

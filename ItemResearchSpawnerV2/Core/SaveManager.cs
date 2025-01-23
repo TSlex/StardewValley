@@ -75,6 +75,11 @@ namespace ItemResearchSpawnerV2.Core {
                         CommitProgression = changedProgression
                     });
                 }
+                //else if (Context.IsMainPlayer && ModManager.Instance.Config.ShareProgression) {
+                //    NetworkManager.SendNetworkModMessage(new NetworkManager.OnCommitProgressionMessage() {
+                //        CommitProgression = changedProgression
+                //    });
+                //}
             }
             else {
                 Progressions[playerID] = commitProgression;
