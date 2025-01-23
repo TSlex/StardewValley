@@ -100,7 +100,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
             returnItem = ResearchItem?.GameItem ?? null;
             ResearchItem = item != null ? ModManager.ProgressionManagerInstance.GetProgressionItem(item) : null;
 
-            if (returnItem != null && ResearchItem?.GameItem != null && CommonHelper.GetItemUniqueKey(returnItem) == CommonHelper.GetItemUniqueKey(ResearchItem.GameItem)) {
+            if (returnItem != null && ResearchItem?.GameItem != null && 
+                CommonHelper.GetItemUniqueKey(returnItem) == CommonHelper.GetItemUniqueKey(ResearchItem.GameItem) &&
+                returnItem.Quality == ResearchItem?.GameItem.Quality
+                ) {
                 var resIStack = ResearchItem.Stack;
                 var retIStack = returnItem.Stack;
                 var maxStack = returnItem.maximumStackSize();
