@@ -668,6 +668,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     //var removeSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
                     //    "purchase" : "fireball";
 
+                    CommonHelper.ReturnAttachmentsToEnventory(progressionItem.GameItem);
+
                     var removeSound = ModManager.Instance.ModMode switch {
                         ModMode.BuySell => "purchase",
                         ModMode.Combined => "purchase",

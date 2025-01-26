@@ -55,20 +55,22 @@ namespace ItemResearchSpawnerV2.Core {
         public void ResearchItem(ProgressionItem item, out int leftAmount) {
             leftAmount = item.Stack;
 
-            if (item.GameItem is FishingRod fishingRod) {
-                foreach(var attachement in fishingRod.attachments.ToList()) {
-                    if (attachement != null) {
-                        CommonHelper.TryReturnItemToInventory(attachement);
-                    }
-                }
-            }
-            if (item.GameItem is Slingshot slingshot) {
-                foreach (var attachement in slingshot.attachments.ToList()) {
-                    if (attachement != null) {
-                        CommonHelper.TryReturnItemToInventory(attachement);
-                    }
-                }
-            }
+            CommonHelper.ReturnAttachmentsToEnventory(item.GameItem);
+
+            //if (item.GameItem is FishingRod fishingRod) {
+            //    foreach(var attachement in fishingRod.attachments.ToList()) {
+            //        if (attachement != null) {
+            //            CommonHelper.TryReturnItemToInventory(attachement);
+            //        }
+            //    }
+            //}
+            //if (item.GameItem is Slingshot slingshot) {
+            //    foreach (var attachement in slingshot.attachments.ToList()) {
+            //        if (attachement != null) {
+            //            CommonHelper.TryReturnItemToInventory(attachement);
+            //        }
+            //    }
+            //}
 
             if (item.RequiredResearch < 0) {
                 ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();

@@ -1,5 +1,6 @@
 ﻿using StardewValley;
 using StardewValley.Enchantments;
+using StardewValley.Tools;
 
 namespace ItemResearchSpawnerV2.Core.Utils {
     public static class CommonHelper {
@@ -24,6 +25,23 @@ namespace ItemResearchSpawnerV2.Core.Utils {
                 }
                 else {
                     Game1.player.addItemByMenuIfNecessary(item);
+                }
+            }
+        }
+
+        public static void ReturnAttachmentsToEnventory(Item item) {
+            if (item is FishingRod fishingRod) {
+                foreach (var attachement in fishingRod.attachments.ToList()) {
+                    if (attachement != null) {
+                        TryReturnItemToInventory(attachement);
+                    }
+                }
+            }
+            if (item is Slingshot slingshot) {
+                foreach (var attachement in slingshot.attachments.ToList()) {
+                    if (attachement != null) {
+                        TryReturnItemToInventory(attachement);
+                    }
                 }
             }
         }
