@@ -660,7 +660,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (hoveredItem != null && Game1.player.Items.Contains(hoveredItem)) {
                 var progressionItem = ModManager.ProgressionManagerInstance.GetProgressionItem(hoveredItem);
 
-                if (progressionItem?.Forbidden ?? true) {
+                if ((progressionItem?.Forbidden ?? true) || (progressionItem?.Missing ?? true)) {
                     return false;
                 }
 

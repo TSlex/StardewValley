@@ -198,9 +198,9 @@ namespace ItemResearchSpawnerV2 {
             //    Monitor.Log(Game1.chatBox.chatBox.Text);
             //}
 
-            if (Game1.player.ActiveItem != null) {
-                Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
-            }
+            //if (Game1.player.ActiveItem != null) {
+            //    Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
+            //}
 
             // print button presses to the console window
             // this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
@@ -275,13 +275,13 @@ namespace ItemResearchSpawnerV2 {
 
             configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Multiplayer());
 
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                getValue: () => ActiveConfig.GetShareProgression(),
-                setValue: value => ActiveConfig.SetShareProgression(value),
-                name: () => I18n.Config_ShareProgressionEnabledName(),
-                tooltip: () => I18n.Config_ShareProgressionEnabledDesc()
-            );
+            //configMenu.AddBoolOption(
+            //    mod: ModManifest,
+            //    getValue: () => ActiveConfig.GetShareProgression(),
+            //    setValue: value => ActiveConfig.SetShareProgression(value),
+            //    name: () => I18n.Config_ShareProgressionEnabledName(),
+            //    tooltip: () => I18n.Config_ShareProgressionEnabledDesc()
+            //);
 
             configMenu.AddBoolOption(
                 mod: ModManifest,

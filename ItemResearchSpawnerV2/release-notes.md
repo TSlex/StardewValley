@@ -1,5 +1,43 @@
 ﻿[(← Back to readme)](README.md)
 
+## 2.1.0
+Released 14th February 2025 for SMAPI 4.1.10 or later.
+
+New features:
+- 2 new modes as an alternative to BUY/SELL and COMBINED modes that use their own special currency (`jmt`)
+- Extented list of items that support meta saving (new meta-saving approach)
+    - weapons and tools (enchantments)
+    - trinkets levels and other characteristics
+    - item colors (flowers and other items that can have color variants)
+    - combined rings
+- Option to disable command usage for non-host players
+- Option to enable automatic research (will hold research button for you :) )
+- Flavored items (honey, special bait, smoked fish, etc...) can now be researched as separate items
+- 2 new commands for new modes (can increase or decrease currency)
+- Pressing `left ctrl` + `rmb` will take `10` items from "research inventory"
+
+
+Changes:
+- Trinkets now have own category (`trinkets`)
+- Torches moved to `craftable` category
+- Artifacts from Ginger Island moved to `artifacts` category
+- Qi Seasoning moved to `cooking`
+- Some "tools" (horse flute, animal cracker, etc...) moved to `tools` category
+- Some "treasure" items (pearl, golden pumpkin, etc...) moded to `treasure` category
+- Mannequins moved to `non-craftable` category
+- A lot of price balancing, to prevent too unfair money gaining in-game early stages (but still, have you heard about The Smoked Legendary Fish? ;) )
+- Changed some colors
+- And more...?
+
+
+Bug fixes:
+- Improved unique key matching for some items
+- Fixed commands stopped working (God bless ConcernedApe!)
+- Items with their own inventory (fishing rods, slingshots) will dump their content once researched/sold (you don't want to lose your precious bait, do ya?)
+- Fixed quality merging for the same items
+- Research area will no longer convert items to broken ones if it cannot find it in the registry
+- And more...?
+
 ## 2.0.1
 Released 4th August 2024 for SMAPI 4.0.8 or later.
 

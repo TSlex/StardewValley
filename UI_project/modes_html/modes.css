@@ -1,0 +1,43 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 992px;
+  height: 500px;
+}
+
+.canvas {
+  background-color: #ffeab1;
+  width: 992px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+* {
+  font-family: "Stardew Valley";
+}
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
+  flex-grow: 0;
+}
+
+.book {
+  border: 1px solid black;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.book img {
+  width: 84px;
+  height: 96px;
+}
+
+.book > * {
+  border: 1px solid black;
+}

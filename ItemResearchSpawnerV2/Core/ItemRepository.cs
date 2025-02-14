@@ -178,16 +178,23 @@ namespace ItemResearchSpawnerV2.Core {
                     : id => id
                 );
 
+            // This does not make sense, game will reveal secret notes randomly. Replaced with a base secret note item
             // build items
-            foreach (int i in ids) {
-                int id = i; // avoid closure capture
+            //foreach (int i in ids) {
+            //    int id = i; // avoid closure capture
 
-                yield return TryCreate(itemType.Identifier, $"{baseId}/{id}", _ => {
-                    Item note = ItemRegistry.Create(itemType.Identifier + baseId);
-                    note.Name = $"{note.Name} #{id}";
-                    return note;
-                });
-            }
+            //    yield return TryCreate(itemType.Identifier, $"{baseId}/{id}", _ => {
+            //        Item note = ItemRegistry.Create(itemType.Identifier + baseId);
+            //        note.Name = $"{note.Name} #{id}";
+            //        return note;
+            //    });
+            //}
+
+            yield return TryCreate(itemType.Identifier, $"{baseId}", _ => {
+                Item note = ItemRegistry.Create(itemType.Identifier + baseId);
+                note.Name = $"{note.Name}";
+                return note;
+            });
         }
 
         /// <summary>Get flavored variants of a base item (like Blueberry Wine for Blueberry), if any.</summary>

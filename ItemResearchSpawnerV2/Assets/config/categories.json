@@ -215,6 +215,9 @@
         "(O):632",
         "(O):633",
         "(O):835"
+      ],
+      "UniqueKey": [
+        "Banana Sapling:69"
       ]
     },
     "ResearchCount": 1,
@@ -630,17 +633,6 @@
     },
     "ResearchCount": 1,
     "BaseCost": 10000
-  },
-  {
-    "Label": "category.secret-note",
-    "When": {
-      "UniqueKey": [
-        "Secret Note",
-        "Journal Scrap"
-      ]
-    },
-    "ResearchCount": 1,
-    "BaseCost": 1
   },
   {
     "Label": "category.trinkets",
