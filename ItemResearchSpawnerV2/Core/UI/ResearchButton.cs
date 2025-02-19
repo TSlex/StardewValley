@@ -4,12 +4,6 @@ using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
-using StardewValley.Menus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     internal class ResearchButton : ButtonBase {
@@ -79,6 +73,18 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     }
                     else {
                         b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.RNSButtonResearchIcon, Color.White);
+                    }
+
+                    break;
+                case ModMode.JunimoMagicTrade:
+                    b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.JMTCoinButtonIcon, Color.White);
+                    break;
+                case ModMode.JunimoMagicTradePlus:
+                    if (researchArea.ResearchItem?.ResearchCompleted ?? false) {
+                        b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.JMTCoinButtonIcon, Color.White);
+                    }
+                    else {
+                        b.Draw(ModManager.UITextureInstance, buttonBounds, UIConstants.JMTResearchButtonIcon, Color.White);
                     }
 
                     break;

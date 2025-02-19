@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Collections.Generic;
+﻿using System.Linq.Expressions;
 
 public static class PredicateBuilder {
     public static Expression<Func<T, bool>> True<T>() { return f => true; }

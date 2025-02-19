@@ -4,9 +4,6 @@ using StardewValley.Menus;
 using StardewValley;
 using ItemResearchSpawnerV2.Core.Utils;
 using StardewModdingAPI;
-using Microsoft.CodeAnalysis.Text;
-using StardewValley.Network;
-using static System.Net.Mime.MediaTypeNames;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 
 namespace ItemResearchSpawnerV2.Core.UI {

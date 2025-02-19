@@ -1,14 +1,9 @@
-﻿
-
-using ItemResearchSpawnerV2.Core.Data.Enums;
-using ItemResearchSpawnerV2.Core.Data.Serializable;
+﻿using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewModdingAPI.Utilities;
 using StardewValley;
-using static ItemResearchSpawnerV2.Core.NetworkManager;
 
 namespace ItemResearchSpawnerV2.Core {
 
@@ -55,6 +50,12 @@ namespace ItemResearchSpawnerV2.Core {
             public string Type => "RNS_OnCommitModState";
 
             public ModManagerState ModState;
+        }
+
+        public class OnCommitJMTMoneyMessage : IModMessage {
+            public string Type => "RNS_OnCommitJMTMoney";
+
+            public int JMTMoney;
         }
 
         public class OnHostConfigChangedMessage : IModMessage {
@@ -113,6 +114,10 @@ namespace ItemResearchSpawnerV2.Core {
                         OnNonHostConfigChanged(e.FromPlayerID, e.ReadAs<OnNonHostConfigChangedMessage>());
                         break;
 
+                    case "RNS_OnCommitJMTMoney":
+                        OnCommitJMTMoney(e.FromPlayerID, e.ReadAs<OnCommitJMTMoneyMessage>());
+                        break;
+
                     default:
                         break;
                 }
@@ -142,6 +147,8 @@ namespace ItemResearchSpawnerV2.Core {
             playerModState.Config.SellPriceMultiplier = hostModState.Config.SellPriceMultiplier;
             playerModState.Config.BuyPriceMultiplier = hostModState.Config.BuyPriceMultiplier;
             playerModState.Config.ResearchTimeSeconds = hostModState.Config.ResearchTimeSeconds;
+            playerModState.Config.ShareProgression = hostModState.Config.ShareProgression;
+            playerModState.Config.DisableNonHostCommands = hostModState.Config.DisableNonHostCommands;
 
             ModManager.SaveManagerInstance.CommitModState(fromPlayerID.ToString(), playerModState);
         }
@@ -169,6 +176,20 @@ namespace ItemResearchSpawnerV2.Core {
             playerModState.Config.SellPriceMultiplier = hostModState.Config.SellPriceMultiplier;
             playerModState.Config.BuyPriceMultiplier = hostModState.Config.BuyPriceMultiplier;
             playerModState.Config.ResearchTimeSeconds = hostModState.Config.ResearchTimeSeconds;
+            playerModState.Config.ShareProgression = hostModState.Config.ShareProgression;
+            playerModState.Config.DisableNonHostCommands = hostModState.Config.DisableNonHostCommands;
+
+            ModManager.SaveManagerInstance.CommitModState(fromPlayerID.ToString(), playerModState);
+        }
+
+        private static void OnCommitJMTMoney(long fromPlayerID, OnCommitJMTMoneyMessage onCommitJMTMoneyMessage) {
+            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+                return;
+            }
+
+            var playerJMTMoney = onCommitJMTMoneyMessage.JMTMoney;
+            var playerModState = ModManager.SaveManagerInstance.GetModState(fromPlayerID.ToString());
+            playerModState.JMTMoney = playerJMTMoney;
 
             ModManager.SaveManagerInstance.CommitModState(fromPlayerID.ToString(), playerModState);
         }
@@ -189,6 +210,8 @@ namespace ItemResearchSpawnerV2.Core {
             playerModState.Config.SellPriceMultiplier = hostModState.Config.SellPriceMultiplier;
             playerModState.Config.BuyPriceMultiplier = hostModState.Config.BuyPriceMultiplier;
             playerModState.Config.ResearchTimeSeconds = hostModState.Config.ResearchTimeSeconds;
+            playerModState.Config.ShareProgression = hostModState.Config.ShareProgression;
+            playerModState.Config.DisableNonHostCommands = hostModState.Config.DisableNonHostCommands;
 
             var reply = new OnLoadSucceedMessage() {
                 Categories = ModManager.SaveManagerInstance.GetCategories(),
@@ -220,6 +243,8 @@ namespace ItemResearchSpawnerV2.Core {
             ModManager.Instance.Config.SellPriceMultiplier = onHostConfigChangedMessage.Config.SellPriceMultiplier;
             ModManager.Instance.Config.BuyPriceMultiplier = onHostConfigChangedMessage.Config.BuyPriceMultiplier;
             ModManager.Instance.Config.ResearchTimeSeconds = onHostConfigChangedMessage.Config.ResearchTimeSeconds;
+            ModManager.Instance.Config.ShareProgression = onHostConfigChangedMessage.Config.ShareProgression;
+            ModManager.Instance.Config.DisableNonHostCommands = onHostConfigChangedMessage.Config.DisableNonHostCommands;
 
             Game1.activeClickableMenu = null;
             ModManager.CommandManagerInstance.ReplyToChat(I18n.Command_Multiplayer_HostConfigChanged(), color: Color.Cyan);

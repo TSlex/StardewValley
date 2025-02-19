@@ -36,6 +36,11 @@ namespace ItemResearchSpawnerV2 {
         public float BuyPriceMultiplier = 1.2f;
         public float ResearchTimeSeconds = 1f;
 
+        public bool AutoResearch = false;
+
+        public bool ShareProgression = false;
+        public bool DisableNonHostCommands = false;
+
         public bool UseCustomUIColor = false;
         public Color CustomUIColor = Color.Gold;
 
@@ -75,6 +80,18 @@ namespace ItemResearchSpawnerV2 {
 
         public float GetResearchTimeSeconds() {
             return ResearchTimeSeconds >= 0f ? ResearchTimeSeconds : 0f;
+        }
+
+        public bool GetAutoResearch() {
+            return AutoResearch;
+        }
+
+        public bool GetShareProgression() {
+            return ShareProgression;
+        }
+
+        public bool GetDisableNonHostCommands() {
+            return DisableNonHostCommands;
         }
 
         public bool GetUseCustomUIColor() {
@@ -157,6 +174,26 @@ namespace ItemResearchSpawnerV2 {
             checkedValue = checkedValue <= ModConfigConstraints.ResearchTimeSecondsMax ? checkedValue : ModConfigConstraints.ResearchTimeSecondsMax;
 
             ResearchTimeSeconds = checkedValue;
+        }
+
+        public void SetAutoResearch(bool value) {
+            AutoResearch = value;
+        }
+
+        public void SetShareProgression(bool value) {
+            if (!Context.IsMainPlayer) {
+                return;
+            }
+
+            ShareProgression = value;
+        }
+
+        public void SetDisableNonHostCommands(bool value) {
+            if (!Context.IsMainPlayer) {
+                return;
+            }
+
+            DisableNonHostCommands = value;
         }
 
         public void SetUseCustomUIColor(bool value) {

@@ -41,7 +41,21 @@
       ],
       "UniqueKey": [
         "Grass Starter",
-        "Treasure Totem:71"
+        "Treasure Totem:71",
+        "Horse Flute:911",
+        "Golden Animal Cracker:121",
+        "Butterfly Powder:142",
+        "Pet License:138",
+        "Tent Kit:59",
+        "Enricher:913",
+        "Pressure Nozzle:915",
+        "JunimoCatalogue:96",
+        "TrashCatalogue:122",
+        "RetroCatalogue:97",
+        "WizardCatalogue:168",
+        "JojaCatalogue:97",
+        "Catalogue:1308",
+        "Furniture Catalogue:1226"
       ]
     },
     "Except": {
@@ -201,6 +215,9 @@
         "(O):632",
         "(O):633",
         "(O):835"
+      ],
+      "UniqueKey": [
+        "Banana Sapling:69"
       ]
     },
     "ResearchCount": 1,
@@ -330,6 +347,17 @@
     "When": {
       "ObjType": [
         "Arch"
+      ],
+      "UniqueKey": [
+        "Fossilized Skull:820",
+        "Fossilized Spine:821",
+        "Snake Vertebrae:826",
+        "Mummified Bat:827",
+        "Mummified Frog:828",
+        "Fossilized Tail:822",
+        "Fossilized Leg:823",
+        "Fossilized Ribs:824",
+        "Snake Skull:825"
       ]
     },
     "ResearchCount": 1,
@@ -466,7 +494,11 @@
         "??HMTGF??:155",
         "Junimo Kart Arcade System:159",
         "Barrel:174",
-        "Hedge:929"
+        "Hedge:929",
+        "MannequinMale:0",
+        "MannequinFemale:4",
+        "CursedMannequinMale:8",
+        "CursedMannequinFemale:12"
       ]
     },
     "ResearchCount": 1,
@@ -487,7 +519,9 @@
         "Staircase:71",
         "Fairy Dust:872",
         "Cookout Kit:926",
-        "Monster Musk:879"
+        "Monster Musk:879",
+        "Torch:93",
+        "Spirit Torch:94"
       ]
     },
     "ResearchCount": 5,
@@ -536,7 +570,8 @@
         "Bug Steak:874",
         "Sugar:245",
         "Wheat Flour:246",
-        "Oil:247"
+        "Oil:247",
+        "Qi Seasoning:917"
       ]
     },
     "ResearchCount": 5,
@@ -550,17 +585,24 @@
       ]
     },
     "ResearchCount": 1,
-    "BaseCost": 50
+    "BaseCost": 0
+  },
+  {
+    "Label": "category.house-decor",
+    "When": {
+      "UniqueKey": [
+        "Flooring",
+        "Wallpaper"
+      ]
+    },
+    "ResearchCount": 1,
+    "BaseCost": 0
   },
   {
     "Label": "category.decor",
     "When": {
       "ObjCategory": [
         -24
-      ],
-      "UniqueKey": [
-        "Flooring",
-        "Wallpaper"
       ]
     },
     "ResearchCount": 1,
@@ -593,14 +635,33 @@
     "BaseCost": 10000
   },
   {
-    "Label": "category.secret-note",
+    "Label": "category.trinkets",
     "When": {
       "UniqueKey": [
-        "Secret Note",
-        "Journal Scrap"
+        "MagicQuiver:73",
+        "FairyBox:74",
+        "ParrotEgg:2",
+        "IceRod:78",
+        "IridiumSpur:76",
+        "BasiliskPaw:77",
+        "MagicHairDye:1",
+        "FrogEgg:6"
       ]
     },
     "ResearchCount": 1,
     "BaseCost": 1
+  },
+  {
+    "Label": "category.treasures",
+    "When": {
+      "UniqueKey": [
+        "Pearl:797",
+        "Golden Pumpkin:373",
+        "Stardrop Tea:68",
+        "Treasure Chest:166"
+      ]
+    },
+    "ResearchCount": 1,
+    "BaseCost": 1000
   }
 ]

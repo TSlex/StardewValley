@@ -21,6 +21,7 @@
   "category.craftable": "Ремесло",
   "category.crops": "Урожай",
   "category.decor": "Декор",
+  "category.house-decor": "Домашний декор",
   "category.fish": "Рыба",
   "category.flowers": "Цветы",
   "category.forage": "Дикие растения",
@@ -45,6 +46,8 @@
   "category.junk": "Мусор",
   "category.special-book": "Особая книга",
   "category.secret-note": "Таинственные заметки",
+  "category.trinkets": "Брелоки",
+  "category.treasures": "Сокровища",
   "category.misc": "Разное",
 
   //missing item
@@ -61,12 +64,17 @@
 
   //modes
   "mod-mode.research": "Режим исследователя",
-  "mod-mode.buy-sell": "Режим покупки-прожажи",
+  "mod-mode.buy-sell": "Режим покупки-продажи",
   "mod-mode.combined": "Режим \"Исследуй->Продавай\"",
   "mod-mode.research-plus": "Режим Мистера Ки",
   "mod-mode.buy-sell-plus": "Режим ДжоджаМарт",
+  "mod-mode.junimo-magic-trade": "Режим Волшебной Торговли Джунимо",
+  "mod-mode.junimo-magic-trade-plus": "Режим Волшебной Торговли Джунимо+",
 
   //settings
+  "config.section.attention": "Внимание!",
+  "config.attention-note": "Изменение настроек на титульном экране влияет только на новые сохранения. Чтобы изменить уже существующие, сначала загрузите файл сохранения!",
+
   "config.section.main": "Основные настройки",
 
   "config.default-mode-name": "Режим мода",
@@ -102,6 +110,9 @@
   "config.research-delay-name": "Время для исследования (в секундах)",
   "config.research-delay-desc": "Влияет на задержку, прежде чем предмет будет исследован. 0 секунд уберёт эту задержку (как это было раньше)",
 
+  "config.auto-research-enabled-name": "Автоматическое исследование",
+  "config.auto-research-enabled-desc": "Позволяет автоматически исследовать предмет сразу после его помещения в область исследования",
+
   "config.ui-use-custom-color-name": "Переопределить цвета интерфейса",
   "config.ui-custom-color-R-name": "  Красное значение",
   "config.ui-custom-color-G-name": "  Зеленое значение",
@@ -111,6 +122,14 @@
   "config.ui-custom-color-G-desc": "Зеленое значение (0-255)",
   "config.ui-custom-color-B-desc": "Синее значение (0-255)",
 
+  "config.section.multiplayer": "Настройки совместной игры",
+
+  "config.share-progression-enabled-name": "Синхронизация исследований",
+  "config.share-progression-enabled-desc": "Синхронизирует исследования между хостом и другими игроками (используется файл хоста)",
+
+  "config.dissable_non-host-commands-name": "Комманды только для хоста",
+  "config.dissable_non-host-commands-desc": "Разрешает использование комманд только хосту",
+
   //commands
   "command.get-help": "Описание для комманды \"{0}\":\n{1}",
   "command.get-help-fail": "Не могу найти комманду \"{0}\"!",
@@ -119,6 +138,11 @@
   "command.unlock-all.succ": "Все исследования завершены!",
 
   "command.unique-key.desc": "Показать уникальный айди текущего предмета в руках",
+
+  "command.j-m-t-rich.desc": "Добавить 100 тыс. на ваш баланс Волшебной Торговли Джунимо",
+  "command.j-m-t-rich.succ": "Магия леса добавила 100 тыс. на ваш баланс Волшебной Торговли Джунимо!",
+  "command.j-m-t-broke.desc": "Аннулировать ваш баланс Волшебной Торговли Джунимо",
+  "command.j-m-t-broke.succ": "Вы пожертвовали средства на вашем балансе в фонд сохранения лесов!",
 
   "command.unlock-active.desc": "Исследовать (открыть) текущий предмет в руках",
   "command.unlock-active.err-no-item": "Для начала возьмите предмет",

@@ -1,4 +1,5 @@
 ﻿using ItemResearchSpawnerV2.Core;
+using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.UI;
 using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
@@ -6,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ItemResearchSpawnerV2.Components.UI
 {
@@ -23,6 +23,7 @@ namespace ItemResearchSpawnerV2.Components.UI
         private readonly int Width;
 
         private static IModContentHelper Content => ModManager.Instance.Helper.ModContent;
+
 
         public CashTab(Func<int> getXPos, Func<int> getYPos, int width)
         {
@@ -48,12 +49,20 @@ namespace ItemResearchSpawnerV2.Components.UI
 
             DrawHelper.DrawMenuBox(BalanceArea.bounds.X, BalanceArea.bounds.Y, Width, 48, out var textPosition);
 
-            b.Draw(ModManager.UITextureInstance, new Vector2(BalanceArea.bounds.X + 4 * 4, BalanceArea.bounds.Y + 4 * 4), 
-                UIConstants.CoinIcon, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
+            var coinIcon = ModManager.Instance.ModMode switch {
+                ModMode.JunimoMagicTrade => UIConstants.JMTCoinIcon,
+                ModMode.JunimoMagicTradePlus => UIConstants.JMTCoinIcon,
+                _ => UIConstants.CoinIcon,
+            };
+
+            b.Draw(ModManager.UITextureInstance, new Vector2(BalanceArea.bounds.X + 4 * 4, BalanceArea.bounds.Y + 4 * 4),
+                coinIcon, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
 
             var textOffsetX = UIConstants.CoinIcon.Width + 4 * 8;
 
-            var playerMoney = Game1.player._money + 10000000000;
+            //var playerMoney = Game1.player._money + 10000000000;
+            var playerMoney = ModManager.Instance.PlayerMoney + 10000000000;
+
             playerMoney = playerMoney >= 20000000000 ? 19999999999 : playerMoney;
             var playerMoneyStr = new string(playerMoney.ToString().Skip(1).ToArray());
 

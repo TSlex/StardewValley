@@ -1,14 +1,12 @@
 ﻿using Force.DeepCloner;
 using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
-using ItemResearchSpawnerV2.Core.Data.Serializable;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
-using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
-using static ItemResearchSpawnerV2.Core.NetworkManager;
-using SObject = StardewValley.Object;
+using StardewValley.Tools;
 
 
 namespace ItemResearchSpawnerV2.Core {
@@ -57,6 +55,23 @@ namespace ItemResearchSpawnerV2.Core {
         public void ResearchItem(ProgressionItem item, out int leftAmount) {
             leftAmount = item.Stack;
 
+            CommonHelper.ReturnAttachmentsToEnventory(item.GameItem);
+
+            //if (item.GameItem is FishingRod fishingRod) {
+            //    foreach(var attachement in fishingRod.attachments.ToList()) {
+            //        if (attachement != null) {
+            //            CommonHelper.TryReturnItemToInventory(attachement);
+            //        }
+            //    }
+            //}
+            //if (item.GameItem is Slingshot slingshot) {
+            //    foreach (var attachement in slingshot.attachments.ToList()) {
+            //        if (attachement != null) {
+            //            CommonHelper.TryReturnItemToInventory(attachement);
+            //        }
+            //    }
+            //}
+
             if (item.RequiredResearch < 0) {
                 ResearchProgressions[CommonHelper.GetItemUniqueKey(item.GameItem)] = item.GetSaveData();
                 ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
@@ -87,7 +102,13 @@ namespace ItemResearchSpawnerV2.Core {
                 ModManager.Instance.SellItem(itemToSell);
 
                 if (ModManager.Instance.Config.GetEnableSounds()) {
-                    Game1.playSound("purchase");
+                    var purchaseSound = ModManager.Instance.ModMode switch {
+                        ModMode.JunimoMagicTrade => "junimoMeep1",
+                        ModMode.JunimoMagicTradePlus => "junimoMeep1",
+                        _ => "purchase",
+                    };
+
+                    Game1.playSound(purchaseSound);
                 }
             }
 
@@ -116,9 +137,38 @@ namespace ItemResearchSpawnerV2.Core {
         public SpawnableItem GetSpawnableItem(Item item) {
             var key = CommonHelper.GetItemUniqueKey(item);
 
-            var possibleItem = ModManager.Instance.ItemRegistry
+            //var possibleItem = ModManager.Instance.ItemRegistry
+            //    .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId)
+            //    .Select(p => p.Value).FirstOrDefault();
+
+            SpawnableItem possibleItem = null;
+
+            var possibleItems = ModManager.Instance.ItemRegistry
+                .Where(p => p.Key == key)
+                .Select(p => p.Value).ToList();
+
+            if (possibleItems.Count == 1) {
+                possibleItem = possibleItems[0];
+            }
+            else {
+                possibleItem = possibleItems
+                    .Where(p => p.QualifiedItemId == item.QualifiedItemId)
+                    .Select(p => p).FirstOrDefault();
+            }
+
+            // in case unique key matching failed, use QualifiedItemId
+            possibleItem ??= ModManager.Instance.ItemRegistry
                 .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId)
                 .Select(p => p.Value).FirstOrDefault();
+
+            //var possibleItem = ModManager.Instance.ItemRegistry
+            //    .Where(p => p.Key == key)
+            //    .Select(p => p.Value).FirstOrDefault();
+
+            //// in case unique key matching failed, use QualifiedItemId
+            //possibleItem ??= ModManager.Instance.ItemRegistry
+            //    .Where(p => p.Value.QualifiedItemId == item.QualifiedItemId || p.Key == key)
+            //    .Select(p => p.Value).FirstOrDefault();
 
             //possibleItem ??= new SpawnableItem("", "", (item) => new MissingItem(key));
 
@@ -158,10 +208,18 @@ namespace ItemResearchSpawnerV2.Core {
             var itemBaseResearchCount = (int) (category.ResearchCount * ModManager.Instance.Config.GetResearchAmountMultiplier());
             itemBaseResearchCount = itemBaseResearchCount >= 1 ? itemBaseResearchCount : 1;
 
+            // prevents items from catalogues (free infinite items) to be used as money generator :)
+            var cannotSold = category.Label switch {
+                "category.house-decor" => true,
+                "category.furniture" => true,
+                _ => false,
+            };
+
             var itemCategory = new ItemCategory {
                 Label = I18n.GetByKey(category.Label),
                 BasePrice = category.BaseCost,
                 BaseResearchCount = item.Forbidden ? -1 : itemBaseResearchCount,
+                CannotBeSold = cannotSold
             };
 
             itemCategory.BaseResearchCount = ModManager.Instance.ModMode switch {
@@ -170,6 +228,8 @@ namespace ItemResearchSpawnerV2.Core {
                 ModMode.Combined => itemCategory.BaseResearchCount,
                 ModMode.ResearchPlus => 0,
                 ModMode.BuySellPlus => 0,
+                ModMode.JunimoMagicTrade => 1,
+                ModMode.JunimoMagicTradePlus => itemCategory.BaseResearchCount,
                 _ => itemCategory.BaseResearchCount,
             };
 
@@ -202,28 +262,10 @@ namespace ItemResearchSpawnerV2.Core {
                 if (itemPrice > 100000) {
                     itemPrice = 100000;
                 }
+            }
 
-                //if (itemPrice <= 1000) {
-                //    itemPrice = 1000;
-                //}
-                //else if (itemPrice <= 2500) {
-                //    itemPrice = 2500;
-                //}
-                //else if (itemPrice <= 5000) {
-                //    itemPrice = 5000;
-                //}
-                //else if (itemPrice <= 10000) {
-                //    itemPrice = 10000;
-                //}
-                //else if (itemPrice <= 25000) {
-                //    itemPrice = 25000;
-                //}
-                //else if (itemPrice <= 50000) {
-                //    itemPrice = 50000;
-                //}
-                //else {
-                //    itemPrice = 100000;
-                //}
+            if (ModManager.Instance.ModMode != ModMode.BuySellPlus && itemCategory.CannotBeSold) {
+                itemPrice = 0;
             }
 
             var progressionData = GetProgressionDataOrDefault(item.Item);
@@ -305,14 +347,14 @@ namespace ItemResearchSpawnerV2.Core {
             var players = Game1.getAllFarmers().ToDictionary(farmer => farmer.UniqueMultiplayerID.ToString());
             //var progressions = ModManager.SaveManagerInstance.GetAllProgressions();
 
-            foreach (var player in players) { 
-                var playerProgression = (Helper.Data.ReadJsonFile<List<KeyValuePair<string, ItemSaveData>>>(SaveHelper.ProgressionDumpPath(player.Key)) ?? 
+            foreach (var player in players) {
+                var playerProgression = (Helper.Data.ReadJsonFile<List<KeyValuePair<string, ItemSaveData>>>(SaveHelper.ProgressionDumpPath(player.Key)) ??
                     new List<KeyValuePair<string, ItemSaveData>>()).ToDictionary(p => p.Key, p => p.Value);
 
                 ModManager.SaveManagerInstance.CommitProgression(player.Key, playerProgression, replace: true);
 
                 if (player.Key != Game1.player.UniqueMultiplayerID.ToString()) {
-                    NetworkManager.SendNetworkModMessage(new OnReplaceProgressionMessage() {
+                    NetworkManager.SendNetworkModMessage(new NetworkManager.OnReplaceProgressionMessage() {
                         CommitProgression = playerProgression
                     }, playerID: player.Value.UniqueMultiplayerID);
                 }

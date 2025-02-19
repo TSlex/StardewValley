@@ -1,5 +1,4 @@
 ﻿using Force.DeepCloner;
-using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
@@ -7,7 +6,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
-using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     internal class MainMenuController : MainMenu {
@@ -142,7 +140,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     .Skip(PageIndex * CreativeMenu.ItemsPerRow * 2)
                     .Take(CreativeMenu.ItemsPerView).ToList();
 
-
                 foreach (var pi in items) {
 
                     //pi.Item.Item = pi.Item.CreateItem();
@@ -157,9 +154,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         availableQuantity = pi.GameItem.maximumStackSize();
                     }
                     else {
-                        availableQuantity = pi.GetAvailableQuantity(Game1.player._money, ModManager.Instance.ItemQuality, out availableQuality);
+                        //availableQuantity = pi.GetAvailableQuantity(Game1.player._money, ModManager.Instance.ItemQuality, out availableQuality);
+                        availableQuantity = pi.GetAvailableQuantity(ModManager.Instance.PlayerMoney, ModManager.Instance.ItemQuality, out availableQuality);
                     }
-
 
                     pi.GameItem.Quality = (int) availableQuality;
 
@@ -167,6 +164,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         ModMode.BuySell => availableQuantity,
                         ModMode.Combined => availableQuantity,
                         ModMode.BuySellPlus => availableQuantity,
+                        ModMode.JunimoMagicTrade => availableQuantity,
+                        ModMode.JunimoMagicTradePlus => availableQuantity,
                         _ => pi.GameItem.maximumStackSize()
                     };
 
@@ -539,7 +538,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 if (SearchBar.Selected) {
                     SearchBar.Blur();
                 }
-                
+
                 base.receiveLeftClick(x, y, playSound);
 
                 if (ShiftPressed && heldItem != null && !CreativeMenu.isWithinBounds(x, y)) {
@@ -661,18 +660,31 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (hoveredItem != null && Game1.player.Items.Contains(hoveredItem)) {
                 var progressionItem = ModManager.ProgressionManagerInstance.GetProgressionItem(hoveredItem);
 
-                if (progressionItem?.Forbidden ?? true) {
+                if ((progressionItem?.Forbidden ?? true) || (progressionItem?.Missing ?? true)) {
                     return false;
                 }
 
                 if (progressionItem.ResearchCompleted) {
-                    var removeSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
-                        "purchase" : "fireball";
+                    //var removeSound = ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus ?
+                    //    "purchase" : "fireball";
+
+                    CommonHelper.ReturnAttachmentsToEnventory(progressionItem.GameItem);
+
+                    var removeSound = ModManager.Instance.ModMode switch {
+                        ModMode.BuySell => "purchase",
+                        ModMode.Combined => "purchase",
+                        ModMode.BuySellPlus => "purchase",
+                        ModMode.JunimoMagicTrade => "junimoMeep1",
+                        ModMode.JunimoMagicTradePlus => "junimoMeep1",
+                        _ => "fireball",
+                    };
 
                     switch (ModManager.Instance.ModMode) {
                         case ModMode.BuySell:
                         case ModMode.Combined:
                         case ModMode.BuySellPlus:
+                        case ModMode.JunimoMagicTrade:
+                        case ModMode.JunimoMagicTradePlus:
                             ModManager.Instance.SellItem(hoveredItem);
                             UpdateView();
                             break;

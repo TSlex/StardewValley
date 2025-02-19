@@ -21,6 +21,7 @@
   "category.craftable": "Craftable",
   "category.crops": "Crops",
   "category.decor": "Decoration",
+  "category.house-decor": "House decoration",
   "category.fish": "Fish",
   "category.flowers": "Flowers",
   "category.forage": "Forage plants",
@@ -45,6 +46,8 @@
   "category.junk": "Junk",
   "category.special-book": "Special book",
   "category.secret-note": "Secret Notes",
+  "category.trinkets": "Trinkets",
+  "category.treasures": "Treasures",
   "category.misc": "Misc",
 
   //missing item
@@ -65,8 +68,13 @@
   "mod-mode.combined": "Combined mode",
   "mod-mode.research-plus": "Mr.Qi mode",
   "mod-mode.buy-sell-plus": "JojaMart mode",
+  "mod-mode.junimo-magic-trade": "Junimo's Magic Trade mode",
+  "mod-mode.junimo-magic-trade-plus": "JMT Combined mode",
 
   //settings
+  "config.section.attention": "Attention!",
+  "config.attention-note": "Changing settings from the title screen only affects new saves, to change existing ones, load the save file first!",
+
   "config.section.main": "Main settings",
 
   "config.default-mode-name": "Mod mode",
@@ -102,6 +110,9 @@
   "config.research-delay-name": "Research time (in seconds)",
   "config.research-delay-desc": "Use this to control how fast item researching is. \"0\" will research item without any delay (just as it was before)",
 
+  "config.auto-research-enabled-name": "Automatic research",
+  "config.auto-research-enabled-desc": "Enable to research item automatically once it is placed in the research area",
+
   "config.ui-use-custom-color-name": "Override UI color",
   "config.ui-custom-color-R-name": "  UI color red value",
   "config.ui-custom-color-G-name": "  UI color green value",
@@ -111,6 +122,14 @@
   "config.ui-custom-color-G-desc": "Green color value (0-255)",
   "config.ui-custom-color-B-desc": "Blue color value (0-255)",
 
+  "config.section.multiplayer": "Multiplayer settings",
+
+  "config.share-progression-enabled-name": "Share progression",
+  "config.share-progression-enabled-desc": "Enable to share progression between host and non-host players (host file will be used)",
+
+  "config.dissable_non-host-commands-name": "Commands for host only",
+  "config.dissable_non-host-commands-desc": "Enable to allow command usage only for the host player",
+
   //commands
   "command.get-help": "Description for command \"{0}\":\n{1}",
   "command.get-help-fail": "Cannot find command \"{0}\"!",
@@ -119,6 +138,11 @@
   "command.unlock-all.succ": "All items were researched!",
 
   "command.unique-key.desc": "Print hotbar active item unique key",
+
+  "command.j-m-t-rich.desc": "Add 100k to your Junimo's Magic Trade balance",
+  "command.j-m-t-rich.succ": "The magic of the forest has added 100k to your Junimo's Magic Trade balance!",
+  "command.j-m-t-broke.desc": "Void your Junimo's' Magic Trade balance",
+  "command.j-m-t-broke.succ": "You've donated all your JMT for the Forest Conservation fund!",
 
   "command.unlock-active.desc": "Research (unlock) hotbar active item",
   "command.unlock-active.err-no-item": "Select an item first",

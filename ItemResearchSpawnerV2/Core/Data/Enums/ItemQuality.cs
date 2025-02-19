@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ItemResearchSpawnerV2.Core.Data.Enums {
+﻿namespace ItemResearchSpawnerV2.Core.Data.Enums {
     internal enum ItemQuality {
         Normal = StardewValley.Object.lowQuality,
         Silver = StardewValley.Object.medQuality,

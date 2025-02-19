@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ItemResearchSpawnerV2.Core.Data.Enums {
+﻿namespace ItemResearchSpawnerV2.Core.Data.Enums {
     internal enum ItemSortOption {
         NameASC,
         NameDESC,

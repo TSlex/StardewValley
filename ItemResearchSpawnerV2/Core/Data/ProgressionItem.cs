@@ -1,7 +1,14 @@
 ﻿using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data;
 using ItemResearchSpawnerV2.Core.Data.Enums;
+using ItemResearchSpawnerV2.Core.Data.Serializable;
+using ItemResearchSpawnerV2.Core.Utils;
+using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using StardewValley;
+using StardewValley.Objects;
+using StardewValley.Objects.Trinkets;
+using StardewValley.Tools;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Models {
@@ -9,6 +16,7 @@ namespace ItemResearchSpawnerV2.Models {
         public string Label;
         public int BasePrice;
         public int BaseResearchCount;
+        public bool CannotBeSold;
     }
 
     internal class ProgressionItem {
@@ -36,7 +44,7 @@ namespace ItemResearchSpawnerV2.Models {
         public bool BaseResearchCompleted => BaseResearchLeftAmount <= 0;
         public bool BaseResearchStarted => BaseResearchLeftAmount < RequiredResearch && (BaseResearchLeftAmount > 0 || RequiredResearch == 1) && !BaseResearchCompleted;
 
-        public int ResearchPerc => (int)((CurrentResearchAmount * 1f) / (RequiredResearch * 1f) * 100f);
+        public int ResearchPerc => (int) ((CurrentResearchAmount * 1f) / (RequiredResearch * 1f) * 100f);
 
         public bool Favorited => SaveData.Favorite;
         public bool Forbidden => Item.Forbidden;
@@ -47,7 +55,7 @@ namespace ItemResearchSpawnerV2.Models {
 
         public int Stack { get => Item.Item.Stack; set => Item.Item.Stack = value; }
 
-        public ItemQuality Quality => (ItemQuality)((Item.Item as SObject)?.Quality ?? 0);
+        public ItemQuality Quality => (ItemQuality) ((Item.Item as SObject)?.Quality ?? 0);
 
         public Item GameItem => Item.Item;
 
@@ -61,29 +69,143 @@ namespace ItemResearchSpawnerV2.Models {
         public Item InstanciateItem() {
             var itemInstrace = Item.CreateItem();
 
-            if (itemInstrace is StardewValley.Objects.Clothing clothingItem) {
+            // leave for now for backwards compatibility
+            if (itemInstrace is Clothing clothingItem) {
                 clothingItem.clothesColor.Value = SaveData.ClothesColor;
             }
 
-            if (itemInstrace is StardewValley.Tools.WateringCan can) {
+            // leave for now for backwards compatibility
+            if (itemInstrace is WateringCan can) {
                 can.WaterLeft = SaveData.WaterLevel;
             }
+
+            //if (itemInstrace is StardewValley.Objects.ColoredObject coloredObject) {
+
+            //    coloredObject.color.Value = SaveData.TryGetMetaPropery("Color", coloredObject.color.Value);
+            //}
+
+            if (SaveData.Meta.ContainsKey("Color")) {
+                if (ColoredObject.TrySetColor(itemInstrace, SaveData.TryGetMetaPropery("Color", Color.White), out var coloredItemInstance)) {
+                    itemInstrace = coloredItemInstance;
+                }
+            }
+
+            if (itemInstrace is Tool tool) {
+                var loadedEnchantments = SaveData.TryGetMetaPropery("Enchantments", new List<ToolEnchantment>());
+                //var availableEnchantments = BaseEnchantment.GetAvailableEnchantmentsForItem(tool).Select(ne => (Base: ne, Name: ne.GetType().Name)).ToList();
+                var availableEnchantments = CommonHelper.GetAllEnchantments()
+                    .Where(ne => ne.CanApplyTo(GameItem))
+                    .Select(ne => (Base: ne, Name: ne.GetType().Name))
+                    .ToList();
+
+
+                var join = availableEnchantments.Join(loadedEnchantments, a => a.Name, b => b.Name, (a, b) => (a.Base, a.Name, b.Level)).ToList();
+
+                foreach (var enchantment in join) {
+                    var enchInstance = enchantment.Base;
+                    enchInstance.Level = enchantment.Level;
+
+                    tool.AddEnchantment(enchInstance);
+                }
+            }
+
+            if (itemInstrace is CombinedRing cRing) {
+                var ringsKeys = SaveData.TryGetMetaPropery("CombinedRings", new List<string>());
+
+                try {
+                    var ringsItems = ringsKeys.Select(rk => ModManager.Instance.ItemRegistry[rk].Item).ToList();
+
+                    foreach (var ringsItem in ringsItems) {
+                        if (ringsItem is Ring ring) {
+                            cRing.combinedRings.Add((Ring) ring.getOne());
+                        }
+                    }
+
+                }
+                catch { }
+
+            }
+
+            if (itemInstrace is Trinket trinket) {
+                trinket.RerollStats(SaveData.TryGetMetaPropery("TrinketSeed", trinket.generationSeed.Value));
+            }
+
+            //if (itemInstrace is FishingRod fishingRod) {
+            //    var attachments = SaveData.TryGetMetaPropery("FishRodAttachment", new List<FishRodAttachment>())
+            //        .Take(fishingRod.AttachmentSlotsCount)
+            //        .ToList();
+
+            //    foreach (var attachment in attachments) {
+            //        if (attachment.IsEmpty) {
+            //            continue;
+            //        }
+            //        try {
+            //            var attachmentItem = (SObject) ModManager.Instance.ItemRegistry[attachment.UniqueKey].Item.getOne();
+
+            //            attachmentItem.Stack = attachment.Stack;
+            //            attachmentItem.uses.Value = attachment.Uses;
+
+            //            fishingRod.attachments[attachment.Index] = attachmentItem;
+            //        }
+            //        catch { }
+            //    }
+            //}
 
             return itemInstrace;
         }
 
-        public ItemSaveData GetSaveData() { 
+        public ItemSaveData GetSaveData() {
             var saveData = SaveData;
 
             if (GameItem is StardewValley.Objects.Clothing clothingItem) {
+
+                // leave for now for backwards compatibility
                 saveData.ClothesColor = clothingItem.clothesColor.Value;
+                saveData.Meta["ClothesColor"] = JsonConvert.SerializeObject(clothingItem.clothesColor.Value); // new way of storing item's meta
             }
 
             if (GameItem is StardewValley.Tools.WateringCan can) {
+
+                // leave for now for backwards compatibility
                 saveData.WaterLevel = can.WaterLeft;
+                saveData.Meta["WaterLevel"] = JsonConvert.SerializeObject(can.WaterLeft); // new way of storing item's meta
             }
 
-            return SaveData; 
+            if (GameItem is StardewValley.Objects.ColoredObject coloredObject) {
+                saveData.Meta["Color"] = JsonConvert.SerializeObject(coloredObject.color.Value);
+            }
+
+            if (GameItem is Tool tool) {
+                var enchantments = tool.enchantments.Select(ne => new ToolEnchantment(Level: ne.Level, Name: ne.GetType().Name)).ToList();
+
+                saveData.Meta["Enchantments"] = JsonConvert.SerializeObject(enchantments);
+            }
+
+            if (GameItem is CombinedRing cRing) {
+                var rings = cRing.combinedRings.Select(cr => ModManager.ProgressionManagerInstance.GetSpawnableItem(cr).UniqueKey).ToList();
+
+                saveData.Meta["CombinedRings"] = JsonConvert.SerializeObject(rings);
+            }
+
+            if (GameItem is Trinket trinket) {
+                saveData.Meta["TrinketSeed"] = JsonConvert.SerializeObject(trinket.generationSeed.Value);
+            }
+
+            //if (GameItem is FishingRod fishingRod) {
+            //    var attachments = fishingRod.attachments
+            //        .Select((at, i) => new FishRodAttachment(
+            //            UniqueKey: at != null ? ModManager.ProgressionManagerInstance.GetSpawnableItem(at).UniqueKey : null,
+            //            Uses: at?.uses.Value ?? 0,
+            //            Index: i,
+            //            Stack: at?.Stack ?? 0,
+            //            IsEmpty: at == null
+            //            ))
+            //        .ToList();
+
+            //    saveData.Meta["FishRodAttachment"] = JsonConvert.SerializeObject(attachments);
+            //}
+
+            return SaveData;
         }
 
         public int GetResearchProgress(ItemQuality requestedQuality) {
@@ -180,7 +302,13 @@ namespace ItemResearchSpawnerV2.Models {
             var item = Item.CreateItem();
 
             if (item is SObject obj) {
-                obj.Quality = (int)requestedQuality;
+                obj.Quality = (int) requestedQuality;
+            }
+
+            var itemBuyPrice = ModManager.Instance.GetItemBuyPrice(item);
+
+            if (itemBuyPrice <= 0) {
+                return item.maximumStackSize();
             }
 
             try {

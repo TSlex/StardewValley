@@ -3,9 +3,6 @@ using ItemResearchSpawnerV2.Core.Utils;
 using ItemResearchSpawnerV2.Models;
 using StardewModdingAPI;
 using Force.DeepCloner;
-using StardewModdingAPI.Events;
-using StardewValley;
-using static ItemResearchSpawnerV2.Core.NetworkManager;
 
 namespace ItemResearchSpawnerV2.Core {
     internal class SaveManager {
@@ -74,10 +71,15 @@ namespace ItemResearchSpawnerV2.Core {
                 Progressions[playerID] = progression;
 
                 if (!Context.IsMainPlayer && !Context.IsSplitScreen) {
-                    NetworkManager.SendNetworkModMessage(new OnCommitProgressionMessage() {
+                    NetworkManager.SendNetworkModMessage(new NetworkManager.OnCommitProgressionMessage() {
                         CommitProgression = changedProgression
                     });
                 }
+                //else if (Context.IsMainPlayer && ModManager.Instance.Config.ShareProgression) {
+                //    NetworkManager.SendNetworkModMessage(new NetworkManager.OnCommitProgressionMessage() {
+                //        CommitProgression = changedProgression
+                //    });
+                //}
             }
             else {
                 Progressions[playerID] = commitProgression;
@@ -104,7 +106,7 @@ namespace ItemResearchSpawnerV2.Core {
                 //var showMenuButton = modState.Config.ShowMenuButton.ToString();
                 //modState.Config.ShowMenuButton = null;
 
-                NetworkManager.SendNetworkModMessage(new OnCommitModStateMessage() { 
+                NetworkManager.SendNetworkModMessage(new NetworkManager.OnCommitModStateMessage() { 
                     ModState = modState,
                     //ShowMenuButton = showMenuButton
                 });
@@ -201,24 +203,6 @@ namespace ItemResearchSpawnerV2.Core {
 
         private void LoadPricelist() {
 
-            //if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
-
-            //    try {
-            //        PriceList = ModHelper.Data.ReadGlobalData<Dictionary<string, int>>(SaveHelper.PriceConfigKey);
-            //    }
-            //    catch (Exception _) {
-            //        PriceList = null;
-            //    }
-
-            //    PriceList ??= ModHelper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
-            //                   new Dictionary<string, int>();
-            //}
-
-            //else {
-            //    PriceList = ModHelper.Data.ReadJsonFile<Dictionary<string, int>>(SaveHelper.PricelistConfigPath) ??
-            //                 new Dictionary<string, int>();
-            //}
-
             Dictionary<string, int> pricelist = null;
 
             try {
@@ -236,24 +220,6 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private void LoadCategories() {
-
-            //if (!ModHelper.ReadConfig<ModConfig>().GetUseDefaultBalanceConfig()) {
-
-            //    try {
-            //        Categories = ModHelper.Data.ReadGlobalData<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigKey);
-            //    }
-            //    catch (Exception _) {
-            //        Categories = null;
-            //    }
-
-            //    Categories ??= ModHelper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath) ??
-            //                    new List<ItemCategoryMeta>();
-            //}
-
-            //else {
-            //    Categories = ModHelper.Data.ReadJsonFile<List<ItemCategoryMeta>>(SaveHelper.CategoriesConfigPath) ??
-            //                  new List<ItemCategoryMeta>();
-            //}
 
             List<ItemCategoryMeta> categories = null;
 
@@ -274,14 +240,6 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private void LoadItemBlacklist() {
-
-            //try {
-            //    ItemBlacklist = ModHelper.Data.ReadJsonFile<List<string>>(SaveHelper.BannedItemsConfigPath) ??
-            //                 new List<string>();
-            //}
-            //catch (Exception _) {
-            //    ItemBlacklist = new List<string>();
-            //}
 
             List<string> blacklist = null;
 

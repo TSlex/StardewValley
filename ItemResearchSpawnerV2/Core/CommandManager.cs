@@ -1,17 +1,8 @@
-﻿using ItemResearchSpawnerV2.Core.Data.Enums;
-using ItemResearchSpawnerV2.Core.Utils;
+﻿using ItemResearchSpawnerV2.Core.Utils;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static StardewValley.BellsAndWhistles.PlayerStatusList;
 
 namespace ItemResearchSpawnerV2.Core {
 
@@ -19,11 +10,13 @@ namespace ItemResearchSpawnerV2.Core {
         public readonly string command;
         public readonly Func<string> description;
         public readonly Action<string, string[]> action;
+        public readonly bool hidden;
 
-        public ModCommand(string command, Func<string> description, Action<string, string[]> action) {
+        public ModCommand(string command, Func<string> description, Action<string, string[]> action, bool hidden = false) {
             this.command = command;
             this.description = description;
             this.action = action;
+            this.hidden = hidden;
         }
     }
 
@@ -40,7 +33,10 @@ namespace ItemResearchSpawnerV2.Core {
                 { "rns_unlock_all", new ModCommand("rns_unlock_all", () => I18n.Command_UnlockAll_Desc(), UnlockAllProgression) },
                 { "rns_unlock_active", new ModCommand("rns_unlock_active", () => I18n.Command_UnlockActive_Desc(), UnlockActiveProgression) },
                 { "rns_dump_progression", new ModCommand("rns_dump_progression", () => I18n.Command_DumpProgressions_Desc(), DumpProgression) },
-                { "rns_load_progression", new ModCommand("rns_load_progression", () => I18n.Command_LoadProgressions_Desc(), LoadProgression) }
+                { "rns_load_progression", new ModCommand("rns_load_progression", () => I18n.Command_LoadProgressions_Desc(), LoadProgression) },
+                { "rns_jmt_rich", new ModCommand("rns_jmt_rich", () => I18n.Command_JMTRich_Desc(), JMTAdd100k) },
+                { "rns_jmt_broke", new ModCommand("rns_jmt_broke", () => I18n.Command_JMTBroke_Desc(), JMTVoid) },
+                { "rns_check_recipes", new ModCommand("rns_check_recipes", () => "", CheckRecipes, true) }
             };
         }
 
@@ -57,8 +53,10 @@ namespace ItemResearchSpawnerV2.Core {
                 var targetCommand = args.Length > 0 ? args[0] : "";
 
                 if (targetCommand == "") {
-                    foreach (var item in Commands)
-                    {
+                    foreach (var item in Commands) {
+                        if (item.Value.hidden) {
+                            continue;
+                        }
                         GiveCommandDescription(item.Value);
                     }
                 }
@@ -78,7 +76,12 @@ namespace ItemResearchSpawnerV2.Core {
                 //    ReplyToChat($"{arg}");
                 //}
 
-                modCommand.action(command, args);
+                if (!Context.IsMainPlayer && ModManager.Instance.Config.DisableNonHostCommands) {
+                    CheckIsHostPlayer();
+                }
+                else {
+                    modCommand.action(command, args);
+                }
             }
         }
 
@@ -87,8 +90,6 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         public void ReplyToChat(string message, int chatKind = 2, Color? color = null) {
-
-
             Game1.Multiplayer.sendChatMessage(LocalizedContentManager.CurrentLanguageCode, message, Game1.player.UniqueMultiplayerID);
             ReceiveСhatModMessage(Game1.chatBox, 0, chatKind, LocalizedContentManager.CurrentLanguageCode, message, color: color);
         }
@@ -97,11 +98,15 @@ namespace ItemResearchSpawnerV2.Core {
             string text = message;
             ChatMessage chatMessage = new();
 
-            List<ChatMessage> messages = (List<ChatMessage>) typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(chatBox);
-            MethodInfo messageColor = typeof(ChatBox).GetMethod("messageColor", BindingFlags.NonPublic | BindingFlags.Instance);
+            //List<ChatMessage> messages = (List<ChatMessage>) typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(chatBox);
+            var messages = Game1.chatBox.messages;
+
+            //MethodInfo messageColor = typeof(ChatBox).GetMethod("messageColor", BindingFlags.NonPublic | BindingFlags.Instance);
 
             string text2 = Game1.parseText(text, chatBox.chatBox.Font, chatBox.chatBox.Width - 16);
-            var c = (Color) (color != null ? color : (Color) messageColor.Invoke(chatBox, new object[] { chatKind }));
+            //var c = (Color) (color != null ? color : (Color) messageColor.Invoke(chatBox, new object[] { chatKind }));
+
+            var c = (Color) (color != null ? color : chatBox.messageColor(chatKind));
 
             chatMessage.timeLeftToDisplay = 600;
             chatMessage.verticalSize = (int) chatBox.chatBox.Font.MeasureString(text2).Y + 4;
@@ -200,6 +205,89 @@ namespace ItemResearchSpawnerV2.Core {
             }
 
             return true;
+        }
+
+        private void JMTAdd100k(string command, string[] args) {
+            ModManager.Instance.JMTMoney += 100000;
+            ModManager.Instance.JMTMoneySyncRequired = true;
+
+            ReplyToChat(I18n.Command_JMTRich_Succ());
+        }
+
+        private void JMTVoid(string command, string[] args) {
+            ModManager.Instance.JMTMoney = 0;
+            ModManager.Instance.JMTMoneySyncRequired = true;
+
+            ReplyToChat(I18n.Command_JMTBroke_Succ());
+        }
+
+        private void CheckRecipes(string command, string[] args) {
+            if (!CheckIsHostPlayer())
+                return;
+
+            Monitor.Log("Checking crafting prices logic...", LogLevel.Info);
+
+            var craftingRecipes = CraftingRecipe.craftingRecipes.Select(p => new CraftingRecipe(p.Key, isCookingRecipe: false));
+
+            foreach (var recipe in craftingRecipes) {
+                var itemsNeeded = recipe.recipeList
+                    .Select(ri => (
+                    item: ModManager.ProgressionManagerInstance.GetProgressionItem(ItemRegistry.Create(ItemRegistry.GetDataOrErrorItem(ri.Key).QualifiedItemId, 1)),
+                    amount: ri.Value));
+
+                var craftingPrice = itemsNeeded.Sum(p => p.item.Price * p.amount);
+
+                var recipeStr = string.Join(" ",
+                    itemsNeeded.Select(p => $"{CommonHelper.GetItemUniqueKey(p.item.GameItem)} ({p.amount}) [{p.item.Price * p.amount}$]").ToList()
+                    );
+
+                var producedItems = recipe.itemToProduce;
+
+                foreach (var producedItem in producedItems) {
+                    var producedItemData = ItemRegistry.GetDataOrErrorItem(recipe.bigCraftable ? ItemRegistry.ManuallyQualifyItemId(producedItem, "(BC)") : producedItem);
+                    var producedItemInstance = ItemRegistry.Create(producedItemData.QualifiedItemId, 1);
+                    var producedItemPI = ModManager.ProgressionManagerInstance.GetProgressionItem(producedItemInstance);
+
+                    var sellPrice = producedItemPI.Price * recipe.numberProducedPerCraft;
+
+                    var logLevel = sellPrice > craftingPrice ? LogLevel.Error : LogLevel.Info;
+
+                    Monitor.Log($"{CommonHelper.GetItemUniqueKey(producedItemPI.GameItem)} ({recipe.numberProducedPerCraft}) {sellPrice}$ | {craftingPrice}$ {recipeStr}", logLevel);
+                }
+            }
+
+            Monitor.Log("Checking cooking prices logic...", LogLevel.Info);
+
+            var cookingRecipes = CraftingRecipe.cookingRecipes.Select(p => new CraftingRecipe(p.Key, isCookingRecipe: true));
+
+            foreach (var recipe in cookingRecipes) {
+                var itemsNeeded = recipe.recipeList
+                    .Select(ri => (
+                    item: ModManager.ProgressionManagerInstance.GetProgressionItem(ItemRegistry.Create(ItemRegistry.GetDataOrErrorItem(ri.Key).QualifiedItemId, 1)),
+                    amount: ri.Value));
+
+                var craftingPrice = itemsNeeded.Sum(p => p.item.Price * p.amount);
+
+                var recipeStr = string.Join(" ",
+                    itemsNeeded.Select(p => $"{CommonHelper.GetItemUniqueKey(p.item.GameItem)} ({p.amount}) [{p.item.Price * p.amount}$]").ToList()
+                    );
+
+                var producedItems = recipe.itemToProduce;
+
+                foreach (var producedItem in producedItems) {
+                    var producedItemData = ItemRegistry.GetDataOrErrorItem(recipe.bigCraftable ? ItemRegistry.ManuallyQualifyItemId(producedItem, "(BC)") : producedItem);
+                    var producedItemInstance = ItemRegistry.Create(producedItemData.QualifiedItemId, 1);
+                    var producedItemPI = ModManager.ProgressionManagerInstance.GetProgressionItem(producedItemInstance);
+
+                    var sellPrice = producedItemPI.Price * recipe.numberProducedPerCraft;
+
+                    var logLevel = sellPrice > craftingPrice ? LogLevel.Error : LogLevel.Info;
+
+                    Monitor.Log($"{CommonHelper.GetItemUniqueKey(producedItemPI.GameItem)} ({recipe.numberProducedPerCraft}) {sellPrice}$ | {craftingPrice}$ {recipeStr}", logLevel);
+                }
+            }
+
+            Monitor.Log("Checking completed!", LogLevel.Info);
         }
     }
 }

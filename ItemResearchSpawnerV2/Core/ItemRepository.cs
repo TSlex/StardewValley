@@ -9,6 +9,30 @@ using Object = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core {
 
+    /**
+        MIT License
+
+        Copyright (c) 2018 Pathoschild, CJBok
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+    **/
+
     internal static class ItemRepository {
         /*********
         ** Public methods
@@ -31,13 +55,14 @@ namespace ItemResearchSpawnerV2.Core {
             IEnumerable<SpawnableItem?> GetAllRaw() {
                 // get from item data definitions
                 foreach (IItemDataDefinition itemType in ItemRegistry.ItemTypes) {
+
                     if (onlyType != null && itemType.Identifier != onlyType)
                         continue;
 
                     switch (itemType.Identifier) {
                         // objects
                         case "(O)": {
-                            ObjectDataDefinition objectDataDefinition = (ObjectDataDefinition)ItemRegistry.GetTypeDefinition(ItemRegistry.type_object);
+                            ObjectDataDefinition objectDataDefinition = (ObjectDataDefinition) ItemRegistry.GetTypeDefinition(ItemRegistry.type_object);
 
                             foreach (string id in itemType.GetAllIds()) {
                                 // base item
@@ -59,11 +84,37 @@ namespace ItemResearchSpawnerV2.Core {
                                         yield return secretNote;
                                 }
 
-                                // object
+                                //// object
+                                //else {
+                                //    yield return result?.QualifiedItemId == "(O)340"
+                                //        ? TryCreate(itemType.Identifier, result.Id, _ => objectDataDefinition.CreateFlavoredHoney(null)) // game creates "Wild Honey" when there's no ingredient, instead of the base Honey item
+                                //        : result;
+
+                                //    if (includeVariants) {
+                                //        foreach (SpawnableItem? variant in GetFlavoredObjectVariants(objectDataDefinition, result?.Item as Object, itemType))
+                                //            yield return variant;
+                                //    }
+                                //}
+
                                 else {
-                                    yield return result?.QualifiedItemId == "(O)340"
-                                        ? TryCreate(itemType.Identifier, result.Id, _ => objectDataDefinition.CreateFlavoredHoney(null)) // game creates "Wild Honey" when there's no ingredient, instead of the base Honey item
-                                        : result;
+                                    switch (result?.QualifiedItemId) {
+                                        // honey should be "Wild Honey" when there's no ingredient, instead of the base Honey item
+                                        case "(O)340":
+                                            yield return TryCreate(itemType.Identifier, result.Id, _ => objectDataDefinition.CreateFlavoredHoney(null));
+                                            break;
+
+                                        // don't return placeholder items
+                                        case "(O)DriedFruit":
+                                        case "(O)DriedMushrooms":
+                                        case "(O)SmokedFish":
+                                        case "(O)SpecificBait":
+                                            break;
+
+                                        default:
+                                            if (result != null)
+                                                yield return result;
+                                            break;
+                                    }
 
                                     if (includeVariants) {
                                         foreach (SpawnableItem? variant in GetFlavoredObjectVariants(objectDataDefinition, result?.Item as Object, itemType))
@@ -82,17 +133,17 @@ namespace ItemResearchSpawnerV2.Core {
                     }
                 }
 
-                // wallpapers
-                if (onlyType is null or "(WP)") {
-                    for (int id = 0; id < 112; id++)
-                        yield return TryCreate("(WP)", id.ToString(), p => new Wallpaper(int.Parse(p.Id)) { Category = Object.furnitureCategory });
-                }
+                //// wallpapers
+                //if (onlyType is null or "(WP)") {
+                //    for (int id = 0; id < 112; id++)
+                //        yield return TryCreate("(WP)", id.ToString(), p => new Wallpaper(int.Parse(p.Id)) { Category = Object.furnitureCategory });
+                //}
 
-                // flooring
-                if (onlyType is null or "(FL)") {
-                    for (int id = 0; id < 56; id++)
-                        yield return TryCreate("(FL)", id.ToString(), p => new Wallpaper(int.Parse(p.Id), isFloor: true) { Category = Object.furnitureCategory });
-                }
+                //// flooring
+                //if (onlyType is null or "(FL)") {
+                //    for (int id = 0; id < 56; id++)
+                //        yield return TryCreate("(FL)", id.ToString(), p => new Wallpaper(int.Parse(p.Id), isFloor: true) { Category = Object.furnitureCategory });
+                //}
             }
 
             return (
@@ -115,7 +166,7 @@ namespace ItemResearchSpawnerV2.Core {
             string baseId = isJournalScrap ? "842" : "79";
 
             // get secret note IDs
-            var ids = 
+            var ids =
                 TryLoad(() => DataLoader.SecretNotes(Game1.content))
                 .Keys
                 .Where(isJournalScrap
@@ -127,16 +178,23 @@ namespace ItemResearchSpawnerV2.Core {
                     : id => id
                 );
 
+            // This does not make sense, game will reveal secret notes randomly. Replaced with a base secret note item
             // build items
-            foreach (int i in ids) {
-                int id = i; // avoid closure capture
+            //foreach (int i in ids) {
+            //    int id = i; // avoid closure capture
 
-                yield return TryCreate(itemType.Identifier, $"{baseId}/{id}", _ => {
-                    Item note = ItemRegistry.Create(itemType.Identifier + baseId);
-                    note.Name = $"{note.Name} #{id}";
-                    return note;
-                });
-            }
+            //    yield return TryCreate(itemType.Identifier, $"{baseId}/{id}", _ => {
+            //        Item note = ItemRegistry.Create(itemType.Identifier + baseId);
+            //        note.Name = $"{note.Name} #{id}";
+            //        return note;
+            //    });
+            //}
+
+            yield return TryCreate(itemType.Identifier, $"{baseId}", _ => {
+                Item note = ItemRegistry.Create(itemType.Identifier + baseId);
+                note.Name = $"{note.Name}";
+                return note;
+            });
         }
 
         /// <summary>Get flavored variants of a base item (like Blueberry Wine for Blueberry), if any.</summary>
@@ -151,10 +209,25 @@ namespace ItemResearchSpawnerV2.Core {
 
             // by category
             switch (item.Category) {
+
+                // fish
+                case Object.FishCategory:
+                    yield return TryCreate(itemType.Identifier, $"SmokedFish/{id}", _ => objectDataDefinition.CreateFlavoredSmokedFish(item));
+                    yield return TryCreate(itemType.Identifier, $"SpecificBait/{id}", _ => objectDataDefinition.CreateFlavoredBait(item));
+                    break;
+
                 // fruit products
                 case Object.FruitsCategory:
                     yield return TryCreate(itemType.Identifier, $"348/{id}", _ => objectDataDefinition.CreateFlavoredWine(item));
                     yield return TryCreate(itemType.Identifier, $"344/{id}", _ => objectDataDefinition.CreateFlavoredJelly(item));
+
+                    if (item.QualifiedItemId != "(O)398") // raisins are their own item
+                        yield return TryCreate(itemType.Identifier, $"398/{id}", _ => objectDataDefinition.CreateFlavoredDriedFruit(item));
+                    break;
+
+                // greens
+                case Object.GreensCategory:
+                    yield return TryCreate(itemType.Identifier, $"342/{id}", _ => objectDataDefinition.CreateFlavoredPickle(item));
                     break;
 
                 // vegetable products
@@ -201,16 +274,21 @@ namespace ItemResearchSpawnerV2.Core {
             // by context tag
             if (item.HasContextTag("preserves_pickle") && item.Category != Object.VegetableCategory)
                 yield return TryCreate(itemType.Identifier, $"342/{id}", _ => objectDataDefinition.CreateFlavoredPickle(item));
+
+            if (item.HasContextTag("edible_mushroom"))
+                yield return TryCreate(itemType.Identifier, $"DriedMushrooms/{id}", _ => objectDataDefinition.CreateFlavoredDriedMushroom(item));
         }
 
         /// <summary>Get optimized lookups to match items which produce roe in a fish pond.</summary>
         /// <param name="simpleTags">A lookup of simple singular tags which match a roe-producing fish.</param>
         /// <param name="complexTags">A list of tag sets which match roe-producing fish.</param>
         private static void GetRoeContextTagLookups(out HashSet<string> simpleTags, out List<List<string>> complexTags) {
+
             simpleTags = new HashSet<string>();
             complexTags = new List<List<string>>();
 
             foreach (FishPondData data in TryLoad(() => DataLoader.FishPondData(Game1.content))) {
+
                 if (data.ProducedItems.All(p => p.ItemId is not ("812" or "(O)812")))
                     continue; // doesn't produce roe
 

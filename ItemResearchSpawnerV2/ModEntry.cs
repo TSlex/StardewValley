@@ -1,17 +1,11 @@
-﻿using Force.DeepCloner;
-using ItemResearchSpawnerV2.Api;
+﻿using ItemResearchSpawnerV2.Api;
 using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data.Enums;
 using ItemResearchSpawnerV2.Core.Utils;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
-using System.Reflection;
-using static ItemResearchSpawnerV2.Core.NetworkManager;
 
 
 namespace ItemResearchSpawnerV2 {
@@ -48,6 +42,7 @@ namespace ItemResearchSpawnerV2 {
             // -----------------------------------------------
 
             helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
+            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.Saving += OnSave;
@@ -80,7 +75,8 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void HandleChatMessage(TextBox sender) {
-            var messages = (List<ChatMessage>)typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Game1.chatBox);
+            //var messages = (List<ChatMessage>)typeof(ChatBox).GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Game1.chatBox);
+            var messages = Game1.chatBox.messages;
 
             if (messages.Count <= 0) {
                 return;
@@ -100,6 +96,12 @@ namespace ItemResearchSpawnerV2 {
             NetworkManager.RecieveNetworkModMessage(e);
         }
 
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e) {
+            if (e.IsMultipleOf(15)) { // ~every 1/4 of a second
+                Manager.SyncJTMMoney();
+            }
+        }
+
         public void OnConfigChange() {
             if (Manager.SaveDataLoaded) {
                 // Parcing fix
@@ -107,12 +109,12 @@ namespace ItemResearchSpawnerV2 {
                 //c.ShowMenuButton = null;
 
                 if (Context.IsMainPlayer) {
-                    NetworkManager.SendNetworkModMessage(new OnHostConfigChangedMessage() {
+                    NetworkManager.SendNetworkModMessage(new NetworkManager.OnHostConfigChangedMessage() {
                         Config = Manager.Config,
                     });
                 }
                 else {
-                    NetworkManager.SendNetworkModMessage(new OnNonHostConfigChangedMessage() {
+                    NetworkManager.SendNetworkModMessage(new NetworkManager.OnNonHostConfigChangedMessage() {
                         Config = Manager.Config,
                         //ShowMenuButton = Manager.Config.ShowMenuButton.ToString()
                     });
@@ -229,6 +231,19 @@ namespace ItemResearchSpawnerV2 {
 
             // ------------------------------------------------------------
 
+            configMenu.SetTitleScreenOnlyForNextOptions(ModManifest, true);
+
+            configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Attention());
+
+            configMenu.AddParagraph(
+                ModManifest,
+                () => I18n.Config_AttentionNote()
+            );
+
+            configMenu.SetTitleScreenOnlyForNextOptions(ModManifest, false);
+
+            // ------------------------------------------------------------
+
             configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Main());
 
             var availableModes = Enum.GetValues(typeof(ModMode)).Cast<ModMode>().Select(m => m.ToString()).ToList();
@@ -243,10 +258,10 @@ namespace ItemResearchSpawnerV2 {
                 tooltip: () => I18n.Config_DefaultModeDesc()
             );
 
-            configMenu.AddParagraph(
-                ModManifest,
-                () => I18n.Config_DefaultModeNote()
-            );
+            //configMenu.AddParagraph(
+            //    ModManifest,
+            //    () => I18n.Config_DefaultModeNote()
+            //);
 
             configMenu.AddKeybindList(
                 mod: ModManifest,
@@ -254,6 +269,26 @@ namespace ItemResearchSpawnerV2 {
                 setValue: keybind => ActiveConfig.SetShowMenuButton(keybind),
                 name: () => I18n.Config_OpenMenuKeyName(),
                 tooltip: () => I18n.Config_OpenMenuKeyDesc()
+            );
+
+            // ------------------------------------------------------------
+
+            configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Multiplayer());
+
+            //configMenu.AddBoolOption(
+            //    mod: ModManifest,
+            //    getValue: () => ActiveConfig.GetShareProgression(),
+            //    setValue: value => ActiveConfig.SetShareProgression(value),
+            //    name: () => I18n.Config_ShareProgressionEnabledName(),
+            //    tooltip: () => I18n.Config_ShareProgressionEnabledDesc()
+            //);
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetDisableNonHostCommands(),
+                setValue: value => ActiveConfig.SetDisableNonHostCommands(value),
+                name: () => I18n.Config_DissableNonHostCommandsName(),
+                tooltip: () => I18n.Config_DissableNonHostCommandsDesc()
             );
 
             // ------------------------------------------------------------
@@ -336,6 +371,14 @@ namespace ItemResearchSpawnerV2 {
                 min: ModConfigConstraints.ResearchTimeSecondsMin,
                 max: ModConfigConstraints.ResearchTimeSecondsMax,
                 interval: 0.1f
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetAutoResearch(),
+                setValue: value => ActiveConfig.SetAutoResearch(value),
+                name: () => I18n.Config_AutoResearchEnabledName(),
+                tooltip: () => I18n.Config_AutoResearchEnabledDesc()
             );
 
             configMenu.AddBoolOption(

@@ -100,7 +100,25 @@ namespace ItemResearchSpawnerV2.Core.UI {
             returnItem = ResearchItem?.GameItem ?? null;
             ResearchItem = item != null ? ModManager.ProgressionManagerInstance.GetProgressionItem(item) : null;
 
-            if (returnItem != null && ResearchItem?.GameItem != null && CommonHelper.GetItemUniqueKey(returnItem) == CommonHelper.GetItemUniqueKey(ResearchItem.GameItem)) {
+            if (ResearchItem != null && ResearchItem.Missing) {
+                OnResearchImpossible();
+
+                if (returnItem == null) {
+                    returnItem = item;
+                }
+                else {
+                    CommonHelper.TryReturnItemToInventory(item);
+                }
+
+                ResearchItem = null;
+                return;
+            }
+
+
+            if (returnItem != null && ResearchItem?.GameItem != null && 
+                CommonHelper.GetItemUniqueKey(returnItem) == CommonHelper.GetItemUniqueKey(ResearchItem.GameItem) &&
+                returnItem.Quality == ResearchItem?.GameItem.Quality
+                ) {
                 var resIStack = ResearchItem.Stack;
                 var retIStack = returnItem.Stack;
                 var maxStack = returnItem.maximumStackSize();
@@ -119,6 +137,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         returnItem.Stack -= moveAmount;
                     }
                 }
+            }
+
+            if (ResearchItem != null && ModManager.Instance.Config.AutoResearch) {
+                HandleResearch();
             }
         }
 
@@ -481,6 +503,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public void OnResearchInterrupted() {
+            if (ModManager.Instance.Config.AutoResearch && ResearchItem != null) {
+                return;
+            }
+
             ResearchStarted = false;
 
             if (ModManager.Instance.Config.GetEnableSounds()) {
@@ -542,7 +568,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 leftAmount = 0;
 
                 if (ModManager.Instance.Config.GetEnableSounds()) {
-                    Game1.playSound("purchase");
+                    var purchaseSound = ModManager.Instance.ModMode switch {
+                        ModMode.JunimoMagicTrade => "junimoMeep1",
+                        ModMode.JunimoMagicTradePlus => "junimoMeep1",
+                        _ => "purchase",
+                    };
+
+                    Game1.playSound(purchaseSound);
                 }
             }
 
