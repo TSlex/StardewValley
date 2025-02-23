@@ -301,7 +301,7 @@ namespace ItemResearchSpawnerV2.Core {
             // -------------------------------------------------------------------------------------
 
             SaveManager.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(),
-                ProgressionManager.ResearchProgressions.Where(p => p.Value.ResearchCount > 0)
+                ProgressionManager.ResearchProgressions.Where(p => p.Value.ResearchCount > 0 || p.Value.Favorite)
                 .ToDictionary(p => p.Key, p => p.Value));
 
             // -------------------------------------------------------------------------------------

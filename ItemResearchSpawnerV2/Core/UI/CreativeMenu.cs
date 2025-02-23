@@ -235,15 +235,16 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     continue;
                 }
 
+                if (actualInventory[num] != null && ModManager.Instance.Helper.Input.IsDown(SButton.LeftAlt)) {
+                    ModManager.ProgressionManagerInstance.FavoriteItem(ProgressionItems[i]);
+                    return toPlace;
+                }
+
                 if (actualInventory[num] != null && ModManager.Instance.ShouldDisableItemByPrice(actualInventory[num])) {
                     continue;
                 }
 
                 if (actualInventory[num] != null) {
-                    if (ModManager.Instance.Helper.Input.IsDown(SButton.LeftAlt)) {
-                        ModManager.ProgressionManagerInstance.FavoriteItem(ProgressionItems[i]);
-                        return toPlace;
-                    }
 
                     if (ProgressionItems[i] == null || !ProgressionItems[i].ResearchCompleted || ProgressionItems[i].CannotResearch) {
                         return toPlace;
