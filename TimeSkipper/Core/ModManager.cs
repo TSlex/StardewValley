@@ -15,6 +15,8 @@ namespace TimeSkipper.Core {
         public readonly IManifest Manifest;
         public bool SkippingDay = false;
 
+        public int DaysToSkip = 1;
+
         public int LastTileX = -1;
         public int LastTileY = -1;
         public int LastFacingDirection = 0;

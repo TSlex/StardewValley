@@ -121,7 +121,10 @@ namespace TimeSkipper.Core.UI {
 
             DrawHelper.DrawMenuBox(bounds.X, bounds.Y, TabWidth + 4 * 4, List.MaxLabelHeight + 4 * 2, out Vector2 textPos);
 
-            Utility.drawTextWithShadow(b, List.SelectedLabel, Font, textPos + new Vector2(4 * 2, 4 * 2 - 3), Color.Black * opacity);
+            //Utility.drawTextWithShadow(b, List.SelectedLabel, Font, textPos + new Vector2(4 * 2, 4 * 2 - 3), Color.Black * opacity);
+            Utility.drawTextWithShadow(b, 
+                DrawHelper.TruncateString(List.SelectedLabel, Font, TabWidth), 
+                Font, textPos + new Vector2(4 * 2, 4 * 2 - 3), Color.Black * opacity);
 
             b.Draw(ModManager.UITextureInstance,
                 new Vector2(bounds.X + TabWidth - UIConstants.DropdownIcon.Width + 4 * 3, bounds.Y + 4 * 5), UIConstants.DropdownIcon,
@@ -283,15 +286,15 @@ namespace TimeSkipper.Core.UI {
                     continue;
                 }
 
-                //if (option.containsPoint(Game1.getMouseX(), Game1.getMouseY())) {
-                //    b.Draw(ModManager.UITextureInstance, option.bounds, UIConstants.DropdownHover, Color.White * opacity);
-                //}
-                //else if (option.Index == SelectedOption.Index) {
-                //    b.Draw(ModManager.UITextureInstance, option.bounds, UIConstants.DropdownSelected, Color.White * opacity);
-                //}
-                //else {
-                //    b.Draw(ModManager.UITextureInstance, option.bounds, UIConstants.DropdownBase, Color.White * opacity);
-                //}
+                if (option.containsPoint(Game1.getMouseX(), Game1.getMouseY())) {
+                    b.Draw(ModManager.UITextureInstance, option.bounds, UIConstants.DropdownHover, Color.White * opacity);
+                }
+                else if (option.Index == SelectedOption.Index) {
+                    b.Draw(ModManager.UITextureInstance, option.bounds, UIConstants.DropdownSelected, Color.White * opacity);
+                }
+                else {
+                    b.Draw(ModManager.UITextureInstance, option.bounds, UIConstants.DropdownBase, Color.White * opacity);
+                }
             }
 
             UpArrow.HandleHover(Game1.getMouseX(), Game1.getMouseY());
@@ -306,22 +309,22 @@ namespace TimeSkipper.Core.UI {
 
             // --------------------------------------------------------------------------------------
 
-            //b.Draw(ModManager.UITextureInstance,
-            //    new Rectangle(bounds.X + 4 * 2, bounds.Y + bounds.Height - 4 * 2 - 2 - UIConstants.DropdownGradient.Height,
-            //    bounds.Width + 4 * 2, UIConstants.DropdownGradient.Height),
-            //    UIConstants.DropdownGradient, Color.White * opacity);
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(bounds.X + 4 * 2, bounds.Y + bounds.Height - 4 * 2 - 2 - UIConstants.DropdownGradient.Height,
+                bounds.Width + 4 * 2, UIConstants.DropdownGradient.Height),
+                UIConstants.DropdownGradient, Color.White * opacity);
 
-            //b.Draw(ModManager.UITextureInstance,
-            //    new Rectangle(bounds.X + 4 * 2, bounds.Y - 4 * 2 - 2, 4, bounds.Height + 4),
-            //    UIConstants.DropdownBorderH, ModManager.Instance.ModMode.GetColor() * opacity);
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(bounds.X + 4 * 2, bounds.Y - 4 * 2 - 2, 4, bounds.Height + 4),
+                UIConstants.DropdownBorderH, Color.White * opacity);
 
-            //b.Draw(ModManager.UITextureInstance,
-            //    new Rectangle(bounds.X + 4 * 3 + bounds.Width, bounds.Y - 4 * 2 - 2, 4, bounds.Height + 4),
-            //    UIConstants.DropdownBorderH, ModManager.Instance.ModMode.GetColor() * opacity);
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(bounds.X + 4 * 3 + bounds.Width, bounds.Y - 4 * 2 - 2, 4, bounds.Height + 4),
+                UIConstants.DropdownBorderH, Color.White * opacity);
 
-            //b.Draw(ModManager.UITextureInstance,
-            //    new Rectangle(bounds.X + 4 * 2, bounds.Y + bounds.Height - 4 * 2 - 2, bounds.Width + 4 * 2, 4),
-            //    UIConstants.DropdownBorderV, ModManager.Instance.ModMode.GetColor() * opacity);
+            b.Draw(ModManager.UITextureInstance,
+                new Rectangle(bounds.X + 4 * 2, bounds.Y + bounds.Height - 4 * 2 - 2, bounds.Width + 4 * 2, 4),
+                UIConstants.DropdownBorderV, Color.White * opacity);
 
             // --------------------------------------------------------------------------------------
 

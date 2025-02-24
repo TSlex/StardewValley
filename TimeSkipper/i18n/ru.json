@@ -7,8 +7,18 @@
   "calendar.day-sat": "Сб.",
   "calendar.day-sun": "Вс.",
   "calendar.year": "год",
+  "calendaar.spring": "весна",
+  "calendaar.summer": "лето",
+  "calendaar.fall": "осень",
+  "calendaar.winter": "зима",
   "menu.sleep-duration": "Длительность сна",
   "menu.day": "день",
   "menu.days": "дней",
-  "menu.sleep-button": "ИДТИ СПАТЬ"
+  "menu.sleep-button": "> Идти спать @",
+  "schedule.calendar_mode": "Использовать календарь",
+  "schedule.rainy_mode": "Следующий день с плохой погодой",
+  "schedule.sunny_mode": "Следующий день с хорошей погодой",
+  "schedule.lucky_mode": "Следующий удачный день",
+  "schedule.unlucky_mode": "Следующий неудачный день",
+  "schedule.event_mode": "Следующий ивент"
 }

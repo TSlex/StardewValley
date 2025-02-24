@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Inventories;
 using StardewValley.Menus;
+using TimeSkipper.Core.Data.Enums;
 using TimeSkipper.Core.Utils;
 
 namespace TimeSkipper.Core.UI {
@@ -19,12 +20,44 @@ namespace TimeSkipper.Core.UI {
         public readonly int CalendarCellSize = 52;
         public readonly int CalendarGapSize = 4;
 
-        public List<ClickableComponent> CalendarCells = new List<ClickableComponent>();
+        protected int displayerYear = Game1.year;
+        protected GameSeason displayerSeason = (GameSeason) Utility.getSeasonNumber(Game1.currentSeason);
+
+        public (int day, int season, int year) SelectedDay { get; protected set; }
+        public bool CalendarActive = false;
+
+        public bool IsNotCurrentDate => (int) displayerSeason != Utility.getSeasonNumber(Game1.currentSeason) || displayerYear > Game1.year;
+
+        private int HoveredDay = -1;
+
+        public List<CallendarCell> CalendarCells = new List<CallendarCell>();
 
         public CalendarSelector(Func<int> getXPos, Func<int> getYPos) : base(new Rectangle(), "Calendar") {
             GetXPos = getXPos;
             GetYPos = getYPos;
+
+            var currentDay = Game1.dayOfMonth - 1;
+
+            if (currentDay + 1 >= 28) {
+
+                var nextSeason = ((GameSeason) Utility.getSeasonNumber(Game1.currentSeason)).GetNext();
+
+                if (nextSeason == GameSeason.spring) {
+                    SelectedDay = (0, (int) nextSeason, Game1.year + 1);
+                }
+                else {
+                    SelectedDay = (0, (int) nextSeason, Game1.year);
+                }
+            }
+            else {
+                SelectedDay = (currentDay + 1, Utility.getSeasonNumber(Game1.currentSeason), Game1.year);
+            }
+
+            CalendarActive = true;
+            UpdateSleepDays();
         }
+
+        // --------------------------------------------------------------------------------------------------
 
         public void RecreateCalendarCells(int x1, int y1) {
             CalendarCells.Clear();
@@ -37,9 +70,57 @@ namespace TimeSkipper.Core.UI {
                     CalendarCellSize,
                     CalendarCellSize);
 
-                CalendarCells.Add(new ClickableComponent(itemBounds, j.ToString() ?? ""));
+                CalendarCells.Add(new CallendarCell(itemBounds, j.ToString() ?? ""));
             }
         }
+
+        public void SetDisplayedDate(int year, GameSeason season) {
+            displayerYear = year;
+            displayerSeason = season;
+        }
+
+        public void HandleLeftClick(int x, int y) {
+            for (int j = 0; j < CalendarCells.Count; j++) {
+                if (CalendarCells[j].containsPoint(x, y)) {
+                    
+                    if (CanSelectDay(j)) {
+                        SelectedDay = (j, (int) displayerSeason, displayerYear);
+                        CalendarActive = true;
+                        UpdateSleepDays();
+                    }
+
+                    return;
+                }
+            }
+        }
+
+        public virtual void HandleHover(int x, int y) {
+            for (int j = 0; j < CalendarCells.Count; j++) {
+                if (CalendarCells[j].containsPoint(x, y)) {
+                    HoveredDay = j;
+                    return;
+                }
+            }
+
+            HoveredDay = -1;
+        }
+
+        public bool CanSelectDay(int dayIndex) {
+            return dayIndex >= Game1.dayOfMonth || IsNotCurrentDate;
+        }
+
+        public bool IsSelectedDay(int dayIndex) {
+            return CalendarActive && (dayIndex, (int) displayerSeason, displayerYear) == SelectedDay;
+        }
+
+        public void UpdateSleepDays() {
+            var currentDateDays = Game1.dayOfMonth - 1 + 28 * (Utility.getSeasonNumber(Game1.currentSeason) + 4 * Game1.year);
+            var targetDateDays = SelectedDay.day + 28 * (SelectedDay.season + 4 * SelectedDay.year);
+
+            ModManager.Instance.DaysToSkip = targetDateDays - currentDateDays;
+        }
+
+        // --------------------------------------------------------------------------------------------------
 
         public void Draw(SpriteBatch b) {
 
@@ -86,6 +167,8 @@ namespace TimeSkipper.Core.UI {
                     Color.Black);
             }
 
+            var isNotCurrentDate = IsNotCurrentDate;
+
             for (int j = 0; j < Capacity; j++) {
 
                 var slot = CalendarCells[j];
@@ -97,6 +180,10 @@ namespace TimeSkipper.Core.UI {
 
                 var c = day < Game1.dayOfMonth ? Color.LightGray * 1f : Color.White;
                 c = day == Game1.dayOfMonth ? Color.Gold * 0.5f : c;
+                c = isNotCurrentDate ? Color.White : c;
+                c = HoveredDay == j && CanSelectDay(j) ? Color.Blue * 0.3f : c;
+                //c = IsSelectedDay(j) ? Color.Red * 0.3f : c;
+
 
                 // Draw gaps
                 // ----------------------------------------------------
@@ -124,13 +211,35 @@ namespace TimeSkipper.Core.UI {
                 // Draw cells
                 // ----------------------------------------------------
 
-                b.Draw(ModManager.UITextureInstance, new Rectangle((int) location.X, (int) location.Y, CalendarCellSize, CalendarCellSize), 
+                b.Draw(ModManager.UITextureInstance, new Rectangle((int) location.X, (int) location.Y, CalendarCellSize, CalendarCellSize),
                     UIConstants.CalendarCell, c);
 
                 Utility.drawTextWithShadow(b,
                     dayName,
                     Game1.smallFont, location + new Vector2(CalendarCellSize / 2 - dayNameSize.X / 2, CalendarCellSize / 2 - 4 * 4),
                     Color.Black);
+            }
+
+            // Draw selected day frame
+            // ----------------------------------------------------
+
+            if (IsSelectedDay(SelectedDay.day)) {
+                var slot = CalendarCells[SelectedDay.day];
+
+                var sdFrame = DrawHelper.GetRectangleFromAnchor(
+                    (slot.bounds.Center.X, slot.bounds.Center.Y), 
+                    (1, 1), CalendarCellSize + 4 * 6, CalendarCellSize + 4 * 4);
+
+                b.Draw(ModManager.UITextureInstance, 
+                    new Rectangle(calendarRect.X, slot.bounds.Y + 4, sdFrame.X - calendarRect.X, CalendarCellSize - 4 * 2), 
+                    UIConstants.CalendarCellSelectedBackground, Color.White * 0.4f);
+
+                b.Draw(ModManager.UITextureInstance,
+                    new Rectangle(sdFrame.Right, slot.bounds.Y + 4, calendarRect.Right - sdFrame.Right, CalendarCellSize - 4 * 2),
+                    UIConstants.CalendarCellSelectedBackground, Color.White * 0.4f);
+
+                DrawHelper.DrawTileableTexture(b, ModManager.UITextureInstance, UIConstants.CalendarCellSelectedFrame,
+                    sdFrame, cornerSize: 16, colorize: true);
             }
         }
 

@@ -5,6 +5,9 @@ using TimeSkipper.Core.Utils;
 
 namespace TimeSkipper.Core.UI {
     internal class SleepButton : ButtonBase {
+
+        protected override float Scale => HoveredOver ? 1.05f : 1f;
+
         public SleepButton(Func<int> getXPos, Func<int> getYPos, int baseWidth = 68, int baseHeight = 68) : 
             base(getXPos, getYPos, baseWidth, baseHeight) {
         }
@@ -12,12 +15,10 @@ namespace TimeSkipper.Core.UI {
         public void Draw(SpriteBatch b, float opacity = 1f) {
             base.Draw(b);
 
-            //b.Draw(ModManager.UITextureInstance,
-            //    new Rectangle(Component.bounds.X, Component.bounds.Y, Component.bounds.Width, Component.bounds.Height),
-            //    UIConstants.SleepButton, Color.White * opacity);
+            var c = HoveredOver ? Color.Gold : Color.White;
 
             DrawHelper.DrawTileableTexture(b, ModManager.UITextureInstance, UIConstants.SleepButton,
-                new Rectangle(Component.bounds.X, Component.bounds.Y, Component.bounds.Width, Component.bounds.Height), cornerSize: 4 * 3, colorize: true);
+                new Rectangle(Component.bounds.X, Component.bounds.Y, Component.bounds.Width, Component.bounds.Height), cornerSize: 4 * 3, color: c);
 
             var buttonText = I18n.Menu_SleepButton();
             var buttonTextWidth = Game1.smallFont.MeasureString(buttonText);

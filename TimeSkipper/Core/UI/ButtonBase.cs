@@ -19,7 +19,7 @@ namespace TimeSkipper.Core.UI {
         protected static IModContentHelper Content => ModManager.Instance.Helper.ModContent;
 
         public bool HoveredOver { get; protected set; } = false;
-        protected float Scale => HoveredOver ? 1.1f : 1f;
+        protected virtual float Scale => HoveredOver ? 1.1f : 1f;
 
         public ButtonBase(Func<int> getXPos, Func<int> getYPos,
             int baseWidth = 36 + UIConstants.BorderWidth * 2, int baseHeight = 36 + UIConstants.BorderWidth * 2) {

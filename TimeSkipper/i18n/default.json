@@ -7,8 +7,18 @@
   "calendar.day-sat": "Sa.",
   "calendar.day-sun": "Su.",
   "calendar.year": "year",
+  "calendaar.spring": "spring",
+  "calendaar.summer": "summer",
+  "calendaar.fall": "fall",
+  "calendaar.winter": "winter",
   "menu.sleep-duration": "Sleep duration",
   "menu.day": "day",
   "menu.days": "days",
-  "menu.sleep-button": "GO TO SLEEP"
+  "menu.sleep-button": "> Go to sleep @",
+  "schedule.calendar_mode": "Use calendar",
+  "schedule.rainy_mode": "Next rainy/thunder day",
+  "schedule.sunny_mode": "Next sunny day",
+  "schedule.lucky_mode": "Next good luck day",
+  "schedule.unlucky_mode": "Next bad luck day",
+  "schedule.event_mode": "Next event day"
 }

@@ -298,7 +298,7 @@ namespace TimeSkipper.Core.Utils {
             innerDrawPosition = new Vector2(x + 8, y + 8);
         }
 
-        public static void DrawTileableTexture(SpriteBatch b, Texture2D texture, Rectangle sourceRect, Rectangle destRect, int cornerSize = 8, bool colorize = false) {
+        public static void DrawTileableTexture(SpriteBatch b, Texture2D texture, Rectangle sourceRect, Rectangle destRect, int cornerSize = 8, bool colorize = false, Color? color = null) {
 
             var sX = sourceRect.X;
             var sY = sourceRect.Y;
@@ -311,58 +311,58 @@ namespace TimeSkipper.Core.Utils {
             var dH = destRect.Height > cornerSize * 2 ? destRect.Height : cornerSize * 2 + 1;
 
             //var color = colorize ? ModManager.Instance.ModMode.GetColor() : Color.White;
-            var color = Color.White;
+            color ??= Color.White;
 
             // scaled base
 
             b.Draw(ModManager.UITextureInstance,
                 new Rectangle(dX + cornerSize, dY + cornerSize, dW - cornerSize * 2, dH - cornerSize * 2),
                 new Rectangle(sX + cornerSize, sY + cornerSize, sW - cornerSize * 2, sH - cornerSize * 2),
-                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                (Color) color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
             // corners
 
             b.Draw(ModManager.UITextureInstance,
                 new Rectangle(dX, dY, cornerSize, cornerSize),
                 new Rectangle(sX, sY, cornerSize, cornerSize),
-                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                (Color) color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
             b.Draw(ModManager.UITextureInstance,
                 new Rectangle(dX, dY + dH - cornerSize, cornerSize, cornerSize),
                 new Rectangle(sX, sY + sH - cornerSize, cornerSize, cornerSize),
-                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                (Color) color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
             b.Draw(ModManager.UITextureInstance,
                 new Rectangle(dX + dW - cornerSize, dY, cornerSize, cornerSize),
                 new Rectangle(sX + sW - cornerSize, sY, cornerSize, cornerSize),
-                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                (Color) color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
             b.Draw(ModManager.UITextureInstance,
                 new Rectangle(dX + dW - cornerSize, dY + dH - cornerSize, cornerSize, cornerSize),
                 new Rectangle(sX + sW - cornerSize, sY + sH - cornerSize, cornerSize, cornerSize),
-                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                (Color) color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
             // scaled borders
 
             b.Draw(ModManager.UITextureInstance,
                 new Rectangle(dX + cornerSize, dY, dW - cornerSize * 2, cornerSize),
                 new Rectangle(sX + cornerSize, sY, sW - cornerSize * 2, cornerSize),
-                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                (Color) color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
             b.Draw(ModManager.UITextureInstance,
                 new Rectangle(dX + cornerSize, dY + dH - cornerSize, dW - cornerSize * 2, cornerSize),
                 new Rectangle(sX + cornerSize, sY + sH - cornerSize, sW - cornerSize * 2, cornerSize),
-                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                (Color) color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
             b.Draw(ModManager.UITextureInstance,
                 new Rectangle(dX, dY + cornerSize, cornerSize, dH - cornerSize * 2),
                 new Rectangle(sX, sY + cornerSize, cornerSize, sH - cornerSize * 2),
-                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                (Color) color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
             b.Draw(ModManager.UITextureInstance,
                 new Rectangle(dX + dW - cornerSize, dY + cornerSize, cornerSize, dH - cornerSize * 2),
                 new Rectangle(sX + sW - cornerSize, sY + cornerSize, cornerSize, sH - cornerSize * 2),
-                color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                (Color) color, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
         }
 

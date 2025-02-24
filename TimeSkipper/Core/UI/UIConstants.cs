@@ -15,8 +15,8 @@ namespace TimeSkipper.Core.UI {
 
         public static Rectangle DropdownIcon => new Rectangle(132, 324, 20, 20);
 
-        public static Rectangle RightArrow => new Rectangle(68, 324, 44, 40);
-        public static Rectangle LeftArrow => new Rectangle(4, 324, 44, 40);
+        public static Rectangle RightArrow => new Rectangle(4, 324, 44, 40);
+        public static Rectangle LeftArrow => new Rectangle(68, 324, 44, 40);
         public static Rectangle UpArrow => new Rectangle(196, 324, 40, 44);
         public static Rectangle DownArrow => new Rectangle(196, 388, 40, 44);
 
@@ -27,9 +27,19 @@ namespace TimeSkipper.Core.UI {
         public static Rectangle CalendarCellGap => new Rectangle(60, 380, 4, 4);
         public static Rectangle CalendarCellWithFrame => new Rectangle(60, 380, 72, 72);
 
+        public static Rectangle CalendarCellSelectedFrame => new Rectangle(212, 20, 88, 84);
+        public static Rectangle CalendarCellSelectedBackground => new Rectangle(192, 128, 64, 64);
+
         public static Rectangle SleepButton => new Rectangle(64, 256, 52, 52);
 
         public static Rectangle HeaderText => new Rectangle(8, 520, 272, 46);
+
+        public static Rectangle DropdownBorderH => new Rectangle(8, 264, 4, 4);
+        public static Rectangle DropdownBorderV => new Rectangle(8, 264, 4, 4);
+        public static Rectangle DropdownGradient => new Rectangle(256, 128, 32, 320);
+        public static Rectangle DropdownBase => new Rectangle(200, 272, 4, 4);
+        public static Rectangle DropdownSelected => new Rectangle(200, 300, 4, 4);
+        public static Rectangle DropdownHover => new Rectangle(200, 284, 4, 4);
 
         //public const int BarInnerOffcet = 4;
 

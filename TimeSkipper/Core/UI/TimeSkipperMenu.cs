@@ -1,8 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Inventories;
 using StardewValley.Menus;
 using System.Collections.Generic;
+using TimeSkipper.Core.Data.Enums;
 using TimeSkipper.Core.Utils;
 
 namespace TimeSkipper.Core.UI {
@@ -26,6 +29,11 @@ namespace TimeSkipper.Core.UI {
         protected readonly ArrowButton RightArrow;
         protected readonly SleepButton SleepButton;
 
+        protected int displayerYear = Game1.year;
+        protected GameSeason displayerSeason = (GameSeason) Utility.getSeasonNumber(Game1.currentSeason);
+
+        public bool ShowLeftArrow => displayerYear > Game1.year || displayerYear == Game1.year && (int) displayerSeason > Utility.getSeasonNumber(Game1.currentSeason);
+
         public TimeSkipperMenu() {
 
             Game1.playSound("bigSelect");
@@ -35,16 +43,18 @@ namespace TimeSkipper.Core.UI {
             ModeDropdown = new Dropdown(
                 () => XC - 200 - 4 * 10,
                 () => YC + 4 * 32,
-                Game1.smallFont, "Calendar", new[] { "Calendar" }, p => p, tabWidth: 348);
+                Game1.smallFont, SleepSchedule.calendar_mode.GetString(),
+                Enum.GetValues(typeof(SleepSchedule)).Cast<SleepSchedule>().Select(option => option.GetString()).ToArray(), 
+                p => p, tabWidth: 348);
 
             CalendarSelector = new CalendarSelector(() => XC, () => Y1);
 
             LeftArrow = new ArrowButton(
-                () => XC + 4 * 60 - UIConstants.RightArrow.Width + 4,
+                () => XC - 4 * 60,
                 () => YC + 4 * 14,
                 ArrowButtonType.Left);
             RightArrow = new ArrowButton(
-                () => XC - 4 * 60,
+                () => XC + 4 * 60 - UIConstants.RightArrow.Width + 4,
                 () => YC + 4 * 14,
                 ArrowButtonType.Right);
 
@@ -55,6 +65,55 @@ namespace TimeSkipper.Core.UI {
                 80
                 );
         }
+
+        // --------------------------------------------------------------------------------------------------
+
+        public void ChangeDisplayedDate(int direction) {
+            var newSeasonNumber = (int) displayerSeason + direction;
+
+            if (newSeasonNumber < (int) GameSeason.spring) {
+                displayerYear -= 1;
+                displayerSeason = GameSeason.winter;
+            }
+            else if (newSeasonNumber > (int) GameSeason.winter) {
+                displayerYear += 1;
+                displayerSeason = GameSeason.spring;
+            }
+            else {
+                displayerSeason = (GameSeason) newSeasonNumber;
+            }
+
+            CalendarSelector.SetDisplayedDate(displayerYear, displayerSeason);
+        }
+
+        public void ReseetDisplayedDate() {
+            displayerYear = Game1.year;
+            displayerSeason = (GameSeason) Utility.getSeasonNumber(Game1.currentSeason);
+
+            CalendarSelector.SetDisplayedDate(displayerYear, displayerSeason);
+        }
+
+        protected void SetModeDropdown(bool expanded) {
+            ModeDropdown.IsExpanded = expanded;
+
+            if (!expanded && !Game1.lastCursorMotionWasMouse) {
+                setCurrentlySnappedComponentTo(ModeDropdown.myID);
+                snapCursorToCurrentSnappedComponent();
+            }
+        }
+
+        protected void SetSleepSchedule(string category) {
+            if (!ModeDropdown.TrySelect(category)) {
+                ModManager.Instance.Monitor.Log($"Failed selecting mode '{category}'.", LogLevel.Warn);
+                if (category != SleepSchedule.calendar_mode.GetString()) {
+                    SetSleepSchedule(SleepSchedule.calendar_mode.GetString());
+                }
+            }
+
+            //ModManager.Instance.SelectedCategory = category;
+        }
+
+        // --------------------------------------------------------------------------------------------------
 
         public override void draw(SpriteBatch b) {
             DrawMenu(b);
@@ -72,6 +131,54 @@ namespace TimeSkipper.Core.UI {
             xPositionOnScreen = Game1.uiViewport.Width / 2 - width / 2;
             yPositionOnScreen = Game1.uiViewport.Height / 2 - height / 2;
         }
+
+        // --------------------------------------------------------------------------------------------------
+
+        public override void receiveLeftClick(int x, int y, bool playSound = true) {
+            if (LeftArrow.HoveredOver && ShowLeftArrow) {
+                ChangeDisplayedDate(-1);
+            }
+            else if (RightArrow.HoveredOver) {
+                ChangeDisplayedDate(1);
+            }
+            else if (CalendarSelector.containsPoint(x, y)) {
+                CalendarSelector.HandleLeftClick(x, y);
+            }
+
+            else if (ModeDropdown.TryLeftClick(x, y, out bool itemClicked2, out bool dropdownToggled2)) {
+                if (dropdownToggled2) {
+                    SetModeDropdown(ModeDropdown.IsExpanded);
+                }
+                if (itemClicked2) {
+                    SetSleepSchedule(ModeDropdown.Selected);
+                    Game1.playSound("drumkit6");
+                }
+            }
+        }
+
+        public override void receiveRightClick(int x, int y, bool playSound = true) {
+            if (ModeDropdown.IsExpanded || ModeDropdown.containsPoint(x, y)) {
+                if (ModeDropdown.Selected != SleepSchedule.calendar_mode.GetString()) {
+                    SetSleepSchedule(SleepSchedule.calendar_mode.GetString());
+                    Game1.playSound("smallSelect");
+                }
+                SetModeDropdown(false);
+            }
+            else if (LeftArrow.HoveredOver && ShowLeftArrow) {
+                ReseetDisplayedDate();
+            }
+            else if (RightArrow.HoveredOver) {
+                ReseetDisplayedDate();
+            }
+        }
+
+        public override void performHoverAction(int x, int y) {
+            LeftArrow.HandleHover(x, y);
+            RightArrow.HandleHover(x, y);
+            SleepButton.HandleHover(x, y);
+            CalendarSelector.HandleHover(x, y);
+        }
+
 
         // --------------------------------------------------------------------------------------------------
 
@@ -121,24 +228,38 @@ namespace TimeSkipper.Core.UI {
             // Draw arrows and current date
             // ----------------------------------------------------
 
-            LeftArrow.Draw(b);
+            if (ShowLeftArrow) {
+                LeftArrow.Draw(b);
+            }
             RightArrow.Draw(b);
 
-            var currentDateString = $"{Game1.CurrentSeasonDisplayName} --- {I18n.Calendar_Year()} {Game1.year}".ToLower();
+            var currentDateString = $"{displayerSeason.GetString()} --- {I18n.Calendar_Year()} {displayerYear}".ToLower();
             var currentDateWidth = Game1.smallFont.MeasureString(currentDateString);
-            var currentDateLocation = new Vector2(XC, LeftArrow.Bounds.Y);
+            var currentDateLocation = new Vector2(XC, YC + 4 * 14);
 
             Utility.drawTextWithShadow(b,
                 currentDateString,
                 Game1.smallFont, currentDateLocation + new Vector2(-currentDateWidth.X / 2, 0),
                 Color.Black);
 
-            //if (ShowLeftButton) {
-            //    LeftArrow.Draw(b);
-            //}
-            //if (ShowRightButton) {
-            //    RightArrow.Draw(b);
-            //}
+            // Draw duration
+            // ----------------------------------------------------
+
+            var daysTextPluralForm = ModManager.Instance.DaysToSkip <= 1 ? I18n.Menu_Day() : I18n.Menu_Days();
+            var sleepDurationString = $"{I18n.Menu_SleepDuration()}: {ModManager.Instance.DaysToSkip} {daysTextPluralForm}";
+            var sleepDurationWidth = Game1.smallFont.MeasureString(sleepDurationString);
+            var sleepDurationLocation = new Vector2(XC, Y2);
+
+            Utility.drawTextWithShadow(b,
+                sleepDurationString,
+                Game1.smallFont,
+                sleepDurationLocation + new Vector2(-sleepDurationWidth.X / 2, -4 * 20),
+                Color.Black);
+
+            // Draw start button
+            // ----------------------------------------------------
+
+            SleepButton.Draw(b);
 
             // Draw dropdown and dropdown checker
             // ----------------------------------------------------
@@ -173,24 +294,6 @@ namespace TimeSkipper.Core.UI {
                 new Vector2(DDCheckerInnerRect.X + DDCheckerInnerRect.Width / 2,
                 DDCheckerInnerRect.Y + DDCheckerInnerRect.Height / 2) + new Vector2(-Game1.smallFont.MeasureString("?").X / 2, -4 * 4),
                 Color.Black);
-
-            // Draw duration
-            // ----------------------------------------------------
-
-            var sleepDurationString = $"{I18n.Menu_SleepDuration()}: {12} {I18n.Menu_Days()}";
-            var sleepDurationWidth = Game1.smallFont.MeasureString(sleepDurationString);
-            var sleepDurationLocation = new Vector2(XC, Y2);
-
-            Utility.drawTextWithShadow(b,
-                sleepDurationString,
-                Game1.smallFont,
-                sleepDurationLocation + new Vector2(-sleepDurationWidth.X / 2, - 4 * 20),
-                Color.Black);
-
-            // Draw start button
-            // ----------------------------------------------------
-
-            SleepButton.Draw(b);
 
             // Draw rest
             // ----------------------------------------------------
