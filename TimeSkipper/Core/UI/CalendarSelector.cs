@@ -36,25 +36,7 @@ namespace TimeSkipper.Core.UI {
             GetXPos = getXPos;
             GetYPos = getYPos;
 
-            var currentDay = Game1.dayOfMonth - 1;
-
-            if (currentDay + 1 >= 28) {
-
-                var nextSeason = ((GameSeason) Utility.getSeasonNumber(Game1.currentSeason)).GetNext();
-
-                if (nextSeason == GameSeason.spring) {
-                    SelectedDay = (0, (int) nextSeason, Game1.year + 1);
-                }
-                else {
-                    SelectedDay = (0, (int) nextSeason, Game1.year);
-                }
-            }
-            else {
-                SelectedDay = (currentDay + 1, Utility.getSeasonNumber(Game1.currentSeason), Game1.year);
-            }
-
-            CalendarActive = true;
-            UpdateSleepDays();
+            ResetSelectDay();
         }
 
         // --------------------------------------------------------------------------------------------------
@@ -79,14 +61,16 @@ namespace TimeSkipper.Core.UI {
             displayerSeason = season;
         }
 
-        public void HandleLeftClick(int x, int y) {
+        public void HandleLeftClick(int x, int y, out bool dayWasSelected) {
+            dayWasSelected = false;
+
             for (int j = 0; j < CalendarCells.Count; j++) {
                 if (CalendarCells[j].containsPoint(x, y)) {
                     
                     if (CanSelectDay(j)) {
-                        SelectedDay = (j, (int) displayerSeason, displayerYear);
-                        CalendarActive = true;
-                        UpdateSleepDays();
+                        SelectDay(j, (int) displayerSeason, displayerYear);
+                        Game1.playSound("drumkit6");
+                        dayWasSelected = true;
                     }
 
                     return;
@@ -103,6 +87,34 @@ namespace TimeSkipper.Core.UI {
             }
 
             HoveredDay = -1;
+        }
+
+        public void ResetSelectDay() {
+            var currentDay = Game1.dayOfMonth - 1;
+
+            if (currentDay + 1 >= 28) {
+
+                var nextSeason = ((GameSeason) Utility.getSeasonNumber(Game1.currentSeason)).GetNext();
+
+                if (nextSeason == GameSeason.spring) {
+                    SelectedDay = (0, (int) nextSeason, Game1.year + 1);
+                }
+                else {
+                    SelectedDay = (0, (int) nextSeason, Game1.year);
+                }
+            }
+            else {
+                SelectedDay = (currentDay + 1, Utility.getSeasonNumber(Game1.currentSeason), Game1.year);
+            }
+
+            CalendarActive = true;
+            UpdateSleepDays();
+        }
+
+        public void SelectDay(int dayIndex, int season, int year) {
+            SelectedDay = (dayIndex, season, year);
+            CalendarActive = true;
+            UpdateSleepDays();
         }
 
         public bool CanSelectDay(int dayIndex) {

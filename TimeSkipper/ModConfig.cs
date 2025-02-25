@@ -9,7 +9,11 @@ namespace TimeSkipper {
 
     internal class ModConfig {
 
-        public string ShowMenuButton = "Add";
+        public string ShowMenuButton = "Z";
+
+        public string SkipOneDayButton = "Add";
+
+        public int SleepSheduleMaxDays = 28;
 
         // ===============================================================================
 
@@ -17,10 +21,26 @@ namespace TimeSkipper {
             return KeybindList.Parse(ShowMenuButton);
         }
 
+        public KeybindList GetSkipOneDayButton() {
+            return KeybindList.Parse(SkipOneDayButton);
+        }
+
+        public int GetSleepSheduleMaxDays() {
+            return SleepSheduleMaxDays;
+        }
+
         // ===============================================================================
 
         public void SetShowMenuButton(KeybindList value) {
             ShowMenuButton = value.ToString();
+        }
+
+        public void SetSkipOneDayButton(KeybindList value) {
+            SkipOneDayButton = value.ToString();
+        }
+
+        public void SetSleepSheduleMaxDays(int value) {
+            SleepSheduleMaxDays = value;
         }
 
     }

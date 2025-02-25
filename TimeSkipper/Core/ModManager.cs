@@ -56,6 +56,9 @@ namespace TimeSkipper.Core {
         public void OpenMenu() {
             //Monitor.Log($"{Game1.player.Name} tried to open time skipper menu.", LogLevel.Debug);
             Game1.activeClickableMenu = new TimeSkipperMenu();
+            //Game1.addHUDMessage(new HUDMessage("test", 3) {
+            //    noIcon = true,
+            //});
             //SkipDay();
         }
 

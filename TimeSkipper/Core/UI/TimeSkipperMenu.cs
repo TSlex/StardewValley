@@ -29,6 +29,8 @@ namespace TimeSkipper.Core.UI {
         protected readonly ArrowButton RightArrow;
         protected readonly SleepButton SleepButton;
 
+        protected string DefaultSleepSchedule => SleepSchedule.calendar_mode.GetString();
+
         protected int displayerYear = Game1.year;
         protected GameSeason displayerSeason = (GameSeason) Utility.getSeasonNumber(Game1.currentSeason);
 
@@ -44,7 +46,7 @@ namespace TimeSkipper.Core.UI {
                 () => XC - 200 - 4 * 10,
                 () => YC + 4 * 32,
                 Game1.smallFont, SleepSchedule.calendar_mode.GetString(),
-                Enum.GetValues(typeof(SleepSchedule)).Cast<SleepSchedule>().Select(option => option.GetString()).ToArray(), 
+                Enum.GetValues(typeof(SleepSchedule)).Cast<SleepSchedule>().Select(option => option.GetString()).ToArray(),
                 p => p, tabWidth: 348);
 
             CalendarSelector = new CalendarSelector(() => XC, () => Y1);
@@ -69,6 +71,12 @@ namespace TimeSkipper.Core.UI {
         // --------------------------------------------------------------------------------------------------
 
         public void ChangeDisplayedDate(int direction) {
+            if (direction == 0) {
+                return;
+            }
+
+            Game1.playSound("newRecipe");
+
             var newSeasonNumber = (int) displayerSeason + direction;
 
             if (newSeasonNumber < (int) GameSeason.spring) {
@@ -105,10 +113,13 @@ namespace TimeSkipper.Core.UI {
         protected void SetSleepSchedule(string category) {
             if (!ModeDropdown.TrySelect(category)) {
                 ModManager.Instance.Monitor.Log($"Failed selecting mode '{category}'.", LogLevel.Warn);
-                if (category != SleepSchedule.calendar_mode.GetString()) {
-                    SetSleepSchedule(SleepSchedule.calendar_mode.GetString());
+                if (category != DefaultSleepSchedule) {
+                    SetSleepSchedule(DefaultSleepSchedule);
+                    return;
                 }
             }
+
+            CalendarSelector.CalendarActive = category == DefaultSleepSchedule;
 
             //ModManager.Instance.SelectedCategory = category;
         }
@@ -142,7 +153,11 @@ namespace TimeSkipper.Core.UI {
                 ChangeDisplayedDate(1);
             }
             else if (CalendarSelector.containsPoint(x, y)) {
-                CalendarSelector.HandleLeftClick(x, y);
+                CalendarSelector.HandleLeftClick(x, y, out var dayWasSelected);
+
+                if (dayWasSelected) {
+                    SetSleepSchedule(DefaultSleepSchedule);
+                }
             }
 
             else if (ModeDropdown.TryLeftClick(x, y, out bool itemClicked2, out bool dropdownToggled2)) {
@@ -158,8 +173,8 @@ namespace TimeSkipper.Core.UI {
 
         public override void receiveRightClick(int x, int y, bool playSound = true) {
             if (ModeDropdown.IsExpanded || ModeDropdown.containsPoint(x, y)) {
-                if (ModeDropdown.Selected != SleepSchedule.calendar_mode.GetString()) {
-                    SetSleepSchedule(SleepSchedule.calendar_mode.GetString());
+                if (ModeDropdown.Selected != DefaultSleepSchedule) {
+                    SetSleepSchedule(DefaultSleepSchedule);
                     Game1.playSound("smallSelect");
                 }
                 SetModeDropdown(false);
@@ -170,6 +185,11 @@ namespace TimeSkipper.Core.UI {
             else if (RightArrow.HoveredOver) {
                 ReseetDisplayedDate();
             }
+            else if (CalendarSelector.containsPoint(x, y)) {
+                CalendarSelector.ResetSelectDay();
+                SetSleepSchedule(DefaultSleepSchedule);
+                Game1.playSound("smallSelect");
+            }
         }
 
         public override void performHoverAction(int x, int y) {
@@ -179,6 +199,14 @@ namespace TimeSkipper.Core.UI {
             CalendarSelector.HandleHover(x, y);
         }
 
+        public override void receiveScrollWheelAction(int direction) {
+            if (ModeDropdown.IsExpanded) {
+                ModeDropdown.OnScrollWheel(direction);
+            }
+            else {
+                ChangeDisplayedDate(-direction > 0 ? 1 : (ShowLeftArrow ? - 1: 0));
+            }
+        }
 
         // --------------------------------------------------------------------------------------------------
 
@@ -246,7 +274,10 @@ namespace TimeSkipper.Core.UI {
             // ----------------------------------------------------
 
             var daysTextPluralForm = ModManager.Instance.DaysToSkip <= 1 ? I18n.Menu_Day() : I18n.Menu_Days();
+
             var sleepDurationString = $"{I18n.Menu_SleepDuration()}: {ModManager.Instance.DaysToSkip} {daysTextPluralForm}";
+            sleepDurationString = !CalendarSelector.CalendarActive ? $"{I18n.Menu_SleepDuration()}: ??? {I18n.Menu_Days()}" : sleepDurationString;
+
             var sleepDurationWidth = Game1.smallFont.MeasureString(sleepDurationString);
             var sleepDurationLocation = new Vector2(XC, Y2);
 
@@ -294,6 +325,15 @@ namespace TimeSkipper.Core.UI {
                 new Vector2(DDCheckerInnerRect.X + DDCheckerInnerRect.Width / 2,
                 DDCheckerInnerRect.Y + DDCheckerInnerRect.Height / 2) + new Vector2(-Game1.smallFont.MeasureString("?").X / 2, -4 * 4),
                 Color.Black);
+
+            if (!CalendarSelector.CalendarActive) {
+                var sdFrame = DrawHelper.GetRectangleFromAnchor(
+                    (DDCheckerInnerRect.Center.X, DDCheckerInnerRect.Center.Y),
+                    (1, 1), DDCheckerInnerRect.Width + 4 * 6, DDCheckerInnerRect.Height + 4 * 4);
+
+                DrawHelper.DrawTileableTexture(b, ModManager.UITextureInstance, UIConstants.CalendarCellSelectedFrame,
+                    sdFrame, cornerSize: 16, colorize: true);
+            }
 
             // Draw rest
             // ----------------------------------------------------

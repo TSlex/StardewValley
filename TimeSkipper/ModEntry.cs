@@ -1,6 +1,7 @@
 ﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using TimeSkipper.Api;
 using TimeSkipper.Core;
 
 namespace TimeSkipper {
@@ -36,6 +37,7 @@ namespace TimeSkipper {
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
 
         // =======================================================================================================
@@ -52,6 +54,21 @@ namespace TimeSkipper {
             }
         }
 
+        public void ResetConfig() {
+            Config = new ModConfig();
+            Helper.WriteConfig(Config);
+        }
+
+        public void SaveConfig() {
+            Helper.WriteConfig(Config);
+        }
+
+        // =======================================================================================================
+
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
+            InitConfigMenu();
+        }
+
 
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e) {
             // ignore if player hasn't loaded a save yet or free to move
@@ -65,6 +82,52 @@ namespace TimeSkipper {
 
         private void OnDayStarted(object sender, DayStartedEventArgs e) {
             Manager.OnDayStarted();
+        }
+
+        // ---------------------------------------------------------------------------------------
+
+        private void InitConfigMenu() {
+            var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            if (configMenu is null)
+                return;
+
+            // register mod
+            configMenu.Register(
+                mod: ModManifest,
+                reset: () => ResetConfig(),
+                save: () => SaveConfig()
+            );
+
+            // ------------------------------------------------------------
+
+            configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Main());
+
+            configMenu.AddKeybindList(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetShowMenuButton(),
+                setValue: keybind => ActiveConfig.SetShowMenuButton(keybind),
+                name: () => I18n.Config_OpenMenuKeyName(),
+                tooltip: () => I18n.Config_OpenMenuKeyDesc()
+            );
+
+            configMenu.AddKeybindList(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetSkipOneDayButton(),
+                setValue: keybind => ActiveConfig.SetSkipOneDayButton(keybind),
+                name: () => I18n.Config_SkipOneDayKeyName(),
+                tooltip: () => I18n.Config_SkipOneDayKeyDesc()
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetSleepSheduleMaxDays(),
+                setValue: value => ActiveConfig.SetSleepSheduleMaxDays((int) value),
+                name: () => I18n.Config_ScheduleMaxDaysName(),
+                tooltip: () => I18n.Config_ScheduleMaxDaysDesc(),
+                min: 7,
+                max: 112,
+                interval: 1
+            );
         }
     }
 }

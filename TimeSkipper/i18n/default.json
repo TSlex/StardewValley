@@ -20,5 +20,17 @@
   "schedule.sunny_mode": "Next sunny day",
   "schedule.lucky_mode": "Next good luck day",
   "schedule.unlucky_mode": "Next bad luck day",
-  "schedule.event_mode": "Next event day"
+  "schedule.event_mode": "Next event day",
+
+  // settings
+  "config.section.main": "Main settings",
+
+  "config.open-menu-key-name": "Menu open button",
+  "config.open-menu-key-desc": "Button needed to press for menu to open",
+
+  "config.skip-one-day-key-name": "Skip just one day button",
+  "config.skip-one-day-key-desc": "Button needed to press to fast skip one day without openning the menu",
+
+  "config.schedule-max-days-name": "Max sleeping days limit for special sleeping modes",
+  "config.schedule-max-days-desc": "While skipping in a special mode (ex. for the next lucky day), if such a day doesn't appear within the limit, stop sleeping"
 }
