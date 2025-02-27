@@ -66,6 +66,8 @@ namespace TimeSkipper.Core.UI {
                 250,
                 80
                 );
+
+            SetSleepSchedule(DefaultSleepSchedule);
         }
 
         // --------------------------------------------------------------------------------------------------
@@ -120,8 +122,8 @@ namespace TimeSkipper.Core.UI {
             }
 
             CalendarSelector.CalendarActive = category == DefaultSleepSchedule;
-
-            //ModManager.Instance.SelectedCategory = category;
+            ModManager.Instance.SleepSchedule = Enum.GetValues(typeof(SleepSchedule)).Cast<SleepSchedule>()
+                    .Where(op => op.GetString() == category).FirstOrDefault();
         }
 
         // --------------------------------------------------------------------------------------------------

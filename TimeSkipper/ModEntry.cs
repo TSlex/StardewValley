@@ -3,6 +3,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using TimeSkipper.Api;
 using TimeSkipper.Core;
+using TimeSkipper.Core.Data.Enums;
 
 namespace TimeSkipper {
 
@@ -45,17 +46,39 @@ namespace TimeSkipper {
 
         private void OnUpdateTicked(object sender, UpdateTickedEventArgs e) {
 
-            if (Game1.CurrentEvent != null && !Game1.CurrentEvent.skippable && Manager.SkippingActive) {
+            if (!Context.IsWorldReady || !Manager.SkippingActive) {
+                return;
+            }
+
+            if ((Game1.farmEvent != null || Game1.farmEventOverride != null) && Manager.SleepSchedule == SleepSchedule.farm_event_mode) {
                 Manager.ResetSkippingState();
             }
 
-            if (Context.IsWorldReady && Manager.SkippingActive && Game1.activeClickableMenu != null) {
-                var menu = Game1.activeClickableMenu;
-                
-                if (menu is StardewValley.Menus.DialogueBox dialogue) {
-                    dialogue?.receiveLeftClick(0, 0);
-                }
+            if (Game1.CurrentEvent != null && !Game1.CurrentEvent.skippable) {
+                Manager.ResetSkippingState();
             }
+
+            if (Game1.activeClickableMenu != null && Game1.activeClickableMenu is StardewValley.Menus.DialogueBox dialogue) {
+                dialogue?.receiveLeftClick(0, 0);
+            }
+
+            //if (Context.IsWorldReady && Manager.SkippingActive && Manager.SleepSchedule == SleepSchedule.farm_event_mode) {
+            //    if (Game1.farmEvent != null || Game1.farmEventOverride != null) {
+            //        Manager.ResetSkippingState();
+            //    }
+            //}
+
+            //if (Game1.CurrentEvent != null && !Game1.CurrentEvent.skippable && Manager.SkippingActive) {
+            //    Manager.ResetSkippingState();
+            //}
+
+            //if (Context.IsWorldReady && Manager.SkippingActive && Game1.activeClickableMenu != null) {
+            //    var menu = Game1.activeClickableMenu;
+
+            //    if (menu is StardewValley.Menus.DialogueBox dialogue) {
+            //        dialogue?.receiveLeftClick(0, 0);
+            //    }
+            //}
         }
 
         // =======================================================================================================

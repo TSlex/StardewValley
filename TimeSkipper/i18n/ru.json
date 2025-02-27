@@ -24,7 +24,7 @@
   "info.skip_lucky_mode": "Пропускаю пока не наступит удачный день",
   "info.skip_unlucky_mode": "Пропускаю пока не наступит неудачный день",
   "info.skip_event_mode": "Пропускаю пока не наступит событие...",
-  "info.skip_farm_event_mode": "Пропускаю пока не наступит ночное событие",
+  "info.skip_farm_event_mode": "Пропускаю пока не случится ночное событие",
   "info.skip_building_completed_mode": "Пропускаю пока строительство не завершено",
 
   // shedules

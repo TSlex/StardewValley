@@ -24,7 +24,7 @@
   "info.skip_lucky_mode": "Skipping till next good luck day...",
   "info.skip_unlucky_mode": "Skipping till next bad luck day...",
   "info.skip_event_mode": "Skipping till next event...",
-  "info.skip_farm_event_mode": "Skipping till next farm (night) event...",
+  "info.skip_farm_event_mode": "Skipping till next farm (night) event happened...",
   "info.skip_building_completed_mode": "Skipping till building contruction completed...",
 
   // shedules
