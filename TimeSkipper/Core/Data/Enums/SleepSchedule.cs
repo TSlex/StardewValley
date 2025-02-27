@@ -5,7 +5,9 @@
         sunny_mode,
         lucky_mode,
         unlucky_mode,
-        event_mode
+        event_mode,
+        farm_event_mode,
+        building_completed_mode
     }
 
     internal static class SleepScheduleExtensions {
@@ -17,6 +19,8 @@
                 SleepSchedule.lucky_mode => I18n.Schedule_LuckyMode(),
                 SleepSchedule.unlucky_mode => I18n.Schedule_UnluckyMode(),
                 SleepSchedule.event_mode => I18n.Schedule_EventMode(),
+                SleepSchedule.farm_event_mode => I18n.Schedule_FarmEventMode(),
+                SleepSchedule.building_completed_mode => I18n.Schedule_BuildingCompletedMode(),
                 _ => "???"
             };
         }

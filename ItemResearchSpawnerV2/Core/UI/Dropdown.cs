@@ -215,19 +215,24 @@ namespace ItemResearchSpawnerV2.Core.UI {
             bounds.Y = y;
 
             UpArrow = new ArrowButton(
-                () => x - 4 * 9,
-                () => y + 4 * 20,
+                () => bounds.X - 4 * 9,
+                () => bounds.Top + 4 * 5,
                 ArrowButtonType.Up);
 
             DownArrow = new ArrowButton(
-                () => x - 4 * 9,
-                () => y + bounds.Height - 4 * 4,
+                () => bounds.X - 4 * 9,
+                () => bounds.Bottom - UIConstants.DownArrow.Height - 4 * 8,
                 ArrowButtonType.Down);
 
-            //UpArrow = new ClickableTextureComponent("up-arrow",
-            //    new Rectangle(x - upSource.Width - 4 * 3, y + 4 * 8, upSource.Width, upSource.Height), "", "", Game1.mouseCursors, upSource, 1);
-            //DownArrow = new ClickableTextureComponent("down-arrow",
-            //    new Rectangle(x - downSource.Width - 4 * 3, y + bounds.Height - downSource.Height - 4 * 8, downSource.Width, downSource.Height), "", "", Game1.mouseCursors, downSource, 1);
+            //UpArrow = new ArrowButton(
+            //    () => x - 4 * 9,
+            //    () => y + 4 * 20,
+            //    ArrowButtonType.Up);
+
+            //DownArrow = new ArrowButton(
+            //    () => x - 4 * 9,
+            //    () => y + bounds.Height - 4 * 4,
+            //    ArrowButtonType.Down);
 
             Update();
         }

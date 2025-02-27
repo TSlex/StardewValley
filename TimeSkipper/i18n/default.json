@@ -15,12 +15,27 @@
   "menu.day": "day",
   "menu.days": "days",
   "menu.sleep-button": "> Go to sleep @",
+
+  // info
+  "info.skipping": "Skipping",
+  "info.abort": "Spam \"{0}\" to stop sleeping!",
+  "info.skip_rainy_mode": "Skipping till next rainy/thunder day...",
+  "info.skip_sunny_mode": "Skipping till next sunny day...",
+  "info.skip_lucky_mode": "Skipping till next good luck day...",
+  "info.skip_unlucky_mode": "Skipping till next bad luck day...",
+  "info.skip_event_mode": "Skipping till next event...",
+  "info.skip_farm_event_mode": "Skipping till next farm (night) event...",
+  "info.skip_building_completed_mode": "Skipping till building contruction completed...",
+
+  // shedules
   "schedule.calendar_mode": "Use calendar",
   "schedule.rainy_mode": "Next rainy/thunder day",
   "schedule.sunny_mode": "Next sunny day",
   "schedule.lucky_mode": "Next good luck day",
   "schedule.unlucky_mode": "Next bad luck day",
-  "schedule.event_mode": "Next event day",
+  "schedule.event_mode": "Next event",
+  "schedule.farm_event_mode": "Next farm event",
+  "schedule.building_completed_mode": "Till building finished",
 
   // settings
   "config.section.main": "Main settings",
@@ -32,5 +47,14 @@
   "config.skip-one-day-key-desc": "Button needed to press to fast skip one day without openning the menu",
 
   "config.schedule-max-days-name": "Max sleeping days limit for special sleeping modes",
-  "config.schedule-max-days-desc": "While skipping in a special mode (ex. for the next lucky day), if such a day doesn't appear within the limit, stop sleeping"
+  "config.schedule-max-days-desc": "While skipping in a special mode (ex. for the next lucky day), if such a day doesn't appear within the limit, stop sleeping",
+
+  "config.section.misc": "Misc settings",
+  "config.section.misc-note": "Attention! These settings can lead to unexpected game behavior. Use at your own risk!",
+
+  "config.disable-saving-name": "Disable saving while skipping",
+  "config.disable-saving-desc": "Turns off saving to make skipping faster. The last skipped night will be saved. It might interfere with game logic, and mods or even blew-up your pc :)",
+
+  "config.disable-fading-name": "Disable screen fading",
+  "config.disable-fading-desc": "Turns off screen fading to black and back to clear"
 }

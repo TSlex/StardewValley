@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Netcode;
 using StardewModdingAPI;
 using StardewValley;
@@ -13,8 +14,9 @@ namespace TimeSkipper.Core {
         public readonly IModHelper Helper;
         public readonly IMonitor Monitor;
         public readonly IManifest Manifest;
-        public bool SkippingDay = false;
 
+        public bool SkippingActive = false;
+        public bool SkippingTriggered = false;
         public int DaysToSkip = 1;
 
         public int LastTileX = -1;
@@ -53,50 +55,111 @@ namespace TimeSkipper.Core {
             ScreenFade = Helper.Reflection.GetField<ScreenFade>(typeof(Game1), "screenFade").GetValue();
         }
 
-        public void OpenMenu() {
-            //Monitor.Log($"{Game1.player.Name} tried to open time skipper menu.", LogLevel.Debug);
-            Game1.activeClickableMenu = new TimeSkipperMenu();
-            //Game1.addHUDMessage(new HUDMessage("test", 3) {
-            //    noIcon = true,
-            //});
-            //SkipDay();
+        public void ResetSkippingState() {
+            SkippingActive = false;
+            SkippingTriggered = false;
+            DaysToSkip = 1;
+
+            if (Config.DisableSavingWhileSkipping){
+                Game1.saveOnNewDay = true;
+            }
         }
 
-        public void OnDayStarted() {
-            if (SkippingDay) {
-                SkippingDay = false;
+        public void OnOpenMenu() {
+            //Monitor.Log($"{Game1.player.Name} tried to open time skipper menu.", LogLevel.Debug);
+            Game1.activeClickableMenu = new TimeSkipperMenu();
+        }
 
-                ScreenFade.FadeClear(0f);
-                //Game1.warpFarmer(LastLocationName, LastTileX, LastTileY, 2);
-                Game1.player.canMove = true;
+        public void SkipOneDay() {
+            //Monitor.Log($"{Game1.player.Name} tried to skip one day.", LogLevel.Debug);
+            DaysToSkip = 1;
+            StartSkipping();
+        }
+
+        public void StartSkipping() {
+            SkippingActive = true;
+            SkipDay();
+        }
+
+        // --------------------------------------------------------------------------------------------------
+
+        public void OnRendered() {
+            if (!SkippingActive) {
+                return;
+            }
+
+            var scale = 2f;
+            var skippingText = $"{I18n.Info_Skipping()} {DaysToSkip} {(DaysToSkip > 1 ? I18n.Menu_Days() : I18n.Menu_Day())}";
+            var skippingTextWidth = Game1.smallFont.MeasureString(skippingText) * scale;
+
+            Utility.drawTextWithColoredShadow(Game1.spriteBatch,
+                skippingText, Game1.smallFont, 
+                new Vector2 (Game1.viewport.Width / 2, Game1.viewport.Height / 2) + new Vector2(-skippingTextWidth.X / 2, -skippingTextWidth.Y),
+                Color.LightGreen, Color.Black, scale);
+
+            var abortText = $"{string.Format(I18n.Info_Abort(), Config.ShowMenuButton)}";
+            var abortTextWidth = Game1.smallFont.MeasureString(abortText);
+
+            Utility.drawTextWithColoredShadow(Game1.spriteBatch,
+                abortText, Game1.smallFont,
+                new Vector2(Game1.viewport.Width / 2, Game1.viewport.Height / 2) + new Vector2(-abortTextWidth.X / 2, + 4 * 2),
+                Color.LightPink, Color.Cyan, 1f, verticalShadowOffset: 0, horizontalShadowOffset: 0);
+        }
+
+        // --------------------------------------------------------------------------------------------------
+
+        public void OnDayStarted() {
+            SkippingTriggered = false;
+
+            if (SkippingActive) {
+                DaysToSkip--;
+
+                if (DaysToSkip <= 0) {
+                    ResetSkippingState();
+                    return;
+                }
+                else {
+                    SkipDay();
+                }
             }
         }
 
         public void SkipDay() {
-            if (SkippingDay) {
+            if (SkippingTriggered) {
                 return;
             }
+
+            SkippingTriggered = true;
 
             LastTileX = (int) Game1.player.Tile.X;
             LastTileY = (int) Game1.player.Tile.Y;
             LastFacingDirection = Game1.player.getFacingDirection();
             LastLocationName = Game1.currentLocation.ToString().Split('.')[Game1.currentLocation.ToString().Split('.').Length - 1];
 
-            SkippingDay = true;
             PrepareNextDay();
-            ScreenFade.FadeScreenToBlack(1.1f);
+
+            if (Config.DisableFading) {
+                ScreenFade.FadeScreenToBlack(1.1f);
+            }
+            else {
+                ScreenFade.FadeScreenToBlack();
+            }
         }
 
         public void PrepareNextDay() {
+
+            if (Config.DisableSavingWhileSkipping) {
+                if (DaysToSkip > 1) {
+                    Game1.saveOnNewDay = false;
+                }
+                else {
+                    Game1.saveOnNewDay = true;
+                }
+            }
+
             Game1.currentMinigame = null;
             Game1.newDay = true;
             Game1.newDaySync = new NewDaySynchronizer();
-
-            if (Game1.player.isInBed.Value) {
-                Game1.player.currentEyes = 1;
-                Game1.player.blinkTimer = -4000;
-                Game1.player.CanMove = false;
-            }
 
             if (Game1.activeClickableMenu == null || Game1.dialogueUp) {
                 return;

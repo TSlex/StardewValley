@@ -169,6 +169,10 @@ namespace TimeSkipper.Core.UI {
                     Game1.playSound("drumkit6");
                 }
             }
+
+            else if (SleepButton.HoveredOver) {
+                ModManager.Instance.StartSkipping();
+            }
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true) {

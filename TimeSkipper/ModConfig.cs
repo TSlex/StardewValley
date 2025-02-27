@@ -15,6 +15,11 @@ namespace TimeSkipper {
 
         public int SleepSheduleMaxDays = 28;
 
+        // danger, but skipping gets faster
+
+        public bool DisableSavingWhileSkipping = false;
+        public bool DisableFading = false;
+
         // ===============================================================================
 
         public KeybindList GetShowMenuButton() {
@@ -29,6 +34,14 @@ namespace TimeSkipper {
             return SleepSheduleMaxDays;
         }
 
+        public bool GetDisableSavingWhileSkipping() {
+            return DisableSavingWhileSkipping;
+        }
+
+        public bool GetDisableFading() {
+            return DisableFading;
+        }
+
         // ===============================================================================
 
         public void SetShowMenuButton(KeybindList value) {
@@ -41,6 +54,14 @@ namespace TimeSkipper {
 
         public void SetSleepSheduleMaxDays(int value) {
             SleepSheduleMaxDays = value;
+        }
+
+        public void SetDisableSavingWhileSkipping(bool value) {
+            DisableSavingWhileSkipping = value;
+        }
+
+        public void SetDisableFading(bool value) {
+            DisableFading = value;
         }
 
     }

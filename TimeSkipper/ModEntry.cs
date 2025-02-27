@@ -38,6 +38,24 @@ namespace TimeSkipper {
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.GameLoop.SaveLoaded += OnLoad;
+            helper.Events.Display.Rendered += OnRendered;
+            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+        }
+
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e) {
+
+            if (Game1.CurrentEvent != null && !Game1.CurrentEvent.skippable && Manager.SkippingActive) {
+                Manager.ResetSkippingState();
+            }
+
+            if (Context.IsWorldReady && Manager.SkippingActive && Game1.activeClickableMenu != null) {
+                var menu = Game1.activeClickableMenu;
+                
+                if (menu is StardewValley.Menus.DialogueBox dialogue) {
+                    dialogue?.receiveLeftClick(0, 0);
+                }
+            }
         }
 
         // =======================================================================================================
@@ -65,18 +83,37 @@ namespace TimeSkipper {
 
         // =======================================================================================================
 
+        private void OnLoad(object sender, SaveLoadedEventArgs e) {
+            ModManager.Instance.ResetSkippingState();
+        }
+
+        private void OnRendered(object sender, RenderedEventArgs e) {
+            if (!Context.IsWorldReady)
+                return;
+            ModManager.Instance.OnRendered();
+        }
+
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
             InitConfigMenu();
         }
 
 
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e) {
+
+            if (ActiveConfig.GetShowMenuButton().IsDown() && Manager.SkippingActive) {
+                Manager.ResetSkippingState();
+            }
+
             // ignore if player hasn't loaded a save yet or free to move
             if (!Context.IsWorldReady || !Context.IsPlayerFree || !Context.CanPlayerMove)
                 return;
 
-            if (ActiveConfig.GetShowMenuButton().JustPressed()) {
-                Manager.OpenMenu();
+            else if (ActiveConfig.GetSkipOneDayButton().JustPressed()) {
+                Manager.SkipOneDay();
+            }
+
+            else if (ActiveConfig.GetShowMenuButton().JustPressed()) {
+                Manager.OnOpenMenu();
             }
         }
 
@@ -127,6 +164,28 @@ namespace TimeSkipper {
                 min: 7,
                 max: 112,
                 interval: 1
+            );
+
+            // ------------------------------------------------------------
+
+            configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Misc());
+
+            configMenu.AddParagraph(ModManifest, () => I18n.Config_Section_MiscNote());
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetDisableSavingWhileSkipping(),
+                setValue: value => ActiveConfig.SetDisableSavingWhileSkipping(value),
+                name: () => I18n.Config_DisableSavingName(),
+                tooltip: () => I18n.Config_DisableSavingDesc()
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetDisableFading(),
+                setValue: value => ActiveConfig.SetDisableFading(value),
+                name: () => I18n.Config_DisableFadingName(),
+                tooltip: () => I18n.Config_DisableFadingDesc()
             );
         }
     }

@@ -199,13 +199,13 @@ namespace TimeSkipper.Core.UI {
             bounds.Y = y;
 
             UpArrow = new ArrowButton(
-                () => x - 4 * 9,
-                () => y + 4 * 20,
+                () => bounds.X - 4 * 9,
+                () => bounds.Top,
                 ArrowButtonType.Up);
 
             DownArrow = new ArrowButton(
-                () => x - 4 * 9,
-                () => y + bounds.Height - 4 * 4,
+                () => bounds.X - 4 * 9,
+                () => bounds.Bottom - UIConstants.DownArrow.Height - 4 * 4,
                 ArrowButtonType.Down);
 
             Update();
@@ -347,7 +347,7 @@ namespace TimeSkipper.Core.UI {
             var itemWidth = Math.Max(Options.Max(p => p.LabelWidth) - 80, BaseWidth) + 20;
             var itemHeight = MaxLabelHeight + 4 * 2;
 
-            MaxItems = Math.Min(10, Options.Count);
+            MaxItems = Math.Min(5, Options.Count);
 
             FirstVisibleIndex = GetFirstValidItem(FirstVisibleIndex, MaxFirstVisibleIndex);
 
@@ -364,10 +364,6 @@ namespace TimeSkipper.Core.UI {
                     itemY += itemHeight;
                 }
             }
-
-            var upSource = new Rectangle(76, 72, 40, 44);
-            var downSource = new Rectangle(12, 76, 40, 44);
-
         }
 
         // -------------------------------------------------------------------------------------
