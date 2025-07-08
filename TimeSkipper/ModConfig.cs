@@ -11,7 +11,7 @@ namespace TimeSkipper {
 
         public string ShowMenuButton = "Z";
 
-        public string SkipOneDayButton = "Add";
+        public string SkipOneDayButton = "None";
 
         public int SleepSheduleMaxDays = 28;
 

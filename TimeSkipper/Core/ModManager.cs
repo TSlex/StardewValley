@@ -69,6 +69,11 @@ namespace TimeSkipper.Core {
 
         public void OnOpenMenu() {
             //Monitor.Log($"{Game1.player.Name} tried to open time skipper menu.", LogLevel.Debug);
+
+            if (Game1.activeClickableMenu != null || SkippingActive) {
+                return;
+            }
+
             Game1.activeClickableMenu = new TimeSkipperMenu();
         }
 

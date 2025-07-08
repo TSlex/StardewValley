@@ -1,13 +1,13 @@
 {
   "Name": "Time Skipper",
   "Author": "TSlex",
-  "Version": "1.0.0",
+  "Version": "1.0.0-alpha",
   "Description": "Skip days by sleeping!",
   "UniqueID": "TSlex.TimeSkipper",
   "EntryDll": "TimeSkipper.dll",
   "MinimumApiVersion": "4.1.10",
   "MinimumGameVersion": "1.6.15",
-  "UpdateKeys": [],
+  "UpdateKeys": [ "Nexus:35458" ],
   "Dependencies": [
     {
       "UniqueID": "spacechase0.GenericModConfigMenu",
