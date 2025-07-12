@@ -267,17 +267,8 @@
   {
     "Label": "category.legendary-fish",
     "When": {
-      "UniqueKey": [
-        "Glacierfish Jr.:902",
-        "Radioactive Carp:901",
-        "Legend II:900",
-        "Ms. Angler:899",
-        "Son of Crimsonfish:898",
-        "Glacierfish:775",
-        "Mutant Carp:682",
-        "Angler:160",
-        "Legend:163",
-        "Crimsonfish:159"
+      "ContextTag": [
+        "fish_legendary"
       ]
     },
     "ResearchCount": 1,

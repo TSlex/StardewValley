@@ -8,8 +8,9 @@ namespace ItemResearchSpawnerV2.Core.Data.Serializable {
         public ISet<int> ObjCategory { get; }
         public ISet<string> ItemId { get; }
         public ISet<string> UniqueKey { get; set; }
+        public ISet<string> ContextTag { get; set; }
 
-        public ItemCategoryRule(HashSet<string> @class, HashSet<string> objType, HashSet<int> objCategory, HashSet<string> itemId, HashSet<string> uniqueKey) {
+        public ItemCategoryRule(HashSet<string> @class, HashSet<string> objType, HashSet<int> objCategory, HashSet<string> itemId, HashSet<string> uniqueKey, HashSet<string> contextTag) {
             IEnumerable<string> empty = Enumerable.Empty<string>();
 
             Class = new HashSet<string>(@class ?? empty, StringComparer.OrdinalIgnoreCase);
@@ -17,6 +18,7 @@ namespace ItemResearchSpawnerV2.Core.Data.Serializable {
             ObjCategory = new HashSet<int>(objCategory ?? Enumerable.Empty<int>());
             ItemId = new HashSet<string>(itemId ?? empty, StringComparer.OrdinalIgnoreCase);
             UniqueKey = new HashSet<string>(uniqueKey ?? empty, StringComparer.OrdinalIgnoreCase);
+            ContextTag = new HashSet<string>(contextTag ?? empty, StringComparer.OrdinalIgnoreCase);
         }
 
         public bool IsMatch(SpawnableItem entry) {
@@ -32,9 +34,17 @@ namespace ItemResearchSpawnerV2.Core.Data.Serializable {
             if (ObjCategory.Any() && ObjCategory.Contains(item.Category)) {
                 return true;
             }
-            if (ObjType.Any() && item is SObject obj && ObjType.Contains(obj.Type)) {
-                return true;
+
+            if (item is SObject obj) {
+                if (ObjType.Any() && ObjType.Contains(obj.Type)) {
+                    return true;
+                }
+
+                if (ContextTag.Any() && ContextTag.Any(obj.GetContextTags().Contains)) {
+                    return true;
+                }
             }
+
             if (ItemId.Any() && ItemId.Contains($"{entry.Type}:{item.ParentSheetIndex}")) {
                 return true;
             }
