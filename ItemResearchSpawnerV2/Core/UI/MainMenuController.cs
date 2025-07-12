@@ -291,6 +291,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 SetCategory(I18n.Category_All());
                 SetSortOption(I18n.Sort_ByCategoryAsc());
                 MenuWasBuild = true;
+                SetupControllerFlow();
             }
 
             if (rebuild) {

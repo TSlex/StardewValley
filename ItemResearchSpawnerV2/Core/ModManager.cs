@@ -312,6 +312,11 @@ namespace ItemResearchSpawnerV2.Core {
         public void OnLoad() {
             SaveDataLoaded = false;
 
+            if (Context.IsSplitScreen && !Context.IsMainPlayer) {
+                SaveDataLoaded = true;
+                return; // prevent overriding the save since it is the same instance
+            }
+
             if (!Context.IsSplitScreen && !Context.IsMainPlayer) {
                 SaveManager.OnRemoteLoadRequested();
                 return;

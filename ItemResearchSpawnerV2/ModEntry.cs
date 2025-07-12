@@ -162,6 +162,11 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e) {
+
+            if (Context.IsSplitScreen && !Context.IsMainPlayer) {
+                return;
+            }
+
             ReadConfig();
 
             Manager.Config = Config;
