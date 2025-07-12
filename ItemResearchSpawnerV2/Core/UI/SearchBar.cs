@@ -31,8 +31,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
     internal class SearchBar {
 
-        private readonly TextBox SearchBox;
-        private readonly ClickableComponent SearchBoxArea;
+        public readonly TextBox SearchBox;
+        public readonly ClickableComponent SearchBoxArea;
 
         private readonly ClickableTextureComponent SearchBarButton;
 

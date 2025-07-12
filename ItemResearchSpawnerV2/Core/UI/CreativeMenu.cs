@@ -22,6 +22,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public bool AppearAnimComplete = false;
         public float InitialOpacity = 0.1f;
 
+        public const int base_slot_id = 88111000;
+
         public List<ProgressionItem> ProgressionItems = new List<ProgressionItem>();
 
         public CreativeMenu(InventoryMenu menu) :
@@ -30,6 +32,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             ItemOpacity = new float[capacity];
             Array.Fill(ItemOpacity, 1f);
+
+            actualInventory.Clear();
+            inventory.Clear();
         }
 
         public void Update(GameTime time) {
@@ -78,14 +83,32 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public void RecreateItemSlots() {
-            inventory.Clear();
 
             yPositionOnScreen -= 10 * 4;
 
             var middleID = capacity / 2;
 
+            if (inventory.Count != 0) {
+                for (int j = 0; j < capacity; j++) {
+                    var itemBounds = new Rectangle(
+                        38 + xPositionOnScreen + j % ItemsPerRow * 64 + horizontalGap * (j % ItemsPerRow),
+                        12 + yPositionOnScreen + j / ItemsPerRow * (64 + verticalGap) + (j / ItemsPerRow - 1) * 4 -
+                        ((j <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0), 64, 64);
+
+                    if (j >= middleID) {
+                        itemBounds.X += ItemsPerRow * 84 + 40;
+                        itemBounds.Y = 12 + yPositionOnScreen + (j - middleID) / ItemsPerRow * (64 + verticalGap) + ((j - middleID) / ItemsPerRow - 1) * 4 -
+                        (((j - middleID) <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0);
+                    }
+
+                    inventory[j].bounds = itemBounds;
+                }
+
+                return;
+            }
+
             for (int j = 0; j < capacity; j++) {
-                (int top_id, int bottom_id, int left_id, int right_id) = GetNeightSlotsId(j);
+                //(int top_id, int bottom_id, int left_id, int right_id) = GetNeightSlotsId(j);
 
                 //var itemBounds = new Rectangle(
                 //    38 + xPositionOnScreen + j % ItemsPerRow * 64 + horizontalGap * (j % ItemsPerRow),
@@ -107,13 +130,30 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     (((j - middleID) <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0);
                 }
 
+                //int row = j / ItemsPerRow;
+                //int j_in_row = j % ItemsPerRow;
+
+                //int mR = row % 2;
+                //int mC = row / 2;
+                //int mJ = j_in_row + mC * (ItemsPerRow) + mR * (ItemsPerRow * 2);
+
+                int myID = base_slot_id + J2mJ(j);
+
+                int relativeID = myID - base_slot_id;
+
+                int topID = (relativeID < ItemsPerRow * 2 ? -1 : relativeID - ItemsPerRow * 2) + base_slot_id;
+                int bottomID = (relativeID >= capacity - ItemsPerRow * 2 ? -1 : relativeID + ItemsPerRow * 2) + base_slot_id;
+
+                int leftID = (relativeID % (ItemsPerRow * 2) == 0 ? -1 : relativeID - 1) + base_slot_id;
+                int rightID = (relativeID % (ItemsPerRow * 2) == ItemsPerRow * 2 - 1 ? -1 : relativeID + 1) + base_slot_id;
+
                 inventory.Add(new ClickableComponent(itemBounds, j.ToString() ?? "") {
-                    myID = j,
-                    leftNeighborID = left_id,
-                    rightNeighborID = right_id,
-                    downNeighborID = bottom_id,
-                    upNeighborID = top_id,
-                    region = 9000,
+                    myID = myID,
+                    leftNeighborID = leftID,
+                    rightNeighborID = rightID,
+                    downNeighborID = bottomID,
+                    upNeighborID = topID,
+                    region = 88111,
                     upNeighborImmutable = true,
                     downNeighborImmutable = true,
                     leftNeighborImmutable = true,
@@ -122,28 +162,45 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
         }
 
-        private (int TOP_ID, int BOTTOM_ID, int LEFT_ID, int RIGHT_ID) GetNeightSlotsId(int ID) {
-            int TOP_ID, BOTTOM_ID, LEFT_ID, RIGHT_ID;
-
-            TOP_ID = (ID < ItemsPerRow) ? (12340 + ID) : (ID - ItemsPerRow);
-            LEFT_ID = (ID % ItemsPerRow != 0) ? (ID - 1) : 107;
-            RIGHT_ID = ((ID + 1) % ItemsPerRow != 0) ? (ID + 1) : 106;
-
-            if (!playerInventory) {
-                BOTTOM_ID = (ID >= capacity - ItemsPerRow) ? (-99998) : (ID + ItemsPerRow);
-            }
-            else {
-                BOTTOM_ID = (ID < actualInventory.Count - ItemsPerRow)
-                    ? (ID + ItemsPerRow)
-                    : ((ID < actualInventory.Count - 3 && actualInventory.Count >= 36)
-                        ? (-99998)
-                        : ((ID % 12 < 2)
-                            ? 102
-                            : 101));
-            }
-
-            return (TOP_ID, BOTTOM_ID, LEFT_ID, RIGHT_ID);
+        public List<ClickableComponent> GetSlotAsTheyAppear() {
+            return inventory.Select((cc, i) => (j: J2mJ(i), ccj: cc)).OrderBy(o => o.j).Select(o => o.ccj).ToList();
         }
+
+        public int J2mJ(int j) {
+            int row = j / ItemsPerRow;
+            int j_in_row = j % ItemsPerRow;
+
+            int mR = row % 2;
+            int mC = row / 2;
+            int mJ = j_in_row + mC * ItemsPerRow + mR * ItemsPerRow * 2;
+
+            return mJ;
+        }
+
+        //private (int TOP_ID, int BOTTOM_ID, int LEFT_ID, int RIGHT_ID) GetNeightSlotsId(int idx) {
+        //    int TOP_ID, BOTTOM_ID, LEFT_ID, RIGHT_ID;
+
+        //    TOP_ID = ()
+
+        //    //TOP_ID = (ID < ItemsPerRow) ? (12340 + ID) : (ID - ItemsPerRow);
+        //    //LEFT_ID = (ID % ItemsPerRow != 0) ? (ID - 1) : 107;
+        //    //RIGHT_ID = ((ID + 1) % ItemsPerRow != 0) ? (ID + 1) : 106;
+
+        //    //if (!playerInventory) {
+        //    //    BOTTOM_ID = (ID >= capacity - ItemsPerRow) ? (-99998) : (ID + ItemsPerRow);
+        //    //}
+        //    //else {
+        //    //    BOTTOM_ID = (ID < actualInventory.Count - ItemsPerRow)
+        //    //        ? (ID + ItemsPerRow)6tyu 
+        //    //        : ((ID < actualInventory.Count - 3 && actualInventory.Count >= 36)
+        //    //            ? (-99998)
+        //    //            : ((ID % 12 < 2)
+        //    //                ? 102
+        //    //                : 101));
+        //    //}
+
+        //    //return (TOP_ID, BOTTOM_ID, LEFT_ID, RIGHT_ID);
+        //}
 
         // ============================================================================================================
 
@@ -235,7 +292,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     continue;
                 }
 
-                if (actualInventory[num] != null && ModManager.Instance.Helper.Input.IsDown(SButton.LeftAlt)) {
+                if (actualInventory[num] != null && (ModManager.Instance.Helper.Input.IsDown(SButton.LeftAlt) || ModManager.Instance.Helper.Input.IsDown(SButton.RightShoulder))) {
                     ModManager.ProgressionManagerInstance.FavoriteItem(ProgressionItems[i]);
                     return toPlace;
                 }
@@ -309,12 +366,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         Item one = actualInventory[num].getOne();
 
                         if (actualInventory[num].Stack > 1) {
-                            if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1] { new InputButton(Keys.LeftShift) })) {
+                            if (ModManager.Instance.Helper.Input.IsDown(SButton.LeftShift) || ModManager.Instance.Helper.Input.IsDown(SButton.LeftTrigger)) {
                                 int val = (int) Math.Ceiling((double) actualInventory[num].Stack / 2.0);
                                 one.Stack = val;
                                 actualInventory[num].Stack -= val;
                             }
-                            else if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1] { new InputButton(Keys.LeftControl) })) {
+                            else if (ModManager.Instance.Helper.Input.IsDown(SButton.LeftControl) || ModManager.Instance.Helper.Input.IsDown(SButton.LeftShoulder)) {
                                 int val = Math.Min(10, actualInventory[num].Stack);
                                 one.Stack = val;
                                 actualInventory[num].Stack -= val;
@@ -343,13 +400,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
                         continue;
                     }
 
-                    if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1] { new InputButton(Keys.LeftShift) })) {
+                    if (ModManager.Instance.Helper.Input.IsDown(SButton.LeftShift) || ModManager.Instance.Helper.Input.IsDown(SButton.LeftTrigger)) {
                         int val = (int) Math.Ceiling((double) actualInventory[num].Stack / 2.0);
                         val = Math.Min(toAddTo.maximumStackSize() - toAddTo.Stack, val);
                         toAddTo.Stack += val;
                         actualInventory[num].Stack -= val;
                     }
-                    else if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, new InputButton[1] { new InputButton(Keys.LeftControl) })) {
+                    else if (ModManager.Instance.Helper.Input.IsDown(SButton.LeftControl) || ModManager.Instance.Helper.Input.IsDown(SButton.LeftShoulder)) {
                         int val = Math.Min(10, actualInventory[num].Stack);
                         val = Math.Min(toAddTo.maximumStackSize() - toAddTo.Stack, val);
                         toAddTo.Stack += val;

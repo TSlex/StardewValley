@@ -8,8 +8,8 @@ using StardewValley.Menus;
 namespace ItemResearchSpawnerV2.Components.UI {
     internal abstract class ButtonBase {
 
-        private readonly Func<int> GetXPos;
-        private readonly Func<int> GetYPos;
+        public Func<int> GetXPos;
+        public Func<int> GetYPos;
 
         public int BaseWidth;
         public int BaseHeight;

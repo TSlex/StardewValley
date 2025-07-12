@@ -130,6 +130,20 @@
   "config.dissable_non-host-commands-name": "Commands for host only",
   "config.dissable_non-host-commands-desc": "Enable to allow command usage only for the host player",
 
+  "config.section.controller": "Controller settings",
+
+  "config.show-rns-button-name": "Show RNS button",
+  "config.show-rns-button-desc": "Enable to toggle vissibility of button to open menu in player inventory",
+
+  "config.rns-button-pos-x-name": "RNS button X position",
+  "config.rns-button-pos-x-desc": "X position of RNS button relative to inventory tabs",
+
+  "config.rns-button-pos-y-name": "RNS button Y position",
+  "config.rns-button-pos-y-desc": "Y position of RNS button relative to inventory tabs",
+
+  "config.remap-craft-controller-key-name": "Remap \"craft\" key",
+  "config.remap-craft-controller-key-desc": "Enable to open RNS menu with craft key (Y on xbox controller)",
+
   //commands
   "command.get-help": "Description for command \"{0}\":\n{1}",
   "command.get-help-fail": "Cannot find command \"{0}\"!",

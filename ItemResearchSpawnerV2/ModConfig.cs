@@ -44,6 +44,11 @@ namespace ItemResearchSpawnerV2 {
         public bool UseCustomUIColor = false;
         public Color CustomUIColor = Color.Gold;
 
+        public bool ShowRNSButton = true;
+        public bool RemapCraftControllerKey = true;
+        public int RNSButtonXPos = 0;
+        public int RNSButtonYPos = 0;
+
         // ===============================================================================
 
         public KeybindList GetShowMenuButton() {
@@ -101,6 +106,23 @@ namespace ItemResearchSpawnerV2 {
         public Color GetCustomUIColor() {
             return CustomUIColor;
         }
+
+        public bool GetShowRNSButton() {
+            return ShowRNSButton;
+        }
+
+        public bool GetRemapCraftControllerKey() {
+            return RemapCraftControllerKey;
+        }
+
+        public int GetRNSButtonXPos() {
+            return RNSButtonXPos;
+        }
+
+        public int GetRNSButtonYPos() {
+            return RNSButtonYPos;
+        }
+
 
         // ===============================================================================
 
@@ -212,6 +234,22 @@ namespace ItemResearchSpawnerV2 {
             var newB = B >= 0 ? B : currentColor.B;
 
             CustomUIColor = new Color(newR, newG, newB);
+        }
+
+        public void SetShowRNSButton(bool value) {
+            ShowRNSButton = value;
+        }
+
+        public void SetRemapCraftControllerKey(bool value) {
+            RemapCraftControllerKey = value;
+        }
+
+        public void SetRNSButtonXPos(int value) {
+            RNSButtonXPos = value;
+        }
+
+        public void SetRNSButtonYPos(int value) {
+            RNSButtonYPos = value;
         }
     }
 }

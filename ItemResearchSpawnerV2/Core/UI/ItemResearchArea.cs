@@ -9,7 +9,7 @@ using StardewValley.Menus;
 
 namespace ItemResearchSpawnerV2.Core.UI {
     internal class ItemResearchArea {
-        private readonly ClickableComponent ResearchArea;
+        public readonly ClickableComponent ResearchArea;
         public readonly ResearchButton ResearchButton;
         //private readonly Texture2D ResearchTexture;
         //private readonly Texture2D SellTexture;
@@ -156,7 +156,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
             if (ResearchStarted && time.TotalGameTime.TotalSeconds >= ResearchProcessTime) {
                 OnResearchCompleted();
             }
-            else if (ResearchStarted && !ModManager.Instance.Helper.Input.IsDown(SButton.MouseLeft)) {
+            else if (ResearchStarted && (!ModManager.Instance.Helper.Input.IsDown(SButton.MouseLeft) && !ModManager.Instance.Helper.Input.IsDown(SButton.ControllerA))) {
                 OnResearchInterrupted();
             }
 
@@ -433,13 +433,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
 
             if (ResearchStarted && ResearchItem != null) {
-                float deltatime = ((float) (ResearchProcessTime - Game1.currentGameTime.TotalGameTime.TotalSeconds)) / 2f;
+                float deltatime = ((float) (ResearchProcessTime - Game1.currentGameTime.TotalGameTime.TotalSeconds)) / ModManager.Instance.Config.GetResearchTimeSeconds() / 2f;
 
-                for (int i = 0; i < 5; i++) {
-                    //b.Draw(ResearchItemLightTexture,
-                    //    new Rectangle((int) researchItemCellX, (int) (areaInnerAnchors.Y - 10), 64, 64),
-                    //    ResearchItemLightTexture.Bounds, Color.White * (1f - deltatime));
-                }
+                //for (int i = 0; i < 5; i++) {
+                //    //b.Draw(ResearchItemLightTexture,
+                //    //    new Rectangle((int) researchItemCellX, (int) (areaInnerAnchors.Y - 10), 64, 64),
+                //    //    ResearchItemLightTexture.Bounds, Color.White * (1f - deltatime));
+                //}
 
                 //b.Draw(ModManager.UITextureInstance,
                 //    new Vector2(ResearchArea.bounds.X + 4 * 26 + 2, ResearchArea.bounds.Y + 4 * 10 + 2),
@@ -455,6 +455,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     Color.White * (1f - EasingFunctions.InOutQuad(MathF.Sqrt(deltatime))), MathF.PI / 2,
                     new Vector2(UIConstants.RNSSplashEffect.Width / 2, UIConstants.RNSSplashEffect.Height / 2),
                     1f, SpriteEffects.None, 1f);
+
+                ModManager.Instance.Monitor.Log($"{deltatime}");
 
                 // 1f * (1f - deltatime) / 2 + 0.5f
                 // * (1.2f - EasingFunctions.OutQuad(MathF.Sqrt(deltatime))) / 2 + 0.5f
@@ -485,6 +487,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                 if (ResearchItem.CannotResearch) {
                     OnResearchImpossible();
+                    return;
+                }
+
+                if (ResearchStarted) {
                     return;
                 }
 

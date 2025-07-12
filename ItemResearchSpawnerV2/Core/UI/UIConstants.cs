@@ -8,6 +8,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         public static string AssetsPath => "assets";
         public static string UISheet => Path.Combine(AssetsPath, "images", "spritesheet.png");
 
+        public static int RNS_CC_ID = 17120001;
+
         //public static Color ResearchModeColor => new Color(160, 80, 0);
         public static Color ResearchModeColor => new Color(240, 60, 60);
         public static Color BuySellModeColor => new Color(255, 200, 20);
@@ -19,6 +21,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public static Rectangle CreativeMenuBase => new Rectangle(64, 256, 832, 384);
         public static Rectangle CreativeMenuFrame => new Rectangle(896, 256, 960, 384);
+
+        public static Rectangle BookBase => new Rectangle(928, 192, 28, 30);
+        public static Rectangle BookFrame => new Rectangle(960, 192, 28, 30);
 
         public static Rectangle BookAnimBase => new Rectangle(256, 640, 192, 192);
         public static Rectangle BookAnimFrame => new Rectangle(256, 832, 192, 192);

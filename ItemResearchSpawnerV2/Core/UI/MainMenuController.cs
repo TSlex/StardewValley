@@ -12,8 +12,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
         private List<ProgressionItem> ProgressionItems;
         private List<ProgressionItem> FilteredProgressionItems;
 
-        private static bool ControlPressed => ModManager.Instance.Helper.Input.IsDown(SButton.LeftControl);
-        private static bool ShiftPressed => ModManager.Instance.Helper.Input.IsDown(SButton.LeftShift);
+        private static bool ControlPressed => ModManager.Instance.Helper.Input.IsDown(SButton.LeftControl) || ModManager.Instance.Helper.Input.IsDown(SButton.LeftShoulder);
+        private static bool ShiftPressed => ModManager.Instance.Helper.Input.IsDown(SButton.LeftShift) || ModManager.Instance.Helper.Input.IsDown(SButton.LeftTrigger);
 
         private string LastSearchQuery;
 
@@ -306,6 +306,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 UpdateCreativeMenu();
                 MaxTopRowIndex = Math.Max(0, (int) Math.Ceiling(FilteredProgressionItems.Count / (CreativeMenu.ItemsPerRow * 2m) - 2));
                 ItemResearchArea.BookTurnRightRequested = true;
+
+                if (!MenuWasBuild) {
+                    SetupControllerFlow();
+                }
+
                 return;
             }
 
@@ -341,12 +346,15 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 SetSortDropdown(false);
             }
 
-            CategoryDropdown.IsExpanded = expanded;
+            if (CategoryDropdown.IsExpanded != expanded) {
+                CategoryDropdown.IsExpanded = expanded;
+            }
+
             inventory.highlightMethod = _ => !expanded;
             CreativeMenu.highlightMethod = expanded ? _ => false : GetDefaultHighlightMethod();
 
-            if (!expanded && !Game1.lastCursorMotionWasMouse) {
-                setCurrentlySnappedComponentTo(CategoryDropdown.myID);
+            if (expanded && Game1.options.gamepadControls) {
+                setCurrentlySnappedComponentTo(CategoryDropdown.List.SelectedOption?.myID ?? CategoryDropdown.myID);
                 snapCursorToCurrentSnappedComponent();
             }
         }
@@ -356,12 +364,15 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 SetCategoryDropdown(false);
             }
 
-            SortDropdown.IsExpanded = expanded;
+            if (SortDropdown.IsExpanded != expanded) {
+                SortDropdown.IsExpanded = expanded;
+            }
+
             inventory.highlightMethod = _ => !expanded;
             CreativeMenu.highlightMethod = expanded ? _ => false : GetDefaultHighlightMethod();
 
-            if (!expanded && !Game1.lastCursorMotionWasMouse) {
-                setCurrentlySnappedComponentTo(SortDropdown.myID);
+            if (expanded && Game1.options.gamepadControls) {
+                setCurrentlySnappedComponentTo(SortDropdown.List.SelectedOption?.myID ?? SortDropdown.myID);
                 snapCursorToCurrentSnappedComponent();
             }
         }
@@ -461,7 +472,34 @@ namespace ItemResearchSpawnerV2.Core.UI {
             //}
         }
 
+        public override void receiveGamePadButton(Buttons button) {
+
+            var isExitKey = button is Buttons.B or Buttons.Y or Buttons.Start;
+
+            if (SearchBar.Selected && currentlySnappedComponent == SearchBar.SearchBoxArea) {
+                if (button == Buttons.A) {
+                    Game1.showTextEntry(SearchBar.SearchBox);
+                }
+                else if (isExitKey && SearchBar.Selected) {
+                    if (SearchBar.PersistFocus && SearchBar.Text == "") {
+                        SearchBar.Blur();
+                    }
+                    else {
+                        SearchBar.Clear();
+                    }
+                }
+            }
+
+            //else if (!(isExitKey && SearchBar.Selected)) {
+            //    base.receiveGamePadButton(button);
+            //}
+        }
+
         public override void receiveLeftClick(int x, int y, bool playSound = true) {
+            if (!SearchBar.Contains(x, y) && SearchBar.Selected) {
+                SearchBar.Blur();
+            }
+
             if (trashCan.containsPoint(x, y) && heldItem != null) {
                 TrashHeldItem();
             }
@@ -479,6 +517,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("drumkit6");
                     }
+
+                    if (Game1.options.gamepadControls) {
+                        setCurrentlySnappedComponentTo(SortDropdown.myID);
+                        snapCursorToCurrentSnappedComponent();
+                    }
                 }
             }
 
@@ -491,12 +534,22 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     if (ModManager.Instance.Config.GetEnableSounds()) {
                         Game1.playSound("drumkit6");
                     }
+
+                    if (Game1.options.gamepadControls) {
+                        setCurrentlySnappedComponentTo(CategoryDropdown.myID);
+                        snapCursorToCurrentSnappedComponent();
+                    }
                 }
             }
 
             else if (ItemResearchArea.Bounds.Contains(x, y)) {
                 ItemResearchArea.SetItem(heldItem, out var returnItem);
                 heldItem = returnItem;
+
+                if (heldItem == null && ItemResearchArea.ResearchItem != null && Game1.options.gamepadControls) {
+                    setCurrentlySnappedComponentTo(ItemResearchArea.ResearchButton.Component.myID);
+                    snapCursorToCurrentSnappedComponent();
+                }
             }
 
             else if (LeftArrow.Bounds.Contains(x, y)) {
@@ -535,10 +588,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             else {
-                if (SearchBar.Selected) {
-                    SearchBar.Blur();
-                }
-
                 base.receiveLeftClick(x, y, playSound);
 
                 if (ShiftPressed && heldItem != null && !CreativeMenu.isWithinBounds(x, y)) {
@@ -557,6 +606,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                     }
                 }
                 SetCategoryDropdown(false);
+
+                if (Game1.options.gamepadControls) {
+                    setCurrentlySnappedComponentTo(CategoryDropdown.myID);
+                    snapCursorToCurrentSnappedComponent();
+                }
             }
             else if (SortDropdown.IsExpanded || SortDropdown.containsPoint(x, y)) {
                 if (SortDropdown.Selected != I18n.Sort_ByCategoryAsc()) {
@@ -567,6 +621,15 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 SetSortDropdown(false);
+
+                if (Game1.options.gamepadControls) {
+                    setCurrentlySnappedComponentTo(SortDropdown.myID);
+                    snapCursorToCurrentSnappedComponent();
+                }
+            }
+
+            else if (SearchBar.Bounds.Contains(x, y)) {
+                SearchBar.Clear();
             }
 
             else if (QualityButton.HoveredOver) {
@@ -714,6 +777,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 }
 
                 Game1.player.removeItemFromInventory(hoveredItem);
+
+                if (Game1.options.gamepadControls) {
+                    setCurrentlySnappedComponentTo(ItemResearchArea.ResearchButton.Component.myID);
+                    snapCursorToCurrentSnappedComponent();
+                }
 
                 return true;
             }

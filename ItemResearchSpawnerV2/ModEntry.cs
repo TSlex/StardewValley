@@ -1,6 +1,7 @@
 ﻿using ItemResearchSpawnerV2.Api;
 using ItemResearchSpawnerV2.Core;
 using ItemResearchSpawnerV2.Core.Data.Enums;
+using ItemResearchSpawnerV2.Core.UI;
 using ItemResearchSpawnerV2.Core.Utils;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -17,6 +18,8 @@ namespace ItemResearchSpawnerV2 {
         internal ModConfig Config;
         internal ModManager Manager;
         internal IModHelper Helper;
+
+        internal RNSButton rnsButton;
 
         internal bool IsSaveActive = false;
 
@@ -41,17 +44,21 @@ namespace ItemResearchSpawnerV2 {
 
             // -----------------------------------------------
 
-            helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
-            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+            //helper.Events.Display.MenuChanged += OnMenuChanged;
+            helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
 
+            helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
+
+            helper.Events.Input.CursorMoved += OnCursorMoved;
             helper.Events.Input.ButtonPressed += OnButtonPressed;
+
             helper.Events.GameLoop.Saving += OnSave;
             helper.Events.GameLoop.SaveLoaded += OnLoad;
-
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
+            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+
         }
 
         // =======================================================================================================
@@ -100,6 +107,8 @@ namespace ItemResearchSpawnerV2 {
             if (e.IsMultipleOf(15)) { // ~every 1/4 of a second
                 Manager.SyncJTMMoney();
             }
+
+            SetupRNSButton();
         }
 
         public void OnConfigChange() {
@@ -185,7 +194,22 @@ namespace ItemResearchSpawnerV2 {
             }
         }
 
+        private void OnCursorMoved(object sender, CursorMovedEventArgs e) {
+            var cursorPos = e.NewPosition.ScreenPixels * Game1.options.zoomLevel;
+
+            rnsButton?.HandleHover((int) cursorPos.X, (int) cursorPos.Y);
+        }
+
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
+
+            var cursorPos = e.Cursor.ScreenPixels * Game1.options.zoomLevel;
+
+            if ((e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) && ActiveConfig.ShowRNSButton) {
+
+                Monitor.Log($"{cursorPos}", LogLevel.Debug);
+
+                rnsButton?.HandleLeftClick((int) cursorPos.X, (int) cursorPos.Y);
+            }
 
             // ignore if player hasn't loaded a save yet
             if (!Context.IsWorldReady || !Context.IsPlayerFree || !Context.CanPlayerMove)
@@ -208,11 +232,55 @@ namespace ItemResearchSpawnerV2 {
             if (ActiveConfig.GetShowMenuButton().JustPressed()) {
                 Manager.OpenMenu();
             }
+
+            if (ActiveConfig.RemapCraftControllerKey && e.Button == SButton.ControllerY) {
+                Helper.Input.Suppress(SButton.ControllerY);
+                Manager.OpenMenu();
+            }
         }
 
         private static string GetItemUniqueKey(Item item) {
             //return $"{item.Name}:" + $"{item.ParentSheetIndex} | {item.ItemId} | {item.QualifiedItemId} | {item.GetType().Name}";
             return $"{CommonHelper.GetItemUniqueKey(item)}";
+        }
+
+        private void SetupRNSButton() {
+            if (!ActiveConfig.ShowRNSButton) {
+                return;
+            }
+
+            if (rnsButton == null) {
+                rnsButton = new RNSButton(() => 0, () => 0);
+                rnsButton.Component.myID = UIConstants.RNS_CC_ID;
+                rnsButton.Component.name = "RNS";
+            }
+
+            if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.currentTab == GameMenu.inventoryTab) {
+                InventoryPage inventoryPage = (InventoryPage) gameMenu.pages[GameMenu.inventoryTab];
+
+                var rnsButtonCC = inventoryPage.allClickableComponents?.Find((cc) => cc?.myID == UIConstants.RNS_CC_ID);
+
+                var inventoryTabCC = inventoryPage.allClickableComponents.Find((cc) => cc.name == "inventory");
+
+                if (rnsButtonCC == null && inventoryTabCC != null) {
+
+                    rnsButton.GetXPos = () => inventoryTabCC.bounds.X - 4 * 10 - ActiveConfig.RNSButtonXPos * 4;
+                    rnsButton.GetYPos = () => inventoryTabCC.bounds.Y + 4 * 6 - ActiveConfig.RNSButtonYPos * 4;
+                    rnsButton.BaseWidth = (int) (UIConstants.BookBase.Width * 1.2);
+                    rnsButton.BaseHeight = (int) (UIConstants.BookBase.Height * 1.2);
+                    rnsButton.Component.rightNeighborID = inventoryTabCC.myID;
+                }
+
+                inventoryPage.allClickableComponents?.Add(rnsButton.Component);
+                inventoryTabCC.leftNeighborID = UIConstants.RNS_CC_ID;
+            }
+        }
+
+        private void OnRenderedActiveMenu(object sender, RenderedActiveMenuEventArgs e) {
+            if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.currentTab == GameMenu.inventoryTab && ActiveConfig.ShowRNSButton) {
+                rnsButton?.Draw(e.SpriteBatch);
+                gameMenu.drawMouse(e.SpriteBatch);
+            }
         }
 
         // ---------------------------------------------------------------------------------------
@@ -251,9 +319,9 @@ namespace ItemResearchSpawnerV2 {
             configMenu.AddTextOption(
                 mod: ModManifest,
                 getValue: () => ActiveConfig.GetDefaultMode().ToString(),
-                setValue: mode => ActiveConfig.SetDefaultMode((ModMode)availableModes.IndexOf(mode)),
+                setValue: mode => ActiveConfig.SetDefaultMode((ModMode) availableModes.IndexOf(mode)),
                 allowedValues: availableModes.ToArray(),
-                formatAllowedValue: (mode) => ((ModMode)availableModes.IndexOf(mode)).GetString(),
+                formatAllowedValue: (mode) => ((ModMode) availableModes.IndexOf(mode)).GetString(),
                 name: () => I18n.Config_DefaultModeName(),
                 tooltip: () => I18n.Config_DefaultModeDesc()
             );
@@ -339,6 +407,48 @@ namespace ItemResearchSpawnerV2 {
             configMenu.AddParagraph(
                 ModManifest,
                 () => I18n.Config_PriceMarginNote()
+            );
+
+            // ------------------------------------------------------------
+
+            configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Controller());
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetShowRNSButton(),
+                setValue: value => ActiveConfig.SetShowRNSButton(value),
+                name: () => I18n.Config_ShowRnsButtonName(),
+                tooltip: () => I18n.Config_ShowRnsButtonDesc()
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetRNSButtonXPos(),
+                setValue: value => ActiveConfig.SetRNSButtonXPos(value),
+                name: () => I18n.Config_RnsButtonPosXName(),
+                tooltip: () => I18n.Config_RnsButtonPosXDesc(),
+                min: 0,
+                max: 100,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetRNSButtonYPos(),
+                setValue: value => ActiveConfig.SetRNSButtonYPos(value),
+                name: () => I18n.Config_RnsButtonPosYName(),
+                tooltip: () => I18n.Config_RnsButtonPosYDesc(),
+                min: -200,
+                max: 100,
+                interval: 1
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetRemapCraftControllerKey(),
+                setValue: value => ActiveConfig.SetRemapCraftControllerKey(value),
+                name: () => I18n.Config_RemapCraftControllerKeyName(),
+                tooltip: () => I18n.Config_RemapCraftControllerKeyDesc()
             );
 
             // ------------------------------------------------------------

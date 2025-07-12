@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
+using System;
 using SObject = StardewValley.Object;
 
 namespace ItemResearchSpawnerV2.Core.UI {
@@ -39,6 +40,8 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         protected bool LeftButtonHovered = false;
         protected bool RightButtonHovered = false;
+
+        public readonly List<ClickableComponent> UICComponents = new();
 
         protected static bool IsAndroid => Constants.TargetPlatform == GamePlatform.Android;
 
@@ -76,7 +79,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 //item.bounds.Y += 32;
             }
 
-
             trashCan.bounds.X += 8;
             okButton.bounds.X += 8;
 
@@ -88,6 +90,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
             CreativeMenu.verticalGap += 4 * 8;
             CreativeMenu.horizontalGap += 4 * 5;
             CreativeMenu.drawSlots = false;
+            CreativeMenu.RecreateItemSlots();
+            CreativeMenu.populateClickableComponentList();
+
+            ItemsToGrabMenu.inventory.Clear();
+            ItemsToGrabMenu.allClickableComponents.Clear();
 
             // ----------------------------------------------------
 
@@ -108,11 +115,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 () => yPositionOnScreen - borderWidth / 2 - 4 - 64 - 24,
                 Game1.smallFont, ItemSortOption.CategoryASC.GetString(),
                 Enum.GetValues(typeof(ItemSortOption)).Cast<ItemSortOption>().Select(option => option.GetString()).ToArray(),
-                p => p, tabWidth: 236);
+                p => p, 88100, tabWidth: 236);
 
             CategoryDropdown = new Dropdown(() => xPositionOnScreen - borderWidth - 40 + 236 + 36,
                 () => yPositionOnScreen - borderWidth / 2 - 4 - 64 - 24,
-                Game1.smallFont, I18n.Category_All(), new[] { I18n.Category_All() }, p => p, tabWidth: 336);
+                Game1.smallFont, I18n.Category_All(), new[] { I18n.Category_All() }, p => p, 88101, tabWidth: 336);
 
             SearchBar = new SearchBar(() => xPositionOnScreen - borderWidth - 40 + 500 + 72 * 2,
                 () => yPositionOnScreen - borderWidth / 2 - 4 - 64 - 24, 464);
@@ -136,6 +143,141 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 ArrowButtonType.Right);
 
             MoneyTooltip = new ItemMoneyTooltip();
+
+            // ----------------------------------------------------
+
+            UICComponents.Clear();
+            UICComponents.AddRange(new List<ClickableComponent>{
+                QualityButton.Component,
+                FavoriteButton.Component,
+                ProgressButton.Component,
+                //LeftArrow.Component,
+                //RightArrow.Component,
+                SortDropdown,
+                CategoryDropdown,
+                SearchBar.SearchBoxArea,
+                ItemResearchArea.ResearchArea,
+                ItemResearchArea.ResearchButton.Component
+
+            });
+
+            // ----------------------------------------------------
+
+            //SetupControllerFlow();
+        }
+
+        public void SetupControllerFlow() {
+
+            for (int i = 0; i < inventory.capacity / inventory.rows; i++) {
+                inventory.inventory[i].upNeighborID = CreativeMenu.capacity - CreativeMenu.ItemsPerRow * 2 + CreativeMenu.base_slot_id +
+                    (i < CreativeMenu.ItemsPerRow * 2 ? i : CreativeMenu.ItemsPerRow * 2 - 1);
+            }
+
+            var slots = CreativeMenu.GetSlotAsTheyAppear();
+
+            for (int i = CreativeMenu.capacity - CreativeMenu.ItemsPerRow * 2; i < CreativeMenu.capacity; i++) {
+                slots[i].downNeighborID = i % (CreativeMenu.ItemsPerRow * 2);
+            }
+
+            // ----------------------------------------------------
+
+            var uiCCBaseID = 0;
+
+            foreach (var UICComponent in UICComponents) {
+                UICComponent.myID = 88110000 + ++uiCCBaseID;
+                UICComponent.region = 88110;
+                UICComponent.rightNeighborImmutable = true;
+                UICComponent.leftNeighborImmutable = true;
+                UICComponent.upNeighborImmutable = true;
+                UICComponent.downNeighborImmutable = true;
+            }
+
+            // ----------------------------------------------------
+
+            QualityButton.Component.upNeighborID = SortDropdown.myID;
+            QualityButton.Component.downNeighborID = FavoriteButton.Component.myID;
+
+            FavoriteButton.Component.upNeighborID = QualityButton.Component.myID;
+            FavoriteButton.Component.downNeighborID = ProgressButton.Component.myID;
+
+            ProgressButton.Component.upNeighborID = FavoriteButton.Component.myID;
+            ProgressButton.Component.downNeighborID = inventory.inventory[0].myID;
+
+            for (int i = 0; i < CreativeMenu.capacity / (CreativeMenu.ItemsPerRow * 2); i++) {
+                slots[i * CreativeMenu.ItemsPerRow * 2].leftNeighborID = QualityButton.Component.myID;
+            }
+
+            QualityButton.Component.rightNeighborID = slots[0].myID;
+            FavoriteButton.Component.rightNeighborID = slots[0].myID;
+            ProgressButton.Component.rightNeighborID = slots[0].myID;
+
+            //slots[CreativeMenu.capacity - CreativeMenu.ItemsPerRow * 2].downNeighborID = LeftArrow.Component.myID;
+            //slots.Last().downNeighborID = RightArrow.Component.myID;
+
+            //LeftArrow.Component.rightNeighborID = RightArrow.Component.myID;
+            //RightArrow.Component.leftNeighborID = LeftArrow.Component.myID;
+
+            //LeftArrow.Component.upNeighborID = slots[CreativeMenu.capacity - CreativeMenu.ItemsPerRow * 2].myID;
+            //LeftArrow.Component.downNeighborID = inventory.inventory[0].myID;
+            //LeftArrow.Component.leftNeighborID = QualityButton.Component.myID;
+
+            //RightArrow.Component.upNeighborID = slots.Last().myID;
+            //RightArrow.Component.downNeighborID = inventory.inventory[inventory.capacity / inventory.rows - 1].myID;
+
+            for (int i = 0; i < CreativeMenu.capacity / (CreativeMenu.rows / 2); i++) {
+                slots[i].upNeighborID = SortDropdown.myID;
+            }
+
+            SortDropdown.rightNeighborID = CategoryDropdown.myID;
+            SortDropdown.downNeighborID = QualityButton.Component.myID;
+            SortDropdown.DefaultDownNeighborId = slots[0].myID;
+
+            CategoryDropdown.leftNeighborID = SortDropdown.myID;
+            CategoryDropdown.rightNeighborID = SearchBar.SearchBoxArea.myID;
+            CategoryDropdown.downNeighborID = slots[0].myID;
+            CategoryDropdown.DefaultDownNeighborId = slots[0].myID;
+
+            SearchBar.SearchBoxArea.leftNeighborID = CategoryDropdown.myID;
+            SearchBar.SearchBoxArea.downNeighborID = ItemResearchArea.ResearchArea.myID;
+
+            ItemResearchArea.ResearchArea.upNeighborID = SearchBar.SearchBoxArea.myID;
+            ItemResearchArea.ResearchArea.downNeighborID = ItemResearchArea.ResearchButton.Component.myID;
+
+            for (int i = 0; i < CreativeMenu.capacity / (CreativeMenu.ItemsPerRow * 2); i++) {
+                slots[i * CreativeMenu.ItemsPerRow * 2 + CreativeMenu.ItemsPerRow * 2 - 1].rightNeighborID = ItemResearchArea.ResearchArea.myID;
+            }
+
+            ItemResearchArea.ResearchArea.leftNeighborID = inventory.inventory[inventory.capacity / inventory.rows - 1].myID;
+
+            inventory.inventory[inventory.capacity / inventory.rows - 1].rightNeighborID = ItemResearchArea.ResearchArea.myID;
+            inventory.inventory[inventory.capacity / inventory.rows - 1].rightNeighborImmutable = true;
+
+            ItemResearchArea.ResearchButton.Component.upNeighborID = ItemResearchArea.ResearchArea.myID;
+            ItemResearchArea.ResearchButton.Component.downNeighborID = trashCan.myID;
+
+            ItemResearchArea.ResearchButton.Component.leftNeighborID = inventory.inventory[inventory.capacity / inventory.rows - 1].myID;
+
+            trashCan.upNeighborID = ItemResearchArea.ResearchButton.Component.myID;
+
+
+            // ----------------------------------------------------
+
+            SortDropdown.ReinitializeControllerFlow();
+            UICComponents.AddRange(SortDropdown.GetChildComponents());
+
+            CategoryDropdown.ReinitializeControllerFlow();
+            UICComponents.AddRange(CategoryDropdown.GetChildComponents());
+
+            // ----------------------------------------------------
+
+            if (Game1.options.gamepadControls) {
+                currentlySnappedComponent = inventory.inventory[0];
+                snapCursorToCurrentSnappedComponent();
+            }
+
+            // ----------------------------------------------------
+
+            populateClickableComponentList();
         }
 
         public override void draw(SpriteBatch b) {
@@ -531,6 +673,17 @@ namespace ItemResearchSpawnerV2.Core.UI {
             }
 
             base.receiveRightClick(x, y, playSound && playRightClickSound);
+        }
+
+        public override void update(GameTime time) {
+            base.update(time);
+        }
+
+        public override void populateClickableComponentList() {
+            base.populateClickableComponentList();
+
+            allClickableComponents.AddRange(CreativeMenu?.allClickableComponents ?? new List<ClickableComponent>());
+            allClickableComponents.AddRange(UICComponents);
         }
     }
 }
