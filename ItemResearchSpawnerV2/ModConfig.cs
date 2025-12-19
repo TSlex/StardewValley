@@ -4,6 +4,7 @@ using ItemResearchSpawnerV2.Core.Data.Enums;
 using Microsoft.Xna.Framework;
 using ItemResearchSpawnerV2.Core;
 using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace ItemResearchSpawnerV2 {
 
@@ -19,6 +20,13 @@ namespace ItemResearchSpawnerV2 {
 
         public static float ResearchTimeSecondsMin => 0.0f;
         public static float ResearchTimeSecondsMax => 60f;
+    }
+
+    internal static class ModConfigExtensions {
+        public static ModConfig Clone(this ModConfig source) {
+            var serialized = JsonConvert.SerializeObject(source);
+            return JsonConvert.DeserializeObject<ModConfig>(serialized);
+        }
     }
 
     internal class ModConfig {
@@ -48,6 +56,10 @@ namespace ItemResearchSpawnerV2 {
         public bool RemapCraftControllerKey = true;
         public int RNSButtonXPos = 0;
         public int RNSButtonYPos = 0;
+
+        public bool ShowTooltipOutside = true;
+
+        public MenuSize MenuSize = MenuSize.Normal;
 
         // ===============================================================================
 
@@ -123,6 +135,13 @@ namespace ItemResearchSpawnerV2 {
             return RNSButtonYPos;
         }
 
+        public bool GetShowTooltipOutside() {
+            return ShowTooltipOutside;
+        }
+
+        public MenuSize GetMenuSize() {
+            return MenuSize;
+        }
 
         // ===============================================================================
 
@@ -131,7 +150,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetDefaultMode(ModMode value) {
-            if (!Context.IsMainPlayer) {
+            if (!Context.IsOnHostComputer) {
                 return;
             }
 
@@ -139,7 +158,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetUseDefaultBalanceConfig(bool value) {
-            if (!Context.IsMainPlayer) {
+            if (!Context.IsOnHostComputer) {
                 return;
             }
 
@@ -155,7 +174,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetResearchAmountMultiplier(float value) {
-            if (!Context.IsMainPlayer) {
+            if (!Context.IsOnHostComputer) {
                 return;
             }
 
@@ -166,7 +185,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetSellPriceMultiplier(float value) {
-            if (!Context.IsMainPlayer) {
+            if (!Context.IsOnHostComputer) {
                 return;
             }
 
@@ -177,7 +196,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetBuyPriceMultiplier(float value) {
-            if (!Context.IsMainPlayer) {
+            if (!Context.IsOnHostComputer) {
                 return;
             }
 
@@ -188,7 +207,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetResearchTimeSeconds(float value) {
-            if (!Context.IsMainPlayer) {
+            if (!Context.IsOnHostComputer) {
                 return;
             }
 
@@ -203,7 +222,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetShareProgression(bool value) {
-            if (!Context.IsMainPlayer) {
+            if (!Context.IsOnHostComputer) {
                 return;
             }
 
@@ -211,7 +230,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         public void SetDisableNonHostCommands(bool value) {
-            if (!Context.IsMainPlayer) {
+            if (!Context.IsOnHostComputer) {
                 return;
             }
 
@@ -250,6 +269,14 @@ namespace ItemResearchSpawnerV2 {
 
         public void SetRNSButtonYPos(int value) {
             RNSButtonYPos = value;
+        }
+
+        public void SetShowTooltipOutside(bool value) {
+            ShowTooltipOutside = value;
+        }
+
+        public void SetMenuSize(MenuSize value) {
+            MenuSize = value;
         }
     }
 }

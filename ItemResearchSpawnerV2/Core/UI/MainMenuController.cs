@@ -280,7 +280,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
         }
 
         public void UpdateView(bool rebuild = false, bool filter = false, bool resetScroll = false, bool reloadCategories = false, bool clearFiltering = false) {
-
             //ModManager.Instance.Monitor.Log($"Menu was updated");
 
             if (clearFiltering) {
@@ -697,6 +696,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 foreach (var item in Game1.player.Items.Where(item => item != null)) {
                     var progressionItem = ModManager.ProgressionManagerInstance.GetProgressionItem(item);
 
+                    if (progressionItem.Forbidden) {
+                        continue;
+                    }
+
                     if (progressionItem.ResearchCompleted) {
                         switch (ModManager.Instance.ModMode) {
                             case ModMode.Research:
@@ -847,6 +850,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
             var item = heldItem;
 
             if (item is null) {
+                return;
+            }
+
+            var progressionItem = ModManager.ProgressionManagerInstance.GetProgressionItem(item);
+
+            if (progressionItem.Forbidden) {
                 return;
             }
 

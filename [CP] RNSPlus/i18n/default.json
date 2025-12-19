@@ -1,0 +1,16 @@
+{
+  "orb.name": "Strange orb",
+  "orb.desc": "This orb appears to be possessed",
+  "book.name": "Stange book",
+  "book.desc": "An ancient power is hidden inside",
+
+  "dialog.orb.found": "You found a strange orb! Perhaps you should show it to the wizard...",
+  "dialog.book.found": "You found a strange book! You sense an ancient power hidden within...",
+
+  "config.WayOfObtaining.name": "Way of obtaining the book",
+  "config.WayOfObtaining.description": "Chose a way to obtain the book in game",
+  "config.WayOfObtaining.values.BasicCraft": "Crafting",
+  "config.WayOfObtaining.values.QiShop": "In Qi shop (on the island)",
+  "config.WayOfObtaining.values.CommunityCentreBookSeller": "Boom seller (Community Centre completed)",
+  "config.WayOfObtaining.values.EndGameBookSeller": "Book seller (After visiting The Summit)"
+}

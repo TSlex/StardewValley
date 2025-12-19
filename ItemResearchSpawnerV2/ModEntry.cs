@@ -8,7 +8,6 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 
-
 namespace ItemResearchSpawnerV2 {
 
     public class ModEntry : Mod {
@@ -58,7 +57,6 @@ namespace ItemResearchSpawnerV2 {
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
             helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
-
         }
 
         // =======================================================================================================
@@ -108,6 +106,8 @@ namespace ItemResearchSpawnerV2 {
                 Manager.SyncJTMMoney();
             }
 
+            AddonsManager.Instance?.Update();
+
             SetupRNSButton();
         }
 
@@ -117,7 +117,7 @@ namespace ItemResearchSpawnerV2 {
                 //var c = Manager.Config.DeepClone();
                 //c.ShowMenuButton = null;
 
-                if (Context.IsMainPlayer) {
+                if (Context.IsOnHostComputer) {
                     NetworkManager.SendNetworkModMessage(new NetworkManager.OnHostConfigChangedMessage() {
                         Config = Manager.Config,
                     });
@@ -137,7 +137,24 @@ namespace ItemResearchSpawnerV2 {
                 if (!Manager.SaveDataLoaded) {
                     return;
                 }
-                Manager.Config = new ModConfig();
+
+                if (!Context.IsOnHostComputer) {
+                    var DefaultConfig = Config.Clone();
+
+                    DefaultConfig.DefaultMode = Manager.Config.DefaultMode;
+                    DefaultConfig.ResearchAmountMultiplier = Manager.Config.ResearchAmountMultiplier;
+                    DefaultConfig.SellPriceMultiplier = Manager.Config.SellPriceMultiplier;
+                    DefaultConfig.BuyPriceMultiplier = Manager.Config.BuyPriceMultiplier;
+                    DefaultConfig.ResearchTimeSeconds = Manager.Config.ResearchTimeSeconds;
+                    DefaultConfig.ShareProgression = Manager.Config.ShareProgression;
+                    DefaultConfig.DisableNonHostCommands = Manager.Config.DisableNonHostCommands;
+
+                    Manager.Config = DefaultConfig;
+                }
+                else {
+                    //Manager.Config = new ModConfig();
+                    Manager.Config = Config.Clone();
+                }
             }
 
             else {
@@ -179,6 +196,8 @@ namespace ItemResearchSpawnerV2 {
 
         private void OnDayStarted(object sender, DayStartedEventArgs e) {
             IsSaveActive = true;
+
+            //Game1.player.stats.Set(RNS_unlock_stat_ID, 1);
         }
 
         private void OnSave(object sender, SavingEventArgs saveLoadedEventArgs) {
@@ -200,18 +219,17 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void OnCursorMoved(object sender, CursorMovedEventArgs e) {
-            var cursorPos = e.NewPosition.ScreenPixels * Game1.options.zoomLevel;
+            var cursorPos = Utility.ModifyCoordinatesForUIScale(e.NewPosition.ScreenPixels);
 
             rnsButton?.HandleHover((int) cursorPos.X, (int) cursorPos.Y);
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
 
-            var cursorPos = e.Cursor.ScreenPixels * Game1.options.zoomLevel;
+            var cursorPos = Utility.ModifyCoordinatesForUIScale(e.Cursor.ScreenPixels);
 
-            if ((e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) && ActiveConfig.ShowRNSButton) {
-
-                Monitor.Log($"{cursorPos}", LogLevel.Debug);
+            if ((e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA)
+                && ActiveConfig.ShowRNSButton && AddonsManager.Instance.CanOpenBook()) {
 
                 rnsButton?.HandleLeftClick((int) cursorPos.X, (int) cursorPos.Y);
             }
@@ -227,9 +245,9 @@ namespace ItemResearchSpawnerV2 {
             //    Monitor.Log(Game1.chatBox.chatBox.Text);
             //}
 
-            //if (Game1.player.ActiveItem != null) {
-            //    Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
-            //}
+            if (Game1.player.ActiveItem != null) {
+                Monitor.Log(GetItemUniqueKey(Game1.player.ActiveItem));
+            }
 
             // print button presses to the console window
             // this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
@@ -250,7 +268,7 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void SetupRNSButton() {
-            if (!ActiveConfig.ShowRNSButton) {
+            if (!ActiveConfig.ShowRNSButton || !AddonsManager.Instance.CanOpenBook()) {
                 return;
             }
 
@@ -274,6 +292,8 @@ namespace ItemResearchSpawnerV2 {
                     rnsButton.BaseWidth = (int) (UIConstants.BookBase.Width * 1.2);
                     rnsButton.BaseHeight = (int) (UIConstants.BookBase.Height * 1.2);
                     rnsButton.Component.rightNeighborID = inventoryTabCC.myID;
+                    rnsButton.Component.downNeighborID = inventoryTabCC.downNeighborID;
+                    rnsButton.Component.leftNeighborID = inventoryTabCC.upNeighborID;
                 }
 
                 inventoryPage.allClickableComponents?.Add(rnsButton.Component);
@@ -282,10 +302,13 @@ namespace ItemResearchSpawnerV2 {
         }
 
         private void OnRenderedActiveMenu(object sender, RenderedActiveMenuEventArgs e) {
-            if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.currentTab == GameMenu.inventoryTab && ActiveConfig.ShowRNSButton) {
+            if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.currentTab == GameMenu.inventoryTab
+                && ActiveConfig.ShowRNSButton && AddonsManager.Instance.CanOpenBook()) {
                 rnsButton?.Draw(e.SpriteBatch);
                 gameMenu.drawMouse(e.SpriteBatch);
             }
+
+            ModManager.Instance.DrawTooltip(e.SpriteBatch);
         }
 
         // ---------------------------------------------------------------------------------------
@@ -342,6 +365,18 @@ namespace ItemResearchSpawnerV2 {
                 setValue: keybind => ActiveConfig.SetShowMenuButton(keybind),
                 name: () => I18n.Config_OpenMenuKeyName(),
                 tooltip: () => I18n.Config_OpenMenuKeyDesc()
+            );
+
+            var availableMenuSizes = Enum.GetValues(typeof(MenuSize)).Cast<MenuSize>().Select(m => m.ToString()).ToList();
+
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetMenuSize().ToString(),
+                setValue: size => ActiveConfig.SetMenuSize((MenuSize) availableMenuSizes.IndexOf(size)),
+                allowedValues: availableMenuSizes.ToArray(),
+                formatAllowedValue: (size) => ((MenuSize) availableMenuSizes.IndexOf(size)).GetString(),
+                name: () => I18n.Config_MenuSizeName(),
+                tooltip: () => I18n.Config_MenuSizeDesc()
             );
 
             // ------------------------------------------------------------
@@ -459,6 +494,14 @@ namespace ItemResearchSpawnerV2 {
             // ------------------------------------------------------------
 
             configMenu.AddSectionTitle(ModManifest, () => I18n.Config_Section_Misc());
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => ActiveConfig.GetShowTooltipOutside(),
+                setValue: value => ActiveConfig.SetShowTooltipOutside(value),
+                name: () => I18n.Config_ShowTooltipOutsideName(),
+                tooltip: () => I18n.Config_ShowTooltipOutsideDesc()
+            );
 
             configMenu.AddBoolOption(
                 mod: ModManifest,

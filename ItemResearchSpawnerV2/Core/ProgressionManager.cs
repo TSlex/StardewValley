@@ -416,5 +416,27 @@ namespace ItemResearchSpawnerV2.Core {
                 ModManager.SaveManagerInstance.CommitProgression(Game1.player.UniqueMultiplayerID.ToString(), ResearchProgressions);
             }
         }
+
+        public string GetItemProgressionText(Item item) {
+            return GetItemProgressionText(GetProgressionItem(item));
+        }
+
+        public string GetItemProgressionText(ProgressionItem progressionItem) {
+            var left = progressionItem.ResearchLeftAmount;
+
+            if (progressionItem.CannotResearch) {
+                return I18n.Ui_ResearchImpossible();
+            }
+
+            if (left > 1) {
+                return string.Format(I18n.Ui_ResearchMoreLeft(), left);
+            }
+            else if (left == 1) {
+                return I18n.Ui_ResearchOneLeft();
+            }
+            else {
+                return I18n.Ui_ResearchCompleted();
+            }
+        }
     }
 }

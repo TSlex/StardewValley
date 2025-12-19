@@ -24,7 +24,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
         protected readonly Dropdown SortDropdown;
         protected readonly SearchBar SearchBar;
         protected readonly ItemResearchArea ItemResearchArea;
-        protected readonly ItemMoneyTooltip MoneyTooltip;
 
         //protected readonly ClickableTextureComponent LeftArrow;
         //protected readonly ClickableTextureComponent RightArrow;
@@ -82,12 +81,15 @@ namespace ItemResearchSpawnerV2.Core.UI {
             trashCan.bounds.X += 8;
             okButton.bounds.X += 8;
 
+            var menuRows = ModManager.Instance.Config.MenuSize.GetNumberRows();
+            var menuCols = ModManager.Instance.Config.MenuSize.GetNumberCols();
 
-            CreativeMenu = new(ItemsToGrabMenu) {
-                rows = 4,
+            CreativeMenu = new(ItemsToGrabMenu, menuRows, menuRows * menuCols) {
+                rows = menuRows,
+                capacity = menuRows * menuCols,
             };
-            CreativeMenu.capacity = CreativeMenu.rows * 4;
-            CreativeMenu.verticalGap += 4 * 8;
+
+            CreativeMenu.verticalGap += 4 * ModManager.Instance.Config.MenuSize.GetVerticalGap();
             CreativeMenu.horizontalGap += 4 * 5;
             CreativeMenu.drawSlots = false;
             CreativeMenu.RecreateItemSlots();
@@ -141,8 +143,6 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 () => xPositionOnScreen + width - borderWidth - 120 + 4 * 4,
                 () => yPositionOnScreen - borderWidth / 2 - 4 + 72 * 3 - 4 * 2,
                 ArrowButtonType.Right);
-
-            MoneyTooltip = new ItemMoneyTooltip();
 
             // ----------------------------------------------------
 
@@ -270,9 +270,11 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             // ----------------------------------------------------
 
+            // TODO: HERE
             if (Game1.options.gamepadControls) {
                 currentlySnappedComponent = inventory.inventory[0];
                 snapCursorToCurrentSnappedComponent();
+                ModManager.Instance.Helper.Input.Suppress(SButton.ControllerA);
             }
 
             // ----------------------------------------------------
@@ -357,9 +359,9 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             drawMouse(b);
 
-            if (ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus) {
-                MoneyTooltip.Draw(b, hoveredItem);
-            }
+            //if (ModManager.Instance.ModMode != ModMode.Research && ModManager.Instance.ModMode != ModMode.ResearchPlus) {
+            //    ItemTooltip.Draw(b, hoveredItem);
+            //}
         }
 
         protected void DrawCreativeMenu(SpriteBatch b) {

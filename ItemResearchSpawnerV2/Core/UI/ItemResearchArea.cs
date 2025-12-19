@@ -602,21 +602,23 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 return "";
             }
 
-            var left = ResearchItem.ResearchLeftAmount;
+            return ModManager.ProgressionManagerInstance.GetItemProgressionText(ResearchItem);
 
-            if (ResearchItem.CannotResearch) {
-                return I18n.Ui_ResearchImpossible();
-            }
+            //var left = ResearchItem.ResearchLeftAmount;
 
-            if (left > 1) {
-                return string.Format(I18n.Ui_ResearchMoreLeft(), left);
-            }
-            else if (left == 1) {
-                return I18n.Ui_ResearchOneLeft();
-            }
-            else {
-                return I18n.Ui_ResearchCompleted();
-            }
+            //if (ResearchItem.CannotResearch) {
+            //    return I18n.Ui_ResearchImpossible();
+            //}
+
+            //if (left > 1) {
+            //    return string.Format(I18n.Ui_ResearchMoreLeft(), left);
+            //}
+            //else if (left == 1) {
+            //    return I18n.Ui_ResearchOneLeft();
+            //}
+            //else {
+            //    return I18n.Ui_ResearchCompleted();
+            //}
         }
     }
 }

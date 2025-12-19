@@ -1,0 +1,16 @@
+{
+  "orb.name": "Странная сфера",
+  "orb.desc": "Эта сфера, кажется, одержима",
+  "book.name": "Странная книга",
+  "book.desc": "Внутри сокрыта древняя сила",
+
+  "dialog.orb.found": "Вы нашли странную сферу! Возможно стоит показать её волшебнику...",
+  "dialog.book.found": "Вы нашли странную книгу! Вы ощущаете древнюю силу, сокрытую внутри...",
+  
+  "config.WayOfObtaining.name": "Способ получения книги",
+  "config.WayOfObtaining.description": "Выберите способ получения книги в игре",
+  "config.WayOfObtaining.values.BasicCraft": "Ремесло",
+  "config.WayOfObtaining.values.QiShop": "В магазине Qi (на острове)",
+  "config.WayOfObtaining.values.CommunityCentreBookSeller": "Продавец книг (все узелки клуба завершены)",
+  "config.WayOfObtaining.values.EndGameBookSeller": "Продавец книг (после 100% прохождения игры)"
+}

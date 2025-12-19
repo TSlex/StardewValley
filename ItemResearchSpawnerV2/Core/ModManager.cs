@@ -7,6 +7,7 @@ using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Menus;
 
 namespace ItemResearchSpawnerV2.Core {
     internal class ModManager {
@@ -14,6 +15,7 @@ namespace ItemResearchSpawnerV2.Core {
         public static ProgressionManager ProgressionManagerInstance => Instance.ProgressionManager;
         public static SaveManager SaveManagerInstance => Instance.SaveManager;
         public static CommandManager CommandManagerInstance => Instance.CommandManager;
+        public static AddonsManager AddonsManagerInstance => Instance.AddonsManager;
 
         public readonly IModHelper Helper;
         public readonly IMonitor Monitor;
@@ -24,6 +26,7 @@ namespace ItemResearchSpawnerV2.Core {
         public readonly ProgressionManager ProgressionManager;
         public readonly SaveManager SaveManager;
         public readonly CommandManager CommandManager;
+        public readonly AddonsManager AddonsManager;
 
         public ProgressionItem RecentlyUnlockedItem = null;
         public int RecentlyUnlockedItemIndex = -1;
@@ -47,6 +50,8 @@ namespace ItemResearchSpawnerV2.Core {
         public bool JMTMoneySyncRequired = false;
 
         public bool SaveDataLoaded = false;
+
+        public bool ModMenuActive => Game1.activeClickableMenu is MainMenuController;
 
         // ===========================================================================================
 
@@ -72,12 +77,53 @@ namespace ItemResearchSpawnerV2.Core {
             ProgressionManager = new ProgressionManager();
             SaveManager = new SaveManager();
             CommandManager = new CommandManager();
+            AddonsManager = new AddonsManager(Helper);
+
+            // -----------------------------------------------
         }
 
         // ===========================================================================================
 
+        public void DrawTooltip(SpriteBatch b) {
+            if (!Config.ShowTooltipOutside && !ModMenuActive) {
+                return;
+            }
+
+            Item hoveredItem = null;
+
+            // thanks to https://github.com/musbah/StardewValleyMods/blob/master/BundleTooltips/ModEntry.cs for a clue on how to get the current hovered item
+
+            if (Game1.activeClickableMenu is null) {
+                foreach (IClickableMenu menu in Game1.onScreenMenus) {
+                    if (menu is Toolbar _) {
+                        hoveredItem = Helper.Reflection.GetField<Item>(menu, "hoverItem").GetValue();
+                    }
+                }
+            }
+            else {
+                if (Game1.activeClickableMenu is MenuWithInventory menuWithInventory) {
+                    hoveredItem = menuWithInventory.hoveredItem;
+                }
+
+                else if (Game1.activeClickableMenu is GameMenu gameMenu) {
+                    IClickableMenu page = Helper.Reflection.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue()[gameMenu.currentTab];
+                    if (page is InventoryPage) {
+                        hoveredItem = Helper.Reflection.GetField<Item>(page, "hoveredItem").GetValue();
+                    }
+                }
+            }
+
+            if (hoveredItem is not null) {
+                ItemTooltip.Draw(b, hoveredItem);
+            }
+        }
+
         public void OpenMenu() {
             //ProgressionManager.LoadCategories();
+            if (!AddonsManager.Instance.CanOpenBook()) {
+                return;
+            }
+
             if (SaveDataLoaded) {
                 Game1.activeClickableMenu = new MainMenuController();
             }
@@ -168,7 +214,7 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         public void SyncJTMMoney() {
-            if (!Context.IsMainPlayer && SaveDataLoaded && JMTMoneySyncRequired) {
+            if (!Context.IsOnHostComputer && SaveDataLoaded && JMTMoneySyncRequired) {
                 JMTMoneySyncRequired = false;
 
                 NetworkManager.SendNetworkModMessage(new NetworkManager.OnCommitJMTMoneyMessage() {
@@ -317,7 +363,7 @@ namespace ItemResearchSpawnerV2.Core {
                 return; // prevent overriding the save since it is the same instance
             }
 
-            if (!Context.IsSplitScreen && !Context.IsMainPlayer) {
+            if (!Context.IsOnHostComputer) {
                 SaveManager.OnRemoteLoadRequested();
                 return;
             }

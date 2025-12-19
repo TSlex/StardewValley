@@ -59,8 +59,9 @@
   "ui.research-completed": "research completed",
   "ui.research-impossible": "forbidden item",
 
-  "ui.price-tooltip.buy": "(Buy)",
-  "ui.price-tooltip.sell": "(Sell)",
+  "ui.price-tooltip.buy": "Buy:",
+  "ui.price-tooltip.sell": "Sell:",
+  "ui.price-tooltip.price": "Price:",
 
   //modes
   "mod-mode.research": "Research (Spawn) mode",
@@ -70,6 +71,11 @@
   "mod-mode.buy-sell-plus": "JojaMart mode",
   "mod-mode.junimo-magic-trade": "Junimo's Magic Trade mode",
   "mod-mode.junimo-magic-trade-plus": "JMT Combined mode",
+
+  //menu size
+  "menu-size.normal": "Normal (16 items)",
+  "menu-size.large": "Large (30 items)",
+  "menu-size.xlarge": "Extra large (48 items)",
 
   //settings
   "config.section.attention": "Attention!",
@@ -83,6 +89,9 @@
 
   "config.open-menu-key-name": "Open key",
   "config.open-menu-key-desc": "Key needed to press for menu to open",
+
+  "config.menu-size-name": "Menu size",
+  "config.menu-size-desc": "Affects the number of items displayed in RnS menu",
 
   "config.section.balance": "Balance settings",
 
@@ -100,6 +109,9 @@
   "config.price-margin-note": "Note: using buy and sell price multipliers you control the money margin, you can make item \"vanish\" or make it too cheaty, up to you :)",
 
   "config.section.misc": "Misc settings",
+
+  "config.show-tooltip-outside-name": "Show tooltip in other menus",
+  "config.show-tooltip-outside-desc": "Enable to toggle the tooltip with the research amount left for the hovered item not only in RnS menu",
 
   "config.enable-sounds-name": "Enable menu sounds",
   "config.enable-sounds-desc": "If menu sounds are very annoying, you can turn them off...",
@@ -132,17 +144,17 @@
 
   "config.section.controller": "Controller settings",
 
-  "config.show-rns-button-name": "Show RNS button",
+  "config.show-rns-button-name": "Show RnS button",
   "config.show-rns-button-desc": "Enable to toggle vissibility of button to open menu in player inventory",
 
-  "config.rns-button-pos-x-name": "RNS button X position",
-  "config.rns-button-pos-x-desc": "X position of RNS button relative to inventory tabs",
+  "config.rns-button-pos-x-name": "RnS button X position",
+  "config.rns-button-pos-x-desc": "X position of RnS button relative to inventory tabs",
 
-  "config.rns-button-pos-y-name": "RNS button Y position",
-  "config.rns-button-pos-y-desc": "Y position of RNS button relative to inventory tabs",
+  "config.rns-button-pos-y-name": "RnS button Y position",
+  "config.rns-button-pos-y-desc": "Y position of RnS button relative to inventory tabs",
 
   "config.remap-craft-controller-key-name": "Remap \"craft\" key",
-  "config.remap-craft-controller-key-desc": "Enable to open RNS menu with craft key (Y on xbox controller)",
+  "config.remap-craft-controller-key-desc": "Enable to open RnS menu with craft key (Y on xbox controller)",
 
   //commands
   "command.get-help": "Description for command \"{0}\":\n{1}",

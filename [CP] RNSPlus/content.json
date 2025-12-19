@@ -1,27 +1,274 @@
 {
   "Format": "2.7.0",
   "ConfigSchema": {
-    "EnableJohn": {
-      "AllowValues": "true, false",
-      "Default": true
+    "WayOfObtaining": {
+      "AllowValues": "BasicCraft, QiShop, CommunityCentreBookSeller, EndGameBookSeller",
+      "Default": "QiShop"
     }
   },
+  "DynamicTokens": [
+    {
+      "Name": "CommunityCentreTierComplete",
+      "Value": false
+    },
+    {
+      "Name": "CommunityCentreTierComplete",
+      "Value": true,
+      "When": {
+        "IsCommunityCenterComplete": true
+      }
+    },
+    {
+      "Name": "CommunityCentreTierComplete",
+      "Value": true,
+      "When": {
+        "IsJojaMartComplete": true
+      }
+    }
+  ],
+  // --------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   "Changes": [
     {
       "Action": "EditData",
       "Target": "Data/Objects",
       "Entries": {
-        "{{ModId}}_RNSBook": {
-          "Name": "{{ModId}}_RNSBook",
-          "Displayname": "RNS",
-          "Description": "RNS book.",
+        "{{ModId}}_Orb": {
+          "Name": "{{ModId}}_Orb",
+          "Displayname": "{{i18n: orb.name}}",
+          "Description": "{{i18n: orb.desc}}",
           "Type": "Basic",
           "Category": 0,
           "Price": -1,
-
           "Texture": "Mods/{{ModId}}/Objects",
-          "SpriteIndex": 0
+          "SpriteIndex": 1,
+          "Edibility": -300,
+          "IsDrink": false,
+          "Buffs": null,
+          "GeodeDropsDefaultItems": false,
+          "GeodeDrops": null,
+          "ArtifactSpotChances": null,
+          "ExcludeFromFishingCollection": false,
+          "ExcludeFromShippingCollection": false,
+          "ExcludeFromRandomSale": false,
+          "ContextTags": ["not_giftable"],
+          "CustomFields": null
         }
+      }
+    },
+    // --------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------
+    {
+      "Action": "EditData",
+      "Target": "Data/Objects",
+      "Entries": {
+        "{{ModId}}_RNS_Book_Unlock": {
+          "Name": "{{ModId}}_RNS_Book_Unlock",
+          "Displayname": "{{i18n: book.name}}",
+          "Description": "{{i18n: book.desc}}",
+          "Type": "asdf",
+          "Category": -103,
+          "Price": -1,
+          "Texture": "Mods/{{ModId}}/Objects",
+          "SpriteIndex": 0,
+          "Edibility": -300,
+          "IsDrink": false,
+          "Buffs": null,
+          "GeodeDropsDefaultItems": false,
+          "GeodeDrops": null,
+          "ArtifactSpotChances": null,
+          "ExcludeFromFishingCollection": false,
+          "ExcludeFromShippingCollection": false,
+          "ExcludeFromRandomSale": false,
+          "ContextTags": ["book_item", "not_giftable"],
+          "CustomFields": null
+        }
+      }
+    },
+    {
+      "Action": "EditData",
+      "Target": "Data/Powers",
+      "Entries": {
+        "{{ModId}}_RNS_Unlocked": {
+          "Displayname": "{{i18n: book.name}}",
+          "Description": "{{i18n: book.desc}}",
+          "TexturePath": "Mods/{{ModId}}/Objects",
+          "TexturePosition": {
+            "X": 0,
+            "Y": 0
+          },
+          "UnlockedCondition": "PLAYER_STAT Current {{ModId}}_RNS_Book_Unlock 1"
+        }
+      }
+    },
+    // --------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------
+    {
+      "Action": "EditData",
+      "Target": "Data/CraftingRecipes",
+      "Entries": {
+        "{{ModId}}_RNS_Book_Craft_Basic": "60 1 62 1 64 1 66 1 68 1 70 1 72 1 74 1/Home/{{ModId}}_RNS_Book_Unlock/false/default/"
+      },
+      "When": {
+        "WayOfObtaining": "BasicCraft"
+      }
+    },
+    {
+      "Action": "EditData",
+      "Target": "Data/Shops",
+      "TargetField": ["Bookseller", "Items"],
+      "Entries": {
+        "{{ModId}}_RNS_Book_Unlock": {
+          "ActionsOnPurchase": null,
+          "CustomFields": null,
+          "TradeItemId": null,
+          "TradeItemAmount": 1,
+          "Price": 100000,
+          "ApplyProfitMargins": null,
+          "AvailableStock": -1,
+          "AvailableStockLimit": "Player",
+          "AvoidRepeat": false,
+          "UseObjectDataPrice": false,
+          "IgnoreShopPriceModifiers": false,
+          "PriceModifiers": null,
+          "PriceModifierMode": "Stack",
+          "AvailableStockModifiers": null,
+          "AvailableStockModifierMode": "Stack",
+          "Condition": null,
+          "Id": "{{ModId}}_RNS_Book_Unlock",
+          "ItemId": "{{ModId}}_RNS_Book_Unlock",
+          "RandomItemId": null,
+          "MaxItems": null,
+          "MinStack": -1,
+          "MaxStack": -1,
+          "Quality": -1,
+          "ObjectInternalName": null,
+          "ObjectDisplayName": null,
+          "ToolUpgradeLevel": -1,
+          "IsRecipe": false,
+          "StackModifiers": null,
+          "StackModifierMode": "Stack",
+          "QualityModifiers": null,
+          "QualityModifierMode": "Stack",
+          "ModData": null,
+          "PerItemCondition": null
+        }
+      },
+      "When": {
+        "WayOfObtaining": "CommunityCentreBookSeller",
+        "CommunityCentreTierComplete": true
+      }
+    },
+    {
+      "Action": "EditData",
+      "Target": "Data/Shops",
+      "TargetField": ["Bookseller", "Items"],
+      "Entries": {
+        "{{ModId}}_RNS_Book_Unlock": {
+          "ActionsOnPurchase": null,
+          "CustomFields": null,
+          "TradeItemId": null,
+          "TradeItemAmount": 1,
+          "Price": 100000,
+          "ApplyProfitMargins": null,
+          "AvailableStock": -1,
+          "AvailableStockLimit": "Player",
+          "AvoidRepeat": false,
+          "UseObjectDataPrice": false,
+          "IgnoreShopPriceModifiers": false,
+          "PriceModifiers": null,
+          "PriceModifierMode": "Stack",
+          "AvailableStockModifiers": null,
+          "AvailableStockModifierMode": "Stack",
+          "Condition": null,
+          "Id": "{{ModId}}_RNS_Book_Unlock",
+          "ItemId": "{{ModId}}_RNS_Book_Unlock",
+          "RandomItemId": null,
+          "MaxItems": null,
+          "MinStack": -1,
+          "MaxStack": -1,
+          "Quality": -1,
+          "ObjectInternalName": null,
+          "ObjectDisplayName": null,
+          "ToolUpgradeLevel": -1,
+          "IsRecipe": false,
+          "StackModifiers": null,
+          "StackModifierMode": "Stack",
+          "QualityModifiers": null,
+          "QualityModifierMode": "Stack",
+          "ModData": null,
+          "PerItemCondition": null
+        }
+      },
+      "When": {
+        "WayOfObtaining": "EndGameBookSeller",
+        "HasVisitedLocation": "Summit"
+      }
+    },
+    {
+      "Action": "EditData",
+      "Target": "Data/Shops",
+      "TargetField": ["QiGemShop", "Items"],
+      "Entries": {
+        "{{ModId}}_RNS_Book_Unlock": {
+          "ActionsOnPurchase": null,
+          "CustomFields": null,
+          "TradeItemId": "(O)858",
+          "TradeItemAmount": 100,
+          "Price": -1,
+          "ApplyProfitMargins": null,
+          "AvailableStock": 1,
+          "AvailableStockLimit": "Player",
+          "AvoidRepeat": false,
+          "UseObjectDataPrice": false,
+          "IgnoreShopPriceModifiers": false,
+          "PriceModifiers": null,
+          "PriceModifierMode": "Stack",
+          "AvailableStockModifiers": null,
+          "AvailableStockModifierMode": "Stack",
+          "Condition": null,
+          "Id": "{{ModId}}_RNS_Book_Unlock",
+          "ItemId": "{{ModId}}_RNS_Book_Unlock",
+          "RandomItemId": null,
+          "MaxItems": null,
+          "MinStack": -1,
+          "MaxStack": -1,
+          "Quality": -1,
+          "ObjectInternalName": null,
+          "ObjectDisplayName": null,
+          "ToolUpgradeLevel": -1,
+          "IsRecipe": false,
+          "StackModifiers": null,
+          "StackModifierMode": "Stack",
+          "QualityModifiers": null,
+          "QualityModifierMode": "Stack",
+          "ModData": null,
+          "PerItemCondition": null
+        }
+      },
+      "When": {
+        "WayOfObtaining": "QiShop"
+      }
+    },
+    // --------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------
+
+    // {
+    //   "Action": "EditData",
+    //   "Target": "Data/Events/WizardHouse",
+    //   "Entries": {
+    //     "{{ModId}}_ShowOrb/HasItem {{ModId}}_Orb": "WizardSong/4 6/farmer 7 10 0 Wizard 4 6 1/skippable/pause 2000/speak Wizard \"Looks like you've found something...\"/end warpOut"
+    //   }
+    // },
+
+    // --------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------
+    {
+      "Action": "EditData",
+      "Target": "Strings/StringsFromCSFiles",
+      "Entries": {
+        "{{ModId}}_OrbDiscoveryDialog": "{{i18n: dialog.orb.found}}",
+        "{{ModId}}_BookDiscoveryDialog": "{{i18n: dialog.book.found}}"
       }
     },
     {

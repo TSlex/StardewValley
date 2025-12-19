@@ -59,8 +59,9 @@
   "ui.research-completed": "исследование завершено",
   "ui.research-impossible": "запрещенный предмет",
 
-  "ui.price-tooltip.buy": "(Куплю)",
-  "ui.price-tooltip.sell": "(Продам)",
+  "ui.price-tooltip.buy": "Куплю:",
+  "ui.price-tooltip.sell": "Продам:",
+  "ui.price-tooltip.price": "Цена:",
 
   //modes
   "mod-mode.research": "Режим исследователя",
@@ -70,6 +71,11 @@
   "mod-mode.buy-sell-plus": "Режим ДжоджаМарт",
   "mod-mode.junimo-magic-trade": "Режим Волшебной Торговли Джунимо",
   "mod-mode.junimo-magic-trade-plus": "Режим Волшебной Торговли Джунимо+",
+
+  //menu size
+  "menu-size.normal": "Нормальный (16 предметов)",
+  "menu-size.large": "Большой (30 предметов)",
+  "menu-size.xlarge": "Очень большой (48 предметов)",
 
   //settings
   "config.section.attention": "Внимание!",
@@ -83,6 +89,9 @@
 
   "config.open-menu-key-name": "Клавиша открытия меню",
   "config.open-menu-key-desc": "При нажатии на эту кнопку меню будет открыто",
+
+  "config.menu-size-name": "Размер меню",
+  "config.menu-size-desc": "Влияет на количество предметов, отображаемых в RnS меню за раз",
 
   "config.section.balance": "Настройки баланса",
 
@@ -100,6 +109,9 @@
   "config.price-margin-note": "Внимание: оба множителя цены влияют на конечную маржу, использовать аккуратно :)",
 
   "config.section.misc": "Прочие настройки",
+
+  "config.show-tooltip-outside-name": "Показывать подсказку в других меню",
+  "config.show-tooltip-outside-desc": "Включить подсказу прогресса исследования для предметов под курсором также вне RnS меню",
 
   "config.enable-sounds-name": "Включить звуки меню",
   "config.enable-sounds-desc": "Если раздражают звуки меню, можете их отключить...",
@@ -129,6 +141,20 @@
 
   "config.dissable_non-host-commands-name": "Комманды только для хоста",
   "config.dissable_non-host-commands-desc": "Разрешает использование комманд только хосту",
+
+  "config.section.controller": "Настойки контроллера",
+
+  "config.show-rns-button-name": "Показывать RnS кнопку",
+  "config.show-rns-button-desc": "Показывать ли кнопку RnS в основном меню (левый верхний угол)",
+
+  "config.rns-button-pos-x-name": "X позиция RnS кнопки",
+  "config.rns-button-pos-x-desc": "Положение кнопки RnS по оси X относительно вкладок инвентаря",
+
+  "config.rns-button-pos-y-name": "Y позиция RnS кнопки",
+  "config.rns-button-pos-y-desc": "Положение кнопки RnS по оси Y относительно вкладок инвентаря",
+
+  "config.remap-craft-controller-key-name": "Переназначить кнопку \"крафта\"",
+  "config.remap-craft-controller-key-desc": "Включить эту функцию для открытия меню RnS с помощью клавиши крафта (Y на контроллере Xbox)",
 
   //commands
   "command.get-help": "Описание для комманды \"{0}\":\n{1}",

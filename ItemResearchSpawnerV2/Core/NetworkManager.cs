@@ -1,4 +1,5 @@
 ﻿using ItemResearchSpawnerV2.Core.Data.Serializable;
+using ItemResearchSpawnerV2.Core.UI;
 using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -132,7 +133,7 @@ namespace ItemResearchSpawnerV2.Core {
         //===================== HOST ONLY =====================
 
         private static void OnNonHostConfigChanged(long fromPlayerID, OnNonHostConfigChangedMessage onNonHostConfigChangedMessage) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsOnHostComputer || !ModManager.Instance.SaveDataLoaded) {
                 return;
             }
 
@@ -154,7 +155,7 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private static void OnCommitProgression(long fromPlayerID, OnCommitProgressionMessage onCommitProgressionMessage) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsOnHostComputer || !ModManager.Instance.SaveDataLoaded) {
                 return;
             }
 
@@ -162,7 +163,7 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private static void OnCommitModState(long fromPlayerID, OnCommitModStateMessage onCommitModStateMessage) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsOnHostComputer || !ModManager.Instance.SaveDataLoaded) {
                 return;
             }
 
@@ -183,7 +184,7 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private static void OnCommitJMTMoney(long fromPlayerID, OnCommitJMTMoneyMessage onCommitJMTMoneyMessage) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsOnHostComputer || !ModManager.Instance.SaveDataLoaded) {
                 return;
             }
 
@@ -195,7 +196,7 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private static void OnLoadRequested(long fromPlayerID) {
-            if (!Context.IsMainPlayer || !ModManager.Instance.SaveDataLoaded) {
+            if (!Context.IsOnHostComputer || !ModManager.Instance.SaveDataLoaded) {
                 return;
             }
 
@@ -234,24 +235,25 @@ namespace ItemResearchSpawnerV2.Core {
         // ===================== NON-HOST ONLY =====================
 
         private static void OnHostConfigChanged(OnHostConfigChangedMessage onHostConfigChangedMessage) {
-            if (Context.IsMainPlayer) {
-                return;
+            if (Game1.activeClickableMenu is MainMenuController _) {
+                Game1.activeClickableMenu = null;
             }
 
-            ModManager.Instance.Config.DefaultMode = onHostConfigChangedMessage.Config.DefaultMode;
-            ModManager.Instance.Config.ResearchAmountMultiplier = onHostConfigChangedMessage.Config.ResearchAmountMultiplier;
-            ModManager.Instance.Config.SellPriceMultiplier = onHostConfigChangedMessage.Config.SellPriceMultiplier;
-            ModManager.Instance.Config.BuyPriceMultiplier = onHostConfigChangedMessage.Config.BuyPriceMultiplier;
-            ModManager.Instance.Config.ResearchTimeSeconds = onHostConfigChangedMessage.Config.ResearchTimeSeconds;
-            ModManager.Instance.Config.ShareProgression = onHostConfigChangedMessage.Config.ShareProgression;
-            ModManager.Instance.Config.DisableNonHostCommands = onHostConfigChangedMessage.Config.DisableNonHostCommands;
+            if (!Context.IsOnHostComputer) {
+                ModManager.Instance.Config.DefaultMode = onHostConfigChangedMessage.Config.DefaultMode;
+                ModManager.Instance.Config.ResearchAmountMultiplier = onHostConfigChangedMessage.Config.ResearchAmountMultiplier;
+                ModManager.Instance.Config.SellPriceMultiplier = onHostConfigChangedMessage.Config.SellPriceMultiplier;
+                ModManager.Instance.Config.BuyPriceMultiplier = onHostConfigChangedMessage.Config.BuyPriceMultiplier;
+                ModManager.Instance.Config.ResearchTimeSeconds = onHostConfigChangedMessage.Config.ResearchTimeSeconds;
+                ModManager.Instance.Config.ShareProgression = onHostConfigChangedMessage.Config.ShareProgression;
+                ModManager.Instance.Config.DisableNonHostCommands = onHostConfigChangedMessage.Config.DisableNonHostCommands;
 
-            Game1.activeClickableMenu = null;
-            ModManager.CommandManagerInstance.ReplyToChat(I18n.Command_Multiplayer_HostConfigChanged(), color: Color.Cyan);
+                ModManager.CommandManagerInstance.ReplyToChat(I18n.Command_Multiplayer_HostConfigChanged(), color: Color.Cyan);
+            }
         }
 
         private static void OnReplaceProgression(OnReplaceProgressionMessage onCommitProgressionMessage) {
-            if (Context.IsMainPlayer) {
+            if (Context.IsOnHostComputer) {
                 return;
             }
 
@@ -263,7 +265,7 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         private static void OnLoadSucceed(OnLoadSucceedMessage onLoadSucceedMessage) {
-            if (Context.IsMainPlayer) {
+            if (Context.IsOnHostComputer) {
                 return;
             }
 

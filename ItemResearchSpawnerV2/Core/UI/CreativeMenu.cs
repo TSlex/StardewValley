@@ -1,4 +1,5 @@
-﻿using ItemResearchSpawnerV2.Models;
+﻿using ItemResearchSpawnerV2.Core.Data.Enums;
+using ItemResearchSpawnerV2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -26,9 +27,12 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
         public List<ProgressionItem> ProgressionItems = new List<ProgressionItem>();
 
-        public CreativeMenu(InventoryMenu menu) :
+        public CreativeMenu(InventoryMenu menu, int rows, int capacity) :
             base(menu.xPositionOnScreen, menu.yPositionOnScreen, menu.playerInventory, menu.actualInventory,
                 menu.highlightMethod, menu.capacity, menu.rows, menu.horizontalGap, menu.verticalGap, menu.drawSlots) {
+
+            this.capacity = capacity;
+            this.rows = rows;
 
             ItemOpacity = new float[capacity];
             Array.Fill(ItemOpacity, 1f);
@@ -86,18 +90,25 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
             yPositionOnScreen -= 10 * 4;
 
+            var slotScale = ModManager.Instance.Config.MenuSize.GetItemScale();
+            var pageOffset = ModManager.Instance.Config.MenuSize.GetPageOffset();
+            var rootX = ModManager.Instance.Config.MenuSize.GetRootX();
+            var rootY = ModManager.Instance.Config.MenuSize.GetRootY();
+
+            int slotRectSize = (int) (64 * slotScale);
+
             var middleID = capacity / 2;
 
             if (inventory.Count != 0) {
                 for (int j = 0; j < capacity; j++) {
                     var itemBounds = new Rectangle(
-                        38 + xPositionOnScreen + j % ItemsPerRow * 64 + horizontalGap * (j % ItemsPerRow),
-                        12 + yPositionOnScreen + j / ItemsPerRow * (64 + verticalGap) + (j / ItemsPerRow - 1) * 4 -
-                        ((j <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0), 64, 64);
+                        rootX + xPositionOnScreen + j % ItemsPerRow * slotRectSize + horizontalGap * (j % ItemsPerRow),
+                        rootY + yPositionOnScreen + j / ItemsPerRow * (slotRectSize + verticalGap) + (j / ItemsPerRow - 1) * 4 -
+                        ((j <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0), slotRectSize, slotRectSize);
 
                     if (j >= middleID) {
-                        itemBounds.X += ItemsPerRow * 84 + 40;
-                        itemBounds.Y = 12 + yPositionOnScreen + (j - middleID) / ItemsPerRow * (64 + verticalGap) + ((j - middleID) / ItemsPerRow - 1) * 4 -
+                        itemBounds.X += (int) (ItemsPerRow * pageOffset) + 40;
+                        itemBounds.Y = rootY + yPositionOnScreen + (j - middleID) / ItemsPerRow * (slotRectSize + verticalGap) + ((j - middleID) / ItemsPerRow - 1) * 4 -
                         (((j - middleID) <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0);
                     }
 
@@ -120,13 +131,13 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 //}
 
                 var itemBounds = new Rectangle(
-                    38 + xPositionOnScreen + j % ItemsPerRow * 64 + horizontalGap * (j % ItemsPerRow),
-                    12 + yPositionOnScreen + j / ItemsPerRow * (64 + verticalGap) + (j / ItemsPerRow - 1) * 4 -
-                    ((j <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0), 64, 64);
+                    38 + xPositionOnScreen + j % ItemsPerRow * slotRectSize + horizontalGap * (j % ItemsPerRow),
+                    rootY + yPositionOnScreen + j / ItemsPerRow * (slotRectSize + verticalGap) + (j / ItemsPerRow - 1) * 4 -
+                    ((j <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0), slotRectSize, slotRectSize);
 
                 if (j >= middleID) {
-                    itemBounds.X += ItemsPerRow * 84 + 40;
-                    itemBounds.Y = 12 + yPositionOnScreen + (j - middleID) / ItemsPerRow * (64 + verticalGap) + ((j - middleID) / ItemsPerRow - 1) * 4 -
+                    itemBounds.X += (int) (ItemsPerRow * pageOffset) + 40;
+                    itemBounds.Y = rootY + yPositionOnScreen + (j - middleID) / ItemsPerRow * (slotRectSize + verticalGap) + ((j - middleID) / ItemsPerRow - 1) * 4 -
                     (((j - middleID) <= ItemsPerRow && playerInventory && verticalGap == 0) ? 12 : 0);
                 }
 
@@ -170,8 +181,10 @@ namespace ItemResearchSpawnerV2.Core.UI {
             int row = j / ItemsPerRow;
             int j_in_row = j % ItemsPerRow;
 
-            int mR = row % 2;
-            int mC = row / 2;
+            int rowsPerPage = capacity / 2 / ItemsPerRow;
+
+            int mR = row % rowsPerPage;
+            int mC = row / rowsPerPage;
             int mJ = j_in_row + mC * ItemsPerRow + mR * ItemsPerRow * 2;
 
             return mJ;
@@ -227,7 +240,7 @@ namespace ItemResearchSpawnerV2.Core.UI {
                 var c = (ProgressionItems.ElementAtOrDefault(j)?.Favorited ?? false) ? Color.Gold * 0.5f : Color.White;
 
                 //b.Draw(texture, location - new Vector2(12, 12), new Rectangle(648, 841, 30, 30), c, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0.5f);
-                b.Draw(texture, location - new Vector2(8, 8), UIConstants.ItemCell, c, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
+                b.Draw(texture, location - new Vector2(8, 8) * ModManager.Instance.Config.MenuSize.GetItemScale(), UIConstants.ItemCell, c, 0f, Vector2.Zero, 1f * ModManager.Instance.Config.MenuSize.GetItemScale(), SpriteEffects.None, 0.5f);
 
                 if (actualInventory.Count <= j || actualInventory[j] == null) {
                     continue;
@@ -243,9 +256,15 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                 opacity = MathF.Min(opacity, flag ? 1f : 0.25f);
 
+                float itemScale = ((inventory.Count > j) ? inventory[j].scale : 1f) * ModManager.Instance.Config.MenuSize.GetItemScale();
+
+                Vector2 itemImageLocation = location + ModManager.Instance.Config.MenuSize.GetItemImageOffcet();
+
+                float textScale = ModManager.Instance.Config.MenuSize.GetItemScale();
+
                 if (!(ProgressionItems.ElementAtOrDefault(j)?.ResearchCompleted ?? false)) {
                     actualInventory[j].drawInMenu(b,
-                        location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f,
+                        itemImageLocation, itemScale, 1f, 0.865f,
                         StackDrawType.HideButShowQuality,
                         Color.Black * 0.25f,
                         flag);
@@ -254,23 +273,25 @@ namespace ItemResearchSpawnerV2.Core.UI {
 
                     Utility.drawTextWithColoredShadow(b,
                         progressText,
-                        Game1.smallFont, location + new Vector2(Game1.smallFont.MeasureString(progressText).X * 0.01f + 16f, 32 / 2 + 4f),
-                        Color.Gold, Color.Red * 0.5f, 0.9f);
+                        Game1.smallFont, location + new Vector2(Game1.smallFont.MeasureString(progressText).X * 0.01f + 16f * textScale, (32 / 2 + 4f) * textScale),
+                        Color.Gold, Color.Red * 0.5f, 0.9f * textScale);
 
                     Utility.drawTextWithColoredShadow(b,
                         progressText,
-                        Game1.smallFont, location + new Vector2(Game1.smallFont.MeasureString(progressText).X * 0.01f + 17f, 32 / 2 + 4f),
-                        Color.Gold, Color.Red * 0.5f, 0.9f);
+                        Game1.smallFont, location + new Vector2(Game1.smallFont.MeasureString(progressText).X * 0.01f + 17f * textScale, (32 / 2 + 4f) * textScale),
+                        Color.Gold, Color.Red * 0.5f, 0.9f * textScale);
                 }
                 else if (ModManager.Instance.ShouldDisableItemByPrice(actualInventory[j])) {
-                    actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw, Color.White * 0.25f, flag);
+                    actualInventory[j].drawInMenu(b, itemImageLocation, itemScale, 1f, 0.865f, StackDrawType.Draw, Color.White * 0.25f, flag);
                 }
                 else {
-                    actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw, Color.White * opacity, flag);
+                    actualInventory[j].drawInMenu(b, itemImageLocation, itemScale, 1f, 0.865f, StackDrawType.Draw, Color.White * opacity, flag);
                 }
 
+                Vector2 favoriteIconPosition = ModManager.Instance.Config.MenuSize.GetFavoriteOffcet();
+
                 if (ProgressionItems.ElementAtOrDefault(j)?.Favorited ?? false) {
-                    b.Draw(texture, location + new Vector2(4 * 12, 4 * -1), UIConstants.FavoriteItemIcon, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
+                    b.Draw(texture, location + favoriteIconPosition, UIConstants.FavoriteItemIcon, Color.White, 0f, Vector2.Zero, 1f * ModManager.Instance.Config.MenuSize.GetItemScale(), SpriteEffects.None, 0.5f);
                 }
 
                 //actualInventory[j].drawInMenu(b, location, (inventory.Count > j) ? inventory[j].scale : 1f, 1f, 0.865f, StackDrawType.Draw_OneInclusive, Color.White * opacity, flag);

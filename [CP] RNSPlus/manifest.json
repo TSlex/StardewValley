@@ -2,7 +2,7 @@
     "Name": "Item Research 'n' Spawn Plus",
     "Author": "TSlex",
     "Version": "1.0.0",
-    "Description": "Content patcher addon for RNS extending it's functionality",
+    "Description": "Content patcher addon for RnS extending it's functionality",
     "UniqueID": "TSlex.ItemResearchSpawnerCPPlus",
     "UpdateKeys": [],
     "ContentPackFor": {

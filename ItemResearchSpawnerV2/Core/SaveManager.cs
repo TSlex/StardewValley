@@ -70,7 +70,7 @@ namespace ItemResearchSpawnerV2.Core {
 
                 Progressions[playerID] = progression;
 
-                if (!Context.IsMainPlayer && !Context.IsSplitScreen) {
+                if (!Context.IsOnHostComputer) {
                     NetworkManager.SendNetworkModMessage(new NetworkManager.OnCommitProgressionMessage() {
                         CommitProgression = changedProgression
                     });
@@ -101,7 +101,7 @@ namespace ItemResearchSpawnerV2.Core {
         }
 
         public void CommitModState(string playerID, ModManagerState modState) {
-            if (!Context.IsMainPlayer && !Context.IsSplitScreen) {
+            if (!Context.IsOnHostComputer) {
                 //var modStateC = modState.DeepClone();
                 //var showMenuButton = modState.Config.ShowMenuButton.ToString();
                 //modState.Config.ShowMenuButton = null;
@@ -152,7 +152,7 @@ namespace ItemResearchSpawnerV2.Core {
         #region Load
 
         public void OnLoad() {
-            if (!Context.IsMainPlayer && !Context.IsSplitScreen)
+            if (!Context.IsOnHostComputer)
                 throw new NotImplementedException();
 
             LoadProgression();
@@ -255,6 +255,8 @@ namespace ItemResearchSpawnerV2.Core {
             }
 
             ItemBlacklist = blacklist ?? new List<string>();
+
+            ItemBlacklist.Add("TSlex.ItemResearchSpawnerCPPlus_RNS_Book_Unlock:0");
         }
 
         #endregion
