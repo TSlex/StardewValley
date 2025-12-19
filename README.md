@@ -1,5 +1,7 @@
 This is a repository of my Stardew Valley mods
 
-Mods:
-+ [Item Research 'n' Spawn V2.0](/ItemResearchSpawnerV2/README.md)
+My mods:
++ [Item Research 'n' Spawn](/ItemResearchSpawnerV2/README.md)
++ [Item Research 'n' Spawn Plus](/[CP] RNSPlus/]/README.md)
++ [Time Skipper](/TimeSkipper/README.md)
 

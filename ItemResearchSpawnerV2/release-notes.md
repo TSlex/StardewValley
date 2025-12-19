@@ -1,5 +1,28 @@
 ﻿[(← Back to readme)](README.md)
 
+## 2.2.0
+Released 19th December 2025 for SMAPI 4.1.10 or later.
+
+New features:
+- Gamepad support (tested with Xbox controller)
+- Splitscreen multiplayer support (progression is currently shared between local players)
+- Updated tooltip to show the research progression of the hovered item (should work in any inventory except for the toolbar)
+- Option to increase menu density (default was 16 items, now you can choose between 16, 30 and 48 items in the RnS menu)
+- Support for context tags for categories (should help with items added by other mods)
+- A dedicated button in player inventory for those playing with a gamepad (or for those who don't want to open the RnS menu with a key)
+- Support for my Content-Pather-based addon (RnS+) ;)
+
+Changes:
+- Config reset in active game will apply global config (which is in config.json)
+- Config reset in title menu will apply default config (and re-create config.json)
+
+Bug fixes:
+- Fixed the dropdown arrows' position when the game window is resized
+- Fixed the inability to favourite items in JojaMart mode
+- Fixed the inability to favourite items that you cannot buy
+- Fixed research animation timing
+- Fixed trashing forbidden items (i.e. Quest items)
+
 ## 2.1.0
 Released 14th February 2025 for SMAPI 4.1.10 or later.
 

@@ -1,6 +1,13 @@
 ![](title.png)
 
-Hey-hey, a new update is here :)
+\*ringing bells\* Hey, version 2.2 is here!
+
+## Version 2.2 details
+
+1. Gamepad support
+2. Splitscreen multiplayer support
+3. Updated tooltip
+4. More items per screen (choose between 16, 30 and 48 items on screen)
 
 ## Description
 
@@ -10,12 +17,14 @@ This mod introduces mechanics similar to Terraria's Journey Mode and Minecraft's
 
 ## How to use
 
-1. Press `R` (or your configured key) to open the menu.
+1. Press `R` (or your configured key) to open the menu (`Y` on Xbox gamepad).
 2. Place items into the research area (a small animated hungry book).
 3. Press the research button (under research area) until the item disappears from the research area.
 4. Check the menu, if the amount of item was sufficient, the researched item will appear in the menu and leftovers will be returned to your inventory.
 
 ### Shortcuts
+
+**Keyboard:**
 
 Press `left shift + lmb` to take full stack of item from menu.   
 Press `left shift + rmb` to take half of a stack of item from menu.   
@@ -23,6 +32,15 @@ Press `left ctrl + rmb` to take `10` items from menu.
 Press `left alt + lmb` to mark/unmark the item as a favorite.   
 Press `left ctrl + lmb` to quickly move items to the research area and back. If the item is researched, it will be sold or removed (bypassing the move to the research area).      
 Press `left ctrl + lmb` on a trash can to remove all researched items from inventory (only for Research and Mr. Qi modes)        
+
+**Gamepad (Xbox layout):**
+
+Press `LT + A` to take full stack of item from menu.   
+Press `LT + X` to take half of a stack of item from menu.   
+Press `LB + X` to take `10` items from menu.   
+Press `RB + A` to mark/unmark the item as a favorite.   
+Press `LB + A` to quickly move items to the research area and back. If the item is researched, it will be sold or removed (bypassing the move to the research area).      
+Press `LB + A` on a trash can to remove all researched items from inventory (only for Research and Mr. Qi modes)        
 
 ## Install
 
@@ -32,11 +50,11 @@ Press `left ctrl + lmb` on a trash can to remove all researched items from inven
 4. Start the game using [SMAPI](https://stardewvalleywiki.com/Modding:Installing_SMAPI_on_Windows#Configure_your_game_client).
 
 ## Сompatibility
-- **Stardew Valley 1.6** (*for SDV 1.5 use version 1.0.1*).
-- **SMAPI 4.1.10** or later.
+- **Stardew Valley 1.6+** (*for SDV 1.5 use version 1.0.1*).
+- **SMAPI 4.1.10** or latest.
 - **Windows**, *Linux*, *MacOS* (Linux and MacOS not tested, but should work ok)
-- **Singleplayer** or **Multiplayer** (not split screen). For multiplayer, the mod must be installed by the host and optionally installed for other players (if they want to use the menu themselves).
-- **Keyboard+Mouse only** (gamepad support will be added later, maybe......)
+- **Singleplayer/Splitscreen** or **Multiplayer**. For multiplayer, the mod must be installed by the host and optionally installed for other players (if they want to use the menu themselves).
+- **Keyboard+Mouse** or **Gamepad** (Gamepad tested with Xbox one, if you can connect other ones to PC, they should work as well)
 - Items added by other mods should work, but are not guaranteed. Besides that, there is no known mod conflict.
 
 ## Features
@@ -78,7 +96,8 @@ Some commands are for host players only (in singleplayer you are the host) and w
 ### Main
 
 `Mod mode` - active mode (research mode, buy/sell mode, etc...) **\[Host only\]**     
-`Open key` - keyboard key to open the menu     
+`Open key` - keyboard key to open the menu
+`Menu size` - density of menu (choose 16, 30 or 48 items, 16 - is the default value)
 
 ### Multiplayer
 
@@ -90,8 +109,15 @@ Some commands are for host players only (in singleplayer you are the host) and w
 `Buy price multiplayer`- increase/decrease buy/spawn price for all items **\[Host only\]**          
 `Sell price multiplayer`- increase/decrease sell price (to menu) for all items **\[Host only\]**    
 
+### Controller settings
+
+`Show RnS button` - show/hide the RnS button to open the RnS menu (up-left corner in inventory)
+`RnS button X and Y position` - button position offset (in case other mods add something there)
+`Remap "craft" key` - maps `Y` key on gamepad to open the RnS menu via gamepad
+
 ### Misc
 
+`Show tooltip in other menus` - show/hide the tooltip outside of RnS menu
 `Enable menu sounds` - speaks for itself     
 `Show missing items` - to show each "Missing Item" in the menu if there are any     
 `Research time` - determines how long you need to press the research button (in seconds) **\[Host only\]**   
